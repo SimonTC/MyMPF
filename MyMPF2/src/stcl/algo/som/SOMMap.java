@@ -36,7 +36,7 @@ public class SOMMap {
 		for (int row = 0; row< rows; row++){
 			for (int col = 0; col < columns; col++){
 				SomNode n = new SomNode(inputLength, rand, col, row);
-				models.set(col * row, n);
+				models.set(row * columns + col, n);
 			}
 		}
 	}

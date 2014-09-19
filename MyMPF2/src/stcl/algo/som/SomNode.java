@@ -53,16 +53,16 @@ public class SomNode {
 	 * @param learningEffect How effective the learning is. This is dependant on the distance to the bmu
 	 */
 	public void adjustValues(SimpleMatrix inputVector, double learningRate, double learningEffect){
-		//Calculate distance between input and current values
-		SimpleMatrix dist = inputVector.minus(valueVector);
+		//Calculate difference between input and current values
+		SimpleMatrix diff = inputVector.minus(valueVector);
 		
 		//Multiply by learning rate and learning effect
-		SimpleMatrix tmp = new SimpleMatrix(dist.numRows(), dist.numCols());
+		SimpleMatrix tmp = new SimpleMatrix(diff.numRows(), diff.numCols());
 		tmp.set(learningRate * learningEffect);
-		dist = dist.elementMult(tmp);
+		diff = diff.elementMult(tmp);
 		
 		//Add the dist-values to the value vector
-		valueVector = valueVector.plus(dist);
+		valueVector = valueVector.plus(diff);
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class SomNode {
 	public double squaredDifference(SomNode n){
 		SimpleMatrix thatVector = n.getVector();
 		SimpleMatrix diff = valueVector.minus(thatVector);
-		diff.elementPower(2);
+		diff = diff.elementPower(2);
 		return diff.elementSum();
 	}
 	

@@ -1,4 +1,4 @@
-package stcl.som;
+package stcl.algo.som;
 
 import java.util.Random;
 
@@ -7,14 +7,27 @@ import org.ejml.simple.SimpleMatrix;
 public class SomNode {
 	
 	private SimpleMatrix valueVector;
-	private int col, row; //ID of the column and row where the node is
+	private int col, row; // Coordinates of the node
 	
-	public SomNode(int dimensionsSize, Random rand, int col, int row) {
+	/**
+	 * Creates a node with a vector with random values between 0 and 1
+	 * @param vectorSize 
+	 * @param rand
+	 * @param col
+	 * @param row
+	 */
+	public SomNode(int vectorSize, Random rand, int col, int row) {
 		// Create vector with the dimension values and set values between 0 and 1
-		valueVector = SimpleMatrix.random(1, dimensionsSize, 0, 1, rand);	
+		valueVector = SimpleMatrix.random(1, vectorSize, 0, 1, rand);	
 		setCoordinate(col, row);
 	}
 	
+	/**
+	 * Creates a new node where its internal vector is referencing the given vector
+	 * @param vector
+	 * @param col
+	 * @param row
+	 */
 	public SomNode(SimpleMatrix vector, int col, int row){
 		this.valueVector = vector;
 		setCoordinate(col, row);
@@ -34,7 +47,7 @@ public class SomNode {
 	}
 	
 	/**
-	 * Adjust the values of the nodes based on the difference between the valueVectors
+	 * Adjust the values of the nodes based on the difference between the valueVectors of this node and input vector
 	 * @param inputVector
 	 * @param learningRate
 	 * @param learningEffect How effective the learning is. This is dependant on the distance to the bmu
@@ -43,7 +56,7 @@ public class SomNode {
 		//Calculate distance between input and current values
 		SimpleMatrix dist = inputVector.minus(valueVector);
 		
-		//Multiply by learning rate and neighbourhood distance
+		//Multiply by learning rate and learning effect
 		SimpleMatrix tmp = new SimpleMatrix(dist.numRows(), dist.numCols());
 		tmp.set(learningRate * learningEffect);
 		dist = dist.elementMult(tmp);
@@ -52,6 +65,10 @@ public class SomNode {
 		valueVector = valueVector.plus(dist);
 	}
 	
+	/**
+	 * Returns the vector with the values for this node
+	 * @return
+	 */
 	public SimpleMatrix getVector(){
 		return valueVector;
 	}

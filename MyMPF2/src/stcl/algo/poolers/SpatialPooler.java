@@ -1,12 +1,12 @@
-package stcl.poolers;
+package stcl.algo.poolers;
 
 import java.util.Random;
 import java.util.Vector;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.som.SOMMap;
-import stcl.som.SomNode;
+import stcl.algo.som.SOMMap;
+import stcl.algo.som.SomNode;
 
 public class SpatialPooler {
 	

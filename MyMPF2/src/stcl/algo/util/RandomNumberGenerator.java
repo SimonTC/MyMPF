@@ -1,4 +1,4 @@
-package stcl.util;
+package stcl.algo.util;
 
 import java.util.Random;
 /**

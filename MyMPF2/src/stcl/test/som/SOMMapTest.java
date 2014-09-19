@@ -2,6 +2,8 @@ package stcl.test.som;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.Vector;
 
@@ -27,13 +29,13 @@ public class SOMMapTest {
 		SOMMap map = new SOMMap(width, height, vectorLength, rand);
 		
 		//Test that size of model is N x M
-		Vector<SomNode> models = map.getModels();
-		assertTrue(models.size() == height * width);
+		SomNode[] models = map.getModels();
+		assertTrue(models.length == height * width);
 		
 		//Test that Nodes with vectors have been created for all coordinates
 		for (int y = 0; y < height; y++){
 			for (int x = 0; x < width; x++){
-				SomNode n = models.get(x * y);
+				SomNode n = map.getModel(y, x);
 				assertNotNull(n);
 				SimpleMatrix m = n.getVector();
 				assertNotNull(m);
@@ -43,27 +45,180 @@ public class SOMMapTest {
 
 	@Test
 	public void testGetBMU() {
-		fail("Not yet implemented");
+		int height = 26;
+		int width = 13;
+		int vectorLength = 6;
+		Random rand = new Random();
+		SOMMap map = new SOMMap(width, height, vectorLength, rand);
+		
+		double[] correctValues = {0,1,1,0,1,0};
+		SomNode correct = new SomNode(correctValues, 5, 6);
+		map.set(correct, 5, 6);
+		
+		SomNode bmu = map.getBMU(correctValues);
+		
+		assertTrue(bmu.getVector().isIdentical(correct.getVector(), 0.000001));
+
 	}
 
 	@Test
 	public void testAdjustWeights() {
-		fail("Not yet implemented");
-	}
+		/*
+		 * Testing that only units in a radius of two around the BMU gets their weights adjusted, and that the adjustment diminishes with distance from BMU
+		 */
+		
+		//Create map
+		Random rand = new Random();
+		int rows = 7;
+		int cols = 7;
+		int vectorSize = 2;
+		
+		//Create map and set all vector values to be zero
+		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		for (SomNode n :map.getModels()){
+			n.getVector().set(0);
+		}		
+				
+		//Do adjustment
+		double learningRate = 0.8;
+		double neighborhoodRadius = 2;
+		double[] correct = {0.3,0.4};
+		SomNode bmu = map.step(correct, learningRate, neighborhoodRadius);
 
+		//Collect data for map after weight adjustment
+		double[][][] valuesAfter = new double[rows][cols][vectorSize];
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < cols; col++){
+				valuesAfter[row][col] = map.getModel(row, col).getVector().getMatrix().data;
+			}
+		}
+		
+		//Calculate expected adjustements
+		double[][][] expValuesAfter = new double[rows][cols][vectorSize];
+		double squaredNeighborhoodRadius =  neighborhoodRadius * neighborhoodRadius;
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < cols; col++){
+				double squaredDist = bmu.distanceTo(map.getModel(row, col));
+				double learningEffect = learningEffect(squaredDist, squaredNeighborhoodRadius);
+				if (squaredDist < squaredNeighborhoodRadius){
+					for (int i = 0; i < 2; i++){
+						expValuesAfter[row][col][i] = 0 + learningRate * learningEffect * (correct[i] - 0);
+					}
+				}
+			}
+		}
+		
+		//Test if adjustments are correct
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < cols; col++){
+				for (int i = 0; i < 2; i++){
+					assertEquals("BMU is at (" + bmu.getCol() + "," + bmu.getRow() + "). This node is at (" +col + "," + row + ")", expValuesAfter[row][col][i], valuesAfter[row][col][i], 0.000001);
+					
+				}
+			}
+		}
+	}
+	
+	private double learningEffect(double squaredDist, double squaredRadius){
+		double d = Math.exp(- squaredDist / (2*squaredRadius));
+		return d;
+	}
+	
+	@Test
+	public void testLearningEffect_RandomCoordinate() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		//Create map
+		Random rand = new Random();
+		int rows = 7;
+		int cols = 7;
+		int vectorSize = 2;
+		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+
+		Method method = SOMMap.class.getDeclaredMethod("learningEffect", double.class, double.class);
+		method.setAccessible(true);
+		
+		//Test
+		double squaredDist = 4;
+		double squaredRadius = 7;
+		
+		double expected = learningEffect(squaredDist, squaredRadius);
+		double actual = (double) method.invoke(map, squaredDist, squaredRadius);
+		
+		assertEquals(expected, actual, 0.00001);
+	}
+	
+	@Test
+	public void testLearningEffect_Coordinate00() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		//Create map
+		Random rand = new Random();
+		int rows = 7;
+		int cols = 7;
+		int vectorSize = 2;
+		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+
+		Method method = SOMMap.class.getDeclaredMethod("learningEffect", double.class, double.class);
+		method.setAccessible(true);
+		
+		//Test
+		double squaredDist = 0;
+		double squaredRadius = 7;
+		
+		double expected = learningEffect(squaredDist, squaredRadius);
+		double actual = (double) method.invoke(map, squaredDist, squaredRadius);
+		
+		assertEquals(expected, actual, 0.00001);
+	}
+	
 	@Test
 	public void testGetModels() {
-		fail("Not yet implemented");
+		//Create map
+		Random rand = new Random();
+		int rows = 7;
+		int cols = 7;
+		int vectorSize = 2;
+		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		
+		int size = map.getModels().length;
+		
+		assertTrue(size == rows * cols);
+
 	}
 
 	@Test
 	public void testGetErrorMatrix() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetModel() {
-		fail("Not yet implemented");
+		//Create map
+		Random rand = new Random();
+		int rows = 7;
+		int cols = 7;
+		int vectorSize = 2;
+		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		for (SomNode n :map.getModels()){
+			n.getVector().set(0);
+		}	
+				
+		//Before step 1 all entries in error matrix are zero
+		SimpleMatrix errorMatrix = map.getErrorMatrix();
+		assertEquals(0, errorMatrix.elementSum(), 0.0000000001);
+		
+		//Do step 1
+		double learningRate = 0.8;
+		double neighborhoodRadius = 2;
+		double[] correct = {0.3,0.4};
+		SomNode bmu = map.step(correct, learningRate, neighborhoodRadius);
+		
+		//After step 1 an error matrix have been created and contains expected errors
+		//Expected error for all node = (0-0.3)^2 + (0-0.4)^2 = 0.25
+		SimpleMatrix m = new SimpleMatrix(rows, cols);
+		m.set(0.25);
+		
+		errorMatrix = map.getErrorMatrix().copy();
+		assertTrue(errorMatrix.isIdentical(m, 0.000001));
+		
+		//After step 2 a new error matrix have been created
+		double[] correct2 = {0.1,0.3};
+		bmu = map.step(correct2, learningRate, neighborhoodRadius);
+		SimpleMatrix errorMatrix2 = map.getErrorMatrix();
+		
+		assertFalse(errorMatrix.isIdentical(errorMatrix2, 0.000001));
 	}
 
 }

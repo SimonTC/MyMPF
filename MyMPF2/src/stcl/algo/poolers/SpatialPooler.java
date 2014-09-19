@@ -28,11 +28,8 @@ public class SpatialPooler {
 	public SimpleMatrix feedForward(SimpleMatrix input){
 		SomNode inputNode = new SomNode(input);
 		
-		//Find best matching unit
-		SomNode bmu = som.getBMU(inputNode);
-		
-		//Adjust weights
-		som.adjustWeights(bmu, curLearningRate, curNeighborhoodRadius);
+		//Find best matching unit and adjust weights of som
+		SomNode bmu = som.step(inputNode, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error matrix
 		matrix_Error = som.getErrorMatrix();

@@ -34,6 +34,24 @@ public class SomNode {
 	}
 	
 	/**
+	 * Creates a new node with a value vector containing the given data
+	 * @param vector
+	 * @param col
+	 * @param row
+	 */
+	public SomNode(double[] vectorData, int col, int row){
+		//Create 1D vector
+		valueVector = new SimpleMatrix(1, vectorData.length);
+		
+		//Add data
+		for (int i = 0; i< vectorData.length; i++){
+			valueVector.set(0, i, vectorData[i]);
+		}
+		setCoordinate(col, row);
+	}
+	
+	
+	/**
 	 * Only used if node is not placed in a map
 	 * @param vector
 	 */

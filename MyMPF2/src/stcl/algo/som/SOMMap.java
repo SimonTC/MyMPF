@@ -7,9 +7,10 @@ import org.ejml.data.MatrixIterator;
 import org.ejml.simple.SimpleMatrix;
 
 public class SOMMap {
-	int height, width;
-	Vector<SomNode> models; //The models in the map
-	SimpleMatrix errorMatrix;
+	private int rows, columns;
+	private SomNode[] models; //The models in the map
+	private SimpleMatrix errorMatrix;
+	
 	
 	/**
 	 * Creates a new SOM where all node vector values are initialized to a random value between 0 and 1
@@ -17,9 +18,9 @@ public class SOMMap {
 	 * @param rows height of the map (rows)
 	 */
 	public SOMMap(int columns, int rows, int inputLength, Random rand) {
-		initializeMap(columns, rows, inputLength, rand);
-		width = columns;
-		height = rows;
+		this.columns = columns;
+		this.rows = rows;
+		initializeMap(inputLength, rand);
 		errorMatrix = new SimpleMatrix(rows, columns);
 	}
 	
@@ -30,20 +31,56 @@ public class SOMMap {
 	 * @param inputLength
 	 * @param rand
 	 */
-	private void initializeMap(int columns, int rows, int inputLength, Random rand){
-		models = new Vector<SomNode>(columns*rows);
+	private void initializeMap(int inputLength, Random rand){
+		models = new SomNode[rows * columns];
 		
-		for (int row = 0; row< rows; row++){
+		for (int row = 0; row < rows; row++){
 			for (int col = 0; col < columns; col++){
 				SomNode n = new SomNode(inputLength, rand, col, row);
-				models.set(row * columns + col, n);
+				models[coordinateToIndex(row, col)] = n;
 			}
 		}
 	}
 	
 	/**
+	 * Finds the BMU to the given input and updates the vectors of all the nodes
+	 * @param inputVector
+	 * @param learningRate
+	 * @param neighborhoodRadius
+	 * @return
+	 */
+	public SomNode step (double[] inputVector, double learningRate, double neighborhoodRadius){
+		//Create input node
+		SomNode inputNode = new SomNode(inputVector, -1, -1);
+		
+		SomNode bmu = step(inputNode, learningRate, neighborhoodRadius);
+
+		
+		return bmu;
+	}
+	
+	public SomNode step (SomNode inputNode, double learningRate, double neighborhoodRadius){
+		//Find BMU
+		SomNode bmu = getBMU(inputNode);
+		
+		//Adjust Weights
+		adjustWeights(bmu, inputNode, learningRate, neighborhoodRadius);	
+		
+		return bmu;
+	}
+	/**
+	 * Returns the node which vector is least different from the input vector
+	 * @param input as a array of doubles
+	 * @return
+	 */
+	public SomNode getBMU(double[] input){ 
+		SomNode inputNode = new SomNode(input, -1, -1);
+		return getBMU(inputNode);
+	}
+	
+	/**
 	 * Returns the node which vector is least different from the vector of the input node
-	 * @param input
+	 * @param input input as a somNode
 	 * @return
 	 */
 	public SomNode getBMU(SomNode input){
@@ -67,34 +104,34 @@ public class SOMMap {
 	 * @param learningRate
 	 * @param neighborhoodRadius
 	 */
-	public void adjustWeights(SomNode bmu, double learningRate, double neighborhoodRadius){
+	public void adjustWeights(SomNode bmu,SomNode input, double learningRate, double neighborhoodRadius){
 		//Calculate start and end coordinates for the weight updates
-		int xStart = (int) (bmu.getCol() - neighborhoodRadius - 1);
-		int yStart = (int) (bmu.getRow() - neighborhoodRadius - 1);
-		int xEnd = (int) (xStart + (neighborhoodRadius * 2) + 1);
-		int yEnd = (int) (yStart + (neighborhoodRadius * 2) + 1);
+		int colStart = (int) (bmu.getCol() - neighborhoodRadius - 1);
+		int rowStart = (int) (bmu.getRow() - neighborhoodRadius - 1);
+		int colEnd = (int) (colStart + (neighborhoodRadius * 2) + 1);
+		int rowEnd = (int) (rowStart + (neighborhoodRadius * 2) + 1);
 		
 		//Make sure we dont get out of bounds errors
-		if (xStart < 0) xStart = 0;
-		if (yStart < 0) yStart = 0;
-		if (xEnd > width) xEnd = width;
-		if (yEnd > height) yEnd = height;
+		if (colStart < 0) colStart = 0;
+		if (rowStart < 0) rowStart = 0;
+		if (colEnd > columns) colEnd = columns;
+		if (rowEnd > rows) rowEnd = rows;
 		
 		//Adjust weights
-		for (int x = xStart; x < xEnd; x++){
-			for (int y = yStart; y < yEnd; y++){
-				SomNode n = models.elementAt(x * y);
+		for (int col = colStart; col < colEnd; col++){
+			for (int row = rowStart; row < rowEnd; row++){
+				SomNode n = models[coordinateToIndex(row, col)];
 				double squaredDistance = n.distanceTo(bmu);
 				double squaredRadius = neighborhoodRadius * neighborhoodRadius;
 				if (squaredDistance < squaredRadius){ 
 					double learningEffect = learningEffect(squaredDistance, squaredRadius);
-					n.adjustValues(bmu.getVector(), learningRate, learningEffect);					
+					n.adjustValues(input.getVector(), learningRate, learningEffect);					
 				}
 			}
 		}
 	}
 	
-	public Vector<SomNode> getModels(){
+	public SomNode[] getModels(){
 		return models;
 	}
 	
@@ -103,7 +140,11 @@ public class SOMMap {
 	}
 	
 	public SomNode getModel(int id){
-		return models.elementAt(id);
+		return models[id];
+	}
+	
+	public SomNode getModel(int row, int col){
+		return models[coordinateToIndex(row, col)];
 	}
 	
 	
@@ -119,6 +160,13 @@ public class SOMMap {
 		return d;
 	}
 	
+	private int coordinateToIndex(int row, int col){
+		return (row * columns + col);
+	}
+	
+	public void set(SomNode n, int row, int column){
+		models[coordinateToIndex(row, column)] = n;
+	}
 	
 	
 	

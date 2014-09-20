@@ -6,7 +6,7 @@ import java.util.Vector;
 import org.ejml.data.MatrixIterator;
 import org.ejml.simple.SimpleMatrix;
 
-public class SOMMap {
+public class SOM {
 	private int rows, columns;
 	private SomNode[] models; //The models in the map
 	private SimpleMatrix errorMatrix;
@@ -17,7 +17,7 @@ public class SOMMap {
 	 * @param columns width of the map (coulumns)
 	 * @param rows height of the map (rows)
 	 */
-	public SOMMap(int columns, int rows, int inputLength, Random rand) {
+	public SOM(int columns, int rows, int inputLength, Random rand) {
 		this.columns = columns;
 		this.rows = rows;
 		initializeMap(inputLength, rand);

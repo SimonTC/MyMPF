@@ -12,7 +12,7 @@ import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 import stcl.graphics.MapRenderer;
 

@@ -12,7 +12,7 @@ import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 import stcl.graphics.MapRenderer;
 
@@ -24,7 +24,7 @@ public class SOMTrainer implements Runnable {
 	// These constants can be changed to play with the learning algorithm
 	private static final int	NUM_ITERATIONS = 500;
 	
-	private SOMMap map;
+	private SOM map;
 	private MapRenderer renderer;
 	private Vector<SimpleMatrix> inputs;
 	private static boolean running;
@@ -36,7 +36,7 @@ public class SOMTrainer implements Runnable {
 	}
 	
 	// Train the given lattice based on a vector of input vectors
-	public void setTraining(SOMMap map, Vector<SimpleMatrix> in,
+	public void setTraining(SOM map, Vector<SimpleMatrix> in,
 							MapRenderer mapRenderer)
 	{
 		this.map = map;

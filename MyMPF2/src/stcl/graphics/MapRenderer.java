@@ -8,7 +8,7 @@ package stcl.graphics;
 
 import javax.swing.JPanel;
 
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
@@ -24,7 +24,7 @@ import java.awt.FontMetrics;
 public class MapRenderer extends JPanel {
 	private BufferedImage img = null;
 	Font arialFont = new Font("Arial", Font.BOLD, 12);
-	SOMMap lattice;
+	SOM lattice;
 	boolean ready = false;
 	
 	/** Creates a new instance of LatticeRenderer */
@@ -44,7 +44,7 @@ public class MapRenderer extends JPanel {
 			g.drawImage(img, 0, 0, this);
 	}
 	
-	public void registerLattice(SOMMap lat) {
+	public void registerLattice(SOM lat) {
 		lattice = lat;
 		ready = true;
 	}
@@ -52,7 +52,7 @@ public class MapRenderer extends JPanel {
 	// Yeah, it's ugly.  But it works, and I didn't feel like commenting it. :)
 	// All it does it slaps the given lattice's weight values up in a 2x2
 	// grid as an image
-	public void render(SOMMap lattice, int iteration) {
+	public void render(SOM lattice, int iteration) {
 		float cellWidth = (float)getWidth() / (float)lattice.getWidth();
 		float cellHeight = (float)getHeight() / (float)lattice.getHeight();
 //		float cellWidth = 2;

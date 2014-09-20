@@ -11,7 +11,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 
 public class SOMMapTest {
@@ -27,7 +27,7 @@ public class SOMMapTest {
 		int columns = 5;
 		int vectorLength = 2;
 		Random rand = new Random();
-		SOMMap map = new SOMMap(columns, rows, vectorLength, rand);
+		SOM map = new SOM(columns, rows, vectorLength, rand);
 		
 		//Create input
 		double[] input1 = {0,1};
@@ -188,7 +188,7 @@ public class SOMMapTest {
 		int width = 13;
 		int vectorLength = 6;
 		Random rand = new Random();
-		SOMMap map = new SOMMap(width, height, vectorLength, rand);
+		SOM map = new SOM(width, height, vectorLength, rand);
 		
 		//Test that size of model is N x M
 		SomNode[] models = map.getModels();
@@ -211,7 +211,7 @@ public class SOMMapTest {
 		int width = 13;
 		int vectorLength = 6;
 		Random rand = new Random();
-		SOMMap map = new SOMMap(width, height, vectorLength, rand);
+		SOM map = new SOM(width, height, vectorLength, rand);
 		
 		double[] correctValues = {0,1,1,0,1,0};
 		SomNode correct = new SomNode(correctValues, 5, 6);
@@ -269,7 +269,7 @@ public class SOMMapTest {
 		nodesToTest.add(nodeOutsideRadius);
 		
 		//Create map to get access to method
-		SOMMap map = new SOMMap(10, 10, 2, new Random());
+		SOM map = new SOM(10, 10, 2, new Random());
 		for (SomNode n : nodesToTest){
 			//Calculate expected values
 			double squareDistance = n.distanceTo(bmu);
@@ -329,9 +329,9 @@ public class SOMMapTest {
 		int rows = 7;
 		int cols = 7;
 		int vectorSize = 2;
-		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		SOM map = new SOM(cols, rows, vectorSize, rand);
 
-		Method method = SOMMap.class.getDeclaredMethod("learningEffect", double.class, double.class);
+		Method method = SOM.class.getDeclaredMethod("learningEffect", double.class, double.class);
 		method.setAccessible(true);
 		
 		//Test
@@ -351,9 +351,9 @@ public class SOMMapTest {
 		int rows = 7;
 		int cols = 7;
 		int vectorSize = 2;
-		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		SOM map = new SOM(cols, rows, vectorSize, rand);
 
-		Method method = SOMMap.class.getDeclaredMethod("learningEffect", double.class, double.class);
+		Method method = SOM.class.getDeclaredMethod("learningEffect", double.class, double.class);
 		method.setAccessible(true);
 		
 		//Test
@@ -373,7 +373,7 @@ public class SOMMapTest {
 		int rows = 7;
 		int cols = 7;
 		int vectorSize = 2;
-		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		SOM map = new SOM(cols, rows, vectorSize, rand);
 		
 		int size = map.getModels().length;
 		
@@ -388,7 +388,7 @@ public class SOMMapTest {
 		int rows = 7;
 		int cols = 7;
 		int vectorSize = 2;
-		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
+		SOM map = new SOM(cols, rows, vectorSize, rand);
 		for (SomNode n :map.getModels()){
 			n.getVector().set(0);
 		}	

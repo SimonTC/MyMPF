@@ -14,7 +14,7 @@ import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.util.Trainer;
 import stcl.graphics.MapRenderer;
 
@@ -29,14 +29,14 @@ public class SOMDemo extends javax.swing.JFrame {
 	
 	//private SOMTrainer trainer;
 	private SOMTrainer trainer;
-	private SOMMap map;
+	private SOM map;
 	private Vector<SimpleMatrix> inputVectors;
 	
 	/** Creates new form SOMDemo */
 	public SOMDemo() {
 		initComponents();
 		SimpleMatrix tempVec;
-		map = new SOMMap(size, size, 3, new Random());
+		map = new SOM(size, size, 3, new Random());
 		
 		renderPanel.registerLattice(map);
 		trainer = new SOMTrainer();
@@ -186,7 +186,7 @@ public class SOMDemo extends javax.swing.JFrame {
 
 	private void btnRetrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrainActionPerformed
 		trainer.stop();
-		map = new SOMMap(size, size, 3, new Random());
+		map = new SOM(size, size, 3, new Random());
 		trainer.setTraining(map, inputVectors, renderPanel);
 		renderPanel.registerLattice(map);
 		trainer.start();

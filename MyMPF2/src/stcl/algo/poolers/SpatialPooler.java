@@ -7,22 +7,23 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 import stcl.algo.util.ExponentialDecayFunction;
 
 public class SpatialPooler {
 	
-	private SOMMap som;
+	//Weight matrix
+	protected SOM som;
 	
 	//Matrice used 
-	private SimpleMatrix matrix_Error; //Squared error of the activation in the SOM
-	private SimpleMatrix matrix_Activation; //Probablitiy that model i,j in the SOM is the best model for the given input
+	protected SimpleMatrix matrix_Error; //Squared error of the activation in the SOM
+	protected SimpleMatrix matrix_Activation; //Probablitiy that model i,j in the SOM is the best model for the given input
 	
 	//Variables for learning
-	private double curLearningRate;
-	private double curNeighborhoodRadius;
-	private double curNoiseMagnitude;
+	protected double curLearningRate;
+	protected double curNeighborhoodRadius;
+	protected double curNoiseMagnitude;
 	private int tick;
 	
 	//Decay function
@@ -33,12 +34,12 @@ public class SpatialPooler {
 	private ExponentialDecayFunction noiseDecay;
 	
 	//Misc
-	private Random rand;
+	protected Random rand;
 	
 	
 	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize) {
 		this.rand = rand;
-		som = new SOMMap(mapSize, mapSize, inputLength, rand);
+		som = new SOM(mapSize, mapSize, inputLength, rand);
 		matrix_Error = new SimpleMatrix(mapSize, mapSize);
 		matrix_Activation = new SimpleMatrix(mapSize, mapSize);
 		tick = 0;
@@ -53,7 +54,7 @@ public class SpatialPooler {
 		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 0.01, curNeighborhoodRadius);
 		noiseDecay = new ExponentialDecayFunction(curNoiseMagnitude, 0.01, maxIterations);
 	}
-
+	
 	public void tick(){
 		tick++;
 		curLearningRate = learningDecay.decayValue(tick);
@@ -70,14 +71,18 @@ public class SpatialPooler {
 		
 		//Compute ActivationMatrix
 		double maxError = matrix_Error.elementMaxAbs();
-		computeActivationMatrix(maxError);
+		computeActivationMatrix(maxError, matrix_Error);
 		
 		return matrix_Activation;
 	}
-	
-	public SimpleMatrix feedBack(SimpleMatrix bias){
+	/**
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public SimpleMatrix feedBack(SimpleMatrix input){
 		//Transform bias matrix into vector
-		double[] vector = bias.getMatrix().data;
+		double[] vector = input.getMatrix().data;
 		
 		//Choose random number between 0 and 1
 		double d = rand.nextDouble();
@@ -99,19 +104,19 @@ public class SpatialPooler {
 		
 	}
 	
-	private void computeActivationMatrix(double maxError){
-		SimpleMatrix m = matrix_Error.divide(maxError);
+	protected void computeActivationMatrix(double maxError, SimpleMatrix errorMatrix){
+		SimpleMatrix m = errorMatrix.divide(maxError);
 		matrix_Activation.set(1);
 		matrix_Activation = matrix_Activation.minus(m);		
 	}
 	
-	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
+	protected SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
 		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
 		m = m.plus(noise);
 		return m;
 	}
 	
-	public SOMMap getSOM(){
+	public SOM getSOM(){
 		return som;
 	}
 }

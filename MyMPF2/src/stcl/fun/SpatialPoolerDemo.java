@@ -14,7 +14,7 @@ import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOMMap;
+import stcl.algo.som.SOM;
 import stcl.algo.util.Trainer;
 import stcl.graphics.MapRenderer;
 
@@ -29,7 +29,7 @@ public class SpatialPoolerDemo extends javax.swing.JFrame {
 	
 	//private SOMTrainer trainer;
 	private SpatialPoolerTrainer trainer;
-	private SOMMap map;
+	private SOM map;
 	private Vector<SimpleMatrix> inputVectors;
 	private SpatialPooler pooler;
 	

@@ -20,7 +20,7 @@ import stcl.graphics.MapRenderer;
  *
  * @author  alanter
  */
-public class OnlyMapMySOMTrainer implements Runnable {
+public class SOMTrainer implements Runnable {
 	// These constants can be changed to play with the learning algorithm
 	private static final int	NUM_ITERATIONS = 500;
 	
@@ -31,7 +31,7 @@ public class OnlyMapMySOMTrainer implements Runnable {
 	private Thread runner;
 	
 	/** Creates a new instance of SOMTrainer */
-	public OnlyMapMySOMTrainer() {
+	public SOMTrainer() {
 		running = false;
 	}
 	

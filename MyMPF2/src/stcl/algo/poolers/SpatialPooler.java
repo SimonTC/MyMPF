@@ -45,13 +45,13 @@ public class SpatialPooler {
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
 		curLearningRate = 1;
-		curNeighborhoodRadius = 1;
+		curNeighborhoodRadius = mapSize / 2;
 		curNoiseMagnitude = 1;
 		
 		//TODO: Something has to be done about this
-		learningDecay = new ExponentialDecayFunction(curLearningRate, 0.01, maxIterations, Math.E);
-		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 0.01, maxIterations, mapSize / 2);
-		noiseDecay = new ExponentialDecayFunction(curNoiseMagnitude, 0.01, maxIterations, Math.E);
+		learningDecay = new ExponentialDecayFunction(curLearningRate, 0.01, maxIterations);
+		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 0.01, curNeighborhoodRadius);
+		noiseDecay = new ExponentialDecayFunction(curNoiseMagnitude, 0.01, maxIterations);
 	}
 
 	public void tick(){
@@ -104,7 +104,7 @@ public class SpatialPooler {
 	private void computeActivationMatrix(double maxError){
 		SimpleMatrix m = matrix_Error.divide(maxError);
 		matrix_Activation.set(1);
-		matrix_Activation.minus(m);		
+		matrix_Activation = matrix_Activation.minus(m);		
 	}
 	
 	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){

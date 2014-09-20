@@ -25,7 +25,7 @@ import stcl.graphics.MapRenderer;
 public class SOMDemoAppNoVisual {
 	int size = 3;
 	//private SOMTrainer trainer;
-	private MySOMTrainer trainer;
+	private SpatialPoolerTrainer trainer;
 	private SOMMap lattice;
 	private Vector<SimpleMatrix> inputVectors;
 	private SpatialPooler pooler;
@@ -37,7 +37,7 @@ public class SOMDemoAppNoVisual {
 		pooler = new SpatialPooler(new Random(), 500, 3, size);
 		lattice = pooler.getSOM();
 
-		trainer = new MySOMTrainer();
+		trainer = new SpatialPoolerTrainer();
 		inputVectors = new Vector<SimpleMatrix>();
 
 		// Make some colors.  Red, Green, Blue, Yellow, Purple, Black,

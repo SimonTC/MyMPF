@@ -130,14 +130,6 @@ public class SOMMap {
 			for (int row = rowStart; row < rowEnd; row++){
 				SomNode n = models[coordinateToIndex(row, col)];
 				weightAdjustment(n, bmu, input, neighborhoodRadius, learningRate);
-				/*
-				double squaredDistance = n.distanceTo(bmu);
-				double squaredRadius = neighborhoodRadius * neighborhoodRadius;
-				if (squaredDistance <= squaredRadius){ 
-					double learningEffect = learningEffect(squaredDistance, squaredRadius);
-					n.adjustValues(input.getVector(), learningRate, learningEffect);					
-				}
-				*/
 			}
 		}
 	}

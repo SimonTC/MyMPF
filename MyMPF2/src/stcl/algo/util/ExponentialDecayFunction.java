@@ -8,18 +8,19 @@ public class ExponentialDecayFunction {
 
 	private double startValue;
 	private double minValue;
-	private double decayConstant;
+	private double denominator;
 	
 	
-	public ExponentialDecayFunction(double startValue, double minValue,int maxTicks,  double denominatorInDecayConstant) {
+	public ExponentialDecayFunction(double startValue, double minValue,  double denominator) {
 		//TODO: change name of denominatorInDecayConstant
 		this.startValue = startValue;
-		decayConstant = maxTicks / Math.log(denominatorInDecayConstant);
+		this.minValue = minValue;
+		this.denominator = denominator;
 		
 	}
 	
 	public double decayValue(int tick){
-		double d = startValue * Math.exp(-tick/decayConstant);
+		double d = startValue * Math.exp(-tick/denominator);
 		if (d < minValue) d = minValue;
 		return d;
 	}

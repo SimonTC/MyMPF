@@ -20,7 +20,7 @@ import stcl.graphics.MapRenderer;
  *
  * @author  alanter
  */
-public class MySOMTrainer implements Runnable {
+public class SpatialPoolerTrainer implements Runnable {
 	// These constants can be changed to play with the learning algorithm
 	private static final int	NUM_ITERATIONS = 500;
 	
@@ -31,7 +31,7 @@ public class MySOMTrainer implements Runnable {
 	private Thread runner;
 	
 	/** Creates a new instance of SOMTrainer */
-	public MySOMTrainer() {
+	public SpatialPoolerTrainer() {
 		running = false;
 	}
 	
@@ -67,7 +67,6 @@ public class MySOMTrainer implements Runnable {
 			if (renderer != null){
 				renderer.render(spatialPooler.getSOM(), iteration);
 			}
-			System.out.println(iteration + " Checksum: " + spatialPooler.getSOM().getErrorMatrix().elementSum());
 			iteration++;
 			spatialPooler.tick();
 		}

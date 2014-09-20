@@ -19,7 +19,7 @@ public class FirstOrderPredictor {
 	 * 
 	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler.
 	 * @param curLearningRate
-	 * @return
+	 * @return matrix[I x J] containing the probability that  
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
 		//TODO: Check this algorithm once more. Have to be sure that it goes in right direction		
@@ -48,16 +48,19 @@ public class FirstOrderPredictor {
 		//TODO: I think there is a mistake in the article. Has to check other prediction sources
 		SimpleMatrix outPut = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
 		for (int k = 0; k < predictionMatrixSize; k++){
-			SimpleMatrix predictionRow = conditionalPredictionMatrix.extractMatrix(k,k+1,0,conditionalPredictionMatrix.END);
-			outPut.set(k, predictionRow.elementSum());
+			for (int h = 0; h < predictionMatrixSize; h++){
+				SimpleMatrix predictionRow = conditionalPredictionMatrix.extractMatrix(k + h, k + h + 1,0,conditionalPredictionMatrix.END);
+				outPut.set(k, h, predictionRow.elementSum());
+			}		
 		}
 		
-		double normalizationFactor = 1/outPut.elementSum();
+		double normalizationFactor = 1/outPut.elementSum();		
+		
 		outPut = outPut.scale(normalizationFactor);
 		
 		
 		inpuMatrixBefore = inputMatrix;
-		return null;
+		return outPut;
 	}
 
 }

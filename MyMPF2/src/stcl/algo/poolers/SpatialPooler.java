@@ -73,7 +73,10 @@ public class SpatialPooler {
 		double maxError = matrix_Error.elementMaxAbs();
 		computeActivationMatrix(maxError, matrix_Error);
 		
-		return matrix_Activation;
+		//Add noise
+		SimpleMatrix output = addNoise(matrix_Activation, curNoiseMagnitude);
+		
+		return output;
 	}
 	/**
 	 * 

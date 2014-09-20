@@ -8,14 +8,23 @@ public class Bias {
 
 	private double biasInfluence; //Should be set by parameter
 	private Random rand;
+	private SimpleMatrix bias;
 	
-	public Bias(double biasInfluence, Random rand) {
+	public Bias(int biasMatrixSize, double biasInfluence, Random rand) {
 		this.biasInfluence = biasInfluence;
 		this.rand = rand;
+		this.bias = new SimpleMatrix(biasMatrixSize, biasMatrixSize);
+		bias.set(1);
 	}
 	
-	public SimpleMatrix bias(SimpleMatrix input, SimpleMatrix correlationMatrix, double noiseMagnitude){
-		SimpleMatrix bias = new SimpleMatrix(input.numRows(), input.numCols());
+	/**
+	 *
+	 * @param input
+	 * @param correlationMatrix
+	 * @param noiseMagnitude
+	 * @return
+	 */
+	public SimpleMatrix calculateBias(SimpleMatrix input, SimpleMatrix correlationMatrix, double noiseMagnitude){
 		SimpleMatrix s = calculateS(correlationMatrix); //TODO: FInd another name
 		
 		double[] sData = s.getMatrix().data;
@@ -38,6 +47,11 @@ public class Bias {
 		output = normalize(output);
 		
 		return output;
+	}
+	
+	public SimpleMatrix biasSpatialFFOutput(SimpleMatrix ffOutput){
+		SimpleMatrix m = ffOutput.elementMult(bias);
+		return m;
 	}
 	
 	private SimpleMatrix calculateS (SimpleMatrix correlationMatrix){

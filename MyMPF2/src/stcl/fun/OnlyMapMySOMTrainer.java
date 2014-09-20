@@ -20,42 +20,38 @@ import stcl.graphics.MapRenderer;
  *
  * @author  alanter
  */
-public class SOMTrainer implements Runnable {
+public class OnlyMapMySOMTrainer implements Runnable {
 	// These constants can be changed to play with the learning algorithm
 	private static final int	NUM_ITERATIONS = 500;
 	
+	private SOMMap map;
 	private MapRenderer renderer;
-	private SpatialPooler spatialPooler;
 	private Vector<SimpleMatrix> inputs;
 	private static boolean running;
 	private Thread runner;
 	
 	/** Creates a new instance of SOMTrainer */
-	public SOMTrainer() {
+	public OnlyMapMySOMTrainer() {
 		running = false;
 	}
 	
 	// Train the given lattice based on a vector of input vectors
-	public void setTraining(SpatialPooler poolerToTrain, Vector<SimpleMatrix> in,
-							MapRenderer latticeRenderer)
+	public void setTraining(SOMMap map, Vector<SimpleMatrix> in,
+							MapRenderer mapRenderer)
 	{
-		spatialPooler = poolerToTrain;
+		this.map = map;
 		inputs = in;
-		renderer = latticeRenderer;
-	}
-	/**
-	 * Train lattice without visualization
-	 * @param latToTrain
-	 * @param in
-	 */
-	public void setTraining(SpatialPooler poolerToTrain, Vector<SimpleMatrix> in){
-		spatialPooler = poolerToTrain;
-		inputs = in;
-		renderer = null;
+		renderer = mapRenderer;
 	}
 	
+	
 	public void start() {
-		run();
+		if (map != null) {
+			runner = new Thread(this);
+			runner.setPriority(Thread.MIN_PRIORITY);
+			running = true;
+			runner.start();
+		}
 	}
 	
 	public void run() {
@@ -65,14 +61,21 @@ public class SOMTrainer implements Runnable {
 			
 			for (int i = 0; i < inputs.size(); i++){
 				SimpleMatrix curInput = inputs.get(i);
-				spatialPooler.feedForward(curInput);				
+				SomNode inputNode = new SomNode(curInput);
+				double learningRate = 0.7;
+				double initialRadius = map.getHeight() / 2;
+				double neighborHoodRadius  = initialRadius * Math.exp(-iteration/initialRadius);
+				
+				
+				map.step(inputNode, learningRate, neighborHoodRadius);
+								
 			}
 			
 			if (renderer != null){
-				renderer.render(spatialPooler.getSOM(), iteration);
+				renderer.render(map, iteration);
 			}
 			iteration++;
-			spatialPooler.tick();
+
 		}
 		running = false;
 	}

@@ -43,7 +43,7 @@ public class SOMMap {
 	}
 	
 	/**
-	 * Finds the BMU to the given input and updates the vectors of all the nodes
+	 * Finds the BMU to the given input input vector and updates the vectors of all the nodes
 	 * @param inputVector
 	 * @param learningRate
 	 * @param neighborhoodRadius
@@ -58,7 +58,13 @@ public class SOMMap {
 		
 		return bmu;
 	}
-	
+	/**
+	 * Finds the BMU to the given input node and updates the vectors of all the nodes
+	 * @param inputNode
+	 * @param learningRate
+	 * @param neighborhoodRadius
+	 * @return
+	 */
 	public SomNode step (SomNode inputNode, double learningRate, double neighborhoodRadius){
 		//Find BMU
 		SomNode bmu = getBMU(inputNode);
@@ -106,10 +112,12 @@ public class SOMMap {
 	 */
 	public void adjustWeights(SomNode bmu,SomNode input, double learningRate, double neighborhoodRadius){
 		//Calculate start and end coordinates for the weight updates
-		int colStart = (int) (bmu.getCol() - neighborhoodRadius - 1);
-		int rowStart = (int) (bmu.getRow() - neighborhoodRadius - 1);
-		int colEnd = (int) (colStart + (neighborhoodRadius * 2) + 1);
-		int rowEnd = (int) (rowStart + (neighborhoodRadius * 2) + 1);
+		int bmuCol = bmu.getCol();
+		int bmyRow = bmu.getRow();
+		int colStart = (int) (bmuCol - neighborhoodRadius);
+		int rowStart = (int) (bmyRow - neighborhoodRadius );
+		int colEnd = (int) (bmuCol + neighborhoodRadius);
+		int rowEnd = (int) (bmyRow + neighborhoodRadius );
 		
 		//Make sure we dont get out of bounds errors
 		if (colStart < 0) colStart = 0;
@@ -123,7 +131,7 @@ public class SOMMap {
 				SomNode n = models[coordinateToIndex(row, col)];
 				double squaredDistance = n.distanceTo(bmu);
 				double squaredRadius = neighborhoodRadius * neighborhoodRadius;
-				if (squaredDistance < squaredRadius){ 
+				if (squaredDistance <= squaredRadius){ 
 					double learningEffect = learningEffect(squaredDistance, squaredRadius);
 					n.adjustValues(input.getVector(), learningRate, learningEffect);					
 				}
@@ -166,6 +174,14 @@ public class SOMMap {
 	
 	public void set(SomNode n, int row, int column){
 		models[coordinateToIndex(row, column)] = n;
+	}
+	
+	public int getWidth(){
+		return columns;
+	}
+	
+	public int getHeight(){
+		return rows;
 	}
 	
 	

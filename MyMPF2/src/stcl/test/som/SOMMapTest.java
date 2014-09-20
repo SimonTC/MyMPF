@@ -21,6 +21,167 @@ public class SOMMapTest {
 	}
 
 	@Test
+	public void testStep(){
+		//Create map
+		int rows = 5;
+		int columns = 5;
+		int vectorLength = 2;
+		Random rand = new Random();
+		SOMMap map = new SOMMap(columns, rows, vectorLength, rand);
+		
+		//Create input
+		double[] input1 = {0,1};
+		double[] input2 = {1,0};
+		
+		//Read initial vector values
+		double[][][] initialValues = new double[rows] [columns][vectorLength];
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row, col);
+				for (int i = 0; i < vectorLength; i++){
+					initialValues[row][col][i] = n.getVector().get(i);
+				}
+			}
+		}
+		
+		//Step1
+		double radius = 3;
+		double learningRate = 0.7;
+		double squareRadius = radius * radius;
+		SomNode bmu1 = map.step(input1, learningRate, radius);
+	
+		
+		//Read new vector values and check that they are the expected values
+		double[][][] valuesAfterStep1 = new double[rows][columns] [vectorLength];
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row, col);
+				for (int i = 0; i < vectorLength; i++){
+					valuesAfterStep1[row][col][i] = n.getVector().get(i);
+				}
+			}
+		}
+		
+		//Step 2
+		SomNode bmu2 = map.step(input2, learningRate, radius);
+				
+		//Read new vector values and check that they are the expected values
+		double[][][] valuesAfterStep2 = new double[rows][columns] [vectorLength];
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row, col);
+				for (int i = 0; i < vectorLength; i++){
+					valuesAfterStep2[row][col][i] = n.getVector().get(i);
+				}
+			}
+		}
+		
+		//Test that not all values have changed between initial and step 1
+		int counter = 0;
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				for (int i = 0; i < vectorLength; i++){
+					if (initialValues[row][col][i] == valuesAfterStep1[row][col][i]){
+						counter++;
+					}
+				}
+			}
+		}
+		assertNotEquals(counter, rows * columns * vectorLength, 0.1);
+		
+		//Test that not all values have changed between step 1 and step 2
+		counter = 0;
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				for (int i = 0; i < vectorLength; i++){
+					if (valuesAfterStep2[row][col][i] == valuesAfterStep1[row][col][i]){
+						counter++;
+					}
+				}
+			}
+		}
+		assertNotEquals(counter, rows * columns * vectorLength, 0.1);
+		
+		//Test that expected change have been performed between after step 1
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row, col);
+				double squaredist = n.distanceTo(bmu1);
+				double learningEffect = 0;
+				if (squaredist <= squareRadius){
+					learningEffect = learningEffect(squaredist, squareRadius);
+				}
+				System.out.println();
+				System.out.println("Node at (" + n.getCol() + "," + n.getRow() + ") BMU at (" + bmu1.getCol() + "," + bmu1.getRow() + ") Squared distance: " + squaredist);
+				System.out.println("Learning rate: " + learningRate + " Learning effect: " + learningEffect);
+				for (int i = 0; i < vectorLength; i++){
+					double oldValue = initialValues[row][col][i];
+					double inputValue = input1[i];
+					double newValue = valuesAfterStep1[row][col][i];
+					double expectedValue = expectedValue(oldValue, learningRate, learningEffect, inputValue);
+					System.out.printf("%-10.5s  %-10.5s %-10.5s %-10.5s%n", oldValue, inputValue, expectedValue, newValue);
+					assertEquals(expectedValue, newValue, 0.0001);
+				}
+			}
+		}
+		
+	/*
+		//Test that expected change have been performed
+		
+		double[][][] valuesAfterStep1 = new double[rows][columns] [vectorLength];
+		for (int row = 0; row < rows; row++){			
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row, col);
+				double squareDist = bmu.distanceTo(n);
+				double learningEffect = learningEffect(squareDist, squareRadius);
+				if (squareDist > squareRadius) learningEffect = 0;
+				for (int i = 0; i < vectorLength; i++){
+					double oldValue = initialValues[row][col][i];
+					double expected = expectedValue(oldValue, learningRate, learningEffect, input1[i]);	
+					double newValue = n.getVector().get(i);
+					valuesAfterStep1[row][col][i] = newValue;
+					assertEquals(expected, newValue, 0.0001);
+				}			
+				
+			}
+			
+		}
+		
+		//Step 2
+		bmu = map.step(input2, learningRate, radius);
+		
+		//Read new vector values and check that they are the expected values
+		double[][][] valuesAfterStep2 = new double[rows][columns] [vectorLength];
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n = map.getModel(row,col);
+				double squareDist = bmu.distanceTo(n);
+				double learningEffect = learningEffect(squareDist, squareRadius);
+				if (squareDist > squareRadius) learningEffect = 0;
+				for (int i = 0; i < vectorLength; i++){
+					double oldValue = valuesAfterStep1[row][col][i];
+					double expected = expectedValue(oldValue, learningRate, learningEffect, input1[i]);	
+					double newValue = n.getVector().get(i);
+					valuesAfterStep2[row][col][i] = newValue;
+					assertEquals(expected, newValue, 0.0001);
+				}
+				
+				
+			}
+			
+		}	
+		*/
+		
+	}
+	
+	private double expectedValue(double oldValue, double learningRate, double learningEffect, double inputValue){
+		double d = oldValue + learningRate * learningEffect * (inputValue - oldValue);
+		return d;
+	}
+	
+	
+	
+	@Test
 	public void testSOMMap() {
 		int height = 26;
 		int width = 13;
@@ -61,69 +222,12 @@ public class SOMMapTest {
 
 	}
 
-	@Test
-	public void testAdjustWeights() {
-		/*
-		 * Testing that only units in a radius of two around the BMU gets their weights adjusted, and that the adjustment diminishes with distance from BMU
-		 */
-		
-		//Create map
-		Random rand = new Random();
-		int rows = 7;
-		int cols = 7;
-		int vectorSize = 2;
-		
-		//Create map and set all vector values to be zero
-		SOMMap map = new SOMMap(cols, rows, vectorSize, rand);
-		for (SomNode n :map.getModels()){
-			n.getVector().set(0);
-		}		
-				
-		//Do adjustment
-		double learningRate = 0.8;
-		double neighborhoodRadius = 2;
-		double[] correct = {0.3,0.4};
-		SomNode bmu = map.step(correct, learningRate, neighborhoodRadius);
-
-		//Collect data for map after weight adjustment
-		double[][][] valuesAfter = new double[rows][cols][vectorSize];
-		for (int row = 0; row < rows; row++){
-			for (int col = 0; col < cols; col++){
-				valuesAfter[row][col] = map.getModel(row, col).getVector().getMatrix().data;
-			}
-		}
-		
-		//Calculate expected adjustements
-		double[][][] expValuesAfter = new double[rows][cols][vectorSize];
-		double squaredNeighborhoodRadius =  neighborhoodRadius * neighborhoodRadius;
-		for (int row = 0; row < rows; row++){
-			for (int col = 0; col < cols; col++){
-				double squaredDist = bmu.distanceTo(map.getModel(row, col));
-				double learningEffect = learningEffect(squaredDist, squaredNeighborhoodRadius);
-				if (squaredDist < squaredNeighborhoodRadius){
-					for (int i = 0; i < 2; i++){
-						expValuesAfter[row][col][i] = 0 + learningRate * learningEffect * (correct[i] - 0);
-					}
-				}
-			}
-		}
-		
-		//Test if adjustments are correct
-		for (int row = 0; row < rows; row++){
-			for (int col = 0; col < cols; col++){
-				for (int i = 0; i < 2; i++){
-					assertEquals("BMU is at (" + bmu.getCol() + "," + bmu.getRow() + "). This node is at (" +col + "," + row + ")", expValuesAfter[row][col][i], valuesAfter[row][col][i], 0.000001);
-					
-				}
-			}
-		}
-	}
 	
 	private double learningEffect(double squaredDist, double squaredRadius){
 		double d = Math.exp(- squaredDist / (2*squaredRadius));
 		return d;
 	}
-	
+		
 	@Test
 	public void testLearningEffect_RandomCoordinate() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		//Create map

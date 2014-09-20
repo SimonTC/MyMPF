@@ -88,7 +88,7 @@ public class SomNodeTest {
 		SimpleMatrix nodeVector = new SimpleMatrix(vectorValues);
 		
 		//Create input vector
-		double[][] inputValues = {{0.5, 0.3, 0.26}};
+		double[][] inputValues = {{0, 0.3, 0.26}};
 		SimpleMatrix inputVector = new SimpleMatrix(inputValues);
 		
 		//Manually calculate expected value adjustments

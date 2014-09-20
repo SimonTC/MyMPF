@@ -3,11 +3,13 @@ package stcl.algo.poolers;
 import java.util.Random;
 import java.util.Vector;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.som.SOMMap;
 import stcl.algo.som.SomNode;
-import stcl.test.util.ExponentialDecayFunction;
+import stcl.algo.util.ExponentialDecayFunction;
 
 public class SpatialPooler {
 	
@@ -39,6 +41,7 @@ public class SpatialPooler {
 		som = new SOMMap(mapSize, mapSize, inputLength, rand);
 		matrix_Error = new SimpleMatrix(mapSize, mapSize);
 		matrix_Activation = new SimpleMatrix(mapSize, mapSize);
+		tick = 0;
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
 		curLearningRate = 1;
@@ -108,5 +111,9 @@ public class SpatialPooler {
 		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
 		m = m.plus(noise);
 		return m;
+	}
+	
+	public SOMMap getSOM(){
+		return som;
 	}
 }

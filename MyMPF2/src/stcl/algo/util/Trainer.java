@@ -1,8 +1,8 @@
-package stcl.test.util;
+package stcl.algo.util;
 
-public class Runner {
+public class Trainer {
 
-	public Runner() {
+	public Trainer() {
 		// TODO Auto-generated constructor stub
 	}
 

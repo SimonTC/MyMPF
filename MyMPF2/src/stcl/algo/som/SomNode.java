@@ -107,7 +107,7 @@ public class SomNode {
 	 * Calculates the euclidian distance between the two nodes.
 	 * Based on the coordinates of the nodes
 	 * @param n
-	 * @return
+	 * @return returns the squared distance
 	 */
 	public double distanceTo(SomNode n){
 		int thatX = n.getCol();

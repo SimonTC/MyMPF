@@ -1,4 +1,4 @@
-package stcl.test.util;
+package stcl.algo.util;
 /**
  * This class is used to implement the exponential decay function 
  * @author Simon

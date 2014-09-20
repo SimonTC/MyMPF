@@ -96,8 +96,7 @@ public class SomNode {
 	 * @param n
 	 * @return
 	 */
-	public double squaredDifference(SomNode n){
-		SimpleMatrix thatVector = n.getVector();
+	public double squaredDifference(SimpleMatrix thatVector){
 		SimpleMatrix diff = valueVector.minus(thatVector);
 		diff = diff.elementPower(2);
 		return diff.elementSum();

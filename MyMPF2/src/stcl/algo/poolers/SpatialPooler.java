@@ -62,10 +62,8 @@ public class SpatialPooler {
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix input){
-		SomNode inputNode = new SomNode(input);
-		
 		//Adjust weights of SOM
-		som.step(inputNode, curLearningRate, curNeighborhoodRadius);
+		som.step(input, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error matrix
 		matrix_Error = som.getErrorMatrix();

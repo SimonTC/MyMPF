@@ -127,9 +127,8 @@ public class SomNodeTest {
 		}
 		
 		SomNode node = new SomNode(nodeVector);
-		SomNode input = new SomNode(inputVector);
 		
-		double result = node.squaredDifference(input);
+		double result = node.squaredDifference(inputVector);
 		
 		assertEquals(squaredDiff, result, 0.000001);
 		

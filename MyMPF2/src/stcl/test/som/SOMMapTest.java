@@ -238,8 +238,8 @@ public class SOMMapTest {
 		
 		Vector<SomNode> nodesToTest = new Vector<SomNode>();
 		//Create input
-		double[]inputVector = {0,1};
-		SomNode inputNode = new SomNode(inputVector, -1, -1);
+		double[][]inputVector = {{0,1}};
+		SimpleMatrix input = new SimpleMatrix(inputVector);
 		
 		//Create bmu
 		double[] bmuVector = {0.9,0.08};
@@ -278,10 +278,10 @@ public class SOMMapTest {
 				learningEffect = learningEffect(squareDistance, squaredRadius);	
 			}
 			double[] oldValues = n.getVector().getMatrix().data;
-			double[] expectedValuesMatrix = expectedValuesMatrix(inputNode.getVector(), n.getVector(), learningRate, learningEffect);
+			double[] expectedValuesMatrix = expectedValuesMatrix(input, n.getVector(), learningRate, learningEffect);
 			
-			double[] expectedValuesManual = expectedValuesManual(oldValues, learningRate, learningEffect, inputVector);
-			map.weightAdjustment(n, bmu, inputNode, radius, learningRate);
+			double[] expectedValuesManual = expectedValuesManual(oldValues, learningRate, learningEffect, inputVector[0]);
+			map.weightAdjustment(n, bmu, input, radius, learningRate);
 			double[] actualValues = n.getVector().getMatrix().data;
 			
 			for (int i = 0; i < expectedValuesMatrix.length; i++){

@@ -50,10 +50,11 @@ public class SOMMap {
 	 * @return
 	 */
 	public SomNode step (double[] inputVector, double learningRate, double neighborhoodRadius){
-		//Create input node
-		SomNode inputNode = new SomNode(inputVector, -1, -1);
+		//Create input vector
+		double[][] d = {inputVector};
+		SimpleMatrix m = new SimpleMatrix(d);
 		
-		SomNode bmu = step(inputNode, learningRate, neighborhoodRadius);
+		SomNode bmu = step(m, learningRate, neighborhoodRadius);
 
 		
 		return bmu;
@@ -65,12 +66,12 @@ public class SOMMap {
 	 * @param neighborhoodRadius
 	 * @return
 	 */
-	public SomNode step (SomNode inputNode, double learningRate, double neighborhoodRadius){
+	public SomNode step (SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
 		//Find BMU
-		SomNode bmu = getBMU(inputNode);
+		SomNode bmu = getBMU(inputVector);
 		
 		//Adjust Weights
-		adjustWeights(bmu, inputNode, learningRate, neighborhoodRadius);	
+		adjustWeights(bmu, inputVector, learningRate, neighborhoodRadius);	
 		
 		return bmu;
 	}
@@ -80,8 +81,9 @@ public class SOMMap {
 	 * @return
 	 */
 	public SomNode getBMU(double[] input){ 
-		SomNode inputNode = new SomNode(input, -1, -1);
-		return getBMU(inputNode);
+		double[][] d = {input};
+		SimpleMatrix m = new SimpleMatrix(d);
+		return getBMU(m);
 	}
 	
 	/**
@@ -89,11 +91,11 @@ public class SOMMap {
 	 * @param input input as a somNode
 	 * @return
 	 */
-	public SomNode getBMU(SomNode input){
+	public SomNode getBMU(SimpleMatrix inputVector){
 		SomNode BMU = null;
 		double minDiff = Double.POSITIVE_INFINITY;
 		for (SomNode n : models){
-			double diff = n.squaredDifference(input);
+			double diff = n.squaredDifference(inputVector);
 			if (diff < minDiff){
 				minDiff = diff;
 				BMU = n;
@@ -110,7 +112,7 @@ public class SOMMap {
 	 * @param learningRate
 	 * @param neighborhoodRadius
 	 */
-	public void adjustWeights(SomNode bmu,SomNode input, double learningRate, double neighborhoodRadius){
+	public void adjustWeights(SomNode bmu, SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
 		//Calculate start and end coordinates for the weight updates
 		int bmuCol = bmu.getCol();
 		int bmyRow = bmu.getRow();
@@ -129,17 +131,17 @@ public class SOMMap {
 		for (int col = colStart; col < colEnd; col++){
 			for (int row = rowStart; row < rowEnd; row++){
 				SomNode n = models[coordinateToIndex(row, col)];
-				weightAdjustment(n, bmu, input, neighborhoodRadius, learningRate);
+				weightAdjustment(n, bmu, inputVector, neighborhoodRadius, learningRate);
 			}
 		}
 	}
 	
-	public void weightAdjustment(SomNode n, SomNode bmu, SomNode input, double neighborhoodRadius, double learningRate ){
+	public void weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate ){
 		double squaredDistance = n.distanceTo(bmu);
 		double squaredRadius = neighborhoodRadius * neighborhoodRadius;
 		if (squaredDistance <= squaredRadius){ 
 			double learningEffect = learningEffect(squaredDistance, squaredRadius);
-			n.adjustValues(input.getVector(), learningRate, learningEffect);					
+			n.adjustValues(inputVector, learningRate, learningEffect);					
 		}
 	}
 	

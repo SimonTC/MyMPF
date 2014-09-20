@@ -61,13 +61,12 @@ public class SOMTrainer implements Runnable {
 			
 			for (int i = 0; i < inputs.size(); i++){
 				SimpleMatrix curInput = inputs.get(i);
-				SomNode inputNode = new SomNode(curInput);
 				double learningRate = 0.7;
 				double initialRadius = map.getHeight() / 2;
 				double neighborHoodRadius  = initialRadius * Math.exp(-iteration/initialRadius);
 				
 				
-				map.step(inputNode, learningRate, neighborHoodRadius);
+				map.step(curInput, learningRate, neighborHoodRadius);
 								
 			}
 			

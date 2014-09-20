@@ -25,12 +25,10 @@ import stcl.graphics.MapRenderer;
 public class SOMDemoApp extends javax.swing.JFrame {
 
 	int size = 10;
-	private int latticeWidth = 40;
-	private int latticeHeight = 40;
 	
 	//private SOMTrainer trainer;
 	private SOMTrainer trainer;
-	private SOMMap lattice;
+	private SOMMap map;
 	private Vector<SimpleMatrix> inputVectors;
 	private SpatialPooler pooler;
 	
@@ -39,9 +37,9 @@ public class SOMDemoApp extends javax.swing.JFrame {
 		initComponents();
 		SimpleMatrix tempVec;
 		pooler = new SpatialPooler(new Random(), 500, 3, 10);
-		lattice = pooler.getSOM();
+		map = pooler.getSOM();
 		
-		renderPanel.registerLattice(lattice);
+		renderPanel.registerLattice(map);
 		trainer = new SOMTrainer();
 		inputVectors = new Vector<SimpleMatrix>();
 
@@ -190,9 +188,9 @@ public class SOMDemoApp extends javax.swing.JFrame {
 	private void btnRetrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrainActionPerformed
 		trainer.stop();
 		pooler = new SpatialPooler(new Random(), 500, 3, size);
-		lattice = pooler.getSOM();
+		map = pooler.getSOM();
 		trainer.setTraining(pooler, inputVectors, renderPanel);
-		renderPanel.registerLattice(lattice);
+		renderPanel.registerLattice(map);
 		trainer.start();
 	}//GEN-LAST:event_btnRetrainActionPerformed
 
@@ -213,10 +211,10 @@ public class SOMDemoApp extends javax.swing.JFrame {
 
 	public void go() {
 		BufferedImage i = renderPanel.getImage();
-		renderPanel.registerLattice(lattice);
-		renderPanel.render(lattice, 0);
+		renderPanel.registerLattice(map);
+		renderPanel.render(map, 0);
 		trainer.setTraining(pooler, inputVectors, renderPanel);
-//		trainer.start();
+		trainer.start();
 	}
 	
     // Variables declaration - do not modify//GEN-BEGIN:variables

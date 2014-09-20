@@ -119,7 +119,7 @@ public class SOMMap {
 		int colEnd = (int) (bmuCol + neighborhoodRadius);
 		int rowEnd = (int) (bmyRow + neighborhoodRadius );
 		
-		//Make sure we dont get out of bounds errors
+		//Make sure we don't get out of bounds errors
 		if (colStart < 0) colStart = 0;
 		if (rowStart < 0) rowStart = 0;
 		if (colEnd > columns) colEnd = columns;
@@ -129,13 +129,25 @@ public class SOMMap {
 		for (int col = colStart; col < colEnd; col++){
 			for (int row = rowStart; row < rowEnd; row++){
 				SomNode n = models[coordinateToIndex(row, col)];
+				weightAdjustment(n, bmu, input, neighborhoodRadius, learningRate);
+				/*
 				double squaredDistance = n.distanceTo(bmu);
 				double squaredRadius = neighborhoodRadius * neighborhoodRadius;
 				if (squaredDistance <= squaredRadius){ 
 					double learningEffect = learningEffect(squaredDistance, squaredRadius);
 					n.adjustValues(input.getVector(), learningRate, learningEffect);					
 				}
+				*/
 			}
+		}
+	}
+	
+	public void weightAdjustment(SomNode n, SomNode bmu, SomNode input, double neighborhoodRadius, double learningRate ){
+		double squaredDistance = n.distanceTo(bmu);
+		double squaredRadius = neighborhoodRadius * neighborhoodRadius;
+		if (squaredDistance <= squaredRadius){ 
+			double learningEffect = learningEffect(squaredDistance, squaredRadius);
+			n.adjustValues(input.getVector(), learningRate, learningEffect);					
 		}
 	}
 	

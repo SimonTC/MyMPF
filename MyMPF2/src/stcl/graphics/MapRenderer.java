@@ -66,7 +66,7 @@ public class MapRenderer extends JPanel {
 		g2.clearRect(0,0,imgW,imgH);
 		for (int x=0; x<lattice.getWidth(); x++) {
 			for (int y=0; y<lattice.getHeight(); y++) {
-				
+
 				r = (float)(lattice.getModel(y, x).getVector().get(0));
 				g = (float)(lattice.getModel(y, x).getVector().get(1));
 				b = (float)(lattice.getModel(y, x).getVector().get(2));
@@ -104,9 +104,9 @@ public class MapRenderer extends JPanel {
 		Graphics2D g2 = (Graphics2D)img.getGraphics();
 		g2.setFont(arialFont);
 		float r, g , b;
-		r = (float)(lattice.getModel(y, x).getVector().get(0));
-		g = (float)(lattice.getModel(y, x).getVector().get(1));
-		b = (float)(lattice.getModel(y, x).getVector().get(2));
+		r = (float)(lattice.getModel(cellY, cellX).getVector().get(0));
+		g = (float)(lattice.getModel(cellY, cellX).getVector().get(1));
+		b = (float)(lattice.getModel(cellY, cellX).getVector().get(2));
 		StringBuffer sb = new StringBuffer("Value: ");
 		sb.append(String.valueOf(r)).append(", ");
 		sb.append(String.valueOf(g)).append(", ");

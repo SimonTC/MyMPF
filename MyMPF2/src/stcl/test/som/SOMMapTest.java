@@ -20,7 +20,7 @@ public class SOMMapTest {
 	public void setUp() throws Exception {
 	}
 
-	@Test
+	//@Test
 	public void testStep(){
 		//Create map
 		int rows = 5;
@@ -111,6 +111,7 @@ public class SOMMapTest {
 				if (squaredist <= squareRadius){
 					learningEffect = learningEffect(squaredist, squareRadius);
 				}
+				
 				System.out.println();
 				System.out.println("Node at (" + n.getCol() + "," + n.getRow() + ") BMU at (" + bmu1.getCol() + "," + bmu1.getRow() + ") Squared distance: " + squaredist);
 				System.out.println("Learning rate: " + learningRate + " Learning effect: " + learningEffect);
@@ -226,6 +227,99 @@ public class SOMMapTest {
 	private double learningEffect(double squaredDist, double squaredRadius){
 		double d = Math.exp(- squaredDist / (2*squaredRadius));
 		return d;
+	}
+	
+	@Test
+	public void testWeightAdjustment(){
+		
+		int radius = 3;
+		int squaredRadius = radius * radius;
+		double learningRate = 0.7;
+		
+		Vector<SomNode> nodesToTest = new Vector<SomNode>();
+		//Create input
+		double[]inputVector = {0,1};
+		SomNode inputNode = new SomNode(inputVector, -1, -1);
+		
+		//Create bmu
+		double[] bmuVector = {0.9,0.08};
+		int bmuCol = 5;
+		int bmuRow = 5;
+		SomNode bmu = new SomNode(bmuVector, bmuCol, bmuRow);
+		
+		//Create bmu twin
+		SomNode nodeSameAsBMU = new SomNode(bmuVector, bmuCol, bmuRow);
+		nodesToTest.add(nodeSameAsBMU);
+		
+		//Create node
+		double[] nodeVector = {0.3,0.95};
+		int insideRadiusCol = bmuCol + radius - 1;
+		int insideRadiusRow = bmuRow + radius - 1;
+		SomNode nodeInsideRadius = new SomNode(nodeVector, insideRadiusCol, insideRadiusRow);
+		nodesToTest.add(nodeInsideRadius);
+		
+		int onRadiusCol = bmuCol + radius;
+		int onRadiusRow = bmuRow + radius;
+		SomNode nodeonRadius = new SomNode(nodeVector, onRadiusCol, onRadiusRow);
+		nodesToTest.add(nodeonRadius);
+		
+		int outsideRadiusCol = bmuCol + radius + 2;
+		int outsideRadiusRow = bmuRow + radius + 2;
+		SomNode nodeOutsideRadius = new SomNode(nodeVector, outsideRadiusCol, outsideRadiusRow);
+		nodesToTest.add(nodeOutsideRadius);
+		
+		//Create map to get access to method
+		SOMMap map = new SOMMap(10, 10, 2, new Random());
+		for (SomNode n : nodesToTest){
+			//Calculate expected values
+			double squareDistance = n.distanceTo(bmu);
+			double learningEffect = 0;
+			if (squareDistance <= squaredRadius){
+				learningEffect = learningEffect(squareDistance, squaredRadius);	
+			}
+			double[] oldValues = n.getVector().getMatrix().data;
+			double[] expectedValuesMatrix = expectedValuesMatrix(inputNode.getVector(), n.getVector(), learningRate, learningEffect);
+			
+			double[] expectedValuesManual = expectedValuesManual(oldValues, learningRate, learningEffect, inputVector);
+			map.weightAdjustment(n, bmu, inputNode, radius, learningRate);
+			double[] actualValues = n.getVector().getMatrix().data;
+			
+			for (int i = 0; i < expectedValuesMatrix.length; i++){
+				if (expectedValuesMatrix[i] != expectedValuesManual[i]){
+					System.out.println("Oh No! Matrix and manual does not agree");
+					System.out.println("Matrix: " + expectedValuesMatrix[i] );
+					System.out.println("Manual: " + expectedValuesManual[i] );
+				}
+				assertEquals(expectedValuesMatrix[i], actualValues[i], 0.0001);
+			}
+			
+		}		
+	}
+	
+	private double[] expectedValuesManual(double[] oldValues, double learningRate, double learningEffect, double[] inputValues){
+		double[] result = new double[oldValues.length];
+		
+		for (int i = 0; i < oldValues.length; i++){
+			result[i] = expectedValue(oldValues[i], learningRate, learningEffect, inputValues[i]);
+		}
+		return result;
+	}
+	
+	private double[] expectedValuesMatrix(SimpleMatrix inputVector, SimpleMatrix valueVector, double learningRate, double learningEffect){
+		//Calculate difference between input and current values
+				SimpleMatrix diff = inputVector.minus(valueVector);
+				
+				//Multiply by learning rate and learning effect
+				SimpleMatrix tmp = new SimpleMatrix(diff.numRows(), diff.numCols());
+				tmp.set(learningRate * learningEffect);
+				diff = diff.elementMult(tmp);
+				
+				//Add the dist-values to the value vector
+				valueVector = valueVector.plus(diff);
+				
+				double[] result = valueVector.getMatrix().data;
+				
+				return result;
 	}
 		
 	@Test

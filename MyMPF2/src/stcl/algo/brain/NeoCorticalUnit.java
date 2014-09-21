@@ -23,7 +23,7 @@ public class NeoCorticalUnit {
 	//Learning rates
 	private double predictionLearningRate; //TODO: Find correct name for it
 	private double curNoiseMagnitude;
-	//private double biasInfluence;
+	//private double biasInfluence; 
 	
 	private boolean useMarkovPrediction;
 	

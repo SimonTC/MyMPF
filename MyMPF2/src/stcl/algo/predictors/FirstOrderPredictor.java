@@ -3,64 +3,93 @@ package stcl.algo.predictors;
 import org.ejml.simple.SimpleMatrix;
 
 public class FirstOrderPredictor {
-	
-	SimpleMatrix inpuMatrixBefore;
-	SimpleMatrix conditionalPredictionMatrix;
+
+	private SimpleMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;
+	
+	private SimpleMatrix inputVectorBefore;
 
 	public FirstOrderPredictor(int inputMatrixSize) {
-		inpuMatrixBefore = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
+		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
-		// TODO Auto-generated constructor stub
 	}
 	
 	/**
 	 * 
-	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler.
+	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
-	 * @return matrix[I x J] containing the probability that  
+	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be the correct model for the input to the spatial pooler at time t + 1.
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
-		//TODO: Check this algorithm once more. Have to be sure that it goes in right direction		
+		
+		//Transform input matrix to vector of size IJ
+		SimpleMatrix inputVector = new SimpleMatrix(1, inputMatrix.numCols() * inputMatrix.numRows());
+		
+		//Association
+		association(inputVector, curLearningRate);
+		
+		//Prediction
+		SimpleMatrix output = prediction(inputVector);
+		
+		//Transform outputVector to matrix
+		output.reshape(inputMatrix.numRows(), inputMatrix.numCols());		
+		
+		//Save input vector
+		inputVectorBefore = inputVector;
+		
+		//Return output
+		return output;
+	}
 	
-		for (int h = 0; h < predictionMatrixSize; h++){ //Go through rows
-			double priorProbOfModelHNow =inputMatrix.get(h);
-			double priorProbOfModelHBefore =inpuMatrixBefore.get(h);
-			double max = Double.NEGATIVE_INFINITY;
-			for (int k = 0; k < predictionMatrixSize; k++){ //Go through columns
-				double priorProbOfModelKNow = inputMatrix.get(k);
-				double priorProbOfModelKBefore = inpuMatrixBefore.get(k);
-				double delta1 = Math.max(priorProbOfModelHBefore - priorProbOfModelHNow, 0);
-				double delta2 = Math.max(priorProbOfModelKNow - priorProbOfModelKBefore, 0 );
-				double conditionalProbability = conditionalPredictionMatrix.get(h, k) + curLearningRate * delta1 * delta2;
-				if (conditionalProbability > max) max = conditionalProbability;
-				conditionalPredictionMatrix.set(h, k, conditionalProbability);
+	private void association(SimpleMatrix inputVector, double curLearningRate){
+		for (int h = 0; h < inputVector.numCols(); h++){
+			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
+			if (delta1 < 0) delta1 = 0;
+			double sum = 0;
+			for (int k = 0; k <inputVector.numCols(); k++){
+				double delta2 = inputVector.get(k) - inputVectorBefore.get(k);
+				if (delta2 < 0) delta2 = 0;
+				double tmp = conditionalPredictionMatrix.get(k, h) + delta1 * delta2 * curLearningRate;
+				conditionalPredictionMatrix.set(k, h, tmp);
+				sum += tmp;
 			}
+			if (sum > 0){
+				SimpleMatrix column = conditionalPredictionMatrix.extractVector(false, h);
+				column = column.scale(1/sum);
+				conditionalPredictionMatrix.insertIntoThis(0, h, column);
+			}
+		}
+
+	}
+	
+	private SimpleMatrix prediction(SimpleMatrix inputVector){
+		SimpleMatrix outputVector = new SimpleMatrix(inputVector);
+		double sum = 0;
+		for (int k = 0; k < outputVector.numCols(); k++){
+			//Calculate P(W_k) = P(W_k | W_0) x P(W_0) +  P(W_k | W_1) x P(W_1) + ... + P(W_k | W_H) x P(W_H)
 			
-			//Normalize column n
-			SimpleMatrix normalizedRow = conditionalPredictionMatrix.extractMatrix(h, h+1, 0, conditionalPredictionMatrix.END);
-			normalizedRow = normalizedRow.scale(1/max);
-			conditionalPredictionMatrix.insertIntoThis(h, 0, normalizedRow);			
+			//First collect all P(W_k | W_h)
+			SimpleMatrix conditionalPropbVector = conditionalPredictionMatrix.extractVector(true, k);
+						
+			//Then multiply by P(W_h)
+			SimpleMatrix probabilityVector = conditionalPropbVector.elementMult(inputVector);
+			
+			//Then calculate sum and add to outputVector
+			double tmp = probabilityVector.elementSum();
+			outputVector.set(k, tmp);
+			
+			sum += tmp;
 		}
 		
-		//Calculate output
-		//TODO: I think there is a mistake in the article. Has to check other prediction sources
-		SimpleMatrix outPut = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
-		for (int k = 0; k < predictionMatrixSize; k++){
-			for (int h = 0; h < predictionMatrixSize; h++){
-				SimpleMatrix predictionRow = conditionalPredictionMatrix.extractMatrix(k + h, k + h + 1,0,conditionalPredictionMatrix.END);
-				outPut.set(k, h, predictionRow.elementSum());
-			}		
+		//Normalize output vector
+		if (sum > 0){
+			outputVector = outputVector.scale(1/sum);
 		}
 		
-		double normalizationFactor = 1/outPut.elementSum();		
-		
-		outPut = outPut.scale(normalizationFactor);
+		return outputVector;
 		
 		
-		inpuMatrixBefore = inputMatrix;
-		return outPut;
 	}
 
 }

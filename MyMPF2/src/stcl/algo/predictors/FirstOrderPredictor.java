@@ -16,10 +16,10 @@ public class FirstOrderPredictor {
 	}
 	
 	/**
-	 * 
+	 * Predicts which spatial som model will be active at time t+1 given the current input at time t.
 	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
-	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be the correct model for the input to the spatial pooler at time t + 1.
+	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be active at time t + 1.
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
 		
@@ -42,6 +42,11 @@ public class FirstOrderPredictor {
 		return output;
 	}
 	
+	/**
+	 * Associates the current som activations with the som activations at time t-1
+	 * @param inputVector
+	 * @param curLearningRate
+	 */
 	private void association(SimpleMatrix inputVector, double curLearningRate){
 		for (int h = 0; h < inputVector.numCols(); h++){
 			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
@@ -63,6 +68,11 @@ public class FirstOrderPredictor {
 
 	}
 	
+	/**
+	 * Predict the som activations at time t+1 given the current input 
+	 * @param inputVector
+	 * @return
+	 */
 	private SimpleMatrix prediction(SimpleMatrix inputVector){
 		SimpleMatrix outputVector = new SimpleMatrix(inputVector);
 		double sum = 0;

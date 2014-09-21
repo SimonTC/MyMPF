@@ -72,10 +72,7 @@ public class SpatialPooler {
 		//Compute ActivationMatrix
 		activationMatrix = computeActivationMatrix(errorMatrix);
 		
-		//Add noise
-		SimpleMatrix output = addNoise(activationMatrix, curNoiseMagnitude);
-		
-		return output;
+		return activationMatrix;
 	}
 	/**
 	 * 

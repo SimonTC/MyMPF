@@ -7,17 +7,17 @@ import org.ejml.data.MatrixIterator;
 import org.ejml.simple.SimpleMatrix;
 
 public class SOM {
-	private SomMap map;
+	private SomMap weightMap;
 	private SimpleMatrix errorMatrix;
 	
 	
 	/**
 	 * Creates a new SOM where all node vector values are initialized to a random value between 0 and 1
-	 * @param columns width of the map (coulumns)
-	 * @param rows height of the map (rows)
+	 * @param columns width of the map 
+	 * @param rows height of the map 
 	 */
 	public SOM(int columns, int rows, int inputLength, Random rand) {
-		map = new SomMap(columns, rows, inputLength, rand);
+		weightMap = new SomMap(columns, rows, inputLength, rand);
 		errorMatrix = new SimpleMatrix(rows, columns);
 	}
 	
@@ -54,17 +54,7 @@ public class SOM {
 		
 		return bmu;
 	}
-	/**
-	 * Returns the node which vector is least different from the input vector
-	 * @param input as a array of doubles
-	 * @return
-	 */
-	public SomNode getBMU(double[] input){ 
-		double[][] d = {input};
-		SimpleMatrix m = new SimpleMatrix(d);
-		return getBMU(m);
-	}
-	
+		
 	/**
 	 * Returns the node which vector is least different from the vector of the input node. This method also updates the internal error matrix
 	 * @param input input as a somNode
@@ -73,7 +63,7 @@ public class SOM {
 	public SomNode getBMU(SimpleMatrix inputVector){
 		SomNode BMU = null;
 		double minDiff = Double.POSITIVE_INFINITY;
-		for (SomNode n : map.getNodes()){
+		for (SomNode n : weightMap.getNodes()){
 			double diff = n.squaredDifference(inputVector);
 			if (diff < minDiff){
 				minDiff = diff;
@@ -103,13 +93,13 @@ public class SOM {
 		//Make sure we don't get out of bounds errors
 		if (colStart < 0) colStart = 0;
 		if (rowStart < 0) rowStart = 0;
-		if (colEnd > map.getWidth()) colEnd = map.getWidth();
-		if (rowEnd > map.getHeight()) rowEnd = map.getHeight();
+		if (colEnd > weightMap.getWidth()) colEnd = weightMap.getWidth();
+		if (rowEnd > weightMap.getHeight()) rowEnd = weightMap.getHeight();
 		
 		//Adjust weights
 		for (int col = colStart; col < colEnd; col++){
 			for (int row = rowStart; row < rowEnd; row++){
-				SomNode n = map.get(col, row);
+				SomNode n = weightMap.get(col, row);
 				weightAdjustment(n, bmu, inputVector, neighborhoodRadius, learningRate);
 			}
 		}
@@ -125,7 +115,7 @@ public class SOM {
 	}
 	
 	public SomNode[] getModels(){
-		return map.getNodes();
+		return weightMap.getNodes();
 	}
 	
 	public SimpleMatrix getErrorMatrix(){
@@ -133,11 +123,11 @@ public class SOM {
 	}
 	
 	public SomNode getModel(int id){
-		return map.get(id);
+		return weightMap.get(id);
 	}
 	
 	public SomNode getModel(int row, int col){
-		return map.get(col, row);
+		return weightMap.get(col, row);
 	}
 	
 	
@@ -154,19 +144,19 @@ public class SOM {
 	}
 	
 	public void set(SomNode n, int row, int column){
-		map.set(column, row, n);
+		weightMap.set(column, row, n);
 	}
 	
 	public int getWidth(){
-		return map.getWidth();
+		return weightMap.getWidth();
 	}
 	
 	public int getHeight(){
-		return map.getHeight();
+		return weightMap.getHeight();
 	}
 	
 	public SomMap getMap(){
-		return map;
+		return weightMap;
 	}
 	
 	

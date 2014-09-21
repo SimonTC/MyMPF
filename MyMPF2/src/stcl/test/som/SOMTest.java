@@ -14,7 +14,7 @@ import org.junit.Test;
 import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 
-public class SOMMapTest {
+public class SOMTest {
 
 	@Before
 	public void setUp() throws Exception {

@@ -46,7 +46,11 @@ public class NeoCorticalUnit {
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Bias output by the prediction from t-1
-		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix.elementMult(biasMatrix);		
+		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix.elementMult(biasMatrix);	
+		
+		//Normalize output
+		double sum = spatialFFOutputMatrixBiased.elementSum();
+		spatialFFOutputMatrixBiased = spatialFFOutputMatrixBiased.scale(1/sum);
 		
 		//Predict next input
 		if (useMarkovPrediction){

@@ -102,6 +102,9 @@ public class SomNode {
 		return diff.elementSum();
 	}
 	
+	public void setVector(SimpleMatrix vector){
+		valueVector = vector;
+	}
 	
 	
 	/**

@@ -24,7 +24,7 @@ import stcl.graphics.MapRenderer;
  */
 public class SpatialPoolerDemo extends javax.swing.JFrame {
 
-	int size = 40;
+	int size = 100;
 	int iterations = 500;
 	
 	//private SOMTrainer trainer;

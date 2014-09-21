@@ -13,7 +13,7 @@ public class FirstOrderPredictor {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
-	}
+	} 
 	
 	/**
 	 * Predicts which spatial som model will be active at time t+1 given the current input at time t.

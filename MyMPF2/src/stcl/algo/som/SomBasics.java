@@ -21,9 +21,55 @@ public abstract class SomBasics {
 		errorMatrix = new SimpleMatrix(rows, columns);
 	}
 	
+	public abstract SomNode getBMU();
+	
 	public abstract SomNode getBMU(SimpleMatrix inputVector);
 	
-	public abstract SomNode getBMU();
+	public SimpleMatrix getErrorMatrix(){
+		return errorMatrix;
+	}
+	
+	public int getHeight(){
+		return weightMap.getHeight();
+	}
+	
+	public SomMap getMap(){
+		return weightMap;
+	}
+	
+	public SomNode getModel(int id){
+		return weightMap.get(id);
+	}
+	
+	public SomNode getModel(int row, int col){
+		return weightMap.get(col, row);
+	}
+	
+	public SomNode[] getModels(){
+		return weightMap.getNodes();
+	}
+	
+	public int getWidth(){
+		return weightMap.getWidth();
+	}
+	
+	/**
+	 * Calculates the learning effect based on distance to the learning center.
+	 * The lower the distance, the higher the learning effect
+	 * @param squaredDistance
+	 * @param squaredRadius
+	 * @return
+	 */
+	protected double learningEffect(double squaredDistance, double squaredRadius){
+		double d = Math.exp(-(squaredDistance / (2 * squaredRadius)));
+		return d;
+	}
+	
+	public void set(SomNode n, int row, int column){
+		weightMap.set(column, row, n);
+	}
+	
+	public abstract SomNode step (SimpleMatrix inputVector, double learningRate, double neighborhoodRadius);
 	
 	protected void updateWeightMatrix(SomNode bmu,SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
 		//Calculate start and end coordinates for the weight updates
@@ -50,49 +96,5 @@ public abstract class SomBasics {
 	}
 	
 	public abstract void weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate );
-	
-	/**
-	 * Calculates the learning effect based on distance to the learning center.
-	 * The lower the distance, the higher the learning effect
-	 * @param squaredDistance
-	 * @param squaredRadius
-	 * @return
-	 */
-	protected double learningEffect(double squaredDistance, double squaredRadius){
-		double d = Math.exp(-(squaredDistance / (2 * squaredRadius)));
-		return d;
-	}
-	
-	public SomNode[] getModels(){
-		return weightMap.getNodes();
-	}
-	
-	public SimpleMatrix getErrorMatrix(){
-		return errorMatrix;
-	}
-	
-	public SomNode getModel(int id){
-		return weightMap.get(id);
-	}
-	
-	public SomNode getModel(int row, int col){
-		return weightMap.get(col, row);
-	}
-	
-	public void set(SomNode n, int row, int column){
-		weightMap.set(column, row, n);
-	}
-	
-	public int getWidth(){
-		return weightMap.getWidth();
-	}
-	
-	public int getHeight(){
-		return weightMap.getHeight();
-	}
-	
-	public SomMap getMap(){
-		return weightMap;
-	}
 
 }

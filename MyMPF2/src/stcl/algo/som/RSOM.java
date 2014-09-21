@@ -4,23 +4,35 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class RSOM  {
+public class RSOM extends SomBasics {
+	
 	private SomMap leakyDifferencesMap;
 	private SomMap oldLeakyDifferencesMap; 
-	private SomMap weightMap;
-	private SimpleMatrix errorMatrix;
+	private double leakyCoefficient;
+	
+	public RSOM(int columns, int rows, int inputLength, Random rand, double leakyCoefficient) {
+		super(columns, rows, inputLength, rand);
+		leakyDifferencesMap = new SomMap(columns, rows, inputLength, rand);
+		this.leakyCoefficient = leakyCoefficient; // TODO: Does this change during learning?
+	}
+
 	
 	
-	public void step(SimpleMatrix inputVector, double leakyCoefficient, double learningRate, double neighborhoodRadius){
+	
+	public SomNode step(SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
 		//Update leaky differences
 		updateLeakyDifferences(inputVector, leakyCoefficient);
 		
 		//Find BMU
-		SomNode bmu = findBMU();		
+		SomNode bmu = getBMU();		
 		
 		//Update weight matrix
-		updateWeightMatrix(bmu, learningRate, neighborhoodRadius);
+		updateWeightMatrix(bmu, inputVector, learningRate, neighborhoodRadius);
+		
+		//Save the leakyDifferences map
+		oldLeakyDifferencesMap = leakyDifferencesMap;
 	
+		return bmu;
 	}
 
 	/**
@@ -48,53 +60,22 @@ public class RSOM  {
 		}
 	}
 	
-	private void updateWeightMatrix(SomNode bmu, double learningRate, double neighborhoodRadius){
-		//Calculate start and end coordinates for the weight updates
-		int bmuCol = bmu.getCol();
-		int bmuRow = bmu.getRow();
-		int colStart = (int) (bmuCol - neighborhoodRadius);
-		int rowStart = (int) (bmuRow - neighborhoodRadius );
-		int colEnd = (int) (bmuCol + neighborhoodRadius);
-		int rowEnd = (int) (bmuRow + neighborhoodRadius );
+	@Override
+	public void weightAdjustment(SomNode n, SomNode bmu,
+			SimpleMatrix inputVector, double neighborhoodRadius,
+			double learningRate) {
 		
-		//Make sure we don't get out of bounds errors
-		if (colStart < 0) colStart = 0;
-		if (rowStart < 0) rowStart = 0;
-		if (colEnd > weightMap.getWidth()) colEnd = weightMap.getWidth();
-		if (rowEnd > weightMap.getHeight()) rowEnd = weightMap.getHeight();
-		
-		//Adjust weights
-		for (int col = colStart; col < colEnd; col++){
-			for (int row = rowStart; row < rowEnd; row++){
-				SomNode n = weightMap.get(col, row);
-				SomNode oldLeakyDifferenceNode = oldLeakyDifferencesMap.get(col, row);
-				weightAdjustment(n, bmu, oldLeakyDifferenceNode, neighborhoodRadius, learningRate);
-			}
-		}
-	}
-	
-	private void weightAdjustment(SomNode n, SomNode bmu, SomNode oldLeakyDifferenceNode, double neighborhoodRadius, double learningRate ){
 		double squaredDistance = n.distanceTo(bmu);
 		double squaredRadius = neighborhoodRadius * neighborhoodRadius;
 		if (squaredDistance <= squaredRadius){ 
 			double learningEffect = learningEffect(squaredDistance, squaredRadius);
 			SimpleMatrix vector = n.getVector();
+			SomNode oldLeakyDifferenceNode = oldLeakyDifferencesMap.get(n.getCol(), n.getRow());
 			SimpleMatrix delta = oldLeakyDifferenceNode.getVector().scale(learningRate * learningEffect);
 			vector = vector.plus(delta);
 			n.setVector(vector);
 		}
-	}
-	
-	/**
-	 * Calculates the learning effect based on distance to the learning center.
-	 * The lower the distance, the higher the learning effect
-	 * @param squaredDistance
-	 * @param squaredRadius
-	 * @return
-	 */
-	private double learningEffect(double squaredDistance, double squaredRadius){
-		double d = Math.exp(-(squaredDistance / (2 * squaredRadius)));
-		return d;
+		
 	}
 	
 	/**
@@ -102,7 +83,8 @@ public class RSOM  {
 	 * The error matrix i also updated in this method.
 	 * @return
 	 */
-	private SomNode findBMU(){
+	@Override
+	public SomNode getBMU(){
 		double max = Double.POSITIVE_INFINITY;
 		SomNode[] nodes = leakyDifferencesMap.getNodes();
 		SomNode bmu = null;
@@ -120,7 +102,13 @@ public class RSOM  {
 	public SimpleMatrix getErrorMatrix(){
 		return errorMatrix;
 	}
-	
+
+
+	@Override
+	public SomNode getBMU(SimpleMatrix inputVector) throws UnsupportedOperationException{
+		throw new UnsupportedOperationException();
+	}
+
 	
 	
 }

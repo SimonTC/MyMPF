@@ -48,7 +48,7 @@ public class SOMTest {
 		double radius = 3;
 		double learningRate = 0.7;
 		double squareRadius = radius * radius;
-		SomNode bmu1 = map.step(input1, learningRate, radius);
+		SomNode bmu1 = map.step(createVector(input1), learningRate, radius);
 	
 		
 		//Read new vector values and check that they are the expected values
@@ -63,7 +63,7 @@ public class SOMTest {
 		}
 		
 		//Step 2
-		SomNode bmu2 = map.step(input2, learningRate, radius);
+		SomNode bmu2 = map.step(createVector(input2), learningRate, radius);
 				
 		//Read new vector values and check that they are the expected values
 		double[][][] valuesAfterStep2 = new double[rows][columns] [vectorLength];
@@ -217,10 +217,15 @@ public class SOMTest {
 		SomNode correct = new SomNode(correctValues, 5, 6);
 		map.set(correct, 5, 6);
 		
-		SomNode bmu = map.getBMU(correctValues);
+		SomNode bmu = map.getBMU(createVector(correctValues));
 		
 		assertTrue(bmu.getVector().isIdentical(correct.getVector(), 0.000001));
 
+	}
+	
+	private SimpleMatrix createVector(double[] data){
+		SomNode input = new SomNode(data, -1, -1);
+		return input.getVector();
 	}
 
 	
@@ -401,7 +406,7 @@ public class SOMTest {
 		double learningRate = 0.8;
 		double neighborhoodRadius = 2;
 		double[] correct = {0.3,0.4};
-		SomNode bmu = map.step(correct, learningRate, neighborhoodRadius);
+		SomNode bmu = map.step(createVector(correct), learningRate, neighborhoodRadius);
 		
 		//After step 1 an error matrix have been created and contains expected errors
 		//Expected error for all node = (0-0.3)^2 + (0-0.4)^2 = 0.25
@@ -413,7 +418,7 @@ public class SOMTest {
 		
 		//After step 2 a new error matrix have been created
 		double[] correct2 = {0.1,0.3};
-		bmu = map.step(correct2, learningRate, neighborhoodRadius);
+		bmu = map.step(createVector(correct2), learningRate, neighborhoodRadius);
 		SimpleMatrix errorMatrix2 = map.getErrorMatrix();
 		
 		assertFalse(errorMatrix.isIdentical(errorMatrix2, 0.000001));

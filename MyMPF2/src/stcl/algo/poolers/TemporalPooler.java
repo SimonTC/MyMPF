@@ -18,14 +18,14 @@ public class TemporalPooler extends SpatialPooler  {
 		
 		curLeakyCoefficient = 1; //TODO: Initial leaky coefficient should be a parameter. Does it change at all?
 		
-		rsom = new SOM(mapSize, mapSize, inputLength, rand);
+		rsom = new RSOM(mapSize, mapSize, inputLength, rand, curLeakyCoefficient);
 		
 	}
 	
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		//Update RSOM
-		rsom.step(inputVector, curLeakyCoefficient, curLearningRate, curNeighborhoodRadius);
+		rsom.step(inputVector, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error
 		errorMatrix = rsom.getErrorMatrix();

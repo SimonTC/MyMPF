@@ -39,14 +39,13 @@ public class TemporalPooler extends SpatialPooler  {
 				 // I am not implementing this right now
 		
 		//Collect error
-		SimpleMatrix errorMatrix = new SimpleMatrix(differences);
+		errorMatrix = new SimpleMatrix(differences);
 		
 		//Compute activation
-		double maxError = errorMatrix.elementMaxAbs();
-		computeActivationMatrix(maxError, errorMatrix);
+		activationMatrix = computeActivationMatrix(errorMatrix);
 		
 		//Compute output
-		SimpleMatrix output = addNoise(matrix_Activation, curNoiseMagnitude);
+		SimpleMatrix output = addNoise(activationMatrix, curNoiseMagnitude);
 		
 		return output;
 	}

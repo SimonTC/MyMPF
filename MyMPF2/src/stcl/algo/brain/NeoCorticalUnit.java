@@ -67,7 +67,7 @@ public class NeoCorticalUnit {
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix, SimpleMatrix correlationMatrix){
 		
 		//Selection of best temporal model
-		SimpleMatrix temporalPoolerFBOutputVector = temporalPooler.feedBack(inputMatrix);
+		SimpleMatrix temporalPoolerFBOutputVector = temporalPooler.feedBackward(inputMatrix);
 		
 		//Transformation into matrix
 		SimpleMatrix temporalFBOutputMatrix = new SimpleMatrix(ffInputVectorSize, ffInputVectorSize);
@@ -80,7 +80,7 @@ public class NeoCorticalUnit {
 		} 
 		
 		//Selection of best spatial mode
-		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBack(biasMatrix);
+		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasMatrix);
 		
 		return spatialPoolerFBOutputVector;
 	}

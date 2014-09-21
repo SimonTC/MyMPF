@@ -17,8 +17,8 @@ public class SpatialPooler {
 	protected SOM som;
 	
 	//Matrice used 
-	protected SimpleMatrix matrix_Error; //Squared error of the activation in the SOM
-	protected SimpleMatrix matrix_Activation; //Probablitiy that model i,j in the SOM is the best model for the given input
+	protected SimpleMatrix errorMatrix; //Squared error of the activation in the SOM
+	protected SimpleMatrix activationMatrix;
 	
 	//Variables for learning
 	protected double curLearningRate;
@@ -28,7 +28,7 @@ public class SpatialPooler {
 	
 	//Decay function
 	//TODO: They probably have to be changed at some point. Especially noiseDecay. It should be dependant on activitty from lower levels.
-	//TODO: They should probably be moved to the Neurocortical unit
+	//TODO: They should probably be moved to the Neocortical unit
 	private ExponentialDecayFunction learningDecay;
 	private ExponentialDecayFunction radiusDecay;
 	private ExponentialDecayFunction noiseDecay;
@@ -40,8 +40,8 @@ public class SpatialPooler {
 	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize) {
 		this.rand = rand;
 		som = new SOM(mapSize, mapSize, inputLength, rand);
-		matrix_Error = new SimpleMatrix(mapSize, mapSize);
-		matrix_Activation = new SimpleMatrix(mapSize, mapSize);
+		errorMatrix = new SimpleMatrix(mapSize, mapSize);
+		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		tick = 0;
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
@@ -67,14 +67,13 @@ public class SpatialPooler {
 		som.step(input, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error matrix
-		matrix_Error = som.getErrorMatrix();
+		errorMatrix = som.getErrorMatrix();
 		
 		//Compute ActivationMatrix
-		double maxError = matrix_Error.elementMaxAbs();
-		computeActivationMatrix(maxError, matrix_Error);
+		activationMatrix = computeActivationMatrix(errorMatrix);
 		
 		//Add noise
-		SimpleMatrix output = addNoise(matrix_Activation, curNoiseMagnitude);
+		SimpleMatrix output = addNoise(activationMatrix, curNoiseMagnitude);
 		
 		return output;
 	}
@@ -83,7 +82,18 @@ public class SpatialPooler {
 	 * @param input
 	 * @return vector
 	 */
-	public SimpleMatrix feedBack(SimpleMatrix input){
+	public SimpleMatrix feedBackward(SimpleMatrix input){
+		//Choose random model from som by roulette selection based on the input
+		SimpleMatrix model = chooseRandom(input);
+		
+		//Add noise
+		model = addNoise(model, curNoiseMagnitude);
+		
+		return model;
+		
+	}
+	
+	private SimpleMatrix chooseRandom(SimpleMatrix input){
 		//Transform bias matrix into vector
 		double[] vector = input.getMatrix().data;
 		
@@ -97,22 +107,31 @@ public class SpatialPooler {
 			tmp += vector[id++];
 		}
 		
+		id--; //We have t subtract to be sure we get the correct model
+		
 		//Choose model from som
 		SimpleMatrix model = som.getModel(id).getVector();
-		
-		//Add noise
-		model = addNoise(model, curNoiseMagnitude);
 		
 		return model;
 		
 	}
 	
-	protected void computeActivationMatrix(double maxError, SimpleMatrix errorMatrix){
+	protected SimpleMatrix computeActivationMatrix( SimpleMatrix errorMatrix){
+		double maxError = errorMatrix.elementMaxAbs();
 		SimpleMatrix m = errorMatrix.divide(maxError);
-		matrix_Activation.set(1);
-		matrix_Activation = matrix_Activation.minus(m);		
+		SimpleMatrix activation = new SimpleMatrix(errorMatrix.numRows(), errorMatrix.numCols());
+		activation.set(1);
+		activation = activation.minus(m);	
+		return activation;
 	}
 	
+	/**
+	 * Adds noise to the given matrix and returns the matrix.
+	 * The matrix is altered in this method.
+	 * @param m
+	 * @param noiseMagnitude
+	 * @return
+	 */
 	protected SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
 		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
 		m = m.plus(noise);

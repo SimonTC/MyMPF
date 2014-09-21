@@ -1,4 +1,4 @@
-package stcl.algo.rewardCorrelators;
+package stcl.algo.brain.rewardCorrelators;
 
 import org.ejml.simple.SimpleMatrix;
 

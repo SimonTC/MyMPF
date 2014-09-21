@@ -1,16 +1,16 @@
-package stcl.algo.biasunits;
+package stcl.algo.brain.biasunits;
 
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class Bias {
+public class BiasUnit {
 
 	private double biasInfluence; //Should be set by parameter
 	private Random rand;
 	private SimpleMatrix bias;
 	
-	public Bias(int biasMatrixSize, double biasInfluence, Random rand) {
+	public BiasUnit(int biasMatrixSize, double biasInfluence, Random rand) {
 		this.biasInfluence = biasInfluence;
 		this.rand = rand;
 		this.bias = new SimpleMatrix(biasMatrixSize, biasMatrixSize);

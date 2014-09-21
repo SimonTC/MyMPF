@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.biasunits.Bias;
+import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderPredictor;
@@ -13,7 +13,7 @@ public class NeoCorticalUnit {
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	private Bias biasUnit;
+	private BiasUnit biasUnit;
 	private FirstOrderPredictor predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
@@ -31,7 +31,7 @@ public class NeoCorticalUnit {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
 		temporalPooler = new TemporalPooler(rand, maxIterations, ffInputLength * ffInputLength, temporalMapSize);
-		biasUnit = new Bias(ffInputLength, biasInfluence, rand);
+		biasUnit = new BiasUnit(ffInputLength, biasInfluence, rand);
 		predictor = new FirstOrderPredictor(ffInputLength);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);

@@ -18,13 +18,14 @@ public class Bias {
 	}
 	
 	/**
-	 *
+	 * This bias units is placed between the different layers in the brain.
+	 * Biases the feed back output from one neocortical unit to the next
 	 * @param input
 	 * @param correlationMatrix
 	 * @param noiseMagnitude
 	 * @return
 	 */
-	public SimpleMatrix calculateBias(SimpleMatrix input, SimpleMatrix correlationMatrix, double noiseMagnitude){
+	public SimpleMatrix biasFBSpatialOutput(SimpleMatrix input, SimpleMatrix correlationMatrix, double noiseMagnitude){
 		SimpleMatrix s = calculateS(correlationMatrix); //TODO: FInd another name
 		
 		double[] sData = s.getMatrix().data;
@@ -49,10 +50,6 @@ public class Bias {
 		return output;
 	}
 	
-	public SimpleMatrix biasSpatialFFOutput(SimpleMatrix ffOutput){
-		SimpleMatrix m = ffOutput.elementMult(bias);
-		return m;
-	}
 	
 	private SimpleMatrix calculateS (SimpleMatrix correlationMatrix){
 		SimpleMatrix s = correlationMatrix.plus(1); //the plus operation does add the beta vale, nut multiply by it as it says in the javadoc

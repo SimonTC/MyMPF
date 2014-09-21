@@ -15,6 +15,7 @@ public class NeoCorticalUnit {
 	private TemporalPooler temporalPooler;
 	private Bias biasUnit;
 	private FirstOrderPredictor predictor;
+	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	
 	private int ffInputVectorSize;
@@ -24,16 +25,19 @@ public class NeoCorticalUnit {
 	private double curNoiseMagnitude;
 	//private double biasInfluence;
 	
-	private boolean biasActions;
+	private boolean useMarkovPrediction;
 	
-	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate) {
+	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate, boolean useMarkovPrediction) {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
 		temporalPooler = new TemporalPooler(rand, maxIterations, ffInputLength * ffInputLength, temporalMapSize);
 		biasUnit = new Bias(ffInputLength, biasInfluence, rand);
 		predictor = new FirstOrderPredictor(ffInputLength);
+		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+		biasMatrix.set(1);
 		ffInputVectorSize = ffInputLength;
 		this.predictionLearningRate = predictionLearningRate;
+		this.useMarkovPrediction = useMarkovPrediction;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -41,19 +45,16 @@ public class NeoCorticalUnit {
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
-		//Bias output
-		SimpleMatrix biasedSpatialFFOutputMatrix;
-		if (biasActions){
-			biasedSpatialFFOutputMatrix = biasUnit.biasSpatialFFOutput(spatialFFOutputMatrix);
-		} else {
-			biasedSpatialFFOutputMatrix = spatialFFOutputMatrix;
-		}
+		//Bias output by the prediction from t-1
+		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix.elementMult(biasMatrix);		
 		
 		//Predict next input
-		predictionMatrix = predictor.predict(biasedSpatialFFOutputMatrix, predictionLearningRate);
+		if (useMarkovPrediction){
+			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, predictionLearningRate);
+		} 
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = biasedSpatialFFOutputMatrix.getMatrix().data;		
+		double[] spatialFFOutputDataVector = spatialFFOutputMatrixBiased.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
@@ -72,11 +73,14 @@ public class NeoCorticalUnit {
 		SimpleMatrix temporalFBOutputMatrix = new SimpleMatrix(ffInputVectorSize, ffInputVectorSize);
 		temporalFBOutputMatrix.getMatrix().data = temporalPoolerFBOutputVector.getMatrix().data;
 		
-		//Combine FB output from temporal pooler with prediction
-		SimpleMatrix biasedFBTemporalOutputMatrix = biasUnit.calculateBias(temporalFBOutputMatrix, correlationMatrix, curNoiseMagnitude);
+		//Combine FB output from temporal pooler with bias and prediction (if enabled)
+		biasMatrix = temporalFBOutputMatrix;
+		if (useMarkovPrediction){
+			biasMatrix = biasMatrix.elementMult(predictionMatrix);
+		} 
 		
 		//Selection of best spatial mode
-		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBack(biasedFBTemporalOutputMatrix);
+		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBack(biasMatrix);
 		
 		return spatialPoolerFBOutputVector;
 	}

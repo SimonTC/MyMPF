@@ -102,6 +102,8 @@ public class SomNode {
 		return diff.elementSum();
 	}
 	
+	
+	
 	/**
 	 * Calculates the euclidian distance between the two nodes.
 	 * Based on the coordinates of the nodes

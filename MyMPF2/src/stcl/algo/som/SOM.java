@@ -87,7 +87,7 @@ public class SOM {
 	}
 	
 	/**
-	 * Returns the node which vector is least different from the vector of the input node
+	 * Returns the node which vector is least different from the vector of the input node. This method also updates the internal error matrix
 	 * @param input input as a somNode
 	 * @return
 	 */

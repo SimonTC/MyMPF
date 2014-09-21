@@ -7,8 +7,7 @@ import org.ejml.data.MatrixIterator;
 import org.ejml.simple.SimpleMatrix;
 
 public class SOM {
-	private int rows, columns;
-	private SomNode[] models; //The models in the map
+	private SomMap map;
 	private SimpleMatrix errorMatrix;
 	
 	
@@ -18,28 +17,8 @@ public class SOM {
 	 * @param rows height of the map (rows)
 	 */
 	public SOM(int columns, int rows, int inputLength, Random rand) {
-		this.columns = columns;
-		this.rows = rows;
-		initializeMap(inputLength, rand);
+		map = new SomMap(columns, rows, inputLength, rand);
 		errorMatrix = new SimpleMatrix(rows, columns);
-	}
-	
-	/**
-	 * Fills the map with nodes where the vector values are set to random values between 0 and 1
-	 * @param columns
-	 * @param rows
-	 * @param inputLength
-	 * @param rand
-	 */
-	private void initializeMap(int inputLength, Random rand){
-		models = new SomNode[rows * columns];
-		
-		for (int row = 0; row < rows; row++){
-			for (int col = 0; col < columns; col++){
-				SomNode n = new SomNode(inputLength, rand, col, row);
-				models[coordinateToIndex(row, col)] = n;
-			}
-		}
 	}
 	
 	/**
@@ -94,7 +73,7 @@ public class SOM {
 	public SomNode getBMU(SimpleMatrix inputVector){
 		SomNode BMU = null;
 		double minDiff = Double.POSITIVE_INFINITY;
-		for (SomNode n : models){
+		for (SomNode n : map.getNodes()){
 			double diff = n.squaredDifference(inputVector);
 			if (diff < minDiff){
 				minDiff = diff;
@@ -115,22 +94,22 @@ public class SOM {
 	public void adjustWeights(SomNode bmu, SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
 		//Calculate start and end coordinates for the weight updates
 		int bmuCol = bmu.getCol();
-		int bmyRow = bmu.getRow();
+		int bmuRow = bmu.getRow();
 		int colStart = (int) (bmuCol - neighborhoodRadius);
-		int rowStart = (int) (bmyRow - neighborhoodRadius );
+		int rowStart = (int) (bmuRow - neighborhoodRadius );
 		int colEnd = (int) (bmuCol + neighborhoodRadius);
-		int rowEnd = (int) (bmyRow + neighborhoodRadius );
+		int rowEnd = (int) (bmuRow + neighborhoodRadius );
 		
 		//Make sure we don't get out of bounds errors
 		if (colStart < 0) colStart = 0;
 		if (rowStart < 0) rowStart = 0;
-		if (colEnd > columns) colEnd = columns;
-		if (rowEnd > rows) rowEnd = rows;
+		if (colEnd > map.getWidth()) colEnd = map.getWidth();
+		if (rowEnd > map.getHeight()) rowEnd = map.getHeight();
 		
 		//Adjust weights
 		for (int col = colStart; col < colEnd; col++){
 			for (int row = rowStart; row < rowEnd; row++){
-				SomNode n = models[coordinateToIndex(row, col)];
+				SomNode n = map.get(col, row);
 				weightAdjustment(n, bmu, inputVector, neighborhoodRadius, learningRate);
 			}
 		}
@@ -146,7 +125,7 @@ public class SOM {
 	}
 	
 	public SomNode[] getModels(){
-		return models;
+		return map.getNodes();
 	}
 	
 	public SimpleMatrix getErrorMatrix(){
@@ -154,11 +133,11 @@ public class SOM {
 	}
 	
 	public SomNode getModel(int id){
-		return models[id];
+		return map.get(id);
 	}
 	
 	public SomNode getModel(int row, int col){
-		return models[coordinateToIndex(row, col)];
+		return map.get(col, row);
 	}
 	
 	
@@ -174,20 +153,20 @@ public class SOM {
 		return d;
 	}
 	
-	private int coordinateToIndex(int row, int col){
-		return (row * columns + col);
-	}
-	
 	public void set(SomNode n, int row, int column){
-		models[coordinateToIndex(row, column)] = n;
+		map.set(column, row, n);
 	}
 	
 	public int getWidth(){
-		return columns;
+		return map.getWidth();
 	}
 	
 	public int getHeight(){
-		return rows;
+		return map.getHeight();
+	}
+	
+	public SomMap getMap(){
+		return map;
 	}
 	
 	

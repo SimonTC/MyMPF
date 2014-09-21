@@ -50,8 +50,20 @@ public class SomMap {
 		return nodes[coordinateToIndex(y, x)];
 	}
 	
+	public void set(int x, int y, SomNode n){
+		nodes[coordinateToIndex(y, x)] = n;;
+	}
+	
 	public SomNode get(int id){
 		return nodes[id];
+	}
+	
+	public int getWidth(){
+		return columns;
+	}
+	
+	public int getHeight(){
+		return rows;
 	}
 	
 

@@ -22,11 +22,11 @@ public class TemporalPooler extends SpatialPooler  {
 	}
 	
 	@Override
-	public SimpleMatrix feedForward(SimpleMatrix input){
-		//TODO: OBS I am not sure this alorithm is correct. Has to check up on it
+	public SimpleMatrix feedForward(SimpleMatrix inputVector){
+		//TODO: OBS I am not sure this alogrithm is correct. Has to check up on it
 		
 		//Update weight matrix (SOM)
-		som.step(input, curLearningRate, curNeighborhoodRadius);
+		som.step(inputVector, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error from the SOM (They are used in the update of the leaky differences)
 		SimpleMatrix somErrors = som.getErrorMatrix();

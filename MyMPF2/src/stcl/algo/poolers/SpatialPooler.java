@@ -81,7 +81,7 @@ public class SpatialPooler {
 	/**
 	 * 
 	 * @param input
-	 * @return
+	 * @return vector
 	 */
 	public SimpleMatrix feedBack(SimpleMatrix input){
 		//Transform bias matrix into vector

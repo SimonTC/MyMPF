@@ -40,18 +40,25 @@ public class Trainer {
 				SimpleMatrix inputVector = new SimpleMatrix(input);
 				ffOutput = nu.feedForward(inputVector);
 				
-				fbOutput = nu.feedBackward(ffOutput, ffOutput);
+				SimpleMatrix temporalFBInput = SimpleMatrix.random(temporalMapSize, temporalMapSize, 0, 1, rand);
+				
+				double sum = temporalFBInput.elementSum();
+				temporalFBInput = temporalFBInput.scale(1/sum);
+				
+				fbOutput = nu.feedBackward(temporalFBInput);
+				if (fbOutput == null) return;
 				
 				double[] actual = fbOutput.getMatrix().data;
 				int j = 0;
-				if ( i == 0) j = 1;
-				if ( i == 1) j = 0;
+				if ( sample == 0) j = 1;
+				if ( sample == 1) j = 0;
 				SQME += calculateSQME(trainingData[j], actual);
 				
 			}
 			
 			
-			System.out.println("Step " + i++ + "SQME: " + SQME);
+			System.out.println("Step " + i++ + " SQME: " + SQME);
+			System.out.println();
 			
 		} while (SQME > 0.001);
 		

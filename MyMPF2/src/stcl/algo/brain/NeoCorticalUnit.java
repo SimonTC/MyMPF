@@ -45,6 +45,9 @@ public class NeoCorticalUnit {
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
+		//Test input
+		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
+		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
@@ -61,6 +64,8 @@ public class NeoCorticalUnit {
 			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, predictionLearningRate);
 		} 
 		
+		
+		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = spatialFFOutputMatrixBiased.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
@@ -72,8 +77,17 @@ public class NeoCorticalUnit {
 		return temporalFFOutputMatrix;
 	}
 	
-	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix, SimpleMatrix correlationMatrix){
-		
+	/**
+	 * 
+	 * @param inputMatrix
+	 * @param correlationMatrix
+	 * @return
+	 */
+	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
+		//Test input
+		if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
+		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
+				
 		//Selection of best temporal model
 		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(inputMatrix);
 		
@@ -82,8 +96,12 @@ public class NeoCorticalUnit {
 		
 		//Combine FB output from temporal pooler with bias and prediction (if enabled)
 		biasMatrix = temporalPoolerFBOutput;
+		
 		if (useMarkovPrediction){
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
+			//Normalize
+			double sum = biasMatrix.elementSum();
+			biasMatrix = biasMatrix.scale(1/sum);
 		} 
 		
 		//Selection of best spatial mode

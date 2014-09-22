@@ -26,6 +26,10 @@ public class SpatialPooler {
 	protected double curNoiseMagnitude;
 	private int tick;
 	
+	//Variables used for testing inputs
+	protected int inputLength;
+	protected int mapSize;
+	
 	//Decay function
 	//TODO: They probably have to be changed at some point. Especially noiseDecay. It should be dependant on activitty from lower levels.
 	//TODO: They should probably be moved to the Neocortical unit
@@ -43,6 +47,8 @@ public class SpatialPooler {
 		errorMatrix = new SimpleMatrix(mapSize, mapSize);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		tick = 0;
+		this.inputLength = inputLength;
+		this.mapSize = mapSize;
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
 		curLearningRate = 1;
@@ -62,9 +68,13 @@ public class SpatialPooler {
 		curNoiseMagnitude = noiseDecay.decayValue(tick);
 	}
 	
-	public SimpleMatrix feedForward(SimpleMatrix input){
+	public SimpleMatrix feedForward(SimpleMatrix inputVector){
+		//Test input
+		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
+		if (inputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
+		
 		//Adjust weights of SOM
-		som.step(input, curLearningRate, curNeighborhoodRadius);
+		som.step(inputVector, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error matrix
 		errorMatrix = som.getErrorMatrix();
@@ -77,14 +87,19 @@ public class SpatialPooler {
 		
 		return activationMatrix;
 	}
+	
 	/**
 	 * 
-	 * @param input
+	 * @param inputMatrix
 	 * @return vector
 	 */
-	public SimpleMatrix feedBackward(SimpleMatrix input){
+	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
+		//Test input
+		if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a matrix");
+		if (inputMatrix.numCols() != mapSize || inputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
+		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(input);
+		SimpleMatrix model = chooseRandom(inputMatrix);
 		
 		//Add noise
 		model = addNoise(model, curNoiseMagnitude);
@@ -99,7 +114,7 @@ public class SpatialPooler {
 		return m;
 	}
 	
-	private SimpleMatrix chooseRandom(SimpleMatrix input){
+	protected SimpleMatrix chooseRandom(SimpleMatrix input){
 		//Transform bias matrix into vector
 		double[] vector = input.getMatrix().data;
 		

@@ -19,6 +19,8 @@ public class NeoCorticalUnit {
 	private SimpleMatrix predictionMatrix;
 	
 	private int ffInputVectorSize;
+	private int spatialMapSize;
+	private int temporalMapSize;
 	
 	//Learning rates
 	private double predictionLearningRate; //TODO: Find correct name for it
@@ -30,14 +32,16 @@ public class NeoCorticalUnit {
 	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate, boolean useMarkovPrediction) {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
-		temporalPooler = new TemporalPooler(rand, maxIterations, ffInputLength * ffInputLength, temporalMapSize);
+		temporalPooler = new TemporalPooler(rand, maxIterations, spatialMapSize * spatialMapSize, temporalMapSize);
 		biasUnit = new BiasUnit(ffInputLength, biasInfluence, rand);
-		predictor = new FirstOrderPredictor(ffInputLength);
+		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffInputVectorSize = ffInputLength;
 		this.predictionLearningRate = predictionLearningRate;
 		this.useMarkovPrediction = useMarkovPrediction;
+		this.spatialMapSize = spatialMapSize;
+		this.temporalMapSize = temporalMapSize;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -71,14 +75,13 @@ public class NeoCorticalUnit {
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix, SimpleMatrix correlationMatrix){
 		
 		//Selection of best temporal model
-		SimpleMatrix temporalPoolerFBOutputVector = temporalPooler.feedBackward(inputMatrix);
+		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(inputMatrix);
 		
 		//Transformation into matrix
-		SimpleMatrix temporalFBOutputMatrix = new SimpleMatrix(ffInputVectorSize, ffInputVectorSize);
-		temporalFBOutputMatrix.getMatrix().data = temporalPoolerFBOutputVector.getMatrix().data;
+		temporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize);
 		
 		//Combine FB output from temporal pooler with bias and prediction (if enabled)
-		biasMatrix = temporalFBOutputMatrix;
+		biasMatrix = temporalPoolerFBOutput;
 		if (useMarkovPrediction){
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 		} 

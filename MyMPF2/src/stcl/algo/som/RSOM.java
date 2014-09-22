@@ -13,6 +13,8 @@ public class RSOM extends SomBasics {
 	public RSOM(int columns, int rows, int inputLength, Random rand, double leakyCoefficient) {
 		super(columns, rows, inputLength, rand);
 		leakyDifferencesMap = new SomMap(columns, rows, inputLength, rand);
+		oldLeakyDifferencesMap = new SomMap(columns, rows, inputLength);
+		
 		this.leakyCoefficient = leakyCoefficient; // TODO: Does this change during learning?
 	}
 
@@ -46,8 +48,9 @@ public class RSOM extends SomBasics {
 		for (int row = 0; row < leakyDifferencesMap.getHeight(); row++){
 			for (int col = 0; col < leakyDifferencesMap.getWidth(); col++){
 				SomNode leakyDifferenceNode = leakyDifferencesMap.get(col, row);
+				SomNode weightNode = weightMap.get(col, row);
 				//Calculate squared difference between input vector and weight vector
-				SimpleMatrix weightDiff = weightMap.get(col, row).getVector().minus(inputVector);
+				SimpleMatrix weightDiff = weightNode.getVector().minus(inputVector);
 				weightDiff = weightDiff.elementPower(2);
 				weightDiff = weightDiff.scale(leakyCoefficient);
 				
@@ -85,14 +88,14 @@ public class RSOM extends SomBasics {
 	 */
 	@Override
 	public SomNode getBMU(){
-		double max = Double.POSITIVE_INFINITY;
+		double min = Double.POSITIVE_INFINITY;
 		SomNode[] nodes = leakyDifferencesMap.getNodes();
 		SomNode bmu = null;
 		for (SomNode n : nodes){
 			double value = n.getVector().elementSum();
 			errorMatrix.set(n.getRow(), n.getCol(), value);
-			if (value > max) {
-				max = value;
+			if (value < min) {
+				min = value;
 				bmu = n;
 			}
 		}

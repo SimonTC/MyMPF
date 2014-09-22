@@ -21,6 +21,17 @@ public class SomMap {
 	}
 	
 	/**
+	 * Creates a new map where all node vector values are initialized to 0
+	 * @param columns width of the map 
+	 * @param rows height of the map 
+	 */
+	public SomMap(int columns, int rows, int inputLength) {
+		this.columns = columns;
+		this.rows = rows;
+		initializeMap(inputLength, null);
+	}
+	
+	/**
 	 * Fills the map with nodes where the vector values are set to random values between 0 and 1
 	 * @param columns
 	 * @param rows
@@ -32,7 +43,13 @@ public class SomMap {
 		
 		for (int row = 0; row < rows; row++){
 			for (int col = 0; col < columns; col++){
-				SomNode n = new SomNode(inputLength, rand, col, row);
+				SomNode n;
+				if (rand != null){
+					n = new SomNode(inputLength, rand, col, row);
+				} else{
+					n = new SomNode(inputLength, col, row);
+				}
+					
 				nodes[coordinateToIndex(row, col)] = n;
 			}
 		}

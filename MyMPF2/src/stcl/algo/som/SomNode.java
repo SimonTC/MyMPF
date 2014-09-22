@@ -10,6 +10,19 @@ public class SomNode {
 	private int col, row; // Coordinates of the node
 	
 	/**
+	 * Creates a node with a vector with values set to zero
+	 * @param vectorSize 
+	 * @param col
+	 * @param row
+	 */
+	public SomNode(int vectorSize, int col, int row) {
+		// Create vector with the dimension values and set values between 0 and 1
+		valueVector = new SimpleMatrix(1, vectorSize);
+		valueVector.set(0);
+		setCoordinate(col, row);
+	}
+	
+	/**
 	 * Creates a node with a vector with random values between 0 and 1
 	 * @param vectorSize 
 	 * @param rand

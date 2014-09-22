@@ -33,6 +33,9 @@ public class TemporalPooler extends SpatialPooler  {
 		//Compute activation
 		activationMatrix = computeActivationMatrix(errorMatrix);
 		
+		//Normalize activation matrix
+		activationMatrix = normalize(activationMatrix);
+		
 		return activationMatrix;
 	}
 }

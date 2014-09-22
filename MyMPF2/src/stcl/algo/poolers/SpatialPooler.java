@@ -93,7 +93,7 @@ public class SpatialPooler {
 		
 	}
 	
-	private SimpleMatrix normalize(SimpleMatrix matrix){
+	protected SimpleMatrix normalize(SimpleMatrix matrix){
 		double sum = matrix.elementSum();
 		SimpleMatrix m = matrix.scale(1/sum);
 		return m;

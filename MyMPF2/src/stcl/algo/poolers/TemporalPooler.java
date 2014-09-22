@@ -13,10 +13,10 @@ public class TemporalPooler extends SpatialPooler  {
 	private double curLeakyCoefficient; 
 	
 	public TemporalPooler(Random rand, int maxIterations, int inputLength,
-			int mapSize) {
+			int mapSize, double leakyCoefficient) {
 		super(rand, maxIterations, inputLength, mapSize);
 		
-		curLeakyCoefficient = 1; //TODO: Initial leaky coefficient should be a parameter. Does it change at all?
+		curLeakyCoefficient = leakyCoefficient; //TODO: Initial leaky coefficient should be a parameter. Does it change at all?
 		
 		rsom = new RSOM(mapSize, mapSize, inputLength, rand, curLeakyCoefficient);
 		

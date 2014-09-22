@@ -13,6 +13,8 @@ public class FirstOrderPredictor {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
+		conditionalPredictionMatrix.set(1); //Initialize to 1. 
+											//TODO: Does this make sense?
 	} 
 	
 	/**
@@ -24,7 +26,8 @@ public class FirstOrderPredictor {
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
 		
 		//Transform input matrix to vector of size IJ
-		SimpleMatrix inputVector = new SimpleMatrix(1, inputMatrix.numCols() * inputMatrix.numRows());
+		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
+		inputVector.reshape(1, inputMatrix.numCols() * inputMatrix.numRows());
 		
 		//Association
 		association(inputVector, curLearningRate);

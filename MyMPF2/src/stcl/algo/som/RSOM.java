@@ -49,6 +49,7 @@ public class RSOM extends SomBasics {
 			for (int col = 0; col < leakyDifferencesMap.getWidth(); col++){
 				SomNode leakyDifferenceNode = leakyDifferencesMap.get(col, row);
 				SomNode weightNode = weightMap.get(col, row);
+				
 				//Calculate squared difference between input vector and weight vector
 				SimpleMatrix weightDiff = weightNode.getVector().minus(inputVector);
 				weightDiff = weightDiff.elementPower(2);

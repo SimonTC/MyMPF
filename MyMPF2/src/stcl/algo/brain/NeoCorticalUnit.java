@@ -29,10 +29,10 @@ public class NeoCorticalUnit {
 	
 	private boolean useMarkovPrediction;
 	
-	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate, boolean useMarkovPrediction) {
+	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate, boolean useMarkovPrediction, double leakyCoefficient) {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
-		temporalPooler = new TemporalPooler(rand, maxIterations, spatialMapSize * spatialMapSize, temporalMapSize);
+		temporalPooler = new TemporalPooler(rand, maxIterations, spatialMapSize * spatialMapSize, temporalMapSize, leakyCoefficient);
 		biasUnit = new BiasUnit(ffInputLength, biasInfluence, rand);
 		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);

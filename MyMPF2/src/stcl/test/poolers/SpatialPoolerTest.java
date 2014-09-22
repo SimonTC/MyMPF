@@ -30,12 +30,22 @@ public class SpatialPoolerTest {
 	
 	@Test
 	public void testFeedForward() {
-		//No need to test this as all sub methods are already being tested
-		assertTrue(true);
+		//Make sure that the output is a probability mass distribution
+		SimpleMatrix input = SimpleMatrix.random(1,3, 0, 1, new Random());
+		SimpleMatrix output = pooler.feedForward(input);
+		assertEquals(1, output.elementSum(), 0.00001);
 	}
 	
 	@Test
 	public void testFeedBack() {
+		//Test that output is the same size as input
+		//Make sure that the output is a probability mass distribution
+		SimpleMatrix ffInput = SimpleMatrix.random(1,3, 0, 1, new Random());
+		SimpleMatrix ffOutput = pooler.feedForward(ffInput);
+		SimpleMatrix fbOutput = pooler.feedBackward(ffOutput);
+		assertTrue(fbOutput.numCols() == 3 && fbOutput.numRows() == 1);
+		
+		
 		//No need to test this as all sub methods are already being tested
 		assertTrue(true);
 	}
@@ -46,7 +56,7 @@ public class SpatialPoolerTest {
 		Method method = SpatialPooler.class.getDeclaredMethod("computeActivationMatrix", SimpleMatrix.class);
 		method.setAccessible(true);
 		
-		//Test that the activation matrix has been computed correctly
+		//Create error matrix
 		Random rand = new Random();
 		double[][] errorData = new double[mapSize][mapSize];
 		for (int i = 0; i < mapSize; i++){
@@ -55,11 +65,15 @@ public class SpatialPoolerTest {
 			}
 		}
 		SimpleMatrix errorMatrix = new SimpleMatrix(errorData);
+		
+		//Calculate expected activation
 		double[][] activationData = expectedActivation(errorData);
 		SimpleMatrix expectedActivation = new SimpleMatrix(activationData);
 		SimpleMatrix actualMatrix = (SimpleMatrix) method.invoke(pooler, errorMatrix);
 		
 		assertTrue(expectedActivation.isIdentical(actualMatrix, 0.0001));
+		
+		
 		
 	}
 	
@@ -77,12 +91,28 @@ public class SpatialPoolerTest {
 		double[][] activationData = new double[errorData.length][errorData[0].length];
 		for (int i = 0; i < activationData.length; i++){
 			for (int j = 0; j < activationData[0].length; j++){
-				activationData[i][j] = 1 - (errorData[i][j] / maxError);
-				
+				double activation = 1 - (errorData[i][j] / maxError);;
+				activationData[i][j] = activation;
 			}
-		}
+		}		
 		
 		return activationData;
+	}
+	
+	@Test
+	public void testNormalization() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		Method method = SpatialPooler.class.getDeclaredMethod("normalize", SimpleMatrix.class);
+		method.setAccessible(true);
+		
+		SimpleMatrix m = SimpleMatrix.random(10, 10, 1, 5, new Random());
+		double oldSum = m.elementSum();
+		assertTrue(oldSum > 1);
+		
+		SimpleMatrix normalized = (SimpleMatrix) method.invoke(pooler, m);
+		double newSum = normalized.elementSum();
+		
+		assertEquals(1, newSum, 0.0001);
+		
 	}
 	
 	@Test

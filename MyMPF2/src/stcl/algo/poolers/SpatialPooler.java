@@ -72,6 +72,9 @@ public class SpatialPooler {
 		//Compute ActivationMatrix
 		activationMatrix = computeActivationMatrix(errorMatrix);
 		
+		//Normalize activation matrix
+		activationMatrix = normalize(activationMatrix);
+		
 		return activationMatrix;
 	}
 	/**
@@ -88,6 +91,12 @@ public class SpatialPooler {
 		
 		return model;
 		
+	}
+	
+	private SimpleMatrix normalize(SimpleMatrix matrix){
+		double sum = matrix.elementSum();
+		SimpleMatrix m = matrix.scale(1/sum);
+		return m;
 	}
 	
 	private SimpleMatrix chooseRandom(SimpleMatrix input){

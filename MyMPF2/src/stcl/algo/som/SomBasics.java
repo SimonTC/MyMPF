@@ -33,7 +33,7 @@ public abstract class SomBasics {
 		return weightMap.getHeight();
 	}
 	
-	public SomMap getMap(){
+	public SomMap getWeighttMap(){
 		return weightMap;
 	}
 	
@@ -90,11 +90,11 @@ public abstract class SomBasics {
 		for (int col = colStart; col < colEnd; col++){
 			for (int row = rowStart; row < rowEnd; row++){
 				SomNode n = weightMap.get(col, row);
-				weightAdjustment(n, bmu, inputVector, neighborhoodRadius, learningRate);
+				n = weightAdjustment(n, bmu, inputVector, neighborhoodRadius, learningRate);
 			}
 		}
 	}
 	
-	public abstract void weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate );
+	public abstract SomNode weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate );
 
 }

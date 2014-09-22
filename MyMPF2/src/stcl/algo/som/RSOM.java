@@ -65,7 +65,7 @@ public class RSOM extends SomBasics {
 	}
 	
 	@Override
-	public void weightAdjustment(SomNode n, SomNode bmu,
+	public SomNode weightAdjustment(SomNode n, SomNode bmu,
 			SimpleMatrix inputVector, double neighborhoodRadius,
 			double learningRate) {
 		
@@ -79,6 +79,7 @@ public class RSOM extends SomBasics {
 			vector = vector.plus(delta);
 			n.setVector(vector);
 		}
+		return n;
 		
 	}
 	
@@ -106,12 +107,18 @@ public class RSOM extends SomBasics {
 	public SimpleMatrix getErrorMatrix(){
 		return errorMatrix;
 	}
+	
+	public SomMap getLeakyDifferencesMap(){
+		return leakyDifferencesMap;
+	}
 
 
 	@Override
 	public SomNode getBMU(SimpleMatrix inputVector) throws UnsupportedOperationException{
 		throw new UnsupportedOperationException();
 	}
+	
+	
 
 	
 	

@@ -28,9 +28,6 @@ public class TemporalPoolerTest {
 
 	}
 
-	@Test
-	public void testTemporalPooler() {
-		fail("Not yet implemented");
-	}
+	
 
 }

@@ -55,13 +55,14 @@ public class SOM extends SomBasics {
 		return BMU;
 	}
 	
-	public void weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate ){
+	public SomNode weightAdjustment(SomNode n, SomNode bmu, SimpleMatrix inputVector, double neighborhoodRadius, double learningRate ){
 		double squaredDistance = n.distanceTo(bmu);
 		double squaredRadius = neighborhoodRadius * neighborhoodRadius;
 		if (squaredDistance <= squaredRadius){ 
 			double learningEffect = learningEffect(squaredDistance, squaredRadius);
 			n.adjustValues(inputVector, learningRate, learningEffect);					
 		}
+		return n;
 	}
 
 	@Override

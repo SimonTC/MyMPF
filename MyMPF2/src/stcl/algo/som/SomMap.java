@@ -83,5 +83,18 @@ public class SomMap {
 		return rows;
 	}
 	
+	/**
+	 * Resets all the vector values in the map to resetValue
+	 * @param resetValue
+	 */
+	public void reset(double resetValue){
+		for (int row = 0; row < rows; row++){
+			for (int col = 0; col < columns; col++){
+				SomNode n  = nodes[coordinateToIndex(row, col)];
+				n.getVector().set(resetValue);
+			}
+		}
+	}
+	
 
 }

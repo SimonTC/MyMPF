@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import stcl.algo.som.SOM;
+import stcl.algo.som.SomMap;
 import stcl.algo.som.SomNode;
 
 public class SOMTest {
@@ -274,7 +275,7 @@ public class SOMTest {
 		nodesToTest.add(nodeOutsideRadius);
 		
 		//Create map to get access to method
-		SOM map = new SOM(10, 10, 2, new Random());
+		SOM som = new SOM(10, 10, 2, new Random());
 		for (SomNode n : nodesToTest){
 			//Calculate expected values
 			double squareDistance = n.distanceTo(bmu);
@@ -286,7 +287,7 @@ public class SOMTest {
 			double[] expectedValuesMatrix = expectedValuesMatrix(input, n.getVector(), learningRate, learningEffect);
 			
 			double[] expectedValuesManual = expectedValuesManual(oldValues, learningRate, learningEffect, inputVector[0]);
-			map.weightAdjustment(n, bmu, input, radius, learningRate);
+			som.weightAdjustment(n, bmu, input, radius, learningRate);
 			double[] actualValues = n.getVector().getMatrix().data;
 			
 			for (int i = 0; i < expectedValuesMatrix.length; i++){

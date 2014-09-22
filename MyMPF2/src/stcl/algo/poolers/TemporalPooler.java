@@ -9,7 +9,7 @@ import stcl.algo.som.SOM;
 
 public class TemporalPooler extends SpatialPooler  {
 
-	private RSOM rsom; //TODO: FInd another name
+	private RSOM rsom; 
 	private double curLeakyCoefficient; 
 	
 	public TemporalPooler(Random rand, int maxIterations, int inputLength,

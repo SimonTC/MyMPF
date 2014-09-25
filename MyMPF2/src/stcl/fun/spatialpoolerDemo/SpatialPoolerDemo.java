@@ -4,7 +4,7 @@
  * Created on December 13, 2002, 2:31 PM
  */
 
-package stcl.fun;
+package stcl.fun.spatialpoolerDemo;
 
 
 import java.awt.image.BufferedImage;
@@ -22,24 +22,26 @@ import stcl.graphics.MapRenderer;
  *
  * @author  alanter
  */
-public class SOMDemo extends javax.swing.JFrame {
+public class SpatialPoolerDemo extends javax.swing.JFrame {
 
-	int size = 40;
+	int size = 100;
 	int iterations = 500;
 	
 	//private SOMTrainer trainer;
-	private SOMTrainer trainer;
+	private SpatialPoolerTrainer trainer;
 	private SOM map;
 	private Vector<SimpleMatrix> inputVectors;
+	private SpatialPooler pooler;
 	
 	/** Creates new form SOMDemo */
-	public SOMDemo() {
+	public SpatialPoolerDemo() {
 		initComponents();
 		SimpleMatrix tempVec;
-		map = new SOM(size, size, 3, new Random());
+		pooler = new SpatialPooler(new Random(), iterations, 3, size);
+		map = pooler.getSOM();
 		
 		renderPanel.registerLattice(map);
-		trainer = new SOMTrainer();
+		trainer = new SpatialPoolerTrainer();
 		inputVectors = new Vector<SimpleMatrix>();
 
 		// Make some colors.  Red, Green, Blue, Yellow, Purple, Black,
@@ -186,8 +188,9 @@ public class SOMDemo extends javax.swing.JFrame {
 
 	private void btnRetrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrainActionPerformed
 		trainer.stop();
-		map = new SOM(size, size, 3, new Random());
-		trainer.setTraining(map, inputVectors, renderPanel);
+		pooler = new SpatialPooler(new Random(), iterations, 3, size);
+		map = pooler.getSOM();
+		trainer.setTraining(pooler, inputVectors, renderPanel);
 		renderPanel.registerLattice(map);
 		trainer.start();
 	}//GEN-LAST:event_btnRetrainActionPerformed
@@ -202,7 +205,7 @@ public class SOMDemo extends javax.swing.JFrame {
 	 */
 	@SuppressWarnings("deprecation")
 	public static void main(String args[]) {
-		SOMDemo theApp = new SOMDemo();
+		SpatialPoolerDemo theApp = new SpatialPoolerDemo();
 		theApp.show();
 		theApp.go();
 		//new SOMDemoApp().show();
@@ -212,7 +215,7 @@ public class SOMDemo extends javax.swing.JFrame {
 		BufferedImage i = renderPanel.getImage();
 		renderPanel.registerLattice(map);
 		renderPanel.render(map, 0);
-		trainer.setTraining(map, inputVectors, renderPanel);
+		trainer.setTraining(pooler, inputVectors, renderPanel);
 		trainer.start();
 	}
 	

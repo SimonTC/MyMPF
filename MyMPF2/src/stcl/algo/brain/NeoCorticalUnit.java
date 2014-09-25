@@ -13,7 +13,6 @@ public class NeoCorticalUnit {
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	private BiasUnit biasUnit;
 	private FirstOrderPredictor predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
@@ -23,22 +22,20 @@ public class NeoCorticalUnit {
 	private int temporalMapSize;
 	
 	//Learning rates
-	private double predictionLearningRate; //TODO: Find correct name for it
-	private double curNoiseMagnitude;
-	//private double biasInfluence;  
+	private double curPredictionLearningRate; //TODO: Find correct name for it
+											  //TODO: Does the prediction learning rate change?
 	
 	private boolean useMarkovPrediction;
 	
-	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double biasInfluence, double predictionLearningRate, boolean useMarkovPrediction, double leakyCoefficient) {
+	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double leakyCoefficient) {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
 		temporalPooler = new TemporalPooler(rand, maxIterations, spatialMapSize * spatialMapSize, temporalMapSize, leakyCoefficient);
-		biasUnit = new BiasUnit(ffInputLength, biasInfluence, rand);
 		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffInputVectorSize = ffInputLength;
-		this.predictionLearningRate = predictionLearningRate;
+		this.curPredictionLearningRate = initialPredictionLearningRate;
 		this.useMarkovPrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
@@ -61,10 +58,8 @@ public class NeoCorticalUnit {
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, predictionLearningRate);
-		} 
-		
-		
+			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, curPredictionLearningRate);
+		} 		
 		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = spatialFFOutputMatrixBiased.getMatrix().data;		
@@ -108,6 +103,10 @@ public class NeoCorticalUnit {
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasMatrix);
 		
 		return spatialPoolerFBOutputVector;
+	}
+	
+	public void resetTemporalDifferences(){
+		temporalPooler.resetLeakyDifferences();
 	}
 
 }

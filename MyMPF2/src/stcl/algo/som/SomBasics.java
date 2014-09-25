@@ -8,6 +8,7 @@ public abstract class SomBasics {
 
 	protected SomMap weightMap;
 	protected SimpleMatrix errorMatrix;
+	protected boolean learning; //If false no learning will take place during feed forward and feed back
 	
 	/**
 	 * 
@@ -19,6 +20,7 @@ public abstract class SomBasics {
 	public SomBasics(int columns, int rows, int inputLength, Random rand) {
 		weightMap = new SomMap(columns, rows, inputLength, rand);
 		errorMatrix = new SimpleMatrix(rows, columns);
+		learning = true;
 	}
 	
 	public abstract SomNode getBMU();
@@ -51,6 +53,14 @@ public abstract class SomBasics {
 	
 	public int getWidth(){
 		return weightMap.getWidth();
+	}
+	
+	public boolean getLearning(){
+		return learning;
+	}
+	
+	public void setLearning(boolean learning){
+		this.learning = learning;
 	}
 	
 	/**

@@ -6,8 +6,8 @@ public class RewardCorrelator {
 	
 	private SimpleMatrix correlationMatrix;
 	
-	public RewardCorrelator(int size) {
-		correlationMatrix = new SimpleMatrix(size, size);
+	public RewardCorrelator(int inputMatrixSize) {
+		correlationMatrix = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
 	}
 	
 	/**

@@ -63,7 +63,11 @@ public class TemporalPooler extends SpatialPooler  {
 		double sum = model.elementSum();
 		model = model.scale(1/sum);
 		
-		return model;
-		
+		return model;		
+	}
+	
+	public void resetLeakyDifferences(){
+		//TODO: SHould that be the name of the method?
+		rsom.resetLeakyDifferencesMap();
 	}
 }

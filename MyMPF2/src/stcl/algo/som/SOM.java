@@ -29,8 +29,10 @@ public class SOM extends SomBasics {
 		//Find BMU
 		SomNode bmu = getBMU(inputVector);
 		
-		//Adjust Weights
-		updateWeightMatrix(bmu, inputVector, learningRate, neighborhoodRadius);	
+		if (learning){
+			//Adjust Weights
+			updateWeightMatrix(bmu, inputVector, learningRate, neighborhoodRadius);	
+		}
 		
 		return bmu;
 	}

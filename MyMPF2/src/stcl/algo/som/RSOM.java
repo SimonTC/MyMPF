@@ -9,30 +9,43 @@ public class RSOM extends SomBasics {
 	private SomMap leakyDifferencesMap;
 	private SomMap oldLeakyDifferencesMap; 
 	private double leakyCoefficient;
+	private int columns, rows, inputLength;
 	
 	public RSOM(int columns, int rows, int inputLength, Random rand, double leakyCoefficient) {
 		super(columns, rows, inputLength, rand);
-		leakyDifferencesMap = new SomMap(columns, rows, inputLength, rand);
-		oldLeakyDifferencesMap = new SomMap(columns, rows, inputLength);
+		this.columns = columns;
+		this.rows = rows;
+		this.inputLength = inputLength;
+		resetLeakyDifferencesMap();
 		
 		this.leakyCoefficient = leakyCoefficient; // TODO: Does this change during learning?
 	}
 
-	
+	/**
+	 * Resets the leaky difference maps to zero.
+	 * Used when constructing the RSOM and when making ready for a new set of observations that are independent of the earlier observations
+	 */
+	public void resetLeakyDifferencesMap(){
+		leakyDifferencesMap = new SomMap(columns, rows, inputLength);
+		oldLeakyDifferencesMap = new SomMap(columns, rows, inputLength);
+	}
 	
 	
 	public SomNode step(SimpleMatrix inputVector, double learningRate, double neighborhoodRadius){
-		//Update leaky differences
-		updateLeakyDifferences(inputVector, leakyCoefficient);
+		if (learning){
+			//Update leaky differences
+			updateLeakyDifferences(inputVector, leakyCoefficient);
+		}
 		
 		//Find BMU
 		SomNode bmu = getBMU();		
 		
-		//Update weight matrix
-		updateWeightMatrix(bmu, inputVector, learningRate, neighborhoodRadius);
-		
-		//Save the leakyDifferences map
-		oldLeakyDifferencesMap = leakyDifferencesMap;
+		if (learning){
+			//Update weight matrix
+			updateWeightMatrix(bmu, inputVector, learningRate, neighborhoodRadius);
+			//Save the leakyDifferences map
+			oldLeakyDifferencesMap = leakyDifferencesMap;
+		}
 	
 		return bmu;
 	}

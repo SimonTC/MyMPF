@@ -4,6 +4,10 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.brain.biasunits.BiasUnit;
+import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
+import stcl.algo.brain.rewardCorrelators.RewardFunction;
+
 public class Brain {
 	
 	NeoCorticalUnit nu1;
@@ -19,9 +23,17 @@ public class Brain {
 	int temporalMapSize2;
 	
 	double biasInfluence;
-	double predictionLearningRate;
+	double constantPredictionLearningRate;
 	boolean useMarkovPrediction;
-	double leakyCoefficient;
+	double constantLeakyCoefficient;
+	
+	double noiseMagnitude;
+	
+	RewardCorrelator rewardCorrelator1;
+	RewardFunction rewardFunction;
+	BiasUnit bias;
+	
+	SimpleMatrix ffOutputU1Before;
 	
 	public Brain() {
 		rand = new Random();
@@ -33,35 +45,62 @@ public class Brain {
 		temporalMapSize2 = 5;
 		
 		biasInfluence = 0.1;
-		predictionLearningRate = 0.6;
+		constantPredictionLearningRate = 0.6;
 		useMarkovPrediction = true;
-		leakyCoefficient = 0.1;
+		constantLeakyCoefficient = 0.3;
 		
-		nu1 = new NeoCorticalUnit(rand, maxIterations, ffInputLength1, spatialMapSize1, temporalMapSize1, biasInfluence, predictionLearningRate, useMarkovPrediction, leakyCoefficient);
+		noiseMagnitude = 0.05;
 		
-		nu2 = new NeoCorticalUnit(rand, maxIterations, ffInputLength2, spatialMapSize2, temporalMapSize2, biasInfluence, predictionLearningRate, useMarkovPrediction, leakyCoefficient);
+		double maxReward = 1;
+		double historyInfluence = 0.3;		
+		rewardFunction = new RewardFunction(maxReward, historyInfluence);
+		
+		rewardCorrelator1 = new RewardCorrelator(temporalMapSize1);
+		
+		ffOutputU1Before = new SimpleMatrix(temporalMapSize1, temporalMapSize1);
+		
+		bias = new BiasUnit(ffOutputU1Before.numRows(), historyInfluence, rand);
+		
+		nu1 = new NeoCorticalUnit(rand, maxIterations, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, constantLeakyCoefficient);
+		
+		nu2 = new NeoCorticalUnit(rand, maxIterations, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, constantLeakyCoefficient);
 	}
 	
-	public void step(SimpleMatrix inputVector){
+	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){
 		//Feed input vector forward
-		
-		//Collect ff output from unit one
-		
+		SimpleMatrix ffOutputU1 = nu1.feedForward(inputVector);
+				
 		//Do reward correlation
+		double internalReward = rewardFunction.calculateReward(reward);
+		SimpleMatrix correlationMatrix = rewardCorrelator1.correlateReward(ffOutputU1Before, internalReward, 0.3);
+		ffOutputU1Before = ffOutputU1;
+		
+		//Transform output matrix to vector
+		SimpleMatrix ffInputU2 = new SimpleMatrix(ffOutputU1);
+		ffInputU2.reshape(1, ffInputU2.numCols() * ffInputU2.numRows());
 		
 		//Send unit one's output to unit 2
+		SimpleMatrix ffOutputU2 = nu2.feedBackward(ffInputU2);
 		
 		//Give some fb input to unit 2
+		SimpleMatrix fbInputU2 = SimpleMatrix.random(ffOutputU2.numRows(), ffOutputU2.numCols(), 0, 1, rand);
 		
-		//Collect fb output from unit 2
+		//Collect FB output from unit 2
+		SimpleMatrix fbOutputU2 = nu2.feedBackward(fbInputU2);
+		
+		//Bias fb output from unit 2
+		SimpleMatrix biasedFBOutputU2 = bias.biasFBSpatialOutput(fbOutputU2, correlationMatrix, noiseMagnitude);
 		
 		//Give FB output from unit 2 to unit 1
-		
-		//Collect FB output from unit 1
+		SimpleMatrix fbOutputU1 = nu1.feedBackward(biasedFBOutputU2);
 		
 		//Return something
-		
-		
+		return fbOutputU1;		
+	}
+	
+	public void resetTemporalDifferences(){
+		nu1.resetTemporalDifferences();
+		nu2.resetTemporalDifferences();
 	}
 
 }

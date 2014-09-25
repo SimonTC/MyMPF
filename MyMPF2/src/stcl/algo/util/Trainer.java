@@ -24,7 +24,7 @@ public class Trainer {
 		double leakyCoefficient = 0.3;
 		
 		
-		NeoCorticalUnit nu = new NeoCorticalUnit(rand, maxIterations, ffInputLength, spatialMapSize, temporalMapSize, biasInfluence, predictionLearningRate, useMarkovPrediction, leakyCoefficient);
+		NeoCorticalUnit nu = new NeoCorticalUnit(rand, maxIterations, ffInputLength, spatialMapSize, temporalMapSize, predictionLearningRate, useMarkovPrediction, leakyCoefficient);
 		double[][] trainingData = {{0,1,0,0,1,1,0,1,0,1}, 
 						  		   {0,1,1,1,0,1,0,0,0,1}};
 		

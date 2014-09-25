@@ -64,8 +64,8 @@ public class RSOM extends SomBasics {
 				SomNode weightNode = weightMap.get(col, row);
 				
 				//Calculate squared difference between input vector and weight vector
-				SimpleMatrix weightDiff = weightNode.getVector().minus(inputVector);
-				//weightDiff = weightDiff.elementPower(2);  //TODO: Decide wether to square or not. What do they do in th eoriginal code?
+				SimpleMatrix weightDiff = inputVector.minus(weightNode.getVector());
+				//weightDiff = weightDiff.elementPower(2);  //TODO: Decide wether to square or not. What do they do in the original code?
 				weightDiff = weightDiff.scale(leakyCoefficient);
 				
 				SimpleMatrix leakyDifferenceVector = leakyDifferenceNode.getVector();
@@ -99,7 +99,7 @@ public class RSOM extends SomBasics {
 	}
 	
 	/**
-	 * Returns the best matching unit. The bmi is the unit with the lowest sum of values of its leaky difference vector.
+	 * Returns the best matching unit. The bmu is the unit with the lowest sum of values of its leaky difference vector.
 	 * The error matrix i also updated in this method.
 	 * @return
 	 */

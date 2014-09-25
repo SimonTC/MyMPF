@@ -116,6 +116,7 @@ public class RSOM extends SomBasics {
 				bmu = n;
 			}
 		}
+		if (bmu == null) {int i = 1/0;} //TODO: Only added to help find the errors. Should be removed again
 		return bmu;
 	}
 	

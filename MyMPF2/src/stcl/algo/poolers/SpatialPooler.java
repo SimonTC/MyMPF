@@ -52,7 +52,7 @@ public class SpatialPooler {
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
 		curLearningRate = 1;
-		curNeighborhoodRadius = mapSize / 2;
+		curNeighborhoodRadius = (double) mapSize / 2;
 		curNoiseMagnitude = 1;
 		
 		//TODO: Something has to be done about this

@@ -1,9 +1,10 @@
-package stcl.algo.brain;
+package stcl.fun.minesweeper;
 
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
@@ -35,13 +36,14 @@ public class Brain {
 	
 	private SimpleMatrix ffOutputU1Before;
 	
-	public Brain() {
-		rand = new Random();
-		maxIterations = 100;
-		ffInputLength1 = 16 * 16;
+	public Brain(int maxIterations, int ffInputLength, Random rand) {
+		this.rand = rand;
+		this. maxIterations = maxIterations;
+		this. ffInputLength1 = ffInputLength;
 		spatialMapSize1 = 5;
 		temporalMapSize1 = 5;
 		ffInputLength2 = temporalMapSize1 * temporalMapSize1;
+		spatialMapSize2 = 5;
 		temporalMapSize2 = 5;
 		
 		biasInfluence = 0.1;
@@ -66,7 +68,17 @@ public class Brain {
 		nu2 = new NeoCorticalUnit(rand, maxIterations, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, constantLeakyCoefficient);
 	}
 	
+	/**
+	 * 
+	 * @param inputVector input at time t
+	 * @param reward reward at time t
+	 * @return
+	 */
 	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){
+		//************************
+		//FEED FORWARD
+		//***********************
+		
 		//Feed input vector forward
 		SimpleMatrix ffOutputU1 = nu1.feedForward(inputVector);
 				
@@ -79,14 +91,23 @@ public class Brain {
 		SimpleMatrix ffInputU2 = new SimpleMatrix(ffOutputU1);
 		ffInputU2.reshape(1, ffInputU2.numCols() * ffInputU2.numRows());
 		
-		//Send unit one's output to unit 2
-		SimpleMatrix ffOutputU2 = nu2.feedBackward(ffInputU2);
+		//Send unit one's FFoutput to unit 2
+		SimpleMatrix ffOutputU2 = nu2.feedForward(ffInputU2);
+		
+		
+		//**************************
+		//FEED BACK
+		//**************************
 		
 		//Give some fb input to unit 2
 		SimpleMatrix fbInputU2 = SimpleMatrix.random(ffOutputU2.numRows(), ffOutputU2.numCols(), 0, 1, rand);
 		
 		//Collect FB output from unit 2
 		SimpleMatrix fbOutputU2 = nu2.feedBackward(fbInputU2);
+		
+		//Transform output to matrix
+		SimpleMatrix fbOutputU2Matrix = fbOutputU2;
+		fbOutputU2Matrix.reshape(ffOutputU1.numRows(), ffOutputU1.numCols()); //Has to be the same size as what Unit one is outputting in the FF pass
 		
 		//Bias fb output from unit 2
 		SimpleMatrix biasedFBOutputU2 = bias.biasFBSpatialOutput(fbOutputU2, correlationMatrix, noiseMagnitude);

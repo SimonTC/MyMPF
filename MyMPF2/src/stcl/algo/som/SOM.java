@@ -50,10 +50,11 @@ public class SOM extends SomBasics {
 			if (diff < minDiff){
 				minDiff = diff;
 				BMU = n;
-			}
-			
+			}			
 			errorMatrix.set(n.getRow(), n.getCol(), diff);
 		}
+		
+		if (BMU == null) {int i = 1/0;} //TODO: Only added to help find the errors. Should be removed again
 		return BMU;
 	}
 	

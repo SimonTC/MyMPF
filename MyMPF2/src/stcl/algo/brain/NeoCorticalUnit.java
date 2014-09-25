@@ -108,5 +108,10 @@ public class NeoCorticalUnit {
 	public void resetTemporalDifferences(){
 		temporalPooler.resetLeakyDifferences();
 	}
+	
+	public void newIteration(){
+		spatialPooler.tick();
+		temporalPooler.tick();
+	}
 
 }

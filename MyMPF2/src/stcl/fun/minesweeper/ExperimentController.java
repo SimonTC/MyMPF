@@ -16,9 +16,9 @@ public class ExperimentController extends Controller {
 	private boolean visual;
 	
 	public static void main(String[] args){
-		int maxIterations = 10;
+		int maxIterations = 1000;
 		Random rand = new Random();
-		Brain b = new Brain(maxIterations, N_COLS * N_ROWS + 3, rand);
+		Brain b = new Brain(maxIterations, N_COLS * N_ROWS + 2, rand);
 		
 		AIPlayer p = new AIPlayer("Bob", Player.PlayerType.AI, b, rand);
 		
@@ -61,19 +61,22 @@ public class ExperimentController extends Controller {
 		}
 		
 		boolean running = true;
-		while (running){
+		int counter = 0;
+		int maxCount = model.getFields().length * 2;
+		while (running && counter++ < maxCount){
 			int[] action = aiPlayer.getMove(model.getFields());
-			running = fieldChosen(action[1], action[0], 1 == action[2]);
-			if (running && 1 == action[2]){
+			running = fieldChosen(action[1], action[0], true);
+			if (running ){
 				aiPlayer.giveReward(0.5);
 			}
 		}
 		
+		if (counter >= maxCount) return false;
 		return !model.gameLost();
 	}
 	@Override
 	public boolean runAIGameVisual(){
-		int FRAMES_PER_SECOND = 1;
+		int FRAMES_PER_SECOND = 1000;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
@@ -82,8 +85,8 @@ public class ExperimentController extends Controller {
 		boolean running = true;
 		while (running){
 			int[] action = aiPlayer.getMove(model.getFields());
-			running = fieldChosen(action[1], action[0], 1 == action[2]);
-			if (running && 1 == action[2]){
+			running = fieldChosen(action[1], action[0], true);
+			if (running ){
 				aiPlayer.giveReward(0.5);
 			}
 			System.out.println("Chose row " + action[1] + " col " + action[0] + " leftclicked? " + (1 == action[2]));

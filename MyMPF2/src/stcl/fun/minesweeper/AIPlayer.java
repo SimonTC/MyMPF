@@ -49,16 +49,11 @@ public class AIPlayer extends Player {
 	
 	private int[] convertOutpuIntoActions(SimpleMatrix output){
 		int lastID = output.getNumElements() - 1;
-		double leftClick = output.get(lastID);
-		if (leftClick > 0.5){
-			leftClick = 1;
-		} else {
-			leftClick = 0;
-		}
-		int y = (int) output.get(lastID - 1);
-		int x = (int) output.get(lastID - 2);
 		
-		int[] actions = {x,y,(int) leftClick};
+		int y = (int) output.get(lastID);
+		int x = (int) output.get(lastID - 1);
+		
+		int[] actions = {x,y};
 		
 		return actions;
 	}
@@ -67,9 +62,8 @@ public class AIPlayer extends Player {
 		//Select x
 		int x = rand.nextInt(boardSize);
 		int y = rand.nextInt(boardSize);
-		int leftClick = rand.nextInt(2);
 		
-		int[] actions = {x,y,leftClick};
+		int[] actions = {x,y};
 		return actions;
 	}
 	
@@ -81,7 +75,7 @@ public class AIPlayer extends Player {
 	 */
 	private SimpleMatrix getInputVector(int[] board, int[] nextActions){
 		//Convert array to double
-		double[] input = new double[board.length + 3];
+		double[] input = new double[board.length + 2];
 		
 		for (int i = 0; i < board.length; i++){
 			input[i] = board[i];
@@ -89,7 +83,6 @@ public class AIPlayer extends Player {
 		
 		input[board.length] = nextActions[0];
 		input[board.length + 1] = nextActions[1];
-		input[board.length + 2] = nextActions[2];
 		
 		double[][] inputVector = {input};
 		

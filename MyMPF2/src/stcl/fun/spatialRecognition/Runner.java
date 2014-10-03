@@ -35,6 +35,13 @@ public class Runner {
 		//Create map renderer
 		BWMapRenderer renderer = new BWMapRenderer();
 		
+		SomNode n = pooler.getSOM().getModels()[0];
+		SimpleMatrix m = new SimpleMatrix(n.getVector());
+		m.reshape(5, 5);
+		renderer.setVisible(true);
+		renderer.repaint();
+		renderer.render(m, 1);
+		
 		
 	}
 	

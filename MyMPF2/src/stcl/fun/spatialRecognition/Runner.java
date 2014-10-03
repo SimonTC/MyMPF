@@ -1,48 +1,102 @@
 package stcl.fun.spatialRecognition;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.awt.Dimension;
 import java.util.Random;
+
+import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SomNode;
-import stcl.graphics.BWMapRenderer;
+import stcl.graphics.MapDrawer;
+import stcl.graphics.MapDrawerBW;
+import stcl.graphics.MapDrawerGRAY;
 
 public class Runner {
-
+	
+	private MapDrawer frame;
+	private SpatialPooler pooler;
+	SimpleMatrix bigT;
+	
+	
 	public static void main(String[] args) {
 		Runner runner = new Runner();
 		runner.run();
 	}
 	
 	public void run(){
+		int FRAMES_PER_SECOND = 1;
+	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
+	   
+	    float next_game_tick = System.currentTimeMillis();
+	    float sleepTime = 0;
 		
+		setupExperiment();
+		
+		int maxIterations = 10;
+		
+		for (int i = 0; i < maxIterations; i++){
+			//Feed forward
+			SimpleMatrix out = pooler.feedForward(bigT);
+			
+			
+			//Collect BMU
+			SomNode bmu = pooler.getSOM().getBMU(bigT);
+			
+			//Visualize bmu
+			SimpleMatrix m = new SimpleMatrix(bmu.getVector());
+			m.reshape(5, 5);
+			updateGraphics(m);
+			next_game_tick+= SKIP_TICKS;
+			sleepTime = next_game_tick - System.currentTimeMillis();
+			if (sleepTime >= 0){
+				try {
+					Thread.sleep(SKIP_TICKS);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+				
+			
+	}
+	
+	private void setupExperiment(){
 		//Create Figure matrices
 		//SimpleMatrix[] matrices = matrices();
 		
-		SimpleMatrix bigT = bigT();
+		bigT = bigT();
 		
 		//Create spatial pooler
 		Random rand = new Random();
 		int maxIterations = 10;
 		int inputLength = 5*5;
-		int mapSize = 50;
-		SpatialPooler pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize);
+		int mapSize = 2;
+		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize);
 		
-		//Create map renderer
-		BWMapRenderer renderer = new BWMapRenderer();
+		//Setup graphics
+		setupGraphics(5, 5);
 		
-		SomNode n = pooler.getSOM().getModels()[0];
-		SimpleMatrix m = new SimpleMatrix(n.getVector());
-		m.reshape(5, 5);
-		renderer.setVisible(true);
-		renderer.repaint();
-		renderer.render(m, 1);
-		
-		
+	}
+	
+	private void updateGraphics(SimpleMatrix matrix){
+		frame.updateMap(matrix);
+		frame.revalidate();
+		frame.repaint();
+	}
+	
+	private void setupGraphics(int mapHeight, int mapWidth ) {
+		frame = new MapDrawerGRAY(mapHeight, mapWidth);
+		frame.setSize(new Dimension(400, 400));
+		frame.setTitle("Visualiztion");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		SimpleMatrix m = new SimpleMatrix(5, 5);
+		frame.updateMap(m);
+		frame.setVisible(true);
+
 	}
 	
 	private SimpleMatrix[] matrices(){
@@ -94,6 +148,7 @@ public class Runner {
 				{0,0,1,0,0},
 				{0,0,1,0,0}};
 		SimpleMatrix bigT = new SimpleMatrix(bigTData);
+		bigT.reshape(1, bigT.numCols() * bigT.numRows());
 		return bigT;
 	}
 

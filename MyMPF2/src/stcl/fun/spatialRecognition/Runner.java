@@ -38,8 +38,7 @@ public class Runner {
 		
 		for (int i = 0; i < maxIterations; i++){
 			//Feed forward
-			SimpleMatrix out = pooler.feedForward(bigT);
-			
+			SimpleMatrix out = pooler.feedForward(bigT);			
 			
 			//Collect BMU
 			SomNode bmu = pooler.getSOM().getBMU(bigT);
@@ -58,6 +57,7 @@ public class Runner {
 					e.printStackTrace();
 				}
 			}
+			pooler.tick();
 		}
 				
 			
@@ -73,7 +73,7 @@ public class Runner {
 		Random rand = new Random();
 		int maxIterations = 10;
 		int inputLength = 5*5;
-		int mapSize = 2;
+		int mapSize = 10;
 		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize);
 		
 		//Setup graphics

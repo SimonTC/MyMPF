@@ -60,7 +60,7 @@ public class MapDrawerGRAY extends MapDrawer {
 			for (int x=0; x<mapWidth; x++) {
 				for (int y=0; y<mapHeight; y++) {
 					double value = dataMap.get(y, x);
-					int rgb = (int) (value * 255);
+					int rgb = (int) ((1-value) * 255);
 					Color c = new Color(rgb, rgb, rgb);
 					g.setColor(c);
 					g.fillRect((int)(x*cellWidth), (int)(y*cellHeight),

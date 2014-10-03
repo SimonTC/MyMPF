@@ -9,6 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SomNode;
+import stcl.graphics.BWMapRenderer;
 
 public class Runner {
 
@@ -20,7 +21,9 @@ public class Runner {
 	public void run(){
 		
 		//Create Figure matrices
-		SimpleMatrix[] matrices = matrices();
+		//SimpleMatrix[] matrices = matrices();
+		
+		SimpleMatrix bigT = bigT();
 		
 		//Create spatial pooler
 		Random rand = new Random();
@@ -28,6 +31,10 @@ public class Runner {
 		int inputLength = 5*5;
 		int mapSize = 50;
 		SpatialPooler pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize);
+		
+		//Create map renderer
+		BWMapRenderer renderer = new BWMapRenderer();
+		
 		
 	}
 	
@@ -70,6 +77,17 @@ public class Runner {
 		matrices[3] = smallV;
 		
 		return matrices;
+	}
+	
+	private SimpleMatrix bigT(){
+		double[][] bigTData = {
+				{0,0,0,0,0},
+				{0,1,1,1,0},
+				{0,0,1,0,0},
+				{0,0,1,0,0},
+				{0,0,1,0,0}};
+		SimpleMatrix bigT = new SimpleMatrix(bigTData);
+		return bigT;
 	}
 
 	

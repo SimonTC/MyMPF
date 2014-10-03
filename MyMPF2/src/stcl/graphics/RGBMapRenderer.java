@@ -8,6 +8,8 @@ package stcl.graphics;
 
 import javax.swing.JPanel;
 
+import org.ejml.simple.SimpleMatrix;
+
 import stcl.algo.som.SOM;
 
 import java.awt.image.BufferedImage;
@@ -21,7 +23,7 @@ import java.awt.FontMetrics;
  *
  * @author  alanter
  */
-public class RGBMapRenderer extends JPanel {
+public class RGBMapRenderer extends MapRenderer {
 	private BufferedImage img = null;
 	Font arialFont = new Font("Arial", Font.BOLD, 12);
 	SOM lattice;
@@ -117,5 +119,11 @@ public class RGBMapRenderer extends JPanel {
 		g2.drawString(sb.toString(), 5, getHeight() - 10);
 		g2.dispose();
 		repaint();
+	}
+
+	@Override
+	public void render(SimpleMatrix matrix, int iteration) {
+		// TODO Auto-generated method stub
+		
 	}
 }

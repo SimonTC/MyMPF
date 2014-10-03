@@ -4,7 +4,7 @@
  * Created on December 13, 2002, 2:37 PM
  */
 
-package stcl.fun.spatialpoolerDemo;
+package stcl.fun.spatialRecognition;
 
 
 import java.util.Vector;

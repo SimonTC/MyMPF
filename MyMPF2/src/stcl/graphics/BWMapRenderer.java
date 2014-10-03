@@ -8,6 +8,8 @@ package stcl.graphics;
 
 import javax.swing.JPanel;
 
+import org.ejml.simple.SimpleMatrix;
+
 import stcl.algo.som.SOM;
 
 import java.awt.image.BufferedImage;
@@ -21,7 +23,7 @@ import java.awt.FontMetrics;
  *
  * @author  alanter
  */
-public class BWMapRenderer extends JPanel {
+public class BWMapRenderer extends MapRenderer {
 	private BufferedImage img = null;
 	Font arialFont = new Font("Arial", Font.BOLD, 12);
 	SOM map;
@@ -49,9 +51,11 @@ public class BWMapRenderer extends JPanel {
 		ready = true;
 	}
 	
-	public void render(SOM map, int iteration) {
-		float cellWidth = (float)getWidth() / (float)map.getWidth();
-		float cellHeight = (float)getHeight() / (float)map.getHeight();
+	public void render(SimpleMatrix map, int iteration) {
+		int mapWidth = map.numCols();
+		int mapHeigth = map.numRows();
+		float cellWidth = (float)getWidth() / (float)mapWidth;
+		float cellHeight = (float)getHeight() / (float)mapHeigth;
 		
 		int imgW = img.getWidth();
 		int imgH = img.getHeight();
@@ -59,9 +63,9 @@ public class BWMapRenderer extends JPanel {
 		Graphics2D g2 = img.createGraphics();
 		g2.setBackground(Color.white);
 		g2.clearRect(0,0,imgW,imgH);
-		for (int x=0; x<map.getWidth(); x++) {
-			for (int y=0; y<map.getHeight(); y++) {
-				black = map.getModel(y, x).getVector().get(0);
+		for (int x=0; x<mapWidth; x++) {
+			for (int y=0; y<mapHeigth; y++) {
+				black = map.get(y, x);
 				Color c;
 				if (black > 0.5){
 					c = Color.black;
@@ -93,5 +97,11 @@ public class BWMapRenderer extends JPanel {
 	
 	private void panelMouseMoved(java.awt.event.MouseEvent evt) {
 		//Nothing happens on mouse over
+	}
+
+	@Override
+	public void render(SOM lattice, int iteration) {
+		// TODO Auto-generated method stub
+		
 	}
 }

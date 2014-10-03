@@ -31,7 +31,7 @@ public class Runner {
 				String dataFilePath = "C:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
 				int iterations = 100;
 				
-				boolean sin = true;
+				boolean sin = false;
 				try {
 					if (sin){
 						data = createData(1000);
@@ -71,7 +71,7 @@ public class Runner {
 				ffOutput = unit.feedForward(inputVector);
 				fbOutput = unit.feedBackward(ffOutput);
 				
-				double actualOutput = ffOutput.get(0);
+				double actualOutput = fbOutput.get(0);
 				
 				output.add(actualOutput);
 				
@@ -79,19 +79,23 @@ public class Runner {
 				error *= error;
 				mse += error;
 				
-				//System.out.printf("Exp: %1$.2f Act: %1$.2f", expectedOutput, actualOutput);
-				//System.out.println();
+				/*
+				System.out.printf("Exp: %1$.2f Act: %1$.2f", expectedOutput, actualOutput);
+				System.out.println();
+				*/
 				
 			}	
 			
 			//Plot data
 			
 			plot(iteration);
-			/*
+			
+			
 			mse *= (double) 1/data.size();
 			System.out.printf("Iteration: " + iteration + " MSE: %1$.4f" , mse);
 			System.out.println();
-			*/
+			
+			
 		}
 	}
 	

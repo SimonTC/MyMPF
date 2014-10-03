@@ -21,14 +21,14 @@ import java.awt.FontMetrics;
  *
  * @author  alanter
  */
-public class MapRenderer extends JPanel {
+public class RGBMapRenderer extends JPanel {
 	private BufferedImage img = null;
 	Font arialFont = new Font("Arial", Font.BOLD, 12);
 	SOM lattice;
 	boolean ready = false;
 	
 	/** Creates a new instance of LatticeRenderer */
-	public MapRenderer() {
+	public RGBMapRenderer() {
 		lattice = null;
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {

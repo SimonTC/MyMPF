@@ -14,7 +14,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
-import stcl.graphics.MapRenderer;
+import stcl.graphics.RGBMapRenderer;
 
 /**
  *
@@ -24,7 +24,7 @@ public class SpatialPoolerTrainer implements Runnable {
 	// These constants can be changed to play with the learning algorithm
 	private static final int	NUM_ITERATIONS = 500;
 	
-	private MapRenderer renderer;
+	private RGBMapRenderer renderer;
 	private SpatialPooler spatialPooler;
 	private Vector<SimpleMatrix> inputs;
 	private static boolean running;
@@ -37,7 +37,7 @@ public class SpatialPoolerTrainer implements Runnable {
 	
 	// Train the given lattice based on a vector of input vectors
 	public void setTraining(SpatialPooler poolerToTrain, Vector<SimpleMatrix> in,
-							MapRenderer mapRenderer)
+							RGBMapRenderer mapRenderer)
 	{
 		spatialPooler = poolerToTrain;
 		inputs = in;

@@ -16,7 +16,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SOM;
 import stcl.algo.util.Trainer;
-import stcl.graphics.MapRenderer;
+import stcl.graphics.RGBMapRenderer;
 
 /**
  *
@@ -129,7 +129,7 @@ public class SpatialPoolerDemo extends javax.swing.JFrame {
     private void initComponents() {//GEN-BEGIN:initComponents
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
-        renderPanel = new MapRenderer();
+        renderPanel = new RGBMapRenderer();
         ControlsPanel = new javax.swing.JPanel();
         btnRetrain = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
@@ -220,7 +220,7 @@ public class SpatialPoolerDemo extends javax.swing.JFrame {
 	}
 	
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private MapRenderer renderPanel;
+    private RGBMapRenderer renderPanel;
     private javax.swing.JButton jButton1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JButton btnRetrain;

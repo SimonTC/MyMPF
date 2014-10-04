@@ -61,6 +61,7 @@ public class MultipleMapDrawerGRAY extends JFrame {
 			super();
 			this.id = id;
 		}
+		
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);

@@ -188,4 +188,8 @@ public class SpatialPooler {
 	public SOM getSOM(){
 		return som;
 	}
+	
+	public SimpleMatrix getActivationMatrix(){
+		return this.activationMatrix;
+	}
 }

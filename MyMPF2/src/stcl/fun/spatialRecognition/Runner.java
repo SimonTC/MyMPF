@@ -1,6 +1,5 @@
 package stcl.fun.spatialRecognition;
 
-import java.awt.Dimension;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -9,16 +8,13 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SomNode;
-import stcl.graphics.MapDrawer;
-import stcl.graphics.MapDrawerBW;
-import stcl.graphics.SingleMapDrawerGRAY;
+import stcl.graphics.MultipleMapDrawerGRAY;
 
 public class Runner {
 	
-	private MapDrawer frame;
+	private MultipleMapDrawerGRAY frame;
 	private SpatialPooler pooler;
-	SimpleMatrix bigT;
-	
+	private SimpleMatrix[] figureMatrices;
 	
 	public static void main(String[] args) {
 		Runner runner = new Runner();
@@ -26,27 +22,37 @@ public class Runner {
 	}
 	
 	public void run(){
-		int FRAMES_PER_SECOND = 1;
+		int FRAMES_PER_SECOND = 2;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
 	    float sleepTime = 0;
 		
-		setupExperiment();
+	    int maxIterations = 50;
+	    
+		setupExperiment(maxIterations, true);
 		
-		int maxIterations = 10;
+		
 		
 		for (int i = 0; i < maxIterations; i++){
-			//Feed forward
-			SimpleMatrix out = pooler.feedForward(bigT);			
+			SimpleMatrix[] outputs = new SimpleMatrix[figureMatrices.length];
 			
-			//Collect BMU
-			SomNode bmu = pooler.getSOM().getBMU(bigT);
+			for (int j = 0; j < figureMatrices.length; j++){
+				//Feed forward
+				SimpleMatrix out = pooler.feedForward(figureMatrices[j]);			
+				
+				//Collect BMU
+				SomNode bmu = pooler.getSOM().getBMU(figureMatrices[j]);
+				SimpleMatrix m = new SimpleMatrix(bmu.getVector());
+				m.reshape(5, 5);
+				outputs[j] = m;				
+			}
 			
-			//Visualize bmu
-			SimpleMatrix m = new SimpleMatrix(bmu.getVector());
-			m.reshape(5, 5);
-			updateGraphics(m);
+			
+			//Visualize maps
+			updateGraphics(outputs, i);
+			
+			//Sleep
 			next_game_tick+= SKIP_TICKS;
 			sleepTime = next_game_tick - System.currentTimeMillis();
 			if (sleepTime >= 0){
@@ -63,44 +69,59 @@ public class Runner {
 			
 	}
 	
-	private void setupExperiment(){
-		//Create Figure matrices
-		SimpleMatrix[] matrices = matrices();
+	private void setupExperiment(int iterations, boolean simple){
+		int figureRows = 0;
+		int figureColumns = 0;
 		
-		//bigT = bigT();
+		//Create Figure matrices
+		if (simple){
+			figureMatrices = simpleFigures();
+			figureRows = 5;
+			figureColumns = 5;
+		}
+
 		
 		//Create spatial pooler
 		Random rand = new Random();
-		int maxIterations = 10;
-		int inputLength = 5*5;
+		int maxIterations = iterations;
+		int inputLength = figureColumns * figureRows;
 		int mapSize = 10;
-		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize);
+		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize, 0.2, 5, 1);
 		
 		//Setup graphics
-		setupGraphics(5, 5);
+		setupGraphics(figureRows, figureColumns);
 		
 	}
 	
-	private void updateGraphics(SimpleMatrix matrix){
-		frame.updateMap(matrix);
+	private void updateGraphics(SimpleMatrix[] matrices, int iteration){
+		frame.updateMaps(matrices);
+		frame.setTitle("Visualiztion - Iteration: " + iteration);
 		frame.revalidate();
 		frame.repaint();
 	}
 	
 	private void setupGraphics(int mapHeight, int mapWidth ) {
-		frame = new SingleMapDrawerGRAY(mapHeight, mapWidth);
-		frame.setSize(new Dimension(400, 400));
+		int mapGuiSize = 200;
+		frame = new MultipleMapDrawerGRAY(mapHeight, mapWidth, figureMatrices.length, mapGuiSize, mapGuiSize);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		SimpleMatrix[] tmp = new SimpleMatrix[4];
+		for (int i = 0; i < 4; i++){
+			SimpleMatrix m = new SimpleMatrix(mapHeight, mapWidth);
+			tmp[i] = m;
+		}
+		
+		frame.updateMaps(tmp);
 		frame.pack();
-		SimpleMatrix m = new SimpleMatrix(5, 5);
-		frame.updateMap(m);
+
 		frame.setVisible(true);
 
 	}
 	
-	private SimpleMatrix[] matrices(){
+	private SimpleMatrix[] simpleFigures(){
 		SimpleMatrix[] matrices = new SimpleMatrix[4];
+		
 		double[][] bigTData = {
 				{0,0,0,0,0},
 				{0,1,1,1,0},
@@ -108,6 +129,7 @@ public class Runner {
 				{0,0,1,0,0},
 				{0,0,1,0,0}};
 		SimpleMatrix bigT = new SimpleMatrix(bigTData);
+		bigT.reshape(1, bigT.numCols() * bigT.numRows());
 		matrices[0] = bigT;
 		
 		double[][] smallOData = {
@@ -117,6 +139,7 @@ public class Runner {
 				{0,1,1,1,0},
 				{0,0,0,0,0}};
 		SimpleMatrix smallO = new SimpleMatrix(smallOData);
+		smallO.reshape(1, smallO.numCols() * smallO.numRows());
 		matrices[1] = smallO;
 		
 		double[][] bigOData = {
@@ -126,6 +149,7 @@ public class Runner {
 				{1,0,0,0,1},
 				{1,1,1,1,1}};
 		SimpleMatrix bigO = new SimpleMatrix(bigOData);
+		bigO.reshape(1, bigO.numCols() * bigO.numRows());
 		matrices[2] = bigO;
 		
 		double[][] smallVData = {
@@ -135,6 +159,7 @@ public class Runner {
 				{0,1,0,1,0},
 				{0,0,1,0,0}};
 		SimpleMatrix smallV = new SimpleMatrix(smallVData);
+		smallV.reshape(1, smallV.numCols() * smallV.numRows());
 		matrices[3] = smallV;
 		
 		return matrices;

@@ -40,8 +40,27 @@ public class SpatialPooler {
 	//Misc
 	protected Random rand;
 	
-	
+	/**
+	 * Constructor used when initial learning rate, neighboorhood radius and noise magnitude should be default
+	 * @param rand
+	 * @param maxIterations
+	 * @param inputLength
+	 * @param mapSize
+	 */
 	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize) {
+		this(rand, maxIterations, inputLength, mapSize, 1, (double) mapSize/2, 1);
+	}
+	/**
+	 * Constructor used when all parameters are given
+	 * @param rand
+	 * @param maxIterations
+	 * @param inputLength
+	 * @param mapSize
+	 * @param initialLearningRate
+	 * @param initialNeighborHoodRadius
+	 * @param initialNoiseMagnitude
+	 */
+	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize, double initialLearningRate, double initialNeighborHoodRadius, double initialNoiseMagnitude) {
 		this.rand = rand;
 		som = new SOM(mapSize, mapSize, inputLength, rand);
 		errorMatrix = new SimpleMatrix(mapSize, mapSize);
@@ -51,14 +70,16 @@ public class SpatialPooler {
 		this.mapSize = mapSize;
 		
 		//TODO: change start rates to something from a parameter file / given as parameter to constructor
-		curLearningRate = 1;
-		curNeighborhoodRadius = (double) mapSize / 2;
-		curNoiseMagnitude = 1;
+		curLearningRate = initialLearningRate;
+		curNeighborhoodRadius = initialNeighborHoodRadius;
+		curNoiseMagnitude = initialNoiseMagnitude;
 		
 		//TODO: Something has to be done about this
 		learningDecay = new ExponentialDecayFunction(curLearningRate, 0.01, maxIterations);
-		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 0.01, curNeighborhoodRadius);
+		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 1, curNeighborhoodRadius);
 		noiseDecay = new ExponentialDecayFunction(curNoiseMagnitude, 0.01, maxIterations);
+		
+		
 	}
 	
 	public void tick(){

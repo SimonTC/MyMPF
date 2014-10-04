@@ -3,6 +3,7 @@ package stcl.graphics;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,7 +27,9 @@ public class MultipleMapDrawerGRAY extends JFrame {
 		int spaceBetweenMaps = 20;
 
 		// Set size of map
-		setPreferredSize(new Dimension((prefMapWidth + spaceBetweenMaps) * numberOfMaps, (prefMapHeight + spaceBetweenMaps) * numberOfMaps));
+		setPreferredSize(new Dimension((prefMapWidth + spaceBetweenMaps) * numberOfMaps/2, (prefMapHeight + spaceBetweenMaps) * numberOfMaps/2));
+		
+		setLayout(new GridLayout(2,2));
 		
 		// Add MapPanels
 		panels = new MapPanel[numberOfMaps];
@@ -68,6 +71,8 @@ public class MultipleMapDrawerGRAY extends JFrame {
 			// Draw the grid
 				int cellWidth = getWidth() / columnsInMap;
 			int cellHeight = getHeight() / rowsInMap;
+			
+			//if (dataMaps == null) return;
 			
 			for (int x=0; x<columnsInMap; x++) {
 				for (int y=0; y<rowsInMap; y++) {

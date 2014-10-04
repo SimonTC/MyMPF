@@ -26,7 +26,7 @@ public class RSOM extends SomBasics {
 		this.inputLength = inputLength;
 		resetLeakyDifferencesMap();
 		
-		this.leakyCoefficient = leakyCoefficient; // TODO: Does this change during learning?
+		this.leakyCoefficient = leakyCoefficient; // TODO: Does this change during learning? - I don't think so
 	}
 
 	/**

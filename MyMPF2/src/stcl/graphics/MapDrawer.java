@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.graphics.MapDrawerGRAY.MapPanel;
+import stcl.graphics.SingleMapDrawerGRAY.MapPanel;
 
 public abstract class MapDrawer extends JFrame {
 

@@ -11,7 +11,7 @@ import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.som.SomNode;
 import stcl.graphics.MapDrawer;
 import stcl.graphics.MapDrawerBW;
-import stcl.graphics.MapDrawerGRAY;
+import stcl.graphics.SingleMapDrawerGRAY;
 
 public class Runner {
 	
@@ -65,9 +65,9 @@ public class Runner {
 	
 	private void setupExperiment(){
 		//Create Figure matrices
-		//SimpleMatrix[] matrices = matrices();
+		SimpleMatrix[] matrices = matrices();
 		
-		bigT = bigT();
+		//bigT = bigT();
 		
 		//Create spatial pooler
 		Random rand = new Random();
@@ -88,7 +88,7 @@ public class Runner {
 	}
 	
 	private void setupGraphics(int mapHeight, int mapWidth ) {
-		frame = new MapDrawerGRAY(mapHeight, mapWidth);
+		frame = new SingleMapDrawerGRAY(mapHeight, mapWidth);
 		frame.setSize(new Dimension(400, 400));
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

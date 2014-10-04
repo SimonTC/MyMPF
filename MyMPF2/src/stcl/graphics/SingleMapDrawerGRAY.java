@@ -9,10 +9,9 @@ import javax.swing.JPanel;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class MapDrawerGRAY extends MapDrawer {
+public class SingleMapDrawerGRAY extends MapDrawer {
 
 	// Info about the map
-	//public static final int PREFERRED_GRID_SIZE_PIXELS = 10;
 
 	SimpleMatrix dataMap;
 
@@ -20,7 +19,7 @@ public class MapDrawerGRAY extends MapDrawer {
 	private int mapWidth;
 	private MapPanel panel;
 
-	public MapDrawerGRAY(int mapHeight, int mapWidth) {
+	public SingleMapDrawerGRAY(int mapHeight, int mapWidth) {
 		// Read values
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;

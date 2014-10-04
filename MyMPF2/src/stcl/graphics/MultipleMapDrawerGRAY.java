@@ -64,19 +64,18 @@ public class MultipleMapDrawerGRAY extends JFrame {
 		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
+			SimpleMatrix map = dataMaps[id];
 
 			// Clear the map
 			g.clearRect(0, 0, getWidth(), getHeight());
 
 			// Draw the grid
-				int cellWidth = getWidth() / columnsInMap;
+			int cellWidth = getWidth() / columnsInMap;
 			int cellHeight = getHeight() / rowsInMap;
-			
-			//if (dataMaps == null) return;
 			
 			for (int x=0; x<columnsInMap; x++) {
 				for (int y=0; y<rowsInMap; y++) {
-					double value = dataMaps[id].get(y, x);
+					double value = map.get(y, x);
 					int rgb = (int) ((1-value) * 255);
 					Color c = new Color(rgb, rgb, rgb);
 					g.setColor(c);

@@ -30,7 +30,7 @@ public class Runner {
 	}
 	
 	public void run(){
-		int FRAMES_PER_SECOND = 40;
+		int FRAMES_PER_SECOND = 1;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();

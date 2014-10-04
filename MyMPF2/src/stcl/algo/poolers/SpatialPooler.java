@@ -89,13 +89,18 @@ public class SpatialPooler {
 		curNoiseMagnitude = noiseDecay.decayValue(tick);
 	}
 	
-	public SimpleMatrix feedForward(SimpleMatrix inputVector){
+	/**
+	 * 
+	 * @param feedForwardInputVector
+	 * @return Returns a probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input
+	 */
+	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
 		//Test input
-		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
-		if (inputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
+		if (!feedForwardInputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
+		if (feedForwardInputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
 		
 		//Adjust weights of SOM
-		som.step(inputVector, curLearningRate, curNeighborhoodRadius);
+		som.step(feedForwardInputVector, curLearningRate, curNeighborhoodRadius);
 		
 		//Collect error matrix
 		errorMatrix = som.getErrorMatrix();
@@ -111,16 +116,16 @@ public class SpatialPooler {
 	
 	/**
 	 * 
-	 * @param inputMatrix
-	 * @return vector
+	 * @param feedBackwardInputMatrix
+	 * @return vector Returns a vector with the values that are expected to be observed at time t+1
 	 */
-	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
+	public SimpleMatrix feedBackward(SimpleMatrix feedBackwardInputMatrix){
 		//Test input
-		if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a matrix");
-		if (inputMatrix.numCols() != mapSize || inputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
+		if (feedBackwardInputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a matrix");
+		if (feedBackwardInputMatrix.numCols() != mapSize || feedBackwardInputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(inputMatrix);
+		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix);
 		
 		//Add noise
 		model = addNoise(model, curNoiseMagnitude);

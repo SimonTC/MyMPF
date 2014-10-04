@@ -11,6 +11,14 @@ public class RSOM extends SomBasics {
 	private double leakyCoefficient;
 	private int columns, rows, inputLength;
 	
+	/**
+	 * 
+	 * @param columns
+	 * @param rows
+	 * @param inputLength
+	 * @param rand
+	 * @param leakyCoefficient high value = short memory, low value = long memory
+	 */
 	public RSOM(int columns, int rows, int inputLength, Random rand, double leakyCoefficient) {
 		super(columns, rows, inputLength, rand);
 		this.columns = columns;
@@ -60,21 +68,22 @@ public class RSOM extends SomBasics {
 		
 		for (int row = 0; row < leakyDifferencesMap.getHeight(); row++){
 			for (int col = 0; col < leakyDifferencesMap.getWidth(); col++){
-				SomNode leakyDifferenceNode = oldLeakyDifferencesMap.get(col, row);
+				SomNode oldLeakyDifferenceNode = oldLeakyDifferencesMap.get(col, row);
 				SomNode weightNode = weightMap.get(col, row);
 				
-				//Calculate squared difference between input vector and weight vector
+				//Calculate difference between input vector and weight vector
 				SimpleMatrix weightDiff = inputVector.minus(weightNode.getVector());
+				
 				//weightDiff = weightDiff.elementPower(2);  //TODO: Decide wether to square or not. What do they do in the original code?
 				weightDiff = weightDiff.scale(leakyCoefficient);
 				
-				SimpleMatrix leakyDifferenceVector = leakyDifferenceNode.getVector();
+				SimpleMatrix leakyDifferenceVector = oldLeakyDifferenceNode.getVector();
 				leakyDifferenceVector = leakyDifferenceVector.scale(1-leakyCoefficient);
 								
 				SimpleMatrix sum = leakyDifferenceVector.plus(weightDiff);
 				
-				leakyDifferenceNode.setVector(sum);
-				leakyDifferencesMap.set(col, row, leakyDifferenceNode);
+				oldLeakyDifferenceNode.setVector(sum);
+				leakyDifferencesMap.set(col, row, oldLeakyDifferenceNode);
 			}
 		}
 	}

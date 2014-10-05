@@ -105,6 +105,7 @@ public class Runner {
 	    }
 	}
 	
+	
 	private SimpleMatrix orthogonalize(SimpleMatrix m){
 		double maxValue = 0;
 		int maxID = -1;
@@ -152,7 +153,7 @@ public class Runner {
 		//Spatial pooler
 		int spatialInputLength = 9;
 		int spatialMapSize = 5;
-		double initialLearningRate = 1;
+		double initialLearningRate = 0.8;
 		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, initialLearningRate,3,1);
 		
 		//Temporal pooler

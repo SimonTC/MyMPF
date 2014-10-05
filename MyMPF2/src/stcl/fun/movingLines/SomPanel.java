@@ -57,7 +57,7 @@ public class SomPanel extends JPanel {
 		this.som = somModel;		
 		for (int i = 0; i < som.getModels().length; i++){
 			SomNode n = som.getModel(i);
-			SimpleMatrix m = n.getVector();
+			SimpleMatrix m = new SimpleMatrix(n.getVector());
 			m.reshape(somModelsRows, somModelsColumns);
 			MatrixPanel p = panels[i];
 			if (highlightList[i]){

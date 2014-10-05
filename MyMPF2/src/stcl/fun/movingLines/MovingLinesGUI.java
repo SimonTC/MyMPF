@@ -110,16 +110,25 @@ public class MovingLinesGUI extends JFrame {
 		input.repaint();
 		input.revalidate();
 		
-		//Update Spatial models
-		SOM spatialSom = spatialPooler.getSOM();
-		spatialModels.updateData(spatialSom);
-		spatialModels.repaint();
-		spatialModels.revalidate();
-		
 		//Update spatial activation
-		spatialActivation.updateData(spatialPooler.getActivationMatrix());
+		SimpleMatrix activationMatrix = spatialPooler.getActivationMatrix();
+		spatialActivation.updateData(activationMatrix);
 		spatialActivation.repaint();
 		spatialActivation.revalidate();
+		
+		
+		//Create list of spatial models to be highlighted
+		int maxID = findIDOfMaxValue(activationMatrix);
+		boolean[] highlights = new boolean[activationMatrix.getMatrix().data.length];
+		highlights[maxID] = true;
+		
+		//Update Spatial models
+		SOM spatialSom = spatialPooler.getSOM();
+		spatialModels.updateData(spatialSom, highlights);
+		//spatialModels.updateData(spatialSom);
+		spatialModels.repaint();
+		spatialModels.revalidate();		
+		
 		
 		//Update RSOM models
 		rsomModel1.updateData(spatialSom);
@@ -161,6 +170,26 @@ public class MovingLinesGUI extends JFrame {
 		rsomActivation4.repaint();
 		rsomActivation4.revalidate();
 		
+	}
+	
+	/**
+	 * 
+	 * @param m
+	 * @return id of cell with max value
+	 */
+	private int findIDOfMaxValue(SimpleMatrix m){
+		double maxValue = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		for (int row = 0; row < m.numRows(); row++){
+			for (int col = 0; col < m.numCols(); col++){
+				double value = m.get(row, col);
+				if (value > maxValue){
+					maxValue = value;
+					maxID = m.getIndex(row, col);
+				}
+			}
+		}
+		return maxID;
 	}
 
 	

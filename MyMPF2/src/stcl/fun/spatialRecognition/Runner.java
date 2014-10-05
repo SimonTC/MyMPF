@@ -14,12 +14,13 @@ import org.ejml.simple.SimpleMatrix;
 import org.omg.CORBA.OMGVMCID;
 
 import stcl.algo.poolers.SpatialPooler;
+import stcl.algo.som.SOM;
 import stcl.algo.som.SomNode;
 import stcl.graphics.MultipleMapDrawerGRAY;
 
 public class Runner {
 	
-	private MultipleMapDrawerGRAY frame;
+	private SpatialRecognitionGUI frame;
 	private SpatialPooler pooler;
 	private SimpleMatrix[] figureMatrices;
 	
@@ -29,47 +30,38 @@ public class Runner {
 	}
 	
 	public void run(){
-		int FRAMES_PER_SECOND = 1;
+		int FRAMES_PER_SECOND = 5;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
 	    float sleepTime = 0;
 		
-	    int maxIterations = 50;
+	    int maxIterations = 500;
 	    boolean useSimpleImages = false;
 		setupExperiment(maxIterations, useSimpleImages);
 		
 		
 		
 		for (int i = 0; i < maxIterations; i++){
-			SimpleMatrix[] outputs = new SimpleMatrix[figureMatrices.length];
-			
+						
 			for (int j = 0; j < figureMatrices.length; j++){
 				//Feed forward
 				SimpleMatrix out = pooler.feedForward(figureMatrices[j]);			
 				
-				//Collect BMU
-				SomNode bmu = pooler.getSOM().getBMU(figureMatrices[j]);
-				SimpleMatrix m = new SimpleMatrix(bmu.getVector());
-				m.reshape(100, 100);
-				outputs[j] = m;				
-			}
-			
-			
-			//Visualize maps
-			updateGraphics(outputs, i);
-			
-			//Sleep
-			next_game_tick+= SKIP_TICKS;
-			sleepTime = next_game_tick - System.currentTimeMillis();
-			if (sleepTime >= 0){
+				//Update graphicss
+				updateGraphics(figureMatrices[j], pooler, i);	
+				
+				//Sleep
+				next_game_tick+= SKIP_TICKS;
+				sleepTime = next_game_tick - System.currentTimeMillis();
 				try {
 					Thread.sleep(SKIP_TICKS);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+
+			}					
 			pooler.tick();
 		}
 				
@@ -88,8 +80,7 @@ public class Runner {
 		} else {
 			figureMatrices = pixelArtFigures();
 			figureRows = 100;
-			figureColumns = 100;
-			
+			figureColumns = 100;			
 		}
 
 		
@@ -97,37 +88,36 @@ public class Runner {
 		Random rand = new Random();
 		int maxIterations = iterations;
 		int inputLength = figureColumns * figureRows;
-		int mapSize = 10;
+		int mapSize = 3;
 		double initialLearningRate = 0.5;
-		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize, initialLearningRate, mapSize / 2, 1);
+		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize, initialLearningRate, mapSize , 1);
 		
 		//Setup graphics
-		setupGraphics(figureRows, figureColumns);
+		setupGraphics(pooler, figureRows, mapSize);
 		
 	}
 	
-	private void updateGraphics(SimpleMatrix[] matrices, int iteration){
-		frame.updateMaps(matrices);
+	private void updateGraphics(SimpleMatrix inputVector, SpatialPooler spatialPooler, int iteration){
+		frame.updateData(inputVector, spatialPooler);
 		frame.setTitle("Visualiztion - Iteration: " + iteration);
 		frame.revalidate();
 		frame.repaint();
 	}
 	
-	private void setupGraphics(int mapHeight, int mapWidth ) {
-		int mapGuiSize = 200;
-		frame = new MultipleMapDrawerGRAY(mapHeight, mapWidth, figureMatrices.length, mapGuiSize, mapGuiSize);
+	private void setupGraphics(SpatialPooler spatialPooler, int somModelSize, int sizeOfSom) {
+		SOM spatialSom = spatialPooler.getSOM();
+		frame = new SpatialRecognitionGUI(spatialSom, somModelSize, sizeOfSom);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		SimpleMatrix[] tmp = new SimpleMatrix[figureMatrices.length];
-		for (int i = 0; i < figureMatrices.length; i++){
-			SimpleMatrix m = new SimpleMatrix(mapHeight, mapWidth);
-			tmp[i] = m;
-		}
+		//Create blank input
+		int numRows = figureMatrices[0].numRows();
+		int numCols = figureMatrices[0].numCols();
+		SimpleMatrix tmp = new SimpleMatrix(numRows, numCols);
 		
-		frame.updateMaps(tmp);
+		//Update graphics
+		updateGraphics(tmp, spatialPooler, 0);
 		frame.pack();
-
 		frame.setVisible(true);
 
 	}

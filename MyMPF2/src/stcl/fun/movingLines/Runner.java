@@ -87,13 +87,11 @@ public class Runner {
 	    		//Sleep
 				next_game_tick+= SKIP_TICKS;
 				sleepTime = next_game_tick - System.currentTimeMillis();
-				if (sleepTime >= 0){
-					try {
-						Thread.sleep(SKIP_TICKS);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				try {
+					Thread.sleep(SKIP_TICKS);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 	    		
 	    	}	    	
@@ -133,7 +131,8 @@ public class Runner {
 		//Spatial pooler
 		int spatialInputLength = 9;
 		int spatialMapSize = 5;
-		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, 0.4,3,1);
+		double initialLearningRate = 1;
+		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, initialLearningRate,3,1);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;

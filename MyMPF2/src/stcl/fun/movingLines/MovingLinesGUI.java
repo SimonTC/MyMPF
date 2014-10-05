@@ -34,6 +34,7 @@ public class MovingLinesGUI extends JFrame {
 		int gap = 2;
 		setLayout(new GridLayout(rows, cols, gap, gap));
 		
+		//Set preffered size of GUI
 		int somModelSize = 3;
 		int somModelCellSize = 10;
 		int numberOfModelsInSOMS = 5;
@@ -110,7 +111,8 @@ public class MovingLinesGUI extends JFrame {
 		input.revalidate();
 		
 		//Update Spatial models
-		spatialModels.updateData(spatialPooler.getSOM());
+		SOM spatialSom = spatialPooler.getSOM();
+		spatialModels.updateData(spatialSom);
 		spatialModels.repaint();
 		spatialModels.revalidate();
 		
@@ -120,6 +122,21 @@ public class MovingLinesGUI extends JFrame {
 		spatialActivation.revalidate();
 		
 		//Update RSOM models
+		rsomModel1.updateData(spatialSom);
+		rsomModel1.repaint();
+		rsomModel1.revalidate();
+		
+		rsomModel2.updateData(spatialSom);
+		rsomModel2.repaint();
+		rsomModel2.revalidate();
+		
+		rsomModel3.updateData(spatialSom);
+		rsomModel3.repaint();
+		rsomModel3.revalidate();
+		
+		rsomModel4.updateData(spatialSom);
+		rsomModel4.repaint();
+		rsomModel4.revalidate();
 		
 		
 		//Update RSOM activation

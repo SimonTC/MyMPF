@@ -78,6 +78,9 @@ public class Runner {
 	    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 	    		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 	    		
+	    		//Orthogonalize spatial output
+	    		temporalFFInputVector = orthogonalize(temporalFFInputVector);
+	    		
 	    		//Temporal classification
 	    		temporalPooler.feedForward(temporalFFInputVector);
 	    		
@@ -100,6 +103,24 @@ public class Runner {
 			temporalPooler.tick();
 
 	    }
+	}
+	
+	private SimpleMatrix orthogonalize(SimpleMatrix m){
+		double maxValue = 0;
+		int maxID = -1;
+		for (int row = 0; row < m.numRows(); row++){
+			for (int col = 0; col < m.numCols(); col++){
+				double value = m.get(row, col);
+				if (value > maxValue){
+					maxValue = value;
+					maxID = m.getIndex(row, col);
+				}
+			}
+		}
+		
+		m.set(0);
+		m.set(maxID, maxValue);
+		return m;
 	}
 	
 	private void setupGraphics(){

@@ -154,7 +154,8 @@ public class Runner {
 		int spatialInputLength = 9;
 		int spatialMapSize = 5;
 		double initialLearningRate = 0.8;
-		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, initialLearningRate,3,1);
+		double initialNeighborhoodRadius = 3; //3
+		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, initialLearningRate,initialNeighborhoodRadius,1);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;

@@ -125,28 +125,8 @@ public class MovingLinesGUI extends JFrame {
 		//Update Spatial models
 		SOM spatialSom = spatialPooler.getSOM();
 		spatialModels.updateData(spatialSom, highlights);
-		//spatialModels.updateData(spatialSom);
 		spatialModels.repaint();
 		spatialModels.revalidate();		
-		
-		
-		//Update RSOM models
-		rsomModel1.updateData(spatialSom);
-		rsomModel1.repaint();
-		rsomModel1.revalidate();
-		
-		rsomModel2.updateData(spatialSom);
-		rsomModel2.repaint();
-		rsomModel2.revalidate();
-		
-		rsomModel3.updateData(spatialSom);
-		rsomModel3.repaint();
-		rsomModel3.revalidate();
-		
-		rsomModel4.updateData(spatialSom);
-		rsomModel4.repaint();
-		rsomModel4.revalidate();
-		
 		
 		//Update RSOM activation
 		SimpleMatrix temporalActivationMatrix = temporalPooler.getActivationMatrix();
@@ -169,6 +149,25 @@ public class MovingLinesGUI extends JFrame {
 		rsomActivation4.updateData(new SimpleMatrix(tmp4));
 		rsomActivation4.repaint();
 		rsomActivation4.revalidate();
+		
+		//Update RSOM models
+		rsomModel1.updateData(spatialSom);
+		rsomModel1.repaint();
+		rsomModel1.revalidate();
+		
+		rsomModel2.updateData(spatialSom);
+		rsomModel2.repaint();
+		rsomModel2.revalidate();
+		
+		rsomModel3.updateData(spatialSom);
+		rsomModel3.repaint();
+		rsomModel3.revalidate();
+		
+		rsomModel4.updateData(spatialSom);
+		rsomModel4.repaint();
+		rsomModel4.revalidate();
+		
+		
 		
 	}
 	

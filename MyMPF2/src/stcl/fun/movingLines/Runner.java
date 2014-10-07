@@ -25,24 +25,24 @@ public class Runner {
 	
 	public void run(){
 		//Setup experiment
-		int maxIterations = 1000;
-		setupExperiment(maxIterations);
+		int maxIterations = 50;
+		Random rand = new Random(12);
+		setupExperiment(maxIterations, rand);
 		
 		//Setup graphics
 		setupGraphics();
 		
-		runExperiment(maxIterations);
+		runExperiment(maxIterations, rand);
 		
 	}
 	
-	private void runExperiment(int maxIterations){
+	private void runExperiment(int maxIterations, Random rand){
 		int FRAMES_PER_SECOND = 5;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
 	    float sleepTime = 0;
 	    int timeSinceNotBlank = 0;
-	    Random rand = new Random();
 	    
 	    for (int i = 0; i < maxIterations; i++){
 	    	
@@ -148,13 +148,12 @@ public class Runner {
 
 	}
 	
-	private void setupExperiment(int maxIterations){
+	private void setupExperiment(int maxIterations, Random rand){
 		buildSequences();
-		buildPoolers(maxIterations);		
+		buildPoolers(maxIterations, rand);		
 	}
 	
-	private void buildPoolers(int maxIterations){
-		Random rand = new Random();
+	private void buildPoolers(int maxIterations, Random rand){
 		
 		//Spatial pooler
 		int spatialInputLength = 9;

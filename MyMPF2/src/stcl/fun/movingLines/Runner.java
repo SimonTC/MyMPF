@@ -47,8 +47,8 @@ public class Runner {
 	    for (int i = 0; i < maxIterations; i++){
 	    	
 	    	//Choose sequence
-	    	SimpleMatrix[] curSequence;
-	    
+	    	//SimpleMatrix[] curSequence;
+	    /*
 	    	int notBlankThreshold = 30 * timeSinceNotBlank;
 	    	int value = rand.nextInt(100);
 	    	if (value < notBlankThreshold){
@@ -63,44 +63,50 @@ public class Runner {
 	    		timeSinceNotBlank++;
 	    	}
 	    	
-	    	
-	    	//Go through sequence
-	    	for (int j = 0; j < curSequence.length; j++){
-	    		//Spatial classification
-	    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[j]);
-	    		
-	    		//Normalize output
-	    		double sum = spatialFFOutputMatrix.elementSum();
-	    		spatialFFOutputMatrix = spatialFFOutputMatrix.scale(1/sum);
-	    		
-	    		//Transform spatial output matrix to vector
-	    		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
-	    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
-	    		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-	    		
-	    		//Orthogonalize spatial output
-	    		temporalFFInputVector = orthogonalize(temporalFFInputVector);
-	    		
-	    		//Temporal classification
-	    		temporalPooler.feedForward(temporalFFInputVector);
-	    		
-	    		//Update graphics
-	    		updateGraphics(curSequence[j], i);
-	    		
-	    		//Sleep
-				next_game_tick+= SKIP_TICKS;
-				sleepTime = next_game_tick - System.currentTimeMillis();
-				try {
-					Thread.sleep(SKIP_TICKS);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	    		
-	    	}	    	
+	    	*/
+	    	//Got through all sequences
+	    	for (SimpleMatrix[] curSequence : sequences){
+		    	//Go through sequence
+		    	for (int j = 0; j < curSequence.length; j++){
+		    		//Spatial classification
+		    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[j]);
+		    		
+		    		//Normalize output
+		    		double sum = spatialFFOutputMatrix.elementSum();
+		    		spatialFFOutputMatrix = spatialFFOutputMatrix.scale(1/sum);
+		    		
+		    		//Transform spatial output matrix to vector
+		    		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
+		    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
+		    		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
+		    		
+		    		//Orthogonalize spatial output
+		    		temporalFFInputVector = orthogonalize(temporalFFInputVector);
+		    		
+		    		//Temporal classification
+		    		temporalPooler.feedForward(temporalFFInputVector);
+		    		
+		    		//Update graphics
+		    		updateGraphics(curSequence[j], i);
+		    		
+		    		//Sleep
+					next_game_tick+= SKIP_TICKS;
+					sleepTime = next_game_tick - System.currentTimeMillis();
+					try {
+						Thread.sleep(SKIP_TICKS);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+		    		
+		    	}	
+		    	temporalPooler.resetLeakyDifferences();
+	    	}
 			
 			spatialPooler.tick();
 			temporalPooler.tick();
+			
 
 	    }
 	}

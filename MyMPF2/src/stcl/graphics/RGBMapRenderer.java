@@ -66,9 +66,9 @@ public class RGBMapRenderer extends MapRenderer {
 		for (int x=0; x<lattice.getWidth(); x++) {
 			for (int y=0; y<lattice.getHeight(); y++) {
 
-				r = (float)(lattice.getModel(y, x).getVector().get(0));
-				g = (float)(lattice.getModel(y, x).getVector().get(1));
-				b = (float)(lattice.getModel(y, x).getVector().get(2));
+				r = (float)(lattice.getNode(y, x).getVector().get(0));
+				g = (float)(lattice.getNode(y, x).getVector().get(1));
+				b = (float)(lattice.getNode(y, x).getVector().get(2));
 				g2.setColor(new Color(r,g,b));
 				g2.fillRect((int)(x*cellWidth), (int)(y*cellHeight),
 							(int)cellWidth, (int)cellHeight);
@@ -103,9 +103,9 @@ public class RGBMapRenderer extends MapRenderer {
 		Graphics2D g2 = (Graphics2D)img.getGraphics();
 		g2.setFont(arialFont);
 		float r, g , b;
-		r = (float)(lattice.getModel(cellY, cellX).getVector().get(0));
-		g = (float)(lattice.getModel(cellY, cellX).getVector().get(1));
-		b = (float)(lattice.getModel(cellY, cellX).getVector().get(2));
+		r = (float)(lattice.getNode(cellY, cellX).getVector().get(0));
+		g = (float)(lattice.getNode(cellY, cellX).getVector().get(1));
+		b = (float)(lattice.getNode(cellY, cellX).getVector().get(2));
 		StringBuffer sb = new StringBuffer("Value: ");
 		sb.append(String.valueOf(r)).append(", ");
 		sb.append(String.valueOf(g)).append(", ");

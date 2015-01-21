@@ -26,7 +26,7 @@ public class Runner {
 		Runner runner = new Runner();
 		
 		runner.start();
-	}
+	} 
 	
 	public void start(){
 		//Load data

@@ -1,6 +1,10 @@
 package stcl.test.som;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,9 +15,8 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import stcl.algo.som.SOM;
-import stcl.algo.som.SomMap;
-import stcl.algo.som.SomNode;
+import dk.stcl.som.containers.SomNode;
+import dk.stcl.som.som.SOM;
 
 public class SOMTest {
 

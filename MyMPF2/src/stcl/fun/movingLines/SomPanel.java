@@ -1,17 +1,15 @@
 package stcl.fun.movingLines;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.SOM;
-import stcl.algo.som.SomNode;
+import dk.stcl.som.containers.SomNode;
+import dk.stcl.som.som.SOM;
 
 public class SomPanel extends JPanel {
 

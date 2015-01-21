@@ -1,15 +1,11 @@
 package stcl.algo.poolers;
 
 import java.util.Random;
-import java.util.Vector;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.SOM;
-import stcl.algo.som.SomNode;
 import stcl.algo.util.ExponentialDecayFunction;
+import dk.stcl.som.som.SOM;
 
 public class SpatialPooler {
 	

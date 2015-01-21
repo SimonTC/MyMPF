@@ -1,9 +1,7 @@
 package stcl.fun.spatialRecognition;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
-import java.awt.image.SampleModel;
 import java.io.File;
 import java.util.Random;
 
@@ -11,12 +9,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
-import org.omg.CORBA.OMGVMCID;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOM;
-import stcl.algo.som.SomNode;
-import stcl.graphics.MultipleMapDrawerGRAY;
+import dk.stcl.som.som.SOM;
 
 public class Runner {
 	

@@ -1,17 +1,18 @@
 package stcl.test.som;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import stcl.algo.som.RSOM;
-import stcl.algo.som.SomMap;
-import stcl.algo.som.SomNode;
+import dk.stcl.som.containers.SomMap;
+import dk.stcl.som.containers.SomNode;
+import dk.stcl.som.rsom.RSOM;
 
 public class RSOMTest {
 	private RSOM rsom;

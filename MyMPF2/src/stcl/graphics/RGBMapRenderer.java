@@ -6,18 +6,15 @@
 
 package stcl.graphics;
 
-import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.SOM;
-
-import java.awt.image.BufferedImage;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
+import dk.stcl.som.som.SOM;
 
 /**
  *

@@ -8,8 +8,8 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.som.SOM;
-import stcl.algo.som.SomNode;
+import dk.stcl.som.containers.SomNode;
+import dk.stcl.som.som.SOM;
 
 public class Runner {
 	private SimpleMatrix[][] sequences;

@@ -5,6 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/EJML-Core"/>
 	<classpathentry kind="lib" path="lib/jmathplot.jar"/>
 	<classpathentry kind="lib" path="lib/matrix/EJML-core-0.26.jar" sourcepath="lib/matrix/EJML-core-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="lib/MySOM.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MineSweeper"/>
 	<classpathentry kind="output" path="bin"/>

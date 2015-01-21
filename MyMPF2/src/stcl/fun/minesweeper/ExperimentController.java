@@ -2,14 +2,6 @@ package stcl.fun.minesweeper;
 
 import java.util.Random;
 
-import stcl.Board;
-import stcl.Controller;
-import stcl.MineGui;
-import stcl.Model;
-import stcl.players.Player;
-import stcl.players.RandomAI;
-import stcl.players.Player.PlayerType;
-
 public class ExperimentController extends Controller {
 
 	private AIPlayer aiPlayer;

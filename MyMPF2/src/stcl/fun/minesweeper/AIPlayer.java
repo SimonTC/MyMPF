@@ -6,8 +6,6 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.players.Player;
-
 public class AIPlayer extends Player {
 	private Brain brain;
 	private Random rand;

@@ -4,8 +4,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.RSOM;
-import stcl.algo.som.SOM;
+import dk.stcl.som.rsom.RSOM;
 
 public class TemporalPooler extends SpatialPooler  {
 

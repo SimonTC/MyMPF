@@ -1,9 +1,7 @@
 package stcl.fun.movingLines;
 
 import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
 
@@ -11,7 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.som.SOM;
+import dk.stcl.som.som.SOM;
 
 public class MovingLinesGUI extends JFrame {
 	private MatrixPanel input;

@@ -1,6 +1,8 @@
 package stcl.test.som;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
@@ -8,7 +10,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import stcl.algo.som.SomNode;
+import dk.stcl.som.containers.SomNode;
 
 public class SomNodeTest {
 

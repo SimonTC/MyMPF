@@ -1,19 +1,18 @@
 package stcl.test.poolers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Random;
-import java.util.Vector;
 
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.PortableInterceptor.SUCCESSFUL;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.som.SOM;
 
 public class SpatialPoolerTest {
 	private SpatialPooler pooler;

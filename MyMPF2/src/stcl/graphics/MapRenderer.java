@@ -1,12 +1,10 @@
 package stcl.graphics;
 
-import java.awt.LayoutManager;
-
 import javax.swing.JPanel;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.som.SOM;
+import dk.stcl.som.som.SOM;
 
 public abstract class MapRenderer extends JPanel {
 

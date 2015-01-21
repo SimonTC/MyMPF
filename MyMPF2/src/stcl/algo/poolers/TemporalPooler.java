@@ -9,17 +9,17 @@ import dk.stcl.som.rsom.RSOM;
 public class TemporalPooler extends SpatialPooler  {
 
 	private RSOM rsom; 
-	private double curLeakyCoefficient; 
 	
-	public TemporalPooler(Random rand, int maxIterations, int inputLength,
-			int mapSize, double leakyCoefficient) {
-		super(rand, maxIterations, inputLength, mapSize);
+	public TemporalPooler(Random rand, int inputLength, int mapSize,
+			double initialLearningRate, double stddev,
+			double activationCodingFactor, double decay) {
+		super(rand, inputLength, mapSize, initialLearningRate, stddev,
+				activationCodingFactor);
 		
-		curLeakyCoefficient = leakyCoefficient; //TODO: Initial leaky coefficient should be a parameter. Does it change at all?
+		rsom = new RSOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor, decay);
 		
-		rsom = new RSOM(mapSize, mapSize, inputLength, rand, curLeakyCoefficient);
-		
-	}
+	}	
+	
 	
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -28,13 +28,10 @@ public class TemporalPooler extends SpatialPooler  {
 		if (inputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the temporal pooler has to be a 1 x " + inputLength + " vector");				
 		
 		//Update RSOM
-		rsom.step(inputVector, curLearningRate, curNeighborhoodRadius);
-		
-		//Collect error
-		errorMatrix = rsom.getErrorMatrix();
+		rsom.step(inputVector);
 		
 		//Compute activation
-		activationMatrix = computeActivationMatrix(errorMatrix);
+		activationMatrix = rsom.computeActivationMatrix();
 		
 		//Normalize activation matrix
 		activationMatrix = normalize(activationMatrix);
@@ -67,6 +64,5 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	public void resetLeakyDifferences(){
 		//TODO: SHould that be the name of the method?
-		rsom.resetLeakyDifferencesMap();
-	}
+		rsom.flush();	}
 }

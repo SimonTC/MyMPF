@@ -20,18 +20,10 @@ public class SpatialPooler {
 	protected double curLearningRate;
 	protected double curNeighborhoodRadius;
 	protected double curNoiseMagnitude;
-	private int tick;
 	
 	//Variables used for testing inputs
 	protected int inputLength;
 	protected int mapSize;
-	
-	//Decay function
-	//TODO: They probably have to be changed at some point. Especially noiseDecay. It should be dependant on activitty from lower levels.
-	//TODO: They should probably be moved to the Neocortical unit
-	private ExponentialDecayFunction learningDecay;
-	private ExponentialDecayFunction radiusDecay;
-	private ExponentialDecayFunction noiseDecay;
 	
 	//Misc
 	protected Random rand;
@@ -44,7 +36,7 @@ public class SpatialPooler {
 	 * @param mapSize
 	 */
 	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize) {
-		this(rand, maxIterations, inputLength, mapSize, 1, (double) mapSize/2, 1);
+		this(rand, inputLength, mapSize, 0.1, 1 , 0.125);
 	}
 	/**
 	 * Constructor used when all parameters are given
@@ -56,34 +48,16 @@ public class SpatialPooler {
 	 * @param initialNeighborHoodRadius
 	 * @param initialNoiseMagnitude
 	 */
-	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize, double initialLearningRate, double initialNeighborHoodRadius, double initialNoiseMagnitude) {
+	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
 		this.rand = rand;
-		som = new SOM(mapSize, mapSize, inputLength, rand);
+		som = new SOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor);
 		errorMatrix = new SimpleMatrix(mapSize, mapSize);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
-		tick = 0;
 		this.inputLength = inputLength;
-		this.mapSize = mapSize;
-		
-		//TODO: change start rates to something from a parameter file / given as parameter to constructor
-		curLearningRate = initialLearningRate;
-		curNeighborhoodRadius = initialNeighborHoodRadius;
-		curNoiseMagnitude = initialNoiseMagnitude;
-		
-		//TODO: Something has to be done about this
-		learningDecay = new ExponentialDecayFunction(curLearningRate, 0.01, maxIterations);
-		radiusDecay = new ExponentialDecayFunction(curNeighborhoodRadius, 1, curNeighborhoodRadius);
-		noiseDecay = new ExponentialDecayFunction(curNoiseMagnitude, 0.01, maxIterations);
-		
-		
+		this.mapSize = mapSize;		
+		curNoiseMagnitude = 0; //TODO: Be aware of noise magnitude
 	}
-	
-	public void tick(){
-		tick++;
-		curLearningRate = learningDecay.decayValue(tick);
-		curNeighborhoodRadius = radiusDecay.decayValue(tick);
-		curNoiseMagnitude = noiseDecay.decayValue(tick);
-	}
+
 	
 	/**
 	 * 
@@ -96,13 +70,10 @@ public class SpatialPooler {
 		if (feedForwardInputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
 		
 		//Adjust weights of SOM
-		som.step(feedForwardInputVector, curLearningRate, curNeighborhoodRadius);
-		
-		//Collect error matrix
-		errorMatrix = som.getErrorMatrix();
+		som.step(feedForwardInputVector);
 		
 		//Compute ActivationMatrix
-		activationMatrix = computeActivationMatrix(errorMatrix);
+		activationMatrix = som.computeActivationMatrix();
 		
 		//Normalize activation matrix
 		activationMatrix = normalize(activationMatrix);
@@ -153,19 +124,10 @@ public class SpatialPooler {
 		id--; //We have t subtract to be sure we get the correct model
 		
 		//Choose model from som
-		SimpleMatrix model = som.getModel(id).getVector();
+		SimpleMatrix model = som.getNode(id).getVector();
 		
 		return model;
 		
-	}
-	
-	protected SimpleMatrix computeActivationMatrix( SimpleMatrix errorMatrix){
-		double maxError = errorMatrix.elementMaxAbs();
-		SimpleMatrix m = errorMatrix.divide(maxError);
-		SimpleMatrix activation = new SimpleMatrix(errorMatrix.numRows(), errorMatrix.numCols());
-		activation.set(1);
-		activation = activation.minus(m);	
-		return activation;
 	}
 	
 	/**

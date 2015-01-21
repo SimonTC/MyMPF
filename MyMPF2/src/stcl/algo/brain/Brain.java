@@ -101,8 +101,6 @@ public class Brain {
 	public void newIteration(){
 		nu1.resetTemporalDifferences();
 		nu2.resetTemporalDifferences();
-		nu1.newIteration();
-		nu2.newIteration();
 	}
 
 }

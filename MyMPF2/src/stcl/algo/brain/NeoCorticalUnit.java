@@ -26,10 +26,10 @@ public class NeoCorticalUnit {
 	
 	private boolean useMarkovPrediction;
 	
-	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double leakyCoefficient) {
+	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double decayFactor) {
 		//TODO: All parameters should be handled in parameter file
-		spatialPooler = new SpatialPooler(rand, maxIterations, ffInputLength, spatialMapSize);
-		temporalPooler = new TemporalPooler(rand, maxIterations, spatialMapSize * spatialMapSize, temporalMapSize, leakyCoefficient);
+		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize);
+		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, decayFactor);
 		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -105,12 +105,7 @@ public class NeoCorticalUnit {
 	}
 	
 	public void resetTemporalDifferences(){
-		temporalPooler.resetLeakyDifferences();
-	}
-	
-	public void newIteration(){
-		spatialPooler.tick();
-		temporalPooler.tick();
+		temporalPooler.flushTemporalMemory();
 	}
 
 }

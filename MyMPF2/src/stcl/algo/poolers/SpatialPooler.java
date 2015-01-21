@@ -35,7 +35,7 @@ public class SpatialPooler {
 	 * @param inputLength
 	 * @param mapSize
 	 */
-	public SpatialPooler(Random rand, int maxIterations, int inputLength, int mapSize) {
+	public SpatialPooler(Random rand, int inputLength, int mapSize) {
 		this(rand, inputLength, mapSize, 0.1, 1 , 0.125);
 	}
 	/**

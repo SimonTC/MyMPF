@@ -13,12 +13,19 @@ public class TemporalPooler extends SpatialPooler  {
 	public TemporalPooler(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
 			double activationCodingFactor, double decay) {
+		
 		super(rand, inputLength, mapSize, initialLearningRate, stddev,
 				activationCodingFactor);
 		
 		rsom = new RSOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor, decay);
 		
 	}	
+	
+	public TemporalPooler(Random rand, int inputLength, int mapSize, double decay) {
+		super(rand, inputLength, mapSize);
+		
+		rsom = new RSOM(mapSize, mapSize, inputLength, rand, 0.1, 1, 0.125, decay);
+	}
 	
 	
 	@Override
@@ -62,7 +69,7 @@ public class TemporalPooler extends SpatialPooler  {
 		return model;		
 	}
 	
-	public void resetLeakyDifferences(){
+	public void flushTemporalMemory(){
 		//TODO: SHould that be the name of the method?
 		rsom.flush();	}
 }

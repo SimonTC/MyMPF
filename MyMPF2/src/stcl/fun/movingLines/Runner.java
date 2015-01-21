@@ -101,7 +101,7 @@ public class Runner {
 					
 		    		
 		    	}	
-		    	temporalPooler.resetLeakyDifferences();
+		    	temporalPooler.flushTemporalMemory();
 	    	}
 			
 			spatialPooler.tick();

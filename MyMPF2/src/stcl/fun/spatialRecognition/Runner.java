@@ -57,7 +57,6 @@ public class Runner {
 				}
 
 			}					
-			pooler.tick();
 		}
 				
 			
@@ -85,7 +84,7 @@ public class Runner {
 		int inputLength = figureColumns * figureRows;
 		int mapSize = 3;
 		double initialLearningRate = 0.5;
-		pooler = new SpatialPooler(rand, maxIterations, inputLength, mapSize, initialLearningRate, mapSize , 1);
+		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, 2 , 0.125);
 		
 		//Setup graphics
 		setupGraphics(pooler, figureRows, mapSize);

@@ -30,7 +30,7 @@ public class SomPanel extends JPanel {
 		panels = new MatrixPanel[rows * cols];
 		
 		//Add matrixPanels
-		for (int i = 0; i < som.getModels().length; i++){
+		for (int i = 0; i < som.getNodes().length; i++){
 			MatrixPanel p = new MatrixPanel(new SimpleMatrix(somModelsRows, somModelsColumns));
 			add(p);
 			panels[i] = p;
@@ -40,8 +40,8 @@ public class SomPanel extends JPanel {
 	
 	public void updateData(SOM somModel){
 		this.som = somModel;		
-		for (int i = 0; i < som.getModels().length; i++){
-			SomNode n = som.getModel(i);
+		for (int i = 0; i < som.getNodes().length; i++){
+			SomNode n = som.getNode(i);
 			SimpleMatrix m = new SimpleMatrix(n.getVector());
 			m.reshape(somModelsRows, somModelsColumns);
 			MatrixPanel p = panels[i];
@@ -53,8 +53,8 @@ public class SomPanel extends JPanel {
 	
 	public void updateData(SOM somModel, boolean[]highlightList){
 		this.som = somModel;		
-		for (int i = 0; i < som.getModels().length; i++){
-			SomNode n = som.getModel(i);
+		for (int i = 0; i < som.getNodes().length; i++){
+			SomNode n = som.getNode(i);
 			SimpleMatrix m = new SimpleMatrix(n.getVector());
 			m.reshape(somModelsRows, somModelsColumns);
 			MatrixPanel p = panels[i];

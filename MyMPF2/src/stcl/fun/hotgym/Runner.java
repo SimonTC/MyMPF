@@ -19,6 +19,9 @@ public class Runner {
 	private ArrayList<Double> output;
 	private ArrayList<Double> xValues;
 	
+	private final int ITERATIONS = 100;
+	private final boolean VISUALIZE = true;
+	
 	public static void main(String[] args){
 		Runner runner = new Runner();
 		
@@ -27,10 +30,10 @@ public class Runner {
 	
 	public void start(){
 		//Load data
-				String dataFilePath = "C:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
-				int iterations = 100;
+				String dataFilePath = "D:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
+				int iterations = ITERATIONS;
 				
-				boolean sin = false;
+				boolean sin = true;
 				try {
 					if (sin){
 						data = createData(1000);
@@ -86,8 +89,7 @@ public class Runner {
 			}	
 			
 			//Plot data
-			
-			plot(iteration);
+			if (VISUALIZE) plot(iteration);
 			
 			
 			mse *= (double) 1/data.size();

@@ -25,7 +25,7 @@ public class Runner {
 	
 	public void run(){
 		//Setup experiment
-		int maxIterations = 50;
+		int maxIterations = 1000;
 		Random rand = new Random(12);
 		setupExperiment(maxIterations, rand);
 		
@@ -37,7 +37,7 @@ public class Runner {
 	}
 	
 	private void runExperiment(int maxIterations, Random rand){
-		int FRAMES_PER_SECOND = 5;
+		int FRAMES_PER_SECOND = 20;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
@@ -103,9 +103,7 @@ public class Runner {
 		    	}	
 		    	temporalPooler.flushTemporalMemory();
 	    	}
-			
-			spatialPooler.tick();
-			temporalPooler.tick();
+
 			
 
 	    }
@@ -160,19 +158,19 @@ public class Runner {
 		int spatialMapSize = 5;
 		double initialLearningRate = 0.8;
 		double initialNeighborhoodRadius = 3; //3
-		spatialPooler = new SpatialPooler(rand, maxIterations, spatialInputLength, spatialMapSize, initialLearningRate,initialNeighborhoodRadius,1);
+		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate,2,0.125);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
 		double initialTemporalLeakyCoefficient = 0.6;
-		temporalPooler = new TemporalPooler(rand, maxIterations, temporalInputLength, temporalMapSize, initialTemporalLeakyCoefficient);
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.1, 5, 0.125, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){
 		sequences = new SimpleMatrix[3][3];
-		possibleInputs = new SOM(3, 3, 9, new Random());
-		SomNode[] nodes = possibleInputs.getModels();
+		possibleInputs = new SOM(3, 3, 9, new Random(), 0.1, 1, 0.125);
+		SomNode[] nodes = possibleInputs.getNodes();
 		
 		SimpleMatrix m;
 		

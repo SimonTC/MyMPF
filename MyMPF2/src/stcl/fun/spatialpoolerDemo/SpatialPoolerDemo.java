@@ -32,11 +32,13 @@ public class SpatialPoolerDemo extends javax.swing.JFrame {
 	private Vector<SimpleMatrix> inputVectors;
 	private SpatialPooler pooler;
 	
+	private Random rand = new Random();
+	
 	/** Creates new form SOMDemo */
 	public SpatialPoolerDemo() {
 		initComponents();
 		SimpleMatrix tempVec;
-		pooler = new SpatialPooler(new Random(), iterations, 3, size);
+		pooler = new SpatialPooler(rand, 3, size);
 		map = pooler.getSOM();
 		
 		renderPanel.registerLattice(map);
@@ -113,7 +115,7 @@ public class SpatialPoolerDemo extends javax.swing.JFrame {
 
 	private void btnRetrainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrainActionPerformed
 		trainer.stop();
-		pooler = new SpatialPooler(new Random(), iterations, 3, size);
+		pooler = new SpatialPooler(rand, 3, size);
 		map = pooler.getSOM();
 		trainer.setTraining(pooler, inputVectors, renderPanel);
 		renderPanel.registerLattice(map);

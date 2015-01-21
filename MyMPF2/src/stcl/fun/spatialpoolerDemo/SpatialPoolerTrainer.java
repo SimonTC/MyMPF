@@ -66,7 +66,6 @@ public class SpatialPoolerTrainer implements Runnable {
 				renderer.render(spatialPooler.getSOM(), iteration);
 			}
 			iteration++;
-			spatialPooler.tick();
 		}
 		running = false;
 	}

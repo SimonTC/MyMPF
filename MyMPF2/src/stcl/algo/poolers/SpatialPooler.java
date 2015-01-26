@@ -38,15 +38,15 @@ public class SpatialPooler {
 	public SpatialPooler(Random rand, int inputLength, int mapSize) {
 		this(rand, inputLength, mapSize, 0.1, 1 , 0.125);
 	}
+
 	/**
 	 * Constructor used when all parameters are given
 	 * @param rand
-	 * @param maxIterations
 	 * @param inputLength
 	 * @param mapSize
 	 * @param initialLearningRate
-	 * @param initialNeighborHoodRadius
-	 * @param initialNoiseMagnitude
+	 * @param stddev
+	 * @param activationCodingFactor
 	 */
 	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
 		this.rand = rand;

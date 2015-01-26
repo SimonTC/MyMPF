@@ -25,7 +25,7 @@ public class Runner {
 	}
 	
 	public void run(){
-		int FRAMES_PER_SECOND = 5;
+		int FRAMES_PER_SECOND = 10;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
@@ -83,8 +83,8 @@ public class Runner {
 		int maxIterations = iterations;
 		int inputLength = figureColumns * figureRows;
 		int mapSize = 3;
-		double initialLearningRate = 0.5;
-		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, 2 , 0.125);
+		double initialLearningRate = 0.1;
+		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, 3 , 0.125);
 		
 		//Setup graphics
 		setupGraphics(pooler, figureRows, mapSize);

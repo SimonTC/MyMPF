@@ -59,7 +59,7 @@ public class SomPanel extends JPanel {
 			m.reshape(somModelsRows, somModelsColumns);
 			MatrixPanel p = panels[i];
 			if (highlightList[i]){
-				p.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+				p.setBorder(BorderFactory.createLineBorder(Color.RED));
 			} else {
 				p.setBorder(BorderFactory.createEmptyBorder());
 			}

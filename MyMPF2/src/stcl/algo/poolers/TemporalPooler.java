@@ -71,5 +71,12 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	public void flushTemporalMemory(){
 		//TODO: SHould that be the name of the method?
-		rsom.flush();	}
+		rsom.flush();	
+	}
+	
+	@Override
+	public void setLearning(boolean learning){
+		super.setLearning(learning);
+		rsom.setLearning(learning);
+	}
 }

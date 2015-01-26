@@ -17,6 +17,11 @@ public class Runner {
 	private TemporalPooler temporalPooler;
 	private MovingLinesGUI frame;
 	private SOM possibleInputs;
+	private Random rand = new Random(1234);
+	
+	private final int ITERATIONS = 10000;
+	private final boolean VISUALIZE_TRAINING = false;
+	private final boolean VISUALIZE_RESULT = true;
 	
 	public static void main(String[] args){
 		Runner runner = new Runner();
@@ -24,108 +29,78 @@ public class Runner {
 	}
 	
 	public void run(){
-		//Setup experiment
-		int maxIterations = 1000;
-		Random rand = new Random(12);
-		setupExperiment(maxIterations, rand);
+		//Setup experiment		
+		setupExperiment(ITERATIONS, rand);
 		
 		//Setup graphics
-		setupGraphics();
+		if (VISUALIZE_TRAINING) setupGraphics();
 		
-		runExperiment(maxIterations, rand);
+		runExperiment(ITERATIONS, rand, VISUALIZE_TRAINING);
+		
+		if (VISUALIZE_RESULT){
+			temporalPooler.flushTemporalMemory();
+			temporalPooler.setLearning(false);
+			 setupGraphics();
+			 runExperiment(ITERATIONS, rand, true);
+			 
+		}
 		
 	}
 	
-	private void runExperiment(int maxIterations, Random rand){
-		int FRAMES_PER_SECOND = 20;
+	private void runExperiment(int maxIterations, Random rand, boolean visualize){
+		int FRAMES_PER_SECOND = 10;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
-	    float sleepTime = 0;
-	    int timeSinceNotBlank = 0;
+	    int curSeqID = 0;
+    	int curInputID = -1;
 	    
 	    for (int i = 0; i < maxIterations; i++){
-	    	
 	    	//Choose sequence
-	    	//SimpleMatrix[] curSequence;
-	    /*
-	    	int notBlankThreshold = 30 * timeSinceNotBlank;
-	    	int value = rand.nextInt(100);
-	    	if (value < notBlankThreshold){
-	    		if (rand.nextBoolean()){
-	    			curSequence = sequences[0]; //Horizontal down
-	    		} else {
-	    			curSequence = sequences[1]; //Vertical right
-	    		}
-	    		timeSinceNotBlank = 0;
-	    	} else {
-	    		curSequence = sequences[2]; //Blank
-	    		timeSinceNotBlank++;
-	    	}
 	    	
-	    	*/
-	    	//Got through all sequences
-	    	for (SimpleMatrix[] curSequence : sequences){
-		    	//Go through sequence
-		    	for (int j = 0; j < curSequence.length; j++){
-		    		//Spatial classification
-		    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[j]);
-		    		
-		    		//Normalize output
-		    		double sum = spatialFFOutputMatrix.elementSum();
-		    		spatialFFOutputMatrix = spatialFFOutputMatrix.scale(1/sum);
-		    		
-		    		//Transform spatial output matrix to vector
-		    		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
-		    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
-		    		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-		    		
-		    		//Orthogonalize spatial output
-		    		temporalFFInputVector = orthogonalize(temporalFFInputVector);
-		    		
-		    		//Temporal classification
-		    		temporalPooler.feedForward(temporalFFInputVector);
-		    		
-		    		//Update graphics
-		    		updateGraphics(curSequence[j], i);
-		    		
-		    		//Sleep
-					next_game_tick+= SKIP_TICKS;
-					sleepTime = next_game_tick - System.currentTimeMillis();
-					try {
-						Thread.sleep(SKIP_TICKS);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-		    		
-		    	}	
-		    	temporalPooler.flushTemporalMemory();
-	    	}
-
-			
-
-	    }
-	}
-	
-	
-	private SimpleMatrix orthogonalize(SimpleMatrix m){
-		double maxValue = 0;
-		int maxID = -1;
-		for (int row = 0; row < m.numRows(); row++){
-			for (int col = 0; col < m.numCols(); col++){
-				double value = m.get(row, col);
-				if (value > maxValue){
-					maxValue = value;
-					maxID = m.getIndex(row, col);
+	    	boolean change = rand.nextDouble() > 0.9 ? true : false;
+	    	SimpleMatrix[] curSequence = null;
+			if (change){
+				//temporalPooler.flushTemporalMemory();
+				boolean choose = rand.nextBoolean();
+				switch (curSeqID){
+				case 0 : curSeqID = choose ? 1 : 2; break;
+				case 1 : curSeqID = choose ? 2 : 0; break;
+				case 2 : curSeqID = choose ? 0 : 1; break;
 				}
-			}
-		}
-		
-		m.set(0);
-		m.set(maxID, maxValue);
-		return m;
+				curInputID = -1;
+			} 
+			curSequence = sequences[curSeqID];
+			curInputID++;
+			curInputID = curInputID >= curSequence.length? 0 : curInputID;
+	    
+    		//Spatial classification
+    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[curInputID]);
+    		
+    		//Normalize output
+    		double max = spatialFFOutputMatrix.elementMaxAbs();
+    		SimpleMatrix temporalFFInputVector = spatialFFOutputMatrix.scale(1/max);
+    		
+    		//Transform spatial output matrix to vector
+    		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
+    		
+    		//Temporal classification
+    		temporalPooler.feedForward(temporalFFInputVector);
+    		
+    		if (visualize){
+	    		//Update graphics
+	    		updateGraphics(curSequence[curInputID], i);
+	    		
+	    		//Sleep
+				next_game_tick+= SKIP_TICKS;
+				try {
+					Thread.sleep(SKIP_TICKS);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+    		}
+	    }
 	}
 	
 	private void setupGraphics(){
@@ -156,20 +131,20 @@ public class Runner {
 		//Spatial pooler
 		int spatialInputLength = 9;
 		int spatialMapSize = 5;
-		double initialLearningRate = 0.8;
-		double initialNeighborhoodRadius = 3; //3
+		double initialLearningRate = 0.1;
 		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate,2,0.125);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double initialTemporalLeakyCoefficient = 0.6;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.1, 5, 0.125, initialTemporalLeakyCoefficient);
+		double initialTemporalLeakyCoefficient = 0.3;
+		double stdDev = 2;
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.1, stdDev, 0.125, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){
-		sequences = new SimpleMatrix[3][3];
-		possibleInputs = new SOM(3, 3, 9, new Random(), 0.1, 1, 0.125);
+		sequences = new SimpleMatrix[4][3];
+		possibleInputs = new SOM(3, 4, 9, new Random(), 0.1, 1, 0.125);
 		SomNode[] nodes = possibleInputs.getNodes();
 		
 		SimpleMatrix m;
@@ -243,5 +218,22 @@ public class Runner {
 		nodes[6] = new SomNode(m);
 		nodes[7] = new SomNode(m);
 		nodes[8] = new SomNode(m);
+		
+		//Vertical left
+		m = new SimpleMatrix(ver3);
+		m.reshape(1, 9);
+		sequences[3][0] = m;
+		nodes[9] = new SomNode(m);
+		
+		m = new SimpleMatrix(ver2);
+		m.reshape(1, 9);
+		sequences[3][1] = m;
+		nodes[10] = new SomNode(m);
+		
+		m = new SimpleMatrix(ver1);
+		m.reshape(1, 9);
+		sequences[3][2] = m;
+		nodes[11] = new SomNode(m);
+		
 	}
 }

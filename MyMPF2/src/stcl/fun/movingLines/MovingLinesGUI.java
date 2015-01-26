@@ -9,6 +9,8 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import dk.stcl.som.containers.SomNode;
+import dk.stcl.som.rsom.IRSOM;
 import dk.stcl.som.som.SOM;
 
 public class MovingLinesGUI extends JFrame {
@@ -149,24 +151,45 @@ public class MovingLinesGUI extends JFrame {
 		rsomActivation4.revalidate();
 		
 		//Update RSOM models
-		rsomModel1.updateData(spatialSom);
+		rsomModel1.updateData(spatialSom, getSpatialModelsInTemporalModel(temporalPooler, 0));
 		rsomModel1.repaint();
 		rsomModel1.revalidate();
 		
-		rsomModel2.updateData(spatialSom);
+		rsomModel2.updateData(spatialSom, getSpatialModelsInTemporalModel(temporalPooler, 1));
 		rsomModel2.repaint();
 		rsomModel2.revalidate();
 		
-		rsomModel3.updateData(spatialSom);
+		rsomModel3.updateData(spatialSom, getSpatialModelsInTemporalModel(temporalPooler, 2));
 		rsomModel3.repaint();
 		rsomModel3.revalidate();
 		
-		rsomModel4.updateData(spatialSom);
+		rsomModel4.updateData(spatialSom, getSpatialModelsInTemporalModel(temporalPooler, 3));
 		rsomModel4.repaint();
 		rsomModel4.revalidate();
 		
 		
 		
+	}
+	
+	private boolean[] getSpatialModelsInTemporalModel(TemporalPooler temporalPooler, int modelID){
+		//Collect Model
+		SomNode model = temporalPooler.getSOM().getNode(modelID);
+		
+		//Create boolean vector where an item is true if weight value of that item is higher than the mean.
+		SimpleMatrix weightVector = model.getVector();
+		int vectorSize = weightVector.numCols() * weightVector.numRows();
+		double mean = weightVector.elementSum() / (double)vectorSize;
+		double threshold = 0.9; //2 * ( 1 / (temporalPooler.getHeight() * temporalPooler.getWidth())); 
+		boolean[] importantModels = new boolean[vectorSize];
+		
+		for (int i = 0; i <vectorSize; i++){
+			if (weightVector.get(i) > threshold){
+				importantModels[i] = true;
+			}
+		}
+		
+		
+		return importantModels;
 	}
 	
 	/**

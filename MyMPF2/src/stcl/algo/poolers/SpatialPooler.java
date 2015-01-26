@@ -150,4 +150,8 @@ public class SpatialPooler {
 	public SimpleMatrix getActivationMatrix(){
 		return this.activationMatrix;
 	}
+	
+	public void setLearning(boolean learning){
+		som.setLearning(learning);
+	}
 }

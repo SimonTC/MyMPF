@@ -36,7 +36,7 @@ public class SpatialPooler {
 	 * @param mapSize
 	 */
 	public SpatialPooler(Random rand, int inputLength, int mapSize) {
-		this(rand, inputLength, mapSize, 0.1, 1 , 0.125);
+		this(rand, inputLength, mapSize, 0.1, 2 , 0.125);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class SpatialPooler {
 		activationMatrix = som.computeActivationMatrix();
 		
 		//Normalize activation matrix
-		activationMatrix = normalize(activationMatrix);
+		//activationMatrix = normalize(activationMatrix);
 		
 		return activationMatrix;
 	}

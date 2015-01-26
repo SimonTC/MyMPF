@@ -136,9 +136,9 @@ public class Runner {
 		int ffInputLength = 1;
 		int spatialMapSize = 10;
 		int temporalMapSize = 10;
-		double initialPredictionLearningRate = 0.8;
+		double initialPredictionLearningRate = 0.1;
 		boolean useMarkovPrediction = true;
-		double leakyCoefficient = 0.4;		
+		double leakyCoefficient = 0.3;		
 		
 		NeoCorticalUnit nu = new NeoCorticalUnit(rand, maxIterations, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient);
 		

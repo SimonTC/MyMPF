@@ -18,6 +18,7 @@ public class Runner {
 	private SpatialRecognitionGUI frame;
 	private SpatialPooler pooler;
 	private SimpleMatrix[] figureMatrices;
+	private Random rand = new Random(1234);
 	
 	public static void main(String[] args) {
 		Runner runner = new Runner();
@@ -79,7 +80,6 @@ public class Runner {
 
 		
 		//Create spatial pooler
-		Random rand = new Random();
 		int maxIterations = iterations;
 		int inputLength = figureColumns * figureRows;
 		int mapSize = 3;

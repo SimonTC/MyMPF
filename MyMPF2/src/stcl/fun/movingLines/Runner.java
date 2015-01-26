@@ -48,7 +48,7 @@ public class Runner {
 	}
 	
 	private void runExperiment(int maxIterations, Random rand, boolean visualize){
-		int FRAMES_PER_SECOND = 10;
+		int FRAMES_PER_SECOND = 20;
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
@@ -77,9 +77,13 @@ public class Runner {
     		//Spatial classification
     		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[curInputID]);
     		
+    		/*
     		//Normalize output
-    		double max = spatialFFOutputMatrix.elementMaxAbs();
+    		double max = spatialFFOutputMatrix.elementSum();
     		SimpleMatrix temporalFFInputVector = spatialFFOutputMatrix.scale(1/max);
+    		*/
+    		    		
+    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
     		
     		//Transform spatial output matrix to vector
     		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
@@ -130,7 +134,7 @@ public class Runner {
 		
 		//Spatial pooler
 		int spatialInputLength = 9;
-		int spatialMapSize = 5;
+		int spatialMapSize = 3;
 		double initialLearningRate = 0.1;
 		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate,2,0.125);
 		

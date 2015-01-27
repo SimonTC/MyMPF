@@ -63,7 +63,7 @@ public class Runner {
 			xValues = new ArrayList<Double>();
 			output.add((double) 0);
 			double mse = 0;
-			unit.resetTemporalDifferences();
+			unit.flushTemporalMemory();
 			for (int i = 0; i < data.size() - 1; i++){
 				xValues.add((double) (i+1));
 				double input = data.get(i);

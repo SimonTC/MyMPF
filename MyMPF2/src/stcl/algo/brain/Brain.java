@@ -99,8 +99,8 @@ public class Brain {
 	}
 	
 	public void newIteration(){
-		nu1.resetTemporalDifferences();
-		nu2.resetTemporalDifferences();
+		nu1.flushTemporalMemory();
+		nu2.flushTemporalMemory();
 	}
 
 }

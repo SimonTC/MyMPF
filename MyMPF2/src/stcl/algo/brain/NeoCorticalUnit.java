@@ -16,6 +16,9 @@ public class NeoCorticalUnit {
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	
+	private SimpleMatrix ffOutput;
+	private SimpleMatrix fbOutput;
+	
 	private int ffInputVectorSize;
 	private int spatialMapSize;
 	private int temporalMapSize;
@@ -28,8 +31,8 @@ public class NeoCorticalUnit {
 	
 	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double decayFactor) {
 		//TODO: All parameters should be handled in parameter file
-		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize);
-		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, decayFactor);
+		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
+		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 2, 0.125, 0.3); //TODO: Move all parameters out
 		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -68,7 +71,9 @@ public class NeoCorticalUnit {
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
 		
-		return temporalFFOutputMatrix;
+		ffOutput = temporalFFOutputMatrix;
+		
+		return ffOutput;
 	}
 	
 	/**
@@ -101,11 +106,34 @@ public class NeoCorticalUnit {
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasMatrix);
 		
-		return spatialPoolerFBOutputVector;
+		fbOutput = spatialPoolerFBOutputVector;
+		
+		return fbOutput;
 	}
 	
-	public void resetTemporalDifferences(){
+	public void flushTemporalMemory(){
 		temporalPooler.flushTemporalMemory();
+	}
+	
+	public void setLearning(boolean learning){
+		spatialPooler.setLearning(learning);
+		temporalPooler.setLearning(learning);
+	}
+
+	public SpatialPooler getSpatialPooler() {
+		return spatialPooler;
+	}
+
+	public TemporalPooler getTemporalPooler() {
+		return temporalPooler;
+	}
+
+	public SimpleMatrix getFfOutput() {
+		return ffOutput;
+	}
+
+	public SimpleMatrix getFbOutput() {
+		return fbOutput;
 	}
 
 }

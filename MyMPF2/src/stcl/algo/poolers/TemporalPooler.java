@@ -19,12 +19,6 @@ public class TemporalPooler extends SpatialPooler  {
 		
 		rsom = new RSOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor, decay);
 		
-	}	
-	
-	public TemporalPooler(Random rand, int inputLength, int mapSize, double decay) {
-		super(rand, inputLength, mapSize);
-		
-		rsom = new RSOM(mapSize, mapSize, inputLength, rand, 0.1, 2, 0.125, decay);
 	}
 	
 	
@@ -73,7 +67,6 @@ public class TemporalPooler extends SpatialPooler  {
 	}
 	
 	public void flushTemporalMemory(){
-		//TODO: SHould that be the name of the method?
 		rsom.flush();	
 	}
 	

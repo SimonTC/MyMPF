@@ -27,17 +27,6 @@ public class SpatialPooler {
 	
 	//Misc
 	protected Random rand;
-	
-	/**
-	 * Constructor used when initial learning rate, neighboorhood radius and noise magnitude should be default
-	 * @param rand
-	 * @param maxIterations
-	 * @param inputLength
-	 * @param mapSize
-	 */
-	public SpatialPooler(Random rand, int inputLength, int mapSize) {
-		this(rand, inputLength, mapSize, 0.1, 2 , 0.125);
-	}
 
 	/**
 	 * Constructor used when all parameters are given

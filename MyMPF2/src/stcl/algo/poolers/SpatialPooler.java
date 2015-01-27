@@ -73,7 +73,7 @@ public class SpatialPooler {
 		som.step(feedForwardInputVector);
 		
 		//Compute ActivationMatrix
-		activationMatrix = som.computeActivationMatrix(true);
+		activationMatrix = som.computeActivationMatrix();
 		
 		//Normalize activation matrix
 		activationMatrix = normalize(activationMatrix);

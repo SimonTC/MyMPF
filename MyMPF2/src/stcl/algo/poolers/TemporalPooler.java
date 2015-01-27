@@ -38,10 +38,13 @@ public class TemporalPooler extends SpatialPooler  {
 		rsom.step(inputVector);
 		
 		//Compute activation
-		activationMatrix = rsom.computeActivationMatrix();
+		activationMatrix = rsom.computeActivationMatrix(false);
 		
 		//Normalize activation matrix
 		activationMatrix = normalize(activationMatrix);
+		
+		//Orthogonalize activation matrix
+		activationMatrix = orthogonalize(activationMatrix);
 		
 		return activationMatrix;
 	}

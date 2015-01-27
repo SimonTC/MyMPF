@@ -73,10 +73,13 @@ public class SpatialPooler {
 		som.step(feedForwardInputVector);
 		
 		//Compute ActivationMatrix
-		activationMatrix = som.computeActivationMatrix();
+		activationMatrix = som.computeActivationMatrix(false);
 		
 		//Normalize activation matrix
-		//activationMatrix = normalize(activationMatrix);
+		activationMatrix = normalize(activationMatrix);
+		
+		//Orthogonalize activation matrix
+		activationMatrix = orthogonalize(activationMatrix);
 		
 		return activationMatrix;
 	}
@@ -99,6 +102,12 @@ public class SpatialPooler {
 		
 		return model;
 		
+	}
+	
+	protected SimpleMatrix orthogonalize(SimpleMatrix m) {
+		SimpleMatrix activation = m.divide(-2 * Math.pow(0.125, 2));	 //TODO: Change the activation coding factor 0.125 to a parameter
+		activation = activation.elementExp();
+		return activation;
 	}
 	
 	protected SimpleMatrix normalize(SimpleMatrix matrix){

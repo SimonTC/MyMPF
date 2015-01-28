@@ -16,7 +16,7 @@ public class SequencePrediction {
 	private NeoCorticalUnit unit;
 	private Random rand = new Random(1234);
 	private ArrayList<SimpleMatrix[]> sequences;
-	private final int NUM_ITERAIONS = 40000;
+	private final int NUM_ITERAIONS = 20000;
 	
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
@@ -24,7 +24,7 @@ public class SequencePrediction {
 	private SimpleMatrix smallV;
 	private SimpleMatrix blank;
 	
-	int FRAMES_PER_SECOND = 10;
+	int FRAMES_PER_SECOND = 2;
 	int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	private final boolean VISUALIZE_TRAINING = false;
@@ -45,8 +45,7 @@ public class SequencePrediction {
 		if (VISUALIZE_TRAINING) setupGraphics();
 		runExperiment(VISUALIZE_TRAINING);
 		
-		double error = evaluate(100);
-		System.out.println("Average error: " + error);
+		evaluate(1000);
 		
 		if (VISUALIZE_RESULT){
 			unit.setLearning(false);
@@ -83,16 +82,20 @@ public class SequencePrediction {
 		}
 	}
 	
-	private double evaluate(int iterations){
-		double totalError = 0;
+	private void evaluate(int iterations){
+		double predictionError_Total = 0;
+		double spatialError_Total = 0;
 		for (int i = 0; i < iterations; i++){
 			int seqID = rand.nextInt(sequences.size());
 			SimpleMatrix[] input = sequences.get(seqID);
-			double sequenceError = 0;
+			double predictionError_Sequence = 0;
+			double spatialError_Sequence = 0;
 			for (int patternID = 0; patternID < input.length; patternID++){
 				SimpleMatrix m = input[patternID];
 				m.reshape(1, m.numCols() * m.numRows());
 				SimpleMatrix ffOutput = unit.feedForward(m);
+				SimpleMatrix bmuVector = unit.getSpatialPooler().getSOM().getBMU().getVector();
+				double spatialError_Pattern = calculateError(m, bmuVector);
 				SimpleMatrix fbOutput = unit.feedBackward(ffOutput);
 				SimpleMatrix expectedOutput;
 				boolean dontJudge = false;
@@ -103,23 +106,33 @@ public class SequencePrediction {
 					expectedOutput = input[patternID + 1];
 					dontJudge = false;
 				}
-				double patternError = 0;
+				double predictionError_Pattern = 0;
 				if (!dontJudge){
 					expectedOutput.reshape(1,m.numCols() * m.numRows() );
-					SimpleMatrix diff = fbOutput.minus(expectedOutput);
-					patternError = diff.normF();
-					patternError = patternError / diff.numCols();
+					predictionError_Pattern = calculateError(fbOutput, expectedOutput);
 				}
-				sequenceError += patternError;
+				predictionError_Sequence += predictionError_Pattern;
+				spatialError_Sequence += spatialError_Pattern;
 				
 			}
 			unit.flushTemporalMemory();
-			totalError += sequenceError;
+			predictionError_Total += predictionError_Sequence;
+			spatialError_Total += spatialError_Sequence;
 		}
 		
-		totalError = totalError / (double) iterations;
+		predictionError_Total = predictionError_Total / (double) iterations;
+		spatialError_Total = spatialError_Total / (double) iterations;
+
+		System.out.println("Average spatial error: " + spatialError_Total);
+		System.out.println("Average prediction error: " + predictionError_Total);
 		
-		return totalError;
+	}
+	
+	private double calculateError(SimpleMatrix a, SimpleMatrix b){
+		SimpleMatrix diff = a.minus(b);
+		double error = diff.normF();
+		error = error / diff.numCols();
+		return error;
 	}
 	
 	private void setupExperiment(){
@@ -129,9 +142,9 @@ public class SequencePrediction {
 		int inputLenght = blank.getMatrix().data.length;
 		int spatialMapSize = 3;
 		int temporalMapSize = 2;
-		double initialPredictionLearningRate = 1;
+		double initialPredictionLearningRate = 0.1;
 		boolean useFirstORderPrediction = true;
-		double decay = 0.3;
+		double decay = 0.7;
 		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstORderPrediction, decay);
 	}
 	
@@ -158,15 +171,23 @@ public class SequencePrediction {
 		
 		sequences = new ArrayList<SimpleMatrix[]>();
 		
-		SimpleMatrix[] seq1 = {bigT, smallO, smallO, bigT, blank};
+		//SimpleMatrix[] seq1 = {bigT, smallO, smallO, bigT, blank};
 		//SimpleMatrix[] seq2 = {bigO, smallO, bigO, smallO, blank};
 		//SimpleMatrix[] seq3 = {smallO, smallV, smallV, bigT, blank};
 		//SimpleMatrix[] seq4 = {bigO, smallV, bigO, bigT, blank};
+		SimpleMatrix[] seq5 = {bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO};
+		SimpleMatrix[] seq6 = {smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV};
+		SimpleMatrix[] seq7 = {bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT};
+		SimpleMatrix[] seq8 = {smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO};
 		
-		sequences.add(seq1);
+		//sequences.add(seq1);
 		//sequences.add(seq2);
 		//sequences.add(seq3);
 		//sequences.add(seq4);
+		sequences.add(seq5);
+		sequences.add(seq6);
+		sequences.add(seq7);
+		sequences.add(seq8);
 		
 	}
 	

@@ -25,7 +25,7 @@ public class TemporalPooler extends SpatialPooler  {
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		//Test input
-		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the temporal pooler has to be a vector");
+		//if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the temporal pooler has to be a vector");
 		if (inputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the temporal pooler has to be a 1 x " + inputLength + " vector");				
 		
 		//Update RSOM
@@ -50,7 +50,7 @@ public class TemporalPooler extends SpatialPooler  {
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
-		if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the temporal pooler has to be a matrix");
+		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the temporal pooler has to be a matrix");
 		if (inputMatrix.numCols() != mapSize || inputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the temporal pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input

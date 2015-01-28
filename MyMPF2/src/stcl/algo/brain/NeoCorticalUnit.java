@@ -86,7 +86,7 @@ public class NeoCorticalUnit {
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
-		if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
+		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 				
 		//Selection of best temporal model

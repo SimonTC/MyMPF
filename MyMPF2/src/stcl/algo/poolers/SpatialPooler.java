@@ -119,7 +119,7 @@ public class SpatialPooler {
 			tmp += vector[id++];
 		}
 		
-		id--; //We have t subtract to be sure we get the correct model
+		id--; //We have to subtract to be sure we get the correct model
 		
 		//Choose model from som
 		SimpleMatrix model = som.getNode(id).getVector();

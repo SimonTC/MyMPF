@@ -104,6 +104,11 @@ public class NeoCorticalUnit {
 			double sum = biasMatrix.elementSum();
 			biasMatrix = biasMatrix.scale(1/sum);
 		} 
+		/*
+		System.out.println();
+		biasMatrix.print();
+		System.out.println();
+		*/
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasMatrix);

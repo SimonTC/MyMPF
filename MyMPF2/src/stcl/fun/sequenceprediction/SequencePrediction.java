@@ -140,9 +140,9 @@ public class SequencePrediction {
 		buildSequences();
 		
 		int inputLenght = blank.getMatrix().data.length;
-		int spatialMapSize = 3;
+		int spatialMapSize = 2;
 		int temporalMapSize = 2;
-		double initialPredictionLearningRate = 0.1;
+		double initialPredictionLearningRate = 1;
 		boolean useFirstORderPrediction = true;
 		double decay = 0.7;
 		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstORderPrediction, decay);

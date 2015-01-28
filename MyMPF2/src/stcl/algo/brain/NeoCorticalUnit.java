@@ -62,6 +62,7 @@ public class NeoCorticalUnit {
 		
 		//Predict next input
 		if (useMarkovPrediction){
+			//predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate);
 			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, curPredictionLearningRate);
 		} 		
 		

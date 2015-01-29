@@ -2,6 +2,8 @@ package stcl.algo.brain;
 
 import java.util.Random;
 
+import javax.swing.text.StyleContext.SmallAttributeSet;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
@@ -60,14 +62,17 @@ public class NeoCorticalUnit {
 		double sum = spatialFFOutputMatrixBiased.elementSum();
 		spatialFFOutputMatrixBiased = spatialFFOutputMatrixBiased.scale(1/sum);
 		
+		//Orthogonalize output
+		SimpleMatrix spatialFFOutputMatrixOrthogonalized = aggressiveOrthogonalization(spatialFFOutputMatrixBiased);
+		
 		//Predict next input
 		if (useMarkovPrediction){
 			//predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate);
-			predictionMatrix = predictor.predict(spatialFFOutputMatrixBiased, curPredictionLearningRate);
+			predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
 		} 		
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = spatialFFOutputMatrixBiased.getMatrix().data;		
+		double[] spatialFFOutputDataVector = spatialFFOutputMatrixOrthogonalized.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
@@ -117,6 +122,33 @@ public class NeoCorticalUnit {
 		fbOutput = spatialPoolerFBOutputVector;
 		
 		return fbOutput;
+	}
+	
+	/**
+	 * Orthgonalizes the matrix by setting all values to zero except for the highest value
+	 * Only works with matrices containing non-negative values
+	 * @param m
+	 * @return
+	 */
+	private SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
+		int maxID = -1;
+		int id = 0;
+		double max = Double.NEGATIVE_INFINITY;
+		double value = 0;
+		
+		for (double d : m.getMatrix().data){
+			value = d;
+			if (d > max){
+				max = d;
+				maxID = id;
+			}
+			id++;
+		}
+		
+		SimpleMatrix orthogonalized = new SimpleMatrix(m.numRows(), m.numCols());
+		orthogonalized.set(maxID, 1);
+		return orthogonalized;
+	
 	}
 	
 	public void flushTemporalMemory(){

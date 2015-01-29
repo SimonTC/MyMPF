@@ -153,13 +153,14 @@ public class NeoCorticalUnit {
 	
 	public void flushTemporalMemory(){
 		temporalPooler.flushTemporalMemory();
+		biasMatrix.set(1);
 	}
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
 		if (learning){
-			curPredictionLearningRate = 1; //TODO: Do something about this. SHould be based on some parameter
+			curPredictionLearningRate = 1; //TODO: Do something about this. SHhuld be based on some parameter
 		} else {
 			curPredictionLearningRate = 0;
 		}

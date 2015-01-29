@@ -1,5 +1,7 @@
 package stcl.algo.predictors;
 
+import java.io.IOException;
+
 import org.ejml.simple.SimpleMatrix;
 
 public class FirstOrderPredictor {
@@ -18,12 +20,26 @@ public class FirstOrderPredictor {
 	} 
 	
 	/**
+	 * Resets the memory of the earlier input vector.
+	 * DOes not change conditional memory
+	 */
+	public void flush(){
+		inputVectorBefore.set(0);
+	}
+	
+	/**
 	 * Predicts which spatial som model will be active at time t+1 given the current input at time t.
 	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
 	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be active at time t + 1.
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
+		
+		/*
+		System.out.println("Input vector before");
+		inputVectorBefore.print();
+		System.out.println();
+		*/
 		
 		//Transform input matrix to vector of size IJ
 		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);

@@ -16,7 +16,7 @@ public class SequencePrediction {
 	private NeoCorticalUnit unit;
 	private Random rand = new Random(1234);
 	private ArrayList<SimpleMatrix[]> sequences;
-	private final int NUM_ITERAIONS = 20000;
+	private final int NUM_ITERAIONS = 10;
 	
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
@@ -78,7 +78,7 @@ public class SequencePrediction {
 					}	
 	    		}
 			}
-			unit.flushTemporalMemory();
+			//unit.flushTemporalMemory();
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class SequencePrediction {
 				spatialError_Sequence += spatialError_Pattern;
 				
 			}
-			unit.flushTemporalMemory();
+			//unit.flushTemporalMemory();
 			predictionError_Total += predictionError_Sequence;
 			spatialError_Total += spatialError_Sequence;
 		}
@@ -167,6 +167,7 @@ public class SequencePrediction {
 	}
 
 	private void buildSequences(){
+		System.out.println("Building sequences");
 		createFigures();
 		
 		sequences = new ArrayList<SimpleMatrix[]>();

@@ -14,7 +14,7 @@ public class SequencePrediction {
 	
 	private MovingLinesGUI_Prediction frame;
 	private NeoCorticalUnit unit;
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private ArrayList<SimpleMatrix[]> sequences;
 	private final int NUM_ITERAIONS = 20000;
 	
@@ -28,7 +28,7 @@ public class SequencePrediction {
 	int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	private final boolean VISUALIZE_TRAINING = false;
-	private final boolean VISUALIZE_RESULT = false;
+	private final boolean VISUALIZE_RESULT = true;
 
 	public SequencePrediction() {
 		// TODO Auto-generated constructor stub
@@ -185,9 +185,9 @@ public class SequencePrediction {
 		//sequences.add(seq3);
 		//sequences.add(seq4);
 		sequences.add(seq5);
-		sequences.add(seq6);
-		sequences.add(seq7);
-		sequences.add(seq8);
+		//sequences.add(seq6);
+		//sequences.add(seq7);
+		//sequences.add(seq8);
 		
 	}
 	

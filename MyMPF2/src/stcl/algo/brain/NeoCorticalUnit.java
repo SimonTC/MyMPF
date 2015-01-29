@@ -126,6 +126,11 @@ public class NeoCorticalUnit {
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
+		if (learning){
+			curPredictionLearningRate = 1; //TODO: Do something about this. SHould be based on some parameter
+		} else {
+			curPredictionLearningRate = 0;
+		}
 	}
 
 	public SpatialPooler getSpatialPooler() {

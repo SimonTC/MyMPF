@@ -19,8 +19,8 @@ public class Runner {
 	private ArrayList<Double> output;
 	private ArrayList<Double> xValues;
 	
-	private final int ITERATIONS = 100;
-	private final boolean VISUALIZE = true;
+	private final int ITERATIONS = 20;
+	private final boolean VISUALIZE = false;
 	
 	public static void main(String[] args){
 		Runner runner = new Runner();
@@ -30,7 +30,7 @@ public class Runner {
 	
 	public void start(){
 		//Load data
-				String dataFilePath = "D:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
+				String dataFilePath = "C:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
 				int iterations = ITERATIONS;
 				
 				boolean sin = true;

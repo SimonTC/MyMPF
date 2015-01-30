@@ -144,15 +144,12 @@ public class SequencePrediction {
 		int inputLenght = blank.getMatrix().data.length;
 		int spatialMapSize = 2;
 		int temporalMapSize = 2;
-		double initialPredictionLearningRate = 0.13;
+		double initialPredictionLearningRate = 0.1;
 		boolean useFirstOrderPrediction = true;
 		double decay = 0.7;
 		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction, decay);
 		
-		uniformDistribution = new SimpleMatrix(temporalMapSize, temporalMapSize);
-		uniformDistribution.set(1);
-		double sum = uniformDistribution.elementSum();
-		uniformDistribution = uniformDistribution.divide(sum);
+		
 	}
 	
 	private void setupGraphics(){

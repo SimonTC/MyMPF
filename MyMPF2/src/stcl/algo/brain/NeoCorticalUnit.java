@@ -83,7 +83,7 @@ public class NeoCorticalUnit {
 		if (DEBUG)System.out.println();
 		
 		//Orthogonalize output
-		SimpleMatrix spatialFFOutputMatrixOrthogonalized =  spatialFFOutputMatrixBiased;//aggressiveOrthogonalization(spatialFFOutputMatrixBiased);
+		SimpleMatrix spatialFFOutputMatrixOrthogonalized =  aggressiveOrthogonalization(spatialFFOutputMatrixBiased);
 		
 		if (DEBUG)System.out.println("Orthogonalized biased Likelihood that SOM model ij is best to describe the current input");
 		if (DEBUG)spatialFFOutputMatrixOrthogonalized.print();

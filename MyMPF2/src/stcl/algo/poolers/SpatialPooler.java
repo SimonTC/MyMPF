@@ -124,6 +124,34 @@ public class SpatialPooler {
 		//Choose model from som
 		SimpleMatrix model = som.getNode(id).getVector();
 		
+		//System.out.println("Chose model: " + id);
+		
+		return model;
+		
+	}
+	
+	protected SimpleMatrix chooseMax(SimpleMatrix input){
+		//Transform bias matrix into vector
+		double[] vector = input.getMatrix().data;
+		
+		//Go through bias vector until value is >= random number
+		double max = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		int id = 0;
+		
+		for (double d : vector){
+			if (d > max){
+				max = d;
+				maxID = id;
+			}
+			id++;
+		}
+		
+		//System.out.println("Chose model: " + maxID);
+		
+		//Choose model from som
+		SimpleMatrix model = som.getNode(maxID).getVector();
+		
 		return model;
 		
 	}

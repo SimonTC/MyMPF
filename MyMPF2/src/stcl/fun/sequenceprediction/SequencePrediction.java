@@ -16,7 +16,9 @@ public class SequencePrediction {
 	private NeoCorticalUnit unit;
 	private Random rand = new Random(1234);
 	private ArrayList<SimpleMatrix[]> sequences;
-	private final int NUM_ITERAIONS = 10;
+	private final int NUM_ITERAIONS = 10000;
+	
+	private SimpleMatrix uniformDistribution;
 	
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
@@ -142,10 +144,15 @@ public class SequencePrediction {
 		int inputLenght = blank.getMatrix().data.length;
 		int spatialMapSize = 2;
 		int temporalMapSize = 2;
-		double initialPredictionLearningRate = 1;
-		boolean useFirstORderPrediction = true;
+		double initialPredictionLearningRate = 0.13;
+		boolean useFirstOrderPrediction = true;
 		double decay = 0.7;
-		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstORderPrediction, decay);
+		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction, decay);
+		
+		uniformDistribution = new SimpleMatrix(temporalMapSize, temporalMapSize);
+		uniformDistribution.set(1);
+		double sum = uniformDistribution.elementSum();
+		uniformDistribution = uniformDistribution.divide(sum);
 	}
 	
 	private void setupGraphics(){
@@ -172,20 +179,20 @@ public class SequencePrediction {
 		
 		sequences = new ArrayList<SimpleMatrix[]>();
 		
-		//SimpleMatrix[] seq1 = {bigT, smallO, smallO, bigT, blank};
-		//SimpleMatrix[] seq2 = {bigO, smallO, bigO, smallO, blank};
-		//SimpleMatrix[] seq3 = {smallO, smallV, smallV, bigT, blank};
-		//SimpleMatrix[] seq4 = {bigO, smallV, bigO, bigT, blank};
+		SimpleMatrix[] seq1 = {bigT, smallO, smallO, bigT, blank};
+		SimpleMatrix[] seq2 = {bigO, smallO, bigO, smallO, blank};
+		SimpleMatrix[] seq3 = {smallO, smallV, smallV, bigT, blank};
+		SimpleMatrix[] seq4 = {bigO, smallV, bigO, bigT, blank};
 		SimpleMatrix[] seq5 = {bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO, bigO};
 		SimpleMatrix[] seq6 = {smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV, smallV};
 		SimpleMatrix[] seq7 = {bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT};
 		SimpleMatrix[] seq8 = {smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO};
 		
-		//sequences.add(seq1);
+		sequences.add(seq1);
 		//sequences.add(seq2);
 		//sequences.add(seq3);
 		//sequences.add(seq4);
-		sequences.add(seq5);
+		//sequences.add(seq5);
 		//sequences.add(seq6);
 		//sequences.add(seq7);
 		//sequences.add(seq8);

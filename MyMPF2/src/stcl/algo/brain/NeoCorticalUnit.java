@@ -25,7 +25,7 @@ public class NeoCorticalUnit {
 	private int spatialMapSize;
 	private int temporalMapSize;
 	
-	private boolean DEBUG = true;
+	private boolean DEBUG = false;
 	
 	//Learning rates
 	private double curPredictionLearningRate; //TODO: Find correct name for it
@@ -91,8 +91,9 @@ public class NeoCorticalUnit {
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			//predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate);
-			predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
+			SimpleMatrix tmp = aggressiveOrthogonalization(spatialFFOutputMatrix);
+			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate);
+			//predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
 			/*
 			if (DEBUG)System.out.println("Likelihood that SOM model ij will be the best to describe the next input");
 			if (DEBUG)predictionMatrix.print();
@@ -141,33 +142,41 @@ public class NeoCorticalUnit {
 		//Selection of best temporal model
 		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(inputMatrix);
 		
+		//Transformation into matrix
+		temporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize);
+
 		if (DEBUG)System.out.println("Likelihood that the next input is best described by model ij given that we are in sequence k");
 		if (DEBUG)temporalPoolerFBOutput.print();
 		if (DEBUG)System.out.println();
-		
-		//Transformation into matrix
-		temporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize);
+
 		
 		//Combine FB output from temporal pooler with bias and prediction (if enabled)
-		biasMatrix = temporalPoolerFBOutput;
+		SimpleMatrix biasedTemporalFBOutput = temporalPoolerFBOutput;
 		
 		if (useMarkovPrediction){
+			biasMatrix = biasedTemporalFBOutput;
 			if (DEBUG)System.out.println("Prediction matrix");
 			if (DEBUG)predictionMatrix.print();
 			if (DEBUG)System.out.println();
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
+			
 			//Normalize
+			if (DEBUG)System.out.println("Bias matrix, not normalized");
+			if (DEBUG)biasMatrix.print();
+			if (DEBUG)System.out.println();
+			
 			double sum = biasMatrix.elementSum();
 			biasMatrix = biasMatrix.scale(1/sum);
-		} 
-		
-		if (DEBUG)System.out.println("Bias matrix");
-		if (DEBUG)biasMatrix.print();
-		if (DEBUG)System.out.println();
-		
+			
+			if (DEBUG)System.out.println("Bias matrix, normalized");
+			if (DEBUG)biasMatrix.print();
+			if (DEBUG)System.out.println();
+			
+			biasedTemporalFBOutput = biasMatrix;
+		} 		
 		
 		//Selection of best spatial mode
-		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasMatrix);
+		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
 		
 		if (DEBUG)System.out.println("Expected input next step");
 		if (DEBUG)spatialPoolerFBOutputVector.print();

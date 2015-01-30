@@ -35,15 +35,20 @@ public class FirstOrderPredictor {
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
 		
+		//Transform input matrix to vector of size IJ
+		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
+		inputVector.reshape(1, inputMatrix.numCols() * inputMatrix.numRows());
+		
 		/*
 		System.out.println("Input vector before");
 		inputVectorBefore.print();
 		System.out.println();
-		*/
 		
-		//Transform input matrix to vector of size IJ
-		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
-		inputVector.reshape(1, inputMatrix.numCols() * inputMatrix.numRows());
+		
+		System.out.println("Input vector now");
+		inputVector.print();
+		System.out.println();
+		*/
 		
 		//Association
 		association(inputVector, curLearningRate);
@@ -56,6 +61,15 @@ public class FirstOrderPredictor {
 		
 		//Save input vector
 		inputVectorBefore = inputVector;
+		
+		/*
+		System.out.println("Conditional prediction matrix");
+		conditionalPredictionMatrix.print();
+		System.out.println();
+		
+		System.out.println("*************************************************************");
+		System.out.println();
+		*/
 		
 		//Return output
 		return output;

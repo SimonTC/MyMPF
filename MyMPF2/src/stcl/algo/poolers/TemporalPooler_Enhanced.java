@@ -19,21 +19,18 @@ public class TemporalPooler_Enhanced extends TemporalPooler {
 		super(rand, inputLength, mapSize, initialLearningRate, stddev,
 				activationCodingFactor, decay);
 		
-		predictor = new FirstOrderPredictor(spatialMapSize);
 		this.useMarkovPrediction = useMarkovPrediction;
 		
 	}
 	
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix inputMatrix){
+		if (predictor == null){
+			predictor = new FirstOrderPredictor(inputMatrix.numCols());
+		}
+		
 		if (useMarkovPrediction){
 			predictionMatrix = predictor.predict(inputMatrix, curPredictionLearningRate);
-			//predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
-			/*
-			if (DEBUG)System.out.println("Likelihood that SOM model ij will be the best to describe the next input");
-			if (DEBUG)predictionMatrix.print();
-			if (DEBUG)System.out.println();
-			*/
 		} 		
 		
 		//Transform spatial output matrix to vector

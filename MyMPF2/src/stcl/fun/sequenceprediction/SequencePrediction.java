@@ -185,14 +185,14 @@ public class SequencePrediction {
 		SimpleMatrix[] seq7 = {bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT};
 		SimpleMatrix[] seq8 = {smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO};
 		
-		sequences.add(seq1);
+		//sequences.add(seq1);
 		//sequences.add(seq2);
 		//sequences.add(seq3);
 		//sequences.add(seq4);
 		//sequences.add(seq5);
 		//sequences.add(seq6);
-		//sequences.add(seq7);
-		//sequences.add(seq8);
+		sequences.add(seq7);
+		sequences.add(seq8);
 		
 	}
 	

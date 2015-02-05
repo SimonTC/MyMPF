@@ -14,7 +14,7 @@ public class Connection {
 	private RewardCorrelator correlator;
 	private SimpleMatrix correlationMatrix;
 	private RewardFunction rewardFunction;
-	private SimpleMatrix oldInputMatrix;
+	private SimpleMatrix temporalFFActivationMatrixNow, temporalFFActivationMatrixBefore;
 	
 	/**
 	 * A connection connects two neocortical units.
@@ -27,25 +27,42 @@ public class Connection {
 		this.bias = new BiasUnit(inputMatrixSize, biasInfluence, rand);
 		this.correlator = new RewardCorrelator(inputMatrixSize);
 		this.rewardFunction = new RewardFunction(maxReward, alpha);
+		this.temporalFFActivationMatrixNow = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
 	}
 	
 	/**
 	 * Feeds the input matrix forward without changing it
-	 * @param input
+	 * @param ffInputVector
 	 * @return
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix input, double externalReward, double curLearningRate){
-		double internalReward = rewardFunction.calculateReward(externalReward);
-		correlationMatrix = correlator.correlateReward(oldInputMatrix, internalReward, curLearningRate);
-		oldInputMatrix = input;
+	public SimpleMatrix feedForward(SimpleMatrix ffInputVector, double externalReward, double curLearningRate){
+		temporalFFActivationMatrixBefore = temporalFFActivationMatrixNow;
 		
-		return input;
+		//Feed input vector to first unit
+		temporalFFActivationMatrixNow = in.feedForward(ffInputVector);
+		
+		//Do reward correlation
+		double internalReward = rewardFunction.calculateReward(externalReward);
+		correlationMatrix = correlator.correlateReward(temporalFFActivationMatrixBefore, internalReward, curLearningRate);
+				
+		return new SimpleMatrix(temporalFFActivationMatrixNow);
 	}
 	
-	public SimpleMatrix feedBack(SimpleMatrix fbInputMatrix, double noiseMagnitude){
+	public SimpleMatrix feedBack(double noiseMagnitude){
+		//Get fb outut from out unit
+		SimpleMatrix fbInputMatrix = out.getFbOutput();
+		
+		//Convert to matrix
+		int size = in.getTemporalPooler().getMapSize();
+		fbInputMatrix.reshape(size, size);
+		
+		//Bias output
 		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fbInputMatrix, correlationMatrix, noiseMagnitude);
 		
-		return biasedMatrix;
+		//Feed to in unit
+		SimpleMatrix ffOutput = in.feedBackward(biasedMatrix);
+		
+		return ffOutput;
 	}
 
 }

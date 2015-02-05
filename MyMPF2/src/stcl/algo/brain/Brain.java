@@ -67,7 +67,7 @@ public class Brain {
 	}
 	
 	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){
-		//Feed input vector forward
+		//Feed input vector forward through unit 1
 		SimpleMatrix ffOutputU1 = nu1.feedForward(inputVector);
 				
 		//Do reward correlation
@@ -80,7 +80,8 @@ public class Brain {
 		ffInputU2.reshape(1, ffInputU2.numCols() * ffInputU2.numRows());
 		
 		//Send unit one's output to unit 2
-		SimpleMatrix ffOutputU2 = nu2.feedBackward(ffInputU2);
+		//SimpleMatrix ffOutputU2 = nu2.feedBackward(ffInputU2);
+		SimpleMatrix ffOutputU2 = nu2.feedForward(ffInputU2);
 		
 		//Give some fb input to unit 2
 		SimpleMatrix fbInputU2 = SimpleMatrix.random(ffOutputU2.numRows(), ffOutputU2.numCols(), 0, 1, rand);

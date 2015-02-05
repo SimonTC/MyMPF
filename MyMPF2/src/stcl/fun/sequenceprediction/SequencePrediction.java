@@ -26,7 +26,7 @@ public class SequencePrediction {
 	private SimpleMatrix smallV;
 	private SimpleMatrix blank;
 	
-	int FRAMES_PER_SECOND = 2;
+	int FRAMES_PER_SECOND = 10;
 	int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	private final boolean VISUALIZE_TRAINING = false;

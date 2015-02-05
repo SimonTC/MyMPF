@@ -4,6 +4,11 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+/**
+ * This Bias unit is placed betwen neocortical units to bias the values in the feedback pass towards values that might give better rewards
+ * @author Simon
+ *
+ */
 public class BiasUnit {
 
 	private double biasInfluence; //Should be set by parameter
@@ -32,7 +37,7 @@ public class BiasUnit {
 		
 		double massValue = 1 / (s.numCols() * s.numRows());
 		for (int i = 0; i < sData.length; i++){
-			double delta = sData[i] * biasInfluence * massValue;
+			double delta = sData[i] * biasInfluence + massValue;
 			double min = Math.min(1, delta);
 			double max = Math.max(1, min);
 			bias.set(i, max);
@@ -52,7 +57,7 @@ public class BiasUnit {
 	
 	
 	private SimpleMatrix calculateS (SimpleMatrix correlationMatrix){
-		SimpleMatrix s = correlationMatrix.plus(1); //the plus operation does add the beta vale, nut multiply by it as it says in the javadoc
+		SimpleMatrix s = correlationMatrix.plus(1); //the plus operation does add the beta value, not multiply by it as it says in the javadoc
 		s = s.scale(5);
 		s = s.minus(5);
 		s = s.scale(-1);

@@ -180,4 +180,8 @@ public class SpatialPooler {
 	public void setLearning(boolean learning){
 		som.setLearning(learning);
 	}
+	
+	public int getMapSize(){
+		return this.mapSize;
+	}
 }

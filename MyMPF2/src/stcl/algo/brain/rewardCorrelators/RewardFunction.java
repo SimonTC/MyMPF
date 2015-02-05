@@ -5,24 +5,29 @@ public class RewardFunction {
 	private double externalRewardBefore;
 	private double externalRewardNow;
 	private double maxReward;
-	private double historyInfluence;
+	private double alpha;
 	private double internalRewardBefore;
 	
-	public RewardFunction(double maxReward, double historyInfluence) {
+	/**
+	 * 
+	 * @param maxReward maximum possible reward given. Used in normalizing the weighted average of the rewards
+	 * @param alpha Influence of the historic reward signals
+	 */
+	public RewardFunction(double maxReward, double alpha) {
 		externalRewardBefore = 0;
 		externalRewardNow = 0;
 		internalRewardBefore = 0;
 		this.maxReward = maxReward;
-		this.historyInfluence = historyInfluence;
+		this.alpha = alpha;
 	}
 
 	
 	public double calculateReward(double externalReward){
 		externalRewardNow = externalReward;
 		
-		double evma = (externalRewardNow - externalRewardBefore) / maxReward;
+		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
 		
-		double internalReward = historyInfluence * evma + (1-historyInfluence) * internalRewardBefore;
+		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
 		
 		internalRewardBefore = internalReward;
 		externalRewardBefore = externalRewardNow;

@@ -10,6 +10,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.fun.movingLines.MovingLinesGUI;
+import stcl.fun.movingLines.prediction.MovingLinesGUI_Prediction;
 import dk.stcl.som.containers.SomNode;
 import dk.stcl.som.som.SOM;
 
@@ -17,11 +18,10 @@ public class Runner_TemporalStability {
 	private ArrayList<SimpleMatrix[]> sequences;
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	private MovingLinesGUI frame;
-	private SOM possibleInputs;
+	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 10000;
+	private final int ITERATIONS = 40000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -107,7 +107,7 @@ public class Runner_TemporalStability {
 	}
 	
 	private void setupGraphics(){
-		frame = new MovingLinesGUI(spatialPooler.getSOM(), possibleInputs);
+		frame = new MovingLinesGUI_Prediction(spatialPooler, temporalPooler);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		updateGraphics(blank,0); //Give a blank
@@ -148,16 +148,30 @@ public class Runner_TemporalStability {
 	private void buildSequences(){
 		createFigures();
 		sequences = new ArrayList<SimpleMatrix[]>();
-		possibleInputs = new SOM(3, 4, 9, new Random(), 0.1, 1, 0.125);
 
-		SimpleMatrix[] small_1 = {bigT};
-		SimpleMatrix[] small_2 = {bigO};
-		SimpleMatrix[] small_3 = {smallO};
+		SimpleMatrix[] seq1 = {bigT};
+		SimpleMatrix[] seq2 = {bigO};
+		SimpleMatrix[] seq3 = {smallO};
 		
-		sequences.add(small_1);
-		sequences.add(small_2);
-		sequences.add(small_3);
+		SimpleMatrix[] seq4 = {smallO, bigO};
+		SimpleMatrix[] seq5 = {bigT, smallO};
+		SimpleMatrix[] seq6 = {bigT, bigT};
 		
+		SimpleMatrix[] seq7 = {bigO, smallO, smallO, smallV};
+		SimpleMatrix[] seq8 = {bigT, bigO, smallV, bigT};
+		SimpleMatrix[] seq9 = {bigO, bigO, smallV, bigO};
+		
+		//sequences.add(seq1);
+		//sequences.add(seq2);
+		//sequences.add(seq3);
+		
+		//sequences.add(seq4);
+		//sequences.add(seq5);
+		//sequences.add(seq6);
+		
+		sequences.add(seq7);
+		sequences.add(seq8);
+		sequences.add(seq9);
 		
 	}
 	

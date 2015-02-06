@@ -15,7 +15,7 @@ public class RockPaperScissors {
 	private SimpleMatrix rock, paper, scissors;
 	private SimpleMatrix[] sequence;
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 10000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors runner = new RockPaperScissors();

@@ -29,9 +29,8 @@ public class MovingLinesGUI_Prediction extends JFrame {
 	
 	private int singleSomModelWidth;
 	
-	
-	public MovingLinesGUI_Prediction(NeoCorticalUnit unit) {
-		SOM spatialSom = unit.getSpatialPooler().getSOM();
+	public MovingLinesGUI_Prediction(SpatialPooler spatialPooler, TemporalPooler temporalPooler) {
+		SOM spatialSom = spatialPooler.getSOM();
 		
 		//Create overall grid layout
 		int rows = 3;
@@ -70,10 +69,11 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		add(predictedInput);
 		
 		//Add rsom models and activation
-		int numRsomModels = unit.getTemporalPooler().getSOM().getHeight();
+		int numRsomModels = temporalPooler.getSOM().getHeight();
 		numRsomModels *= numRsomModels;
 		rsomActivations = new ArrayList<MatrixPanel>();
 		rsomModels = new ArrayList<SomPanel>();
+		
 		//Add models
 		for (int i = 0; i < numRsomModels; i++){
 			SomPanel model = new SomPanel(spatialSom, singleSomModelWidth, singleSomModelWidth);
@@ -88,13 +88,31 @@ public class MovingLinesGUI_Prediction extends JFrame {
 			add(activation);
 			rsomActivations.add(activation);
 		}
+				
+	}
+	
+	public MovingLinesGUI_Prediction(NeoCorticalUnit unit) {
+		this(unit.getSpatialPooler(), unit.getTemporalPooler());
+	}
+	
+	/**
+	 * Use this function if you are using a neocortical unit and doing prediction
+	 * @param inputVector
+	 * @param unit
+	 */
+	public void updateData(SimpleMatrix inputVector, NeoCorticalUnit unit){
+		this.updateData(inputVector, unit.getSpatialPooler(), unit.getTemporalPooler());
+		
+		//Get predicted next output
+		SimpleMatrix expectedInput = unit.getFbOutput();
+		expectedInput.reshape(singleSomModelWidth, singleSomModelWidth);
+		predictedInput.updateData(expectedInput);
+		predictedInput.repaint();
+		predictedInput.revalidate();
 		
 	}
 	
-	public void updateData(SimpleMatrix inputVector, NeoCorticalUnit unit){
-		
-		SpatialPooler spatialPooler = unit.getSpatialPooler();
-		TemporalPooler temporalPooler = unit.getTemporalPooler();
+	public void updateData(SimpleMatrix inputVector, SpatialPooler spatialPooler, TemporalPooler temporalPooler){
 		
 		//Update input area
 		SimpleMatrix inputMatrix = new SimpleMatrix(inputVector);
@@ -107,14 +125,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		SimpleMatrix activationMatrix = spatialPooler.getActivationMatrix();
 		spatialActivation.updateData(activationMatrix);
 		spatialActivation.repaint();
-		spatialActivation.revalidate();
-		
-		//Get predicted next output
-		SimpleMatrix expectedInput = unit.getFbOutput();
-		expectedInput.reshape(singleSomModelWidth, singleSomModelWidth);
-		predictedInput.updateData(expectedInput);
-		predictedInput.repaint();
-		predictedInput.revalidate();		
+		spatialActivation.revalidate();		
 		
 		//Create list of spatial models to be highlighted
 		int maxID = findIDOfMaxValue(activationMatrix);

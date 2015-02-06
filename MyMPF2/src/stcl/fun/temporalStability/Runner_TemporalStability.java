@@ -18,7 +18,7 @@ public class Runner_TemporalStability {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 40000;
+	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -62,9 +62,10 @@ public class Runner_TemporalStability {
 	    for (int i = 0; i < maxIterations; i++){
 	    	//Choose sequence
 	    	
-	    	boolean change = rand.nextDouble() > 0.9 ? true : false;
+	    	boolean change = rand.nextDouble() > 0.95 ? true : false;
 	    	SimpleMatrix[] curSequence = null;
 			if (change){
+				temporalPooler.flushTemporalMemory();
 				int nextSeqID;
 				do {
 					nextSeqID = rand.nextInt(sequences.size());
@@ -89,7 +90,7 @@ public class Runner_TemporalStability {
     		
     		if (visualize){
 	    		//Update graphics
-	    		updateGraphics(curSequence[curInputID], i);
+	    		updateGraphics(curSequence[curInputID], curSeqID);
 	    		
 	    		//Sleep
 				next_game_tick+= SKIP_TICKS;
@@ -115,7 +116,7 @@ public class Runner_TemporalStability {
 	
 	private void updateGraphics(SimpleMatrix inputVector, int iteration){
 		frame.updateData(inputVector, spatialPooler, temporalPooler);
-		frame.setTitle("Visualiztion - Iteration: " + iteration);
+		frame.setTitle("Visualiztion - Current sequence: " + iteration);
 		frame.revalidate();
 		frame.repaint();
 
@@ -137,9 +138,9 @@ public class Runner_TemporalStability {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double initialTemporalLeakyCoefficient = 0.3;
+		double initialTemporalLeakyCoefficient = 0.5;
 		double stdDev = 2;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.1, stdDev, 0.125, initialTemporalLeakyCoefficient);
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.2, stdDev, 0.1, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){
@@ -156,7 +157,11 @@ public class Runner_TemporalStability {
 		
 		SimpleMatrix[] seq7 = {bigO, smallO, smallO, smallV};
 		SimpleMatrix[] seq8 = {bigT, bigO, smallV, bigT};
-		SimpleMatrix[] seq9 = {bigO, bigO, smallV, bigO};
+		SimpleMatrix[] seq9 = {smallO, bigT, bigT, bigO};
+		SimpleMatrix[] seq10 = {bigT, smallO, bigO, smallO};
+		SimpleMatrix[] seq11 = {bigT, bigT, bigT, bigT};
+		SimpleMatrix[] seq12 = {smallO, smallO, bigO, bigO};
+
 		
 		//sequences.add(seq1);
 		//sequences.add(seq2);
@@ -166,9 +171,13 @@ public class Runner_TemporalStability {
 		//sequences.add(seq5);
 		//sequences.add(seq6);
 		
-		sequences.add(seq7);
-		sequences.add(seq8);
+		//sequences.add(seq7);
+		//sequences.add(seq8);
+		
 		sequences.add(seq9);
+		sequences.add(seq10);
+		sequences.add(seq11);
+		sequences.add(seq12);
 		
 	}
 	

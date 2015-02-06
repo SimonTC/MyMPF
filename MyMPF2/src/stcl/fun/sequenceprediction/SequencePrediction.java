@@ -16,7 +16,7 @@ public class SequencePrediction {
 	private NeoCorticalUnit unit;
 	private Random rand = new Random(1234);
 	private ArrayList<SimpleMatrix[]> sequences;
-	private final int NUM_ITERAIONS = 10000;
+	private final int NUM_ITERAIONS = 40000;
 	
 	private SimpleMatrix uniformDistribution;
 	
@@ -185,6 +185,7 @@ public class SequencePrediction {
 		SimpleMatrix[] seq7 = {bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT, bigT};
 		SimpleMatrix[] seq8 = {smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO, smallO};
 		SimpleMatrix[] seq9 = {smallO, bigT, bigT, bigO};
+		SimpleMatrix[] seq10 = {bigT, smallO, bigO, smallO};
 		
 		//sequences.add(seq1);
 		//sequences.add(seq2);
@@ -192,9 +193,10 @@ public class SequencePrediction {
 		//sequences.add(seq4);
 		//sequences.add(seq5);
 		//sequences.add(seq6);
-		sequences.add(seq7);
-		sequences.add(seq8);
-		//sequences.add(seq9);
+		//sequences.add(seq7);
+		//sequences.add(seq8);
+		sequences.add(seq9);
+		sequences.add(seq10);
 		
 	}
 	

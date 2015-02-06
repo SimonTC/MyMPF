@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.util.ExponentialDecayFunction;
 import dk.stcl.som.som.SOM;
 
 public class SpatialPooler {

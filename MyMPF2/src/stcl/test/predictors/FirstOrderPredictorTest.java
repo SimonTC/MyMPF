@@ -1,7 +1,5 @@
 package stcl.test.predictors;
 
-import static org.junit.Assert.*;
-
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;

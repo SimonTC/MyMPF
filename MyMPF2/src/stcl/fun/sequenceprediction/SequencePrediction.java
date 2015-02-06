@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NeoCorticalUnit;
-import stcl.fun.movingLines.prediction.MovingLinesGUI_Prediction;
+import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class SequencePrediction {
 	

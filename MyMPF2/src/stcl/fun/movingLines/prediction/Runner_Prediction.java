@@ -7,9 +7,7 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NeoCorticalUnit;
-import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.poolers.TemporalPooler;
-import stcl.fun.movingLines.MovingLinesGUI;
+import stcl.graphics.MovingLinesGUI_Prediction;
 import dk.stcl.som.containers.SomNode;
 import dk.stcl.som.som.SOM;
 

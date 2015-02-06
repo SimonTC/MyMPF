@@ -1,4 +1,4 @@
-package stcl.fun.movingLines;
+package stcl.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;

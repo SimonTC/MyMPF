@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.graphics.MovingLinesGUI_Prediction;
 import dk.stcl.som.containers.SomNode;
 import dk.stcl.som.som.SOM;
 
@@ -15,7 +16,7 @@ public class Runner {
 	private SimpleMatrix[][] sequences;
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	private MovingLinesGUI frame;
+	private MovingLinesGUI_Prediction frame;
 	private SOM possibleInputs;
 	private Random rand = new Random(1234);
 	
@@ -108,7 +109,7 @@ public class Runner {
 	}
 	
 	private void setupGraphics(){
-		frame = new MovingLinesGUI(spatialPooler.getSOM(), possibleInputs);
+		frame = new MovingLinesGUI_Prediction(spatialPooler, temporalPooler);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		updateGraphics(sequences[2][0],0); //Give a blank

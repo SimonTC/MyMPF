@@ -2,8 +2,6 @@ package stcl.algo.brain;
 
 import java.util.Random;
 
-import javax.swing.text.StyleContext.SmallAttributeSet;
-
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;

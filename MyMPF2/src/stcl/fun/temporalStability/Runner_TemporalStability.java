@@ -9,10 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import stcl.fun.movingLines.MovingLinesGUI;
-import stcl.fun.movingLines.prediction.MovingLinesGUI_Prediction;
-import dk.stcl.som.containers.SomNode;
-import dk.stcl.som.som.SOM;
+import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class Runner_TemporalStability {
 	private ArrayList<SimpleMatrix[]> sequences;

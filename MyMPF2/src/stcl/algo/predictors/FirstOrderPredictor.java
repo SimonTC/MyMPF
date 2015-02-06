@@ -1,7 +1,5 @@
 package stcl.algo.predictors;
 
-import java.io.IOException;
-
 import org.ejml.simple.SimpleMatrix;
 
 public class FirstOrderPredictor {

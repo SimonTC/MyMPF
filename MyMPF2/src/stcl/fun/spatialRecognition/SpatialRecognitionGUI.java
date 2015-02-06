@@ -9,8 +9,8 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.fun.movingLines.MatrixPanel;
-import stcl.fun.movingLines.SomPanel;
+import stcl.graphics.MatrixPanel;
+import stcl.graphics.SomPanel;
 import dk.stcl.som.som.SOM;
 
 public class SpatialRecognitionGUI extends JFrame {

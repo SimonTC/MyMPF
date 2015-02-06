@@ -12,7 +12,6 @@ import java.util.Vector;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
-import stcl.graphics.MapRenderer;
 
 /**
  *

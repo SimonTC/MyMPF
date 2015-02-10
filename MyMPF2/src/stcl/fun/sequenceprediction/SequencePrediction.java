@@ -14,9 +14,9 @@ public class SequencePrediction {
 	
 	private MovingLinesGUI_Prediction frame;
 	private NeoCorticalUnit unit;
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private ArrayList<SimpleMatrix[]> sequences;
-	private final int NUM_ITERAIONS = 40000;
+	private final int NUM_ITERAIONS = 80000;
 	
 	private SimpleMatrix uniformDistribution;
 	
@@ -46,6 +46,9 @@ public class SequencePrediction {
 		setupExperiment();
 		if (VISUALIZE_TRAINING) setupGraphics();
 		runExperiment(VISUALIZE_TRAINING);
+		
+		unit.flushTemporalMemory();
+		unit.setLearning(false);
 		
 		evaluate(1000);
 		

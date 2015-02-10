@@ -132,7 +132,7 @@ public class Runner_Prediction {
 	
 	private void buildSequences(){
 		sequences = new SimpleMatrix[4][3];
-		possibleInputs = new SOM(3, 4, 9, new Random(), 0.1, 1, 0.125);
+		possibleInputs =  new SOM(3, 9, rand, ITERATIONS, 0.1, 0.125);  
 		SomNode[] nodes = possibleInputs.getNodes();
 		
 		SimpleMatrix m;

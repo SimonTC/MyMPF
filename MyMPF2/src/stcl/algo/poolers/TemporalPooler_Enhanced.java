@@ -8,6 +8,10 @@ import stcl.algo.predictors.FirstOrderPredictor;
 
 public class TemporalPooler_Enhanced extends TemporalPooler {
 	
+
+
+
+
 	private boolean useMarkovPrediction;
 	private FirstOrderPredictor predictor;
 	private SimpleMatrix predictionMatrix;
@@ -15,12 +19,10 @@ public class TemporalPooler_Enhanced extends TemporalPooler {
 
 	public TemporalPooler_Enhanced(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
-			double activationCodingFactor, double decay, boolean useMarkovPrediction) {
+			double activationCodingFactor, int maxIterations, double decay, boolean useMarkovPrediction) {
 		super(rand, inputLength, mapSize, initialLearningRate, stddev,
-				activationCodingFactor, decay);
-		
+				activationCodingFactor, maxIterations, decay);
 		this.useMarkovPrediction = useMarkovPrediction;
-		
 	}
 	
 	@Override

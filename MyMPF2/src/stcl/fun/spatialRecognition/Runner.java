@@ -84,7 +84,9 @@ public class Runner {
 		int inputLength = figureColumns * figureRows;
 		int mapSize = 3;
 		double initialLearningRate = 0.1;
-		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, 3 , 0.125);
+		double stddev = 3;
+		double activationCoding = 0.125;
+		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCoding, maxIterations);
 		
 		//Setup graphics
 		setupGraphics(pooler, figureRows, mapSize);

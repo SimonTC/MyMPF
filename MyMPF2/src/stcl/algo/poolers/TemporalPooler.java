@@ -6,18 +6,18 @@ import org.ejml.simple.SimpleMatrix;
 
 public class TemporalPooler extends SpatialPooler  {
 
-	private RSOM rsom; 
-	
 	public TemporalPooler(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
-			double activationCodingFactor, double decay) {
-		
+			double activationCodingFactor, int maxIterations, double decay) {
 		super(rand, inputLength, mapSize, initialLearningRate, stddev,
-				activationCodingFactor);
-		
-		rsom = new RSOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor, decay);
-		
+				activationCodingFactor, maxIterations);
+
+		rsom = new RSOM(mapSize, inputLength, rand, maxIterations, initialLearningRate, activationCodingFactor, decay);
 	}
+
+	private RSOM rsom; 
+	
+	
 	
 	
 	@Override
@@ -72,5 +72,9 @@ public class TemporalPooler extends SpatialPooler  {
 	public void setLearning(boolean learning){
 		super.setLearning(learning);
 		rsom.setLearning(learning);
+	}
+	
+	public void sensitize(int iteration){
+		rsom.sensitize(iteration);
 	}
 }

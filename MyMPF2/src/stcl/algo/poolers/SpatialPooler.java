@@ -34,9 +34,9 @@ public class SpatialPooler {
 	 * @param stddev
 	 * @param activationCodingFactor
 	 */
-	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
+	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, int maxIterations ) {
 		this.rand = rand;
-		som = new SOM(mapSize, mapSize, inputLength, rand, initialLearningRate, stddev, activationCodingFactor);
+		som = new SOM(mapSize, inputLength, rand, maxIterations, initialLearningRate, activationCodingFactor);
 		errorMatrix = new SimpleMatrix(mapSize, mapSize);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		this.inputLength = inputLength;
@@ -180,5 +180,9 @@ public class SpatialPooler {
 	
 	public int getMapSize(){
 		return this.mapSize;
+	}
+	
+	public void sensitize(int iteration){
+		som.sensitize(iteration);
 	}
 }

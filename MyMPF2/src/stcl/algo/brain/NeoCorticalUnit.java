@@ -31,10 +31,21 @@ public class NeoCorticalUnit {
 	
 	private boolean useMarkovPrediction;
 	
+	/**
+	 * 
+	 * @param rand
+	 * @param maxIterations
+	 * @param ffInputLength
+	 * @param spatialMapSize
+	 * @param temporalMapSize
+	 * @param initialPredictionLearningRate
+	 * @param useMarkovPrediction
+	 * @param decayFactor
+	 */
 	public NeoCorticalUnit(Random rand, int maxIterations, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double decayFactor) {
 		//TODO: All parameters should be handled in parameter file
-		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
-		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, 0.3); //TODO: Move all parameters out
+		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125, maxIterations); //TODO: Move all parameters out
+		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, maxIterations, 0.3); //TODO: Move all parameters out
 		predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -243,6 +254,11 @@ public class NeoCorticalUnit {
 
 	public SimpleMatrix getFbOutput() {
 		return fbOutput;
+	}
+	
+	public void sensitize(int iteration){
+		spatialPooler.sensitize(iteration);
+		temporalPooler.sensitize(iteration);
 	}
 
 }

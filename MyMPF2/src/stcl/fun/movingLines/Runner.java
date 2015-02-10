@@ -136,20 +136,23 @@ public class Runner {
 		//Spatial pooler
 		int spatialInputLength = 9;
 		int spatialMapSize = 3;
-		double initialLearningRate = 0.1;
-		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate,2,0.125);
+		double initialLearningRate_spatial = 0.1;
+		double stdDev_spatial = 2;
+		double activationCodingFactor = 0.125;
+		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate_spatial, stdDev_spatial, activationCodingFactor, maxIterations);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
 		double initialTemporalLeakyCoefficient = 0.3;
-		double stdDev = 2;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.1, stdDev, 0.125, initialTemporalLeakyCoefficient);
+		double stdDev_temporal = 2;
+		double initialLearning_temporal = 0.1;
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, initialLearning_temporal, stdDev_temporal, activationCodingFactor, maxIterations, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){
 		sequences = new SimpleMatrix[4][3];
-		possibleInputs = new SOM(3, 4, 9, new Random(), 0.1, 1, 0.125);
+		possibleInputs =  new SOM(3, 9, rand, ITERATIONS, 0.1, 0.125);  
 		SomNode[] nodes = possibleInputs.getNodes();
 		
 		SimpleMatrix m;

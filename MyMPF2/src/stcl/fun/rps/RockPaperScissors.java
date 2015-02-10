@@ -56,7 +56,7 @@ public class RockPaperScissors {
 			SimpleMatrix input = new SimpleMatrix( sequence[curInput]);
 			SimpleMatrix diff = input.minus(prediction);
 			double predictionError = diff.normF();
-			//System.out.println("Iteration " + i + " error: " + predictionError);
+			System.out.println("Iteration " + i + " error: " + predictionError);
 			
 			//Reshape input to vector
 			input.reshape(1, 25);

@@ -6,14 +6,17 @@ import org.ejml.simple.SimpleMatrix;
 
 public class SpatialPooler_Enhanced extends SpatialPooler {
 	
+
+
 	private SimpleMatrix biasMatrix;
 
 	public SpatialPooler_Enhanced(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
-			double activationCodingFactor) {
+			double activationCodingFactor, int maxIterations) {
 		super(rand, inputLength, mapSize, initialLearningRate, stddev,
-				activationCodingFactor);
+				activationCodingFactor, maxIterations);
 	}
+	
 	
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){

@@ -4,8 +4,6 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.som.som.SOM;
-
 public class SpatialPooler {
 	
 	//Weight matrix

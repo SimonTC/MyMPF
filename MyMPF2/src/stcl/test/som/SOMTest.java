@@ -15,8 +15,8 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import dk.stcl.som.containers.SomNode;
-import dk.stcl.som.som.SOM;
+import stcl.algo.poolers.SOM;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class SOMTest {
 

@@ -9,10 +9,10 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import dk.stcl.som.containers.SomNode;
-import dk.stcl.som.som.SOM;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class MovingLinesGUI_Prediction extends JFrame {
 	private MatrixPanel input;

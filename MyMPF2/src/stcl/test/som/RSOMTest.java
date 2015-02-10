@@ -10,9 +10,9 @@ import org.ejml.simple.SimpleMatrix;
 import org.junit.Before;
 import org.junit.Test;
 
-import dk.stcl.som.containers.SomMap;
-import dk.stcl.som.containers.SomNode;
-import dk.stcl.som.rsom.RSOM;
+import stcl.algo.poolers.RSOM;
+import dk.stcl.core.basic.containers.SomMap;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class RSOMTest {
 	private RSOM rsom;

@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.som.containers.SomNode;
-import dk.stcl.som.som.SOM;
+import stcl.algo.poolers.SOM;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class SomPanel extends JPanel {
 

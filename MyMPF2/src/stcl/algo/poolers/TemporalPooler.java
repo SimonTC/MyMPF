@@ -77,4 +77,8 @@ public class TemporalPooler extends SpatialPooler  {
 	public void sensitize(int iteration){
 		rsom.sensitize(iteration);
 	}
+	
+	public RSOM getRSOM(){
+		return this.rsom;
+	}
 }

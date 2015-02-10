@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.graphics.MovingLinesGUI_Prediction;
@@ -18,7 +19,7 @@ public class Runner_TemporalStability {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 50000;
+	private final int ITERATIONS = 80000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -44,6 +45,7 @@ public class Runner_TemporalStability {
 		if (VISUALIZE_RESULT){
 			temporalPooler.flushTemporalMemory();
 			temporalPooler.setLearning(false);
+			spatialPooler.setLearning(false);
 			 setupGraphics();
 			 runExperiment(ITERATIONS, rand, true);
 			 
@@ -62,10 +64,10 @@ public class Runner_TemporalStability {
 	    for (int i = 0; i < maxIterations; i++){
 	    	//Choose sequence
 	    	
-	    	boolean change = rand.nextDouble() > 0.95 ? true : false;
+	    	boolean change = rand.nextDouble() > 0.90 ? true : false;
 	    	SimpleMatrix[] curSequence = null;
 			if (change){
-				temporalPooler.flushTemporalMemory();
+				//temporalPooler.flushTemporalMemory();
 				int nextSeqID;
 				do {
 					nextSeqID = rand.nextInt(sequences.size());
@@ -101,6 +103,27 @@ public class Runner_TemporalStability {
 					e.printStackTrace();
 				}	
     		}
+    		spatialPooler.sensitize(i);
+    		temporalPooler.sensitize(i);
+	    }
+	    
+	    System.out.println("SOM models:");
+	    for (SomNode n : spatialPooler.getSOM().getNodes()){
+	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
+	    	vector.reshape(5,5);
+	    	vector.print();
+	    	System.out.println(vector.elementSum());
+	    	System.out.println();
+	    }
+	    
+	    System.out.println("Rsom models:");
+	    System.out.println();
+	    for (SomNode n : temporalPooler.getRSOM().getNodes()){
+	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
+	    	vector.reshape(spatialPooler.getMapSize(), spatialPooler.getMapSize());
+	    	vector.print();
+	    	System.out.println(vector.elementSum());
+	    	System.out.println();
 	    }
 	}
 	
@@ -141,11 +164,11 @@ public class Runner_TemporalStability {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double initialTemporalLeakyCoefficient = 0.5;
+		double decay = 1;
 		double stdDev = 2;
-		double temporalLearningRate = 0.01;
-		double activationCodingFactor = 0.1;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev, activationCodingFactor, maxIterations, initialTemporalLeakyCoefficient);
+		double temporalLearningRate = 0.1;
+		double activationCodingFactor = 0.3;
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev, activationCodingFactor, maxIterations, decay);
 	}
 	
 	private void buildSequences(){

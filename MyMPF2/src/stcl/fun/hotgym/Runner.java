@@ -21,7 +21,7 @@ public class Runner {
 	
 	private final int ITERATIONS = 20;
 	private final boolean VISUALIZE = true;
-	boolean sin = false;
+	boolean sin = true;
 	
 	public static void main(String[] args){
 		Runner runner = new Runner();
@@ -86,6 +86,8 @@ public class Runner {
 				System.out.printf("Exp: %1$.2f Act: %1$.2f", expectedOutput, actualOutput);
 				System.out.println();
 				*/
+				
+				
 				
 			}	
 			

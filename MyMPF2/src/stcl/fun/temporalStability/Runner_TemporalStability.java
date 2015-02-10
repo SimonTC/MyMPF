@@ -18,7 +18,7 @@ public class Runner_TemporalStability {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 10000;
+	private final int ITERATIONS = 50000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -140,7 +140,9 @@ public class Runner_TemporalStability {
 		int temporalMapSize = 2;
 		double initialTemporalLeakyCoefficient = 0.5;
 		double stdDev = 2;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, 0.2, stdDev, 0.1, initialTemporalLeakyCoefficient);
+		double temporalLearningRate = 0.01;
+		double activationCodingFactor = 0.1;
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev, activationCodingFactor, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){

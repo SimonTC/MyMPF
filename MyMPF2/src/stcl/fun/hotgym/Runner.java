@@ -20,7 +20,8 @@ public class Runner {
 	private ArrayList<Double> xValues;
 	
 	private final int ITERATIONS = 20;
-	private final boolean VISUALIZE = false;
+	private final boolean VISUALIZE = true;
+	boolean sin = false;
 	
 	public static void main(String[] args){
 		Runner runner = new Runner();
@@ -33,7 +34,7 @@ public class Runner {
 				String dataFilePath = "C:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
 				int iterations = ITERATIONS;
 				
-				boolean sin = true;
+				
 				try {
 					if (sin){
 						data = createData(1000);
@@ -113,6 +114,7 @@ public class Runner {
 				  // add a line plot to the PlotPanel
 				  plot.addLinePlot("Expected", x, y_expected);
 				  plot.addLinePlot("Actual", x, y_actual);
+				  plot.setLegendOrientation("NORTH");
 				 
 				  // put the PlotPanel in a JFrame, as a JPanel
 				  JFrame frame = new JFrame("Iteration " + iteration);

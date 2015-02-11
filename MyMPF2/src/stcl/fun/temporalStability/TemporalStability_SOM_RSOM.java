@@ -8,14 +8,20 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.rsom.IRSOM;
+import dk.stcl.core.rsom.RSOM_SemiOnline;
+import dk.stcl.core.rsom.RSOM_Simple;
+import dk.stcl.core.som.ISOM;
+import dk.stcl.core.som.SOM_SemiOnline;
+import dk.stcl.core.som.SOM_Simple;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
-public class Runner_TemporalStability {
+public class TemporalStability_SOM_RSOM {
 	private ArrayList<SimpleMatrix[]> sequences;
-	private SpatialPooler spatialPooler;
-	private TemporalPooler temporalPooler;
+	private IRSOM rsom;
+	private ISOM som;
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
@@ -28,10 +34,11 @@ public class Runner_TemporalStability {
 	private SimpleMatrix smallV;
 	private SimpleMatrix blank;
 	
+	private final boolean USE_SIMPLE_SOM = true;
 	int FRAMES_PER_SECOND = 10;
 	
 	public static void main(String[] args){
-		Runner_TemporalStability runner = new Runner_TemporalStability();
+		TemporalStability_SOM_RSOM runner = new TemporalStability_SOM_RSOM();
 		runner.run();
 	}
 	
@@ -45,9 +52,9 @@ public class Runner_TemporalStability {
 		runExperiment(ITERATIONS, rand, VISUALIZE_TRAINING);
 		
 		if (VISUALIZE_RESULT){
-			temporalPooler.flushTemporalMemory();
-			temporalPooler.setLearning(false);
-			spatialPooler.setLearning(false);
+			rsom.flush();
+			rsom.setLearning(false);
+			som.setLearning(false);
 			 setupGraphics();
 			 runExperiment(ITERATIONS, rand, true);
 			 
@@ -68,6 +75,7 @@ public class Runner_TemporalStability {
 	    	SimpleMatrix[] curSequence = null;
 			if (change){
 				//temporalPooler.flushTemporalMemory();
+				rsom.flush();
 				int nextSeqID;
 				do {
 					nextSeqID = rand.nextInt(sequences.size());
@@ -76,19 +84,23 @@ public class Runner_TemporalStability {
 				curSeqID = nextSeqID;
 				curInputID = -1;
 			} 
+			
 			curSequence = sequences.get(curSeqID);
 			curInputID++;
 			curInputID = curInputID >= curSequence.length? 0 : curInputID;
-
+			SimpleMatrix input = curSequence[curInputID];
+			
     		//Spatial classification
-    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[curInputID]);
+    		som.step(input);
+    		SimpleMatrix spatialFFOutputMatrix = som.computeActivationMatrix();
     		
     		//Transform spatial output matrix to vector
     		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
     		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
     		
     		//Temporal classification
-    		temporalPooler.feedForward(temporalFFInputVector);
+    		rsom.step(temporalFFInputVector);
+    		rsom.computeActivationMatrix();
     		
     		if (visualize){
 	    		//Update graphics
@@ -103,12 +115,12 @@ public class Runner_TemporalStability {
 					e.printStackTrace();
 				}	
     		}
-    		spatialPooler.sensitize(i);
-    		temporalPooler.sensitize(i);
+    		som.sensitize(i);
+    		rsom.sensitize(i);
 	    }
 	    
 	    System.out.println("SOM models:");
-	    for (SomNode n : spatialPooler.getSOM().getNodes()){
+	    for (SomNode n : som.getNodes()){
 	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
 	    	vector.reshape(5,5);
 	    	vector.print();
@@ -118,17 +130,40 @@ public class Runner_TemporalStability {
 	    
 	    System.out.println("Rsom models:");
 	    System.out.println();
-	    for (SomNode n : temporalPooler.getRSOM().getNodes()){
+	    for (SomNode n : rsom.getNodes()){
 	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
-	    	vector.reshape(spatialPooler.getMapSize(), spatialPooler.getMapSize());
+	    	vector.reshape(som.getHeight(), som.getWidth());
 	    	vector.print();
 	    	System.out.println(vector.elementSum());
 	    	System.out.println();
 	    }
 	}
 	
+	private SimpleMatrix orthogonalize(SimpleMatrix m) {
+		double max = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		for (int i = 0; i < m.getNumElements(); i++){
+			double value = m.get(i);
+			if (value > max){
+				max = value;
+				maxID = i;
+			}
+		}
+		
+		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
+		ortho.set(maxID, 1);
+		return ortho;
+	}
+
+	
+	private SimpleMatrix normalize(SimpleMatrix matrix){
+		double sum = matrix.elementSum();
+		SimpleMatrix m = matrix.scale(1/sum);
+		return m;
+	}
+	
 	private void setupGraphics(){
-		frame = new MovingLinesGUI_Prediction(spatialPooler, temporalPooler);
+		frame = new MovingLinesGUI_Prediction(som, rsom);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		updateGraphics(blank,0); //Give a blank
@@ -138,7 +173,7 @@ public class Runner_TemporalStability {
 	}
 	
 	private void updateGraphics(SimpleMatrix inputVector, int iteration){
-		frame.updateData(inputVector, spatialPooler, temporalPooler);
+		frame.updateData(inputVector, som, rsom);
 		frame.setTitle("Visualiztion - Current sequence: " + iteration);
 		frame.revalidate();
 		frame.repaint();
@@ -155,11 +190,15 @@ public class Runner_TemporalStability {
 		//Spatial pooler
 		int spatialInputLength = blank.getNumElements();
 		int spatialMapSize = 3;
-		double initialLearningRate = 0.1;
+		double learningRate_Spatial = 0.1;
 		double stddev_spatial = 2;
 		double activationCodingFactor_spatial = 0.125;
 		
-		spatialPooler =  new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate, stddev_spatial, activationCodingFactor_spatial, maxIterations);
+		if (USE_SIMPLE_SOM){
+			som = new SOM_Simple(spatialMapSize, spatialInputLength, rand, maxIterations, learningRate_Spatial, activationCodingFactor_spatial);
+		} else {
+			som = new SOM_SemiOnline(spatialMapSize, spatialInputLength, rand, learningRate_Spatial, stddev_spatial, activationCodingFactor_spatial);
+		}
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
@@ -168,7 +207,11 @@ public class Runner_TemporalStability {
 		double stdDev = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor = 0.125;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev, activationCodingFactor, maxIterations, decay);
+		if (USE_SIMPLE_SOM){
+			rsom = new RSOM_Simple(temporalMapSize, temporalInputLength, rand, maxIterations, temporalLearningRate, activationCodingFactor, decay);
+		} else {
+			rsom = new RSOM_SemiOnline(temporalMapSize, temporalInputLength, rand, temporalLearningRate, stdDev, activationCodingFactor, decay);
+		}
 	}
 	
 	private void buildSequences(){

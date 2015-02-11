@@ -12,7 +12,7 @@ import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
-public class Runner_TemporalStability {
+public class TemporalStability_Poolers {
 	private ArrayList<SimpleMatrix[]> sequences;
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
@@ -31,7 +31,7 @@ public class Runner_TemporalStability {
 	int FRAMES_PER_SECOND = 10;
 	
 	public static void main(String[] args){
-		Runner_TemporalStability runner = new Runner_TemporalStability();
+		TemporalStability_Poolers runner = new TemporalStability_Poolers();
 		runner.run();
 	}
 	
@@ -164,7 +164,7 @@ public class Runner_TemporalStability {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double decay = 1;
+		double decay = 0.3;
 		double stdDev = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor = 0.125;

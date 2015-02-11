@@ -34,7 +34,7 @@ public class TemporalStability_SOM_RSOM {
 	private SimpleMatrix smallV;
 	private SimpleMatrix blank;
 	
-	private final boolean USE_SIMPLE_SOM = true;
+	private final boolean USE_SIMPLE_SOM = false;
 	int FRAMES_PER_SECOND = 10;
 	
 	public static void main(String[] args){
@@ -93,6 +93,8 @@ public class TemporalStability_SOM_RSOM {
     		//Spatial classification
     		som.step(input);
     		SimpleMatrix spatialFFOutputMatrix = som.computeActivationMatrix();
+    		
+    		spatialFFOutputMatrix = orthogonalize(spatialFFOutputMatrix);
     		
     		//Transform spatial output matrix to vector
     		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
@@ -203,7 +205,7 @@ public class TemporalStability_SOM_RSOM {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double decay = 1;
+		double decay = 0.3;
 		double stdDev = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor = 0.125;

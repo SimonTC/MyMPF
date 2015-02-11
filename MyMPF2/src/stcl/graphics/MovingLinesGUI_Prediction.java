@@ -114,7 +114,10 @@ public class MovingLinesGUI_Prediction extends JFrame {
 	}
 	
 	public void updateData(SimpleMatrix inputVector, SpatialPooler spatialPooler, TemporalPooler temporalPooler){
-		
+		this.updateData(inputVector, spatialPooler.getSOM(), temporalPooler.getRSOM());		
+	}
+	
+	public void updateData(SimpleMatrix inputVector, ISOM som, IRSOM rsom){
 		//Update input area
 		SimpleMatrix inputMatrix = new SimpleMatrix(inputVector);
 		inputMatrix.reshape(singleSomModelWidth, singleSomModelWidth);
@@ -123,7 +126,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		input.revalidate();
 		
 		//Update spatial activation
-		SimpleMatrix activationMatrix = spatialPooler.getActivationMatrix();
+		SimpleMatrix activationMatrix = som.getActivationMatrix();
 		spatialActivation.updateData(activationMatrix);
 		spatialActivation.repaint();
 		spatialActivation.revalidate();		
@@ -134,13 +137,12 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		highlights[maxID] = true;
 		
 		//Update Spatial models
-		SOM spatialSom = spatialPooler.getSOM();
-		spatialModels.updateData(spatialSom, highlights);
+		spatialModels.updateData(som, highlights);
 		spatialModels.repaint();
 		spatialModels.revalidate();		
 		
 		//Update RSOM activation
-		SimpleMatrix temporalActivationMatrix = temporalPooler.getActivationMatrix();
+		SimpleMatrix temporalActivationMatrix = rsom.getActivationMatrix();
 		int rows = temporalActivationMatrix.numRows();
 		int cols = temporalActivationMatrix.numCols();
 		int id = 0;
@@ -155,17 +157,18 @@ public class MovingLinesGUI_Prediction extends JFrame {
 				
 				//Update rsom model
 				SomPanel somPanel = rsomModels.get(id);
-				somPanel.updateData(spatialSom, getSpatialModelsInTemporalModel(temporalPooler, id));
+				somPanel.updateData(som, getSpatialModelsInTemporalModel(rsom, id));
 				somPanel.repaint();
 				somPanel.revalidate();
 				id++;
 			}
 		}		
+		
 	}
 	
-	private boolean[] getSpatialModelsInTemporalModel(TemporalPooler temporalPooler, int modelID){
+	private boolean[] getSpatialModelsInTemporalModel(IRSOM rsom, int modelID){
 		//Collect Model
-		SomNode model = temporalPooler.getSOM().getNode(modelID);
+		SomNode model = rsom.getSomMap().get(modelID);// temporalPooler.getSOM().getNode(modelID); 
 		
 		//Create boolean vector where an item is true if weight value of that item is higher than the mean.
 		SimpleMatrix weightVector = model.getVector();

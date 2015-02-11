@@ -164,7 +164,7 @@ public class TemporalStability_Poolers {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double decay = 0.3;
+		double decay = 1;
 		double stdDev = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor = 0.125;

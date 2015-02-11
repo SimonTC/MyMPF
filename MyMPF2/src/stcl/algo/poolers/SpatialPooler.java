@@ -65,7 +65,7 @@ public class SpatialPooler {
 		//activationMatrix = normalize(activationMatrix);
 		
 		//Orthogonalize activation matrix
-		//activationMatrix = orthogonalize(activationMatrix);
+		activationMatrix = orthogonalize(activationMatrix);
 		
 		return activationMatrix;
 	}
@@ -91,9 +91,19 @@ public class SpatialPooler {
 	}
 	
 	protected SimpleMatrix orthogonalize(SimpleMatrix m) {
-		SimpleMatrix activation = m.divide(-2 * Math.pow(0.125, 2));	 //TODO: Change the activation coding factor 0.125 to a parameter
-		activation = activation.elementExp();
-		return activation;
+		double max = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		for (int i = 0; i < m.getNumElements(); i++){
+			double value = m.get(i);
+			if (value > max){
+				max = value;
+				maxID = i;
+			}
+		}
+		
+		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
+		ortho.set(maxID, 1);
+		return ortho;
 	}
 	
 	protected SimpleMatrix normalize(SimpleMatrix matrix){

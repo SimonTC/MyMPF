@@ -13,6 +13,8 @@ import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.rsom.IRSOM;
+import dk.stcl.core.som.ISOM;
 
 public class MovingLinesGUI_Prediction extends JFrame {
 	private MatrixPanel input;
@@ -25,8 +27,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 	
 	private int singleSomModelWidth;
 	
-	public MovingLinesGUI_Prediction(SpatialPooler spatialPooler, TemporalPooler temporalPooler) {
-		SOM spatialSom = spatialPooler.getSOM();
+	public MovingLinesGUI_Prediction(ISOM spatialSom, IRSOM rsom){
 		
 		//Create overall grid layout
 		int rows = 3;
@@ -65,7 +66,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		add(predictedInput);
 		
 		//Add rsom models and activation
-		int numRsomModels = temporalPooler.getSOM().getHeight();
+		int numRsomModels = rsom.getHeight();
 		numRsomModels *= numRsomModels;
 		rsomActivations = new ArrayList<MatrixPanel>();
 		rsomModels = new ArrayList<SomPanel>();
@@ -84,7 +85,11 @@ public class MovingLinesGUI_Prediction extends JFrame {
 			add(activation);
 			rsomActivations.add(activation);
 		}
-				
+		
+	}
+	
+	public MovingLinesGUI_Prediction(SpatialPooler spatialPooler, TemporalPooler temporalPooler) {
+		this(spatialPooler.getSOM(), temporalPooler.getRSOM());
 	}
 	
 	public MovingLinesGUI_Prediction(NeoCorticalUnit unit) {

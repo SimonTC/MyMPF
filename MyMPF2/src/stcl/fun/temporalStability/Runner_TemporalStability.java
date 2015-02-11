@@ -79,6 +79,10 @@ public class Runner_TemporalStability {
 			curSequence = sequences.get(curSeqID);
 			curInputID++;
 			curInputID = curInputID >= curSequence.length? 0 : curInputID;
+			
+			if (i == 40){
+				System.out.println();
+			}
 	    
     		//Spatial classification
     		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[curInputID]);

@@ -5,7 +5,7 @@ import java.util.Random;
 import dk.stcl.core.rsom.RSOM_SemiOnline;
 import dk.stcl.core.rsom.RSOM_Simple;
 
-public class RSOM extends RSOM_Simple {
+public class RSOM extends RSOM_SemiOnline {
 
 	public RSOM(int mapSize, int inputLength, Random rand, int maxIterations, 
 			double learningRate, double activationCodingFactor,

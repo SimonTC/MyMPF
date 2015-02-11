@@ -155,20 +155,20 @@ public class TemporalStability_Poolers {
 		//Spatial pooler
 		int spatialInputLength = blank.getNumElements();
 		int spatialMapSize = 3;
-		double initialLearningRate = 0.1;
+		double spatialInitialLearningRate = 0.1;
 		double stddev_spatial = 2;
 		double activationCodingFactor_spatial = 0.125;
 		
-		spatialPooler =  new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate, stddev_spatial, activationCodingFactor_spatial, maxIterations);
+		spatialPooler =  new SpatialPooler(rand, spatialInputLength, spatialMapSize, spatialInitialLearningRate, stddev_spatial, activationCodingFactor_spatial);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
 		double decay = 1;
-		double stdDev = 2;
+		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
-		double activationCodingFactor = 0.125;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev, activationCodingFactor, maxIterations, decay);
+		double activationCodingFactor_Temporal = 0.125;
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev_temporal, activationCodingFactor_Temporal, decay);
 	}
 	
 	private void buildSequences(){

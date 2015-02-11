@@ -34,9 +34,9 @@ public class SpatialPooler {
 	 * @param stddev
 	 * @param activationCodingFactor
 	 */
-	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, int maxIterations ) {
+	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
 		this.rand = rand;
-		som = new SOM(mapSize, inputLength, rand, maxIterations, initialLearningRate, activationCodingFactor);
+		som = new SOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev);
 		errorMatrix = new SimpleMatrix(mapSize, mapSize);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		this.inputLength = inputLength;

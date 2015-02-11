@@ -143,7 +143,7 @@ public class Runner {
 		double initialLearningRate_spatial = 0.1;
 		double stdDev_spatial = 2;
 		double activationCodingFactor = 0.125;
-		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate_spatial, stdDev_spatial, activationCodingFactor, maxIterations);
+		spatialPooler = new SpatialPooler(rand, spatialInputLength, spatialMapSize, initialLearningRate_spatial, stdDev_spatial, activationCodingFactor);
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
@@ -151,7 +151,7 @@ public class Runner {
 		double initialTemporalLeakyCoefficient = 0.3;
 		double stdDev_temporal = 2;
 		double initialLearning_temporal = 0.1;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, initialLearning_temporal, stdDev_temporal, activationCodingFactor, maxIterations, initialTemporalLeakyCoefficient);
+		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, initialLearning_temporal, stdDev_temporal, activationCodingFactor, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){

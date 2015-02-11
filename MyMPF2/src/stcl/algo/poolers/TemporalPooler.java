@@ -8,11 +8,10 @@ public class TemporalPooler extends SpatialPooler  {
 
 	public TemporalPooler(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
-			double activationCodingFactor, int maxIterations, double decay) {
-		super(rand, inputLength, mapSize, initialLearningRate, stddev,
-				activationCodingFactor, maxIterations);
+			double activationCodingFactor, double decay) {
+		super(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
 
-		rsom = new RSOM(mapSize, inputLength, rand, maxIterations, initialLearningRate, activationCodingFactor, decay);
+		rsom = new RSOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev, decay);
 	}
 
 	private RSOM rsom; 

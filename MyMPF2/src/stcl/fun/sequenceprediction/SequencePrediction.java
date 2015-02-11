@@ -150,7 +150,7 @@ public class SequencePrediction {
 		double initialPredictionLearningRate = 0.1;
 		boolean useFirstOrderPrediction = true;
 		double decay = 0.7;
-		unit = new NeoCorticalUnit(rand, NUM_ITERAIONS, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction, decay);
+		unit = new NeoCorticalUnit(rand, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction, decay);
 		
 		
 	}

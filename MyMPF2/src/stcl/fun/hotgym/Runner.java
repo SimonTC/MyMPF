@@ -144,7 +144,7 @@ public class Runner {
 		boolean useMarkovPrediction = true;
 		double leakyCoefficient = 0.3;		
 		
-		NeoCorticalUnit nu = new NeoCorticalUnit(rand, maxIterations, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient);
+		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient);
 		
 		return nu;
 	}

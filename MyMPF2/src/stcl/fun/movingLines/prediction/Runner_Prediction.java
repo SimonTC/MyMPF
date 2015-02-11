@@ -127,7 +127,7 @@ public class Runner_Prediction {
 		double initialTemporalLeakyCoefficient = 0.3;
 		double stdDev = 2;
 		
-		unit = new NeoCorticalUnit(rand, maxIterations, spatialInputLength, spatialMapSize, temporalMapSize, initialLearningRate, true, initialTemporalLeakyCoefficient);
+		unit = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialLearningRate, true, initialTemporalLeakyCoefficient);
 	}
 	
 	private void buildSequences(){

@@ -24,7 +24,7 @@ public class TemporalStability_RSOM {
 	private SimpleMatrix bigT, bigO, smallO, smallV, blank;
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
-	private SOM_SemiOnline spatialDummy = new SOM_SemiOnline(2,2,5,rand,0,0,0);
+	private SOM_SemiOnline spatialDummy = new SOM_SemiOnline(2,5,rand,0,0,0);
 	
 	
 	
@@ -74,16 +74,10 @@ public class TemporalStability_RSOM {
 		double decay = 1;
 		
 		if (USE_SIMPLE_RSOM){
-			rsom = new RSOM_Simple(mapSize, inputLength, rand, ITERATIONS, learningRate, activationCodingFactor, decay);
+			rsom = new RSOM_Simple(mapSize, inputLength, rand, learningRate, activationCodingFactor, ITERATIONS, decay);
 		} else {
-			rsom = new RSOM_SemiOnline(mapSize, inputLength, rand, learningRate, stddev, activationCodingFactor, decay);
-		}
-		
-		//rsom = new RSOM_Online(mapSize, mapSize, inputLength, rand, learningRate, stddev, activationCodingFactor, decay);
-		
-		//rsom = new RSOM_SemiOnline(mapSize, mapSize, inputLength, rand, learningRate, stddev, activationCodingFactor, decay);
-		
-		
+			rsom = new RSOM_SemiOnline(mapSize, inputLength, rand, learningRate, activationCodingFactor, stddev, decay);
+		}	
 		
 	}
 

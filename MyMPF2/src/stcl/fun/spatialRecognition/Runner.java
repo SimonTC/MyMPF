@@ -86,7 +86,7 @@ public class Runner {
 		double initialLearningRate = 0.1;
 		double stddev = 3;
 		double activationCoding = 0.125;
-		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCoding, maxIterations);
+		pooler = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCoding);
 		
 		//Setup graphics
 		setupGraphics(pooler, figureRows, mapSize);

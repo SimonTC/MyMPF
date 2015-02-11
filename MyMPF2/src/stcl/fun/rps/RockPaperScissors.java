@@ -40,8 +40,8 @@ public class RockPaperScissors {
 		double initialPredictionLearningRate = 0.1;
 		boolean useMarkovPrediction = true;
 		double decayFactor = 0.3;
-		unit1 = new NeoCorticalUnit(rand, maxIterations, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor);
-		unit2 = new NeoCorticalUnit(rand, maxIterations, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor);
+		unit1 = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor);
+		unit2 = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor);
 		conn = new Connection(unit1, unit2, rand, 0.3, 2, 0.3);
 	}
 	

@@ -197,9 +197,9 @@ public class TemporalStability_SOM_RSOM {
 		double activationCodingFactor_spatial = 0.125;
 		
 		if (USE_SIMPLE_SOM){
-			som = new SOM_Simple(spatialMapSize, spatialInputLength, rand, maxIterations, learningRate_Spatial, activationCodingFactor_spatial);
+			som = new SOM_Simple(spatialMapSize, spatialInputLength, rand, learningRate_Spatial, activationCodingFactor_spatial, maxIterations);
 		} else {
-			som = new SOM_SemiOnline(spatialMapSize, spatialInputLength, rand, learningRate_Spatial, stddev_spatial, activationCodingFactor_spatial);
+			som = new SOM_SemiOnline(spatialMapSize, spatialInputLength, rand, learningRate_Spatial, activationCodingFactor_spatial, stddev_spatial);
 		}
 		
 		//Temporal pooler
@@ -210,9 +210,9 @@ public class TemporalStability_SOM_RSOM {
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor = 0.125;
 		if (USE_SIMPLE_SOM){
-			rsom = new RSOM_Simple(temporalMapSize, temporalInputLength, rand, maxIterations, temporalLearningRate, activationCodingFactor, decay);
+			rsom = new RSOM_Simple(temporalMapSize, temporalInputLength, rand, temporalLearningRate, activationCodingFactor, maxIterations, decay);
 		} else {
-			rsom = new RSOM_SemiOnline(temporalMapSize, temporalInputLength, rand, temporalLearningRate, stdDev, activationCodingFactor, decay);
+			rsom = new RSOM_SemiOnline(temporalMapSize, temporalInputLength, rand, temporalLearningRate, activationCodingFactor, stdDev, decay);
 		}
 	}
 	

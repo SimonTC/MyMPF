@@ -21,7 +21,7 @@ public class Runner {
 	
 	private final int ITERATIONS = 20;
 	private final boolean VISUALIZE = true;
-	boolean sin = false;
+	boolean sin = true;
 	
 	public static void main(String[] args){
 		Runner runner = new Runner();

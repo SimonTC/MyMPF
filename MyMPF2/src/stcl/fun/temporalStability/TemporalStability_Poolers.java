@@ -19,7 +19,7 @@ public class TemporalStability_Poolers {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 80000;
+	private final int ITERATIONS = 100000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -49,10 +49,8 @@ public class TemporalStability_Poolers {
 			temporalPooler.setLearning(false);
 			spatialPooler.setLearning(false);
 			 setupGraphics();
-			 runExperiment(ITERATIONS, rand, true);
-			 
-		}
-		
+			 runExperiment(ITERATIONS, rand, true);			 
+		}		
 	}
 	
 	private void runExperiment(int maxIterations, Random rand, boolean visualize){
@@ -164,7 +162,7 @@ public class TemporalStability_Poolers {
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 2;
-		double decay = 1;
+		double decay = 0.3;
 		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor_Temporal = 0.125;

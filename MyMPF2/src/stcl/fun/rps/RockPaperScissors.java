@@ -15,7 +15,7 @@ public class RockPaperScissors {
 	private SimpleMatrix rock, paper, scissors;
 	private SimpleMatrix[] sequence;
 	
-	private final int ITERATIONS = 10000;
+	private final int ITERATIONS = 1000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors runner = new RockPaperScissors();
@@ -70,7 +70,7 @@ public class RockPaperScissors {
 			//Reshape ff output from unit 1
 			ffOutput1.reshape(1, 100);
 			
-			//Feed throug unit 2
+			//Feed through unit 2
 			SimpleMatrix ffOutput = unit2.feedForward(ffOutput1);
 			
 			//Feed back through unit 2
@@ -96,7 +96,7 @@ public class RockPaperScissors {
 				{0,1,1,1,0},
 				{0,1,1,1,0},
 				{0,1,1,1,0},
-				{0,1,1,1,1}
+				{0,0,0,0,0}
 		};
 		
 		rock = new SimpleMatrix(rockData);

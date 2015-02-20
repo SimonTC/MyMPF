@@ -231,6 +231,7 @@ public class NeoCorticalUnit {
 	public void flushTemporalMemory(){
 		temporalPooler.flushTemporalMemory();
 		biasMatrix.set(1);
+		predictor.flush();
 	}
 	
 	public void setLearning(boolean learning){

@@ -48,9 +48,10 @@ public class SpatialPooler {
 	/**
 	 * 
 	 * @param feedForwardInputVector
+	 * @param orthogonalize if true output is orthogonalized. 
 	 * @return Returns a probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
+	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector, boolean orthogonalize){
 		//Test input
 		if (!feedForwardInputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
 		if (feedForwardInputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
@@ -65,9 +66,20 @@ public class SpatialPooler {
 		//activationMatrix = normalize(activationMatrix);
 		
 		//Orthogonalize activation matrix
-		activationMatrix = orthogonalize(activationMatrix);
+		if (orthogonalize){
+			activationMatrix = orthogonalize(activationMatrix);
+		}
 		
 		return activationMatrix;
+	}
+	
+	/**
+	 * 
+	 * @param feedForwardInputVector
+	 * @return orthogonalized probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input
+	 */
+	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
+		return feedForward(feedForwardInputVector, true);
 	}
 	
 	/**

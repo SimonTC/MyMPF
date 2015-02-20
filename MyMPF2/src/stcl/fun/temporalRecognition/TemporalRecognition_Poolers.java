@@ -19,7 +19,7 @@ public class TemporalRecognition_Poolers {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 100000;
+	private final int ITERATIONS = 1000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private SimpleMatrix bigT;
@@ -58,49 +58,41 @@ public class TemporalRecognition_Poolers {
 	   
 	    float next_game_tick = System.currentTimeMillis();
 	    int curSeqID = 0;
-    	int curInputID = -1;
 	    
 	    for (int i = 0; i < maxIterations; i++){
+	    	//Flush memory
+	    	temporalPooler.flushTemporalMemory();
+	    	
 	    	//Choose sequence	    	
-	    	boolean change = rand.nextDouble() > 0.90 ? true : false;
-	    	SimpleMatrix[] curSequence = null;
-			if (change){
-				//temporalPooler.flushTemporalMemory();
-				int nextSeqID;
-				do {
-					nextSeqID = rand.nextInt(sequences.size());
-				} while (nextSeqID == curSeqID);
-				
-				curSeqID = nextSeqID;
-				curInputID = -1;
-			} 
-			curSequence = sequences.get(curSeqID);
-			curInputID++;
-			curInputID = curInputID >= curSequence.length? 0 : curInputID;
-
-    		//Spatial classification
-    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(curSequence[curInputID]);
-    		
-    		//Transform spatial output matrix to vector
-    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
-    		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
-    		
-    		//Temporal classification
-    		temporalPooler.feedForward(temporalFFInputVector);
-    		
-    		if (visualize){
-	    		//Update graphics
-	    		updateGraphics(curSequence[curInputID], curSeqID);
+	    	curSeqID = rand.nextInt(sequences.size());
+	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
+	    	
+	    	for (SimpleMatrix input : curSequence){
+	    		//Spatial classification
+	    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(input);
 	    		
-	    		//Sleep
-				next_game_tick+= SKIP_TICKS;
-				try {
-					Thread.sleep(SKIP_TICKS);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
-    		}
+	    		//Transform spatial output matrix to vector
+	    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
+	    		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
+	    		
+	    		//Temporal classification
+	    		temporalPooler.feedForward(temporalFFInputVector);
+	    		
+	    		if (visualize){
+		    		//Update graphics
+		    		updateGraphics(input, curSeqID);
+		    		
+		    		//Sleep
+					next_game_tick+= SKIP_TICKS;
+					try {
+						Thread.sleep(SKIP_TICKS);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
+	    		}
+	    	}
+    		
     		spatialPooler.sensitize(i);
     		temporalPooler.sensitize(i);
 	    }

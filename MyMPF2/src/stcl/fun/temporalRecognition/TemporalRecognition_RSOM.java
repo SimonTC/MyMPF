@@ -28,7 +28,7 @@ public class TemporalRecognition_RSOM {
 	
 	
 	
-	private final int ITERATIONS = 80000;
+	private final int ITERATIONS = 1000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private final int GUI_SIZE = 500;
@@ -90,41 +90,32 @@ public class TemporalRecognition_RSOM {
     	int curInputID = -1;
 	    
 	    for (int i = 0; i < maxIterations; i++){
+	    	rsom.flush();
 	    	//Choose sequence
-	    	boolean change = rand.nextDouble() > 0.90 ? true : false;
-	    	SimpleMatrix[] curSequence = null;
-			if (change){
-				rsom.flush();
-				int nextSeqID;
-				do {
-					nextSeqID = rand.nextInt(sequences.size());
-				} while (nextSeqID == curSeqID);
-				
-				curSeqID = nextSeqID;
-				curInputID = -1;
-			} 
-			curSequence = sequences.get(curSeqID);
-			curInputID++;
-			curInputID = curInputID >= curSequence.length? 0 : curInputID;
-    		
-    		//Temporal classification
-    		rsom.step((curSequence[curInputID]));
-    		
-    		rsom.computeActivationMatrix();
-    		
-    		if (visualize){
-	    		//Update graphics
-	    		updateGraphics(curSequence[curInputID], curSeqID);
+	    	curSeqID = rand.nextInt(sequences.size());
+	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
+	    	
+	    	for (SimpleMatrix input : curSequence){
+	    		//Temporal classification
+	    		rsom.step((input));
 	    		
-	    		//Sleep
-				next_game_tick+= SKIP_TICKS;
-				try {
-					Thread.sleep(SKIP_TICKS);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	
-    		}
+	    		rsom.computeActivationMatrix();
+	    		
+	    		if (visualize){
+		    		//Update graphics
+		    		updateGraphics(input, curSeqID);
+		    		
+		    		//Sleep
+					next_game_tick+= SKIP_TICKS;
+					try {
+						Thread.sleep(SKIP_TICKS);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
+	    		}
+	    	}
+	    	
     		rsom.sensitize(i);
 	    }
 	    

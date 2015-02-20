@@ -20,7 +20,7 @@ public class TemporalPoolerTest {
 	@Test
 	public void testFeedForward() {
 		//Expect output to be a mass probability distribution
-		TemporalPooler pooler = new TemporalPooler(new Random(), 3, 5, 0.7);// new TemporalPooler(new Random(), 100, 3, 5, 0.7);
+		TemporalPooler pooler = new TemporalPooler(new Random(), 3, 5, 0.7, 2, 0.125, 0.3); 
 		SimpleMatrix input = SimpleMatrix.random(1,3, 0, 1, new Random());
 		SimpleMatrix output = pooler.feedForward(input);
 		assertEquals(1, output.elementSum(), 0.0001);

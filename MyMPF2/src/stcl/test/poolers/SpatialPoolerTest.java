@@ -24,7 +24,7 @@ public class SpatialPoolerTest {
 		//Setup pooler
 		inputLength = 3;
 		mapSize = 5;
-		pooler = new SpatialPooler(new Random(), inputLength, mapSize);
+		pooler = new SpatialPooler(new Random(), inputLength, mapSize, 0.1, 2, 0.125); 
 	}
 	
 	@Test

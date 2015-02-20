@@ -29,9 +29,10 @@ public class FirstOrderPredictor {
 	 * Predicts which spatial som model will be active at time t+1 given the current input at time t.
 	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
+	 * @param associate if this is true the association matrix will be updated. SHould be false when learning is disabled
 	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be active at time t + 1.
 	 */
-	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate){
+	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate){
 		
 		//Transform input matrix to vector of size IJ
 		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
@@ -49,7 +50,9 @@ public class FirstOrderPredictor {
 		*/
 		
 		//Association
-		association(inputVector, curLearningRate);
+		if (associate){
+			association(inputVector, curLearningRate);
+		}
 		
 		//Prediction
 		SimpleMatrix output = prediction(inputVector);

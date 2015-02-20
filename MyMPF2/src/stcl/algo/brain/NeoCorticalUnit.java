@@ -25,6 +25,8 @@ public class NeoCorticalUnit {
 	
 	private boolean DEBUG = false;
 	
+	private boolean learning;
+	
 	//Learning rates
 	private double curPredictionLearningRate; //TODO: Find correct name for it
 											  //TODO: Does the prediction learning rate change?
@@ -56,6 +58,7 @@ public class NeoCorticalUnit {
 		this.useMarkovPrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
+		this.learning = true;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -101,7 +104,7 @@ public class NeoCorticalUnit {
 		//Predict next input
 		if (useMarkovPrediction){
 			SimpleMatrix tmp = aggressiveOrthogonalization(spatialFFOutputMatrix);
-			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate);
+			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning );
 			//predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
 			/*
 			if (DEBUG)System.out.println("Likelihood that SOM model ij will be the best to describe the next input");
@@ -233,11 +236,7 @@ public class NeoCorticalUnit {
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
-		if (learning){
-			curPredictionLearningRate = 1; //TODO: Do something about this. SHhuld be based on some parameter
-		} else {
-			curPredictionLearningRate = 0;
-		}
+		this.learning = learning;
 	}
 
 	public SpatialPooler getSpatialPooler() {

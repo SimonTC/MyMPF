@@ -58,6 +58,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		//Evaluate
 		double noise = 0.0;
 		for (int i = 0; i < 100; i++){
+			nu.setDebug(true);
 			RsomEvaluator evaluator = new RsomEvaluator();
 			double fitness = evaluator.evaluate(nu, sequences, labels, joker, noise, 1000, rand);			
 			System.out.println("Fitness: " + fitness);

@@ -104,13 +104,7 @@ public class NeoCorticalUnit {
 		//Predict next input
 		if (useMarkovPrediction){
 			SimpleMatrix tmp = aggressiveOrthogonalization(spatialFFOutputMatrix);
-			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning );
-			//predictionMatrix = predictor.predict(spatialFFOutputMatrixOrthogonalized, curPredictionLearningRate);
-			/*
-			if (DEBUG)System.out.println("Likelihood that SOM model ij will be the best to describe the next input");
-			if (DEBUG)predictionMatrix.print();
-			if (DEBUG)System.out.println();
-			*/
+			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning);
 		} 		
 		
 		//Transform spatial output matrix to vector
@@ -259,6 +253,10 @@ public class NeoCorticalUnit {
 	public void sensitize(int iteration){
 		spatialPooler.sensitize(iteration);
 		temporalPooler.sensitize(iteration);
+	}
+	
+	public void setDebug(boolean debug){
+		DEBUG = debug;
 	}
 
 }

@@ -48,16 +48,46 @@ public class TemporalRecognition_RSOM {
 		//Setup graphics
 		if (VISUALIZE_TRAINING) setupVisualization(spatialDummy, GUI_SIZE);
 		
-		runExperiment(ITERATIONS, rand, VISUALIZE_TRAINING);
+		//Train
+		training(ITERATIONS, rand, VISUALIZE_TRAINING);
 		
+		//Label
+		int[] labels = createLabels();
+		RSomLabeler labeler = new RSomLabeler();
+		labeler.labelSingleRSOM(rsom, sequences, labels);
+		
+		//Evaluate
+		
+		//Print info
+		rsom.printLabelMap();
+		/*
+	    System.out.println("Rsom models:");
+	    System.out.println();
+	    for (SomNode n : rsom.getNodes()){
+	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
+	    	vector.reshape(2, 2);
+	    	vector.print();
+	    	System.out.println(vector.elementSum());
+	    	System.out.println();
+	    }
+		 */
+	    
 		if (VISUALIZE_RESULT){
 			rsom.flush();
 			rsom.setLearning(false);
 			setupVisualization(spatialDummy, GUI_SIZE);
-			runExperiment(ITERATIONS, rand, true);
+			training(ITERATIONS, rand, true);
 			 
 		}
 		
+	}
+	private int[] createLabels(){
+		int[] labels = new int[sequences.size()];
+		for (int i = 0; i < labels.length; i++){
+			labels[i] = i;
+		}
+		
+		return labels;
 	}
 
 	private void setupExperiment(int maxIterations, Random rand){
@@ -71,7 +101,7 @@ public class TemporalRecognition_RSOM {
 		double learningRate = 0.1;
 		double stddev = 1;
 		double activationCodingFactor = 0.125;
-		double decay = 1;
+		double decay = 0.3;
 		
 		if (USE_SIMPLE_RSOM){
 			rsom = new RSOM_Simple(mapSize, inputLength, rand, learningRate, activationCodingFactor, ITERATIONS, decay);
@@ -82,7 +112,7 @@ public class TemporalRecognition_RSOM {
 	}
 
 	
-	private void runExperiment(int maxIterations, Random rand, boolean visualize){
+	private void training(int maxIterations, Random rand, boolean visualize){
 	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	   
 	    float next_game_tick = System.currentTimeMillis();
@@ -118,15 +148,6 @@ public class TemporalRecognition_RSOM {
     		rsom.sensitize(i);
 	    }
 	    
-	    System.out.println("Rsom models:");
-	    System.out.println();
-	    for (SomNode n : rsom.getNodes()){
-	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
-	    	vector.reshape(2, 2);
-	    	vector.print();
-	    	System.out.println(vector.elementSum());
-	    	System.out.println();
-	    }
 	}
 
 	private void setupVisualization(ISOM som, int GUI_SIZE){

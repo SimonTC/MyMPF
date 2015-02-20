@@ -19,14 +19,15 @@ public class TemporalRecognition_Poolers {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
-	private final boolean VISUALIZE_RESULT = true;
+	private final boolean VISUALIZE_RESULT = false;
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
 	private SimpleMatrix bigO;
 	private SimpleMatrix smallV;
 	private SimpleMatrix blank;
+	private SimpleMatrix joker;
 	
 	int FRAMES_PER_SECOND = 10;
     int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
@@ -55,8 +56,19 @@ public class TemporalRecognition_Poolers {
 		labeler.labelRSOMInTemporalPooler(spatialPooler, temporalPooler, sequences, labels);
 		
 		//Evaluate
+		double noise = 0.0;
+		for (int i = 0; i < 100; i++){
+			RsomEvaluator evaluator = new RsomEvaluator();
+			double fitness = evaluator.evaluate(spatialPooler, temporalPooler, sequences, labels, joker, noise, 1000, rand);
+			
+			System.out.println("Fitness: " + fitness);
+			noise += 0.01;
+		}
+		System.out.println();
+		System.out.println("RSOM labels");
+		temporalPooler.getRSOM().printLabelMap();
 		
-		
+		/*
 		//Print models
 	    System.out.println("SOM models:");
 	    for (SomNode n : spatialPooler.getSOM().getNodes()){
@@ -77,7 +89,7 @@ public class TemporalRecognition_Poolers {
 	    	System.out.println();
 	    }
 
-		
+		*/
 		if (VISUALIZE_RESULT){
 			temporalPooler.flushTemporalMemory();
 			temporalPooler.setLearning(false);
@@ -174,7 +186,7 @@ public class TemporalRecognition_Poolers {
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
-		int temporalMapSize = 2;
+		int temporalMapSize = 3;
 		double decay = 0.3;
 		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
@@ -200,6 +212,8 @@ public class TemporalRecognition_Poolers {
 		SimpleMatrix[] seq10 = {bigT, smallO, bigO, smallO};
 		SimpleMatrix[] seq11 = {bigT, bigT, bigT, bigT};
 		SimpleMatrix[] seq12 = {smallO, smallO, bigO, bigO};
+		
+		SimpleMatrix[] seq13 = {smallO, smallO, bigO, bigO, bigT};
 
 		
 		//sequences.add(seq1);
@@ -210,13 +224,15 @@ public class TemporalRecognition_Poolers {
 		//sequences.add(seq5);
 		//sequences.add(seq6);
 		
-		//sequences.add(seq7);
-		//sequences.add(seq8);
+		sequences.add(seq7);
+		sequences.add(seq8);
 		
 		sequences.add(seq9);
 		sequences.add(seq10);
 		sequences.add(seq11);
 		sequences.add(seq12);
+		
+		//sequences.add(seq13);
 		
 	}
 	
@@ -265,5 +281,14 @@ public class TemporalRecognition_Poolers {
 				{0,0,0,0,0}};
 		blank = new SimpleMatrix(blankData);
 		blank.reshape(1, blank.numCols() * blank.numRows());
+		
+		double[][] jokerData = {
+				{1,0,0,0,1},
+				{0,1,0,1,0},
+				{0,0,1,0,0},
+				{0,1,0,1,0},
+				{1,0,0,0,1}};
+		joker = new SimpleMatrix(jokerData);
+		joker.reshape(1, joker.numCols() * joker.numRows());
 	}
 }

@@ -8,16 +8,17 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
-public class TemporalRecognition_Poolers {
+public class TemporalRecognition_NeocorticalUnit {
 	private ArrayList<SimpleMatrix[]> sequences;
-	private SpatialPooler spatialPooler;
-	private TemporalPooler temporalPooler;
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
+	
+	private NeoCorticalUnit nu;
 	
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
@@ -33,7 +34,7 @@ public class TemporalRecognition_Poolers {
     int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	public static void main(String[] args){
-		TemporalRecognition_Poolers runner = new TemporalRecognition_Poolers();
+		TemporalRecognition_NeocorticalUnit runner = new TemporalRecognition_NeocorticalUnit();
 		runner.run();
 	}
 	
@@ -46,27 +47,25 @@ public class TemporalRecognition_Poolers {
 		
 		//Train
 		training(ITERATIONS, rand, VISUALIZE_TRAINING);
-		temporalPooler.flushTemporalMemory();
-		temporalPooler.setLearning(false);
-		spatialPooler.setLearning(false);
+		nu.flushTemporalMemory();
+		nu.setLearning(false);
 		
 		//Label
 		int[] labels = createLabels();
 		RSomLabeler labeler = new RSomLabeler();
-		labeler.label(spatialPooler, temporalPooler, sequences, labels);
+		labeler.label(nu, sequences, labels);
 		
 		//Evaluate
 		double noise = 0.0;
 		for (int i = 0; i < 100; i++){
 			RsomEvaluator evaluator = new RsomEvaluator();
-			double fitness = evaluator.evaluate(spatialPooler, temporalPooler, sequences, labels, joker, noise, 1000, rand);
-			
+			double fitness = evaluator.evaluate(nu, sequences, labels, joker, noise, 1000, rand);			
 			System.out.println("Fitness: " + fitness);
 			noise += 0.01;
 		}
 		System.out.println();
 		System.out.println("RSOM labels");
-		temporalPooler.getRSOM().printLabelMap();
+		nu.getTemporalPooler().getRSOM().printLabelMap();
 		
 		/*
 		//Print models
@@ -91,9 +90,8 @@ public class TemporalRecognition_Poolers {
 
 		*/
 		if (VISUALIZE_RESULT){
-			temporalPooler.flushTemporalMemory();
-			temporalPooler.setLearning(false);
-			spatialPooler.setLearning(false);
+			nu.flushTemporalMemory();
+			nu.setLearning(false);
 			 setupGraphics();
 			 training(ITERATIONS, rand, true);			 
 		}		
@@ -113,22 +111,15 @@ public class TemporalRecognition_Poolers {
 	    
 	    for (int i = 0; i < maxIterations; i++){
 	    	//Flush memory
-	    	temporalPooler.flushTemporalMemory();
+	    	nu.flushTemporalMemory();
 	    	
 	    	//Choose sequence	    	
 	    	curSeqID = rand.nextInt(sequences.size());
 	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
 	    	
 	    	for (SimpleMatrix input : curSequence){
-	    		//Spatial classification
-	    		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(input);
-	    		
-	    		//Transform spatial output matrix to vector
-	    		SimpleMatrix temporalFFInputVector = new SimpleMatrix(spatialFFOutputMatrix);
-	    		temporalFFInputVector.reshape(1, spatialFFOutputMatrix.getMatrix().data.length);
-	    		
-	    		//Temporal classification
-	    		temporalPooler.feedForward(temporalFFInputVector);
+	    		SimpleMatrix ffOUtput = nu.feedForward(input);
+	    		nu.feedBackward(ffOUtput);
 	    		
 	    		if (visualize){
 		    		//Update graphics
@@ -144,14 +135,13 @@ public class TemporalRecognition_Poolers {
 	    		}
 	    	}
     		
-    		spatialPooler.sensitize(i);
-    		temporalPooler.sensitize(i);
+    		nu.sensitize(i);
 	    }
 
 	}
 	
 	private void setupGraphics(){
-		frame = new MovingLinesGUI_Prediction(spatialPooler, temporalPooler);
+		frame = new MovingLinesGUI_Prediction(nu);
 		frame.setTitle("Visualiztion");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		updateGraphics(blank,0); //Give a blank
@@ -161,7 +151,7 @@ public class TemporalRecognition_Poolers {
 	}
 	
 	private void updateGraphics(SimpleMatrix inputVector, int iteration){
-		frame.updateData(inputVector, spatialPooler, temporalPooler);
+		frame.updateData(inputVector, nu);
 		frame.setTitle("Visualiztion - Current sequence: " + iteration);
 		frame.revalidate();
 		frame.repaint();
@@ -181,8 +171,7 @@ public class TemporalRecognition_Poolers {
 		double spatialInitialLearningRate = 0.1;
 		double stddev_spatial = 2;
 		double activationCodingFactor_spatial = 0.125;
-		
-		spatialPooler =  new SpatialPooler(rand, spatialInputLength, spatialMapSize, spatialInitialLearningRate, stddev_spatial, activationCodingFactor_spatial);
+
 		
 		//Temporal pooler
 		int temporalInputLength = spatialMapSize * spatialMapSize;
@@ -191,7 +180,8 @@ public class TemporalRecognition_Poolers {
 		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor_Temporal = 0.125;
-		temporalPooler = new TemporalPooler(rand, temporalInputLength, temporalMapSize, temporalLearningRate, stdDev_temporal, activationCodingFactor_Temporal, decay);
+		
+		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, 0.1, true, decay);
 	}
 	
 	private void buildSequences(){

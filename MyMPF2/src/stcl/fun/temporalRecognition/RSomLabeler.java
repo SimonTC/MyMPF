@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import dk.stcl.core.basic.containers.SomNode;
@@ -18,12 +19,12 @@ import dk.stcl.core.som.ISOM;
 public class RSomLabeler {
 	
 	/**
-	 * 
+	 *  labels a single rsom
 	 * @param rsom
 	 * @param sequences
 	 * @param sequenceLabels
 	 */
-	public void labelSingleRSOM (IRSOM  rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+	public void label (IRSOM  rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
 		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
 		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
@@ -39,7 +40,14 @@ public class RSomLabeler {
 		}	
 	}
 	
-	public void labelSOMRSOMPair(ISOM som, IRSOM rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+	/**
+	 * labels rsom in som-rsom pair
+	 * @param som
+	 * @param rsom
+	 * @param sequences
+	 * @param sequenceLabels
+	 */
+	public void label(ISOM som, IRSOM rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
 		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
 		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
@@ -68,7 +76,14 @@ public class RSomLabeler {
 
 	}
 	
-	public void labelRSOMInTemporalPooler(SpatialPooler spatialPooler, TemporalPooler temporalPooler, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+	/**
+	 * labels rsom in temporal pooler in spatial pooler - temporal pooler pair
+	 * @param spatialPooler
+	 * @param temporalPooler
+	 * @param sequences
+	 * @param sequenceLabels
+	 */
+	public void label(SpatialPooler spatialPooler, TemporalPooler temporalPooler, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
 		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
 		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
@@ -93,6 +108,32 @@ public class RSomLabeler {
 		}	
 
 	}
+	
+	/**
+	 * labels rsom in temporal pooler in neocortical unit
+	 * @param nu
+	 * @param sequences
+	 * @param sequenceLabels
+	 */
+	public void label(NeoCorticalUnit nu, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
+		
+		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
+			nu.flushTemporalMemory();
+			SimpleMatrix[] sequence = sequences.get(sequenceID);
+						
+			for (SimpleMatrix m : sequence){
+	    		SimpleMatrix ffOUtput = nu.feedForward(m);
+	    		nu.feedBackward(ffOUtput);
+			}
+			
+			SomNode bmu = nu.getTemporalPooler().getRSOM().getBMU();
+			bmu.setLabel(sequenceLabels[sequenceID]);
+		}	
+
+
+	}
+
 	
 	private SimpleMatrix orthogonalize(SimpleMatrix m) {
 		double max = Double.NEGATIVE_INFINITY;

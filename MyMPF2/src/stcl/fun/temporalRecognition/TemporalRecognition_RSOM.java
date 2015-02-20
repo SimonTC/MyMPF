@@ -54,7 +54,7 @@ public class TemporalRecognition_RSOM {
 		//Label
 		int[] labels = createLabels();
 		RSomLabeler labeler = new RSomLabeler();
-		labeler.labelSingleRSOM(rsom, sequences, labels);
+		labeler.label(rsom, sequences, labels);
 		
 		//Evaluate
 		

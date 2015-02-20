@@ -29,6 +29,7 @@ public class TemporalRecognition_Poolers {
 	private SimpleMatrix blank;
 	
 	int FRAMES_PER_SECOND = 10;
+    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	public static void main(String[] args){
 		TemporalRecognition_Poolers runner = new TemporalRecognition_Poolers();
@@ -42,21 +43,60 @@ public class TemporalRecognition_Poolers {
 		//Setup graphics
 		if (VISUALIZE_TRAINING) setupGraphics();
 		
-		runExperiment(ITERATIONS, rand, VISUALIZE_TRAINING);
+		//Train
+		training(ITERATIONS, rand, VISUALIZE_TRAINING);
+		temporalPooler.flushTemporalMemory();
+		temporalPooler.setLearning(false);
+		spatialPooler.setLearning(false);
+		
+		//Label
+		int[] labels = createLabels();
+		RSomLabeler labeler = new RSomLabeler();
+		labeler.labelRSOMInTemporalPooler(spatialPooler, temporalPooler, sequences, labels);
+		
+		//Evaluate
+		
+		
+		//Print models
+	    System.out.println("SOM models:");
+	    for (SomNode n : spatialPooler.getSOM().getNodes()){
+	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
+	    	vector.reshape(5,5);
+	    	vector.print();
+	    	System.out.println(vector.elementSum());
+	    	System.out.println();
+	    }
+	    
+	    System.out.println("Rsom models:");
+	    System.out.println();
+	    for (SomNode n : temporalPooler.getRSOM().getNodes()){
+	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
+	    	vector.reshape(spatialPooler.getMapSize(), spatialPooler.getMapSize());
+	    	vector.print();
+	    	System.out.println(vector.elementSum());
+	    	System.out.println();
+	    }
+
 		
 		if (VISUALIZE_RESULT){
 			temporalPooler.flushTemporalMemory();
 			temporalPooler.setLearning(false);
 			spatialPooler.setLearning(false);
 			 setupGraphics();
-			 runExperiment(ITERATIONS, rand, true);			 
+			 training(ITERATIONS, rand, true);			 
 		}		
 	}
 	
-	private void runExperiment(int maxIterations, Random rand, boolean visualize){
-	    int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
-	   
-	    float next_game_tick = System.currentTimeMillis();
+	private int[] createLabels(){
+		int[] labels = new int[sequences.size()];
+		for (int i = 0; i < labels.length; i++){
+			labels[i] = i;
+		}
+		
+		return labels;
+	}
+		
+	private void training(int maxIterations, Random rand, boolean visualize){
 	    int curSeqID = 0;
 	    
 	    for (int i = 0; i < maxIterations; i++){
@@ -83,7 +123,6 @@ public class TemporalRecognition_Poolers {
 		    		updateGraphics(input, curSeqID);
 		    		
 		    		//Sleep
-					next_game_tick+= SKIP_TICKS;
 					try {
 						Thread.sleep(SKIP_TICKS);
 					} catch (InterruptedException e) {
@@ -96,25 +135,7 @@ public class TemporalRecognition_Poolers {
     		spatialPooler.sensitize(i);
     		temporalPooler.sensitize(i);
 	    }
-	    
-	    System.out.println("SOM models:");
-	    for (SomNode n : spatialPooler.getSOM().getNodes()){
-	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
-	    	vector.reshape(5,5);
-	    	vector.print();
-	    	System.out.println(vector.elementSum());
-	    	System.out.println();
-	    }
-	    
-	    System.out.println("Rsom models:");
-	    System.out.println();
-	    for (SomNode n : temporalPooler.getRSOM().getNodes()){
-	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
-	    	vector.reshape(spatialPooler.getMapSize(), spatialPooler.getMapSize());
-	    	vector.print();
-	    	System.out.println(vector.elementSum());
-	    	System.out.println();
-	    }
+
 	}
 	
 	private void setupGraphics(){

@@ -1,5 +1,7 @@
 package stcl.fun.temporalRecognition;
 
+import java.util.ArrayList;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SpatialPooler;
@@ -21,12 +23,12 @@ public class RSomLabeler {
 	 * @param sequences
 	 * @param sequenceLabels
 	 */
-	public void labelSingleRSOM (IRSOM  rsom, SimpleMatrix[][] sequences, int[] sequenceLabels){
-		assert sequences.length == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
+	public void labelSingleRSOM (IRSOM  rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
-		for (int sequenceID = 0; sequenceID < sequences.length; sequenceID++){
+		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
 			rsom.flush();
-			SimpleMatrix[] sequence = sequences[sequenceID];
+			SimpleMatrix[] sequence = sequences.get(sequenceID);
 						
 			for (SimpleMatrix m : sequence){
 				rsom.step(m);
@@ -37,12 +39,12 @@ public class RSomLabeler {
 		}	
 	}
 	
-	public void labelSOMRSOMPair(ISOM som, IRSOM rsom, SimpleMatrix[][] sequences, int[] sequenceLabels){
-		assert sequences.length == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
+	public void labelSOMRSOMPair(ISOM som, IRSOM rsom, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
-		for (int sequenceID = 0; sequenceID < sequences.length; sequenceID++){
+		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
 			rsom.flush();
-			SimpleMatrix[] sequence = sequences[sequenceID];
+			SimpleMatrix[] sequence = sequences.get(sequenceID);
 						
 			for (SimpleMatrix m : sequence){
 	    		//Spatial classification
@@ -66,12 +68,12 @@ public class RSomLabeler {
 
 	}
 	
-	public void labelRSOMInTemporalPooler(SpatialPooler spatialPooler, TemporalPooler temporalPooler, SimpleMatrix[][] sequences, int[] sequenceLabels){
-		assert sequences.length == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
+	public void labelRSOMInTemporalPooler(SpatialPooler spatialPooler, TemporalPooler temporalPooler, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels){
+		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
-		for (int sequenceID = 0; sequenceID < sequences.length; sequenceID++){
+		for (int sequenceID = 0; sequenceID < sequences.size(); sequenceID++){
 			temporalPooler.flushTemporalMemory();
-			SimpleMatrix[] sequence = sequences[sequenceID];
+			SimpleMatrix[] sequence = sequences.get(sequenceID);
 						
 			for (SimpleMatrix m : sequence){
 	    		//Spatial classification

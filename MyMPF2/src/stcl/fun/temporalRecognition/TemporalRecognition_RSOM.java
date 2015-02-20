@@ -87,7 +87,6 @@ public class TemporalRecognition_RSOM {
 	   
 	    float next_game_tick = System.currentTimeMillis();
 	    int curSeqID = 0;
-    	int curInputID = -1;
 	    
 	    for (int i = 0; i < maxIterations; i++){
 	    	rsom.flush();

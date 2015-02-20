@@ -73,7 +73,7 @@ public class NeoCorticalUnit {
 		if (DEBUG)System.out.println();
 		
 		//Spatial classification
-		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
+		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
 		
 		if (DEBUG)System.out.println("Likelihood that SOM model ij is best to describe the current input");
 		if (DEBUG)spatialFFOutputMatrix.print();

@@ -72,7 +72,8 @@ public class RsomEvaluator {
 	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
 	    	
 	    	for (SimpleMatrix input : curSequence){
-	    		if (rand.nextDouble() < noise) input = joker;
+	    		if (rand.nextDouble() < noise)  input = joker;
+
 	    		SimpleMatrix ffOUtput = nu.feedForward(input);
 	    		nu.feedBackward(ffOUtput);    		
 	    	}

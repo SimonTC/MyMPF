@@ -1,4 +1,4 @@
-package stcl.fun.temporalStability;
+package stcl.fun.temporalRecognition;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,7 +17,7 @@ import dk.stcl.core.rsom.RSOM_Simple;
 import dk.stcl.core.som.ISOM;
 import dk.stcl.core.som.SOM_SemiOnline;
 
-public class TemporalStability_RSOM {
+public class TemporalRecognition_RSOM {
 	
 	private IRSOM rsom;
 	private ArrayList<SimpleMatrix[]> sequences;
@@ -37,7 +37,7 @@ public class TemporalStability_RSOM {
 	private final boolean USE_SIMPLE_RSOM = false;
 
 	public static void main(String[] args){
-		TemporalStability_RSOM runner = new TemporalStability_RSOM();
+		TemporalRecognition_RSOM runner = new TemporalRecognition_RSOM();
 		runner.run();
 	}
 

@@ -26,10 +26,11 @@ public class FirstOrderPredictor {
 	}
 	
 	/**
-	 * Predicts which spatial som model will be active at time t+1 given the current input at time t.
+	 * Predicts which spatial SOM model will be active at time t+1 given the current input at time t.
+	 * To correctly be able to predict staying in the same state, the input has to be highly orthogonal. That is, one element == 1 and the rest == 0
 	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
-	 * @param associate if this is true the association matrix will be updated. SHould be false when learning is disabled
+	 * @param associate if this is true the association matrix will be updated. Should be false when learning is disabled
 	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be active at time t + 1.
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate){

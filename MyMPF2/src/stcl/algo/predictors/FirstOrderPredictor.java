@@ -13,7 +13,7 @@ public class FirstOrderPredictor {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
-		conditionalPredictionMatrix.set(1); //Initialize to 1. 
+		//conditionalPredictionMatrix.set(1); //Initialize to 1. 
 											//TODO: Does this make sense?
 	} 
 	
@@ -134,13 +134,21 @@ public class FirstOrderPredictor {
 		}
 		
 		//Normalize output vector
-		if (sum > 0){
-			outputVector = outputVector.scale(1/sum);
+		if (sum == 0){ //With no prior knowledge everything is possible
+			outputVector.set(1);
+			sum = outputVector.elementSum();
 		}
 		
-		return outputVector;
+		outputVector = outputVector.scale(1/sum);
+			
+			
 		
 		
+		return outputVector;		
+	}
+	
+	public SimpleMatrix getConditionalPredictionMatrix(){
+		return this.conditionalPredictionMatrix;
 	}
 
 }

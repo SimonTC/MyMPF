@@ -58,7 +58,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		//Evaluate
 		double noise = 0.0;
 		for (int i = 0; i < 100; i++){
-			nu.setDebug(true);
+			//nu.setDebug(true);
 			RsomEvaluator evaluator = new RsomEvaluator();
 			double fitness = evaluator.evaluate(nu, sequences, labels, joker, noise, 1000, rand);			
 			System.out.println("Fitness: " + fitness);
@@ -181,8 +181,9 @@ public class TemporalRecognition_NeocorticalUnit {
 		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor_Temporal = 0.125;
+		double initialPredictionLearningRate = 0.0;
 		
-		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, 0.1, true, decay);
+		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, true, decay);
 	}
 	
 	private void buildSequences(){

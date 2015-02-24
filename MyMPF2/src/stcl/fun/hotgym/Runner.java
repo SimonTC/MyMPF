@@ -66,7 +66,7 @@ public class Runner {
 			double mse = 0;
 			unit.flushTemporalMemory();
 			for (int i = 0; i < data.size() - 1; i++){
-				xValues.add((double) (i+1));
+				xValues.add((double) (i+1)); 
 				double input = data.get(i);
 				double[][] inputDataVector = {{input}};
 				SimpleMatrix inputVector = new SimpleMatrix(inputDataVector);

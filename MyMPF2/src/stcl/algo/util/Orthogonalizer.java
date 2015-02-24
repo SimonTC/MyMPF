@@ -5,7 +5,8 @@ import org.ejml.simple.SimpleMatrix;
 public class Orthogonalizer {
 	
 	public static SimpleMatrix orthogonalize(SimpleMatrix m){
-		return aggressiveOrthogonalization(m);
+		//return aggressiveOrthogonalization(m);
+		return orthogonalization_AsOriginalPaper(m);
 	}
 	
 	private static SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
@@ -26,6 +27,11 @@ public class Orthogonalizer {
 		orthogonalized.set(maxID, 1);
 		return orthogonalized;		
 	
+	}
+	
+	private static SimpleMatrix orthogonalization_AsOriginalPaper(SimpleMatrix m){
+		SimpleMatrix orthogonalized = m.elementPower(12);
+		return orthogonalized;
 	}
 	
 	private static SimpleMatrix orthogonalization_AsInSomActivation(SimpleMatrix m){

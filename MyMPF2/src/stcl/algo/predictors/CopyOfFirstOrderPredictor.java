@@ -2,17 +2,19 @@ package stcl.algo.predictors;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class FirstOrderPredictor {
+public class CopyOfFirstOrderPredictor {
 
-	private BinaryTransitionMatrix conditionalPredictionMatrix;
+	private SimpleMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;
 	
 	private SimpleMatrix inputVectorBefore;
 
-	public FirstOrderPredictor(int inputMatrixSize) {
+	public CopyOfFirstOrderPredictor(int inputMatrixSize) {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
-		conditionalPredictionMatrix = new BinaryTransitionMatrix(predictionMatrixSize, 100); //TODO: Move to parameter
+		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
+		//conditionalPredictionMatrix.set(1); //Initialize to 1. 
+											//TODO: Does this make sense?
 	} 
 	
 	/**

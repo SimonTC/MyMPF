@@ -92,10 +92,6 @@ public class CopyOfFirstOrderPredictor {
 				double before = inputVectorBefore.get(k);
 				double delta2 = now - before;
 				if (delta2 < 0) delta2 = 0;
-				if (k==h && now ==1 && before == 1 ){ //Have to make sure that transitions to itself are also recorded
-					delta1 = 1;
-					delta2 = 1;
-				}
 				double tmp = conditionalPredictionMatrix.get(k, h) + delta1 * delta2 * curLearningRate;
 				conditionalPredictionMatrix.set(k, h, tmp);
 				sum += tmp;

@@ -10,6 +10,7 @@ import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderPredictor;
+import stcl.algo.util.Orthogonalizer;
 
 public class NeoCorticalUnit{
 	
@@ -207,7 +208,9 @@ public class NeoCorticalUnit{
 	 */
 	private SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
 		
-		return orthogonalization_NormDist(m);
+		return Orthogonalizer.orthogonalize(m);
+		
+		//return orthogonalization_NormDist(m);
 		
 		/*
 		int maxID = -1;

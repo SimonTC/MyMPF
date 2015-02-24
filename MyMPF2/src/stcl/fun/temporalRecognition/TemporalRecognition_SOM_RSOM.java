@@ -16,6 +16,7 @@ import dk.stcl.core.som.SOM_SemiOnline;
 import dk.stcl.core.som.SOM_Simple;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.util.Orthogonalizer;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class TemporalRecognition_SOM_RSOM {
@@ -131,6 +132,8 @@ public class TemporalRecognition_SOM_RSOM {
 	}
 	
 	private SimpleMatrix orthogonalize(SimpleMatrix m) {
+		return Orthogonalizer.orthogonalize(m);
+		/*
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;
 		for (int i = 0; i < m.getNumElements(); i++){
@@ -144,6 +147,7 @@ public class TemporalRecognition_SOM_RSOM {
 		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
 		ortho.set(maxID, 1);
 		return ortho;
+		*/
 	}
 
 	

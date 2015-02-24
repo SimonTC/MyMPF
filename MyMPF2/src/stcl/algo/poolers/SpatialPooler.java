@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.util.Orthogonalizer;
+
 public class SpatialPooler {
 	
 	//Weight matrix
@@ -103,6 +105,8 @@ public class SpatialPooler {
 	}
 	
 	protected SimpleMatrix orthogonalize(SimpleMatrix m) {
+		return Orthogonalizer.orthogonalize(m);
+		/*
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;
 		for (int i = 0; i < m.getNumElements(); i++){
@@ -116,6 +120,7 @@ public class SpatialPooler {
 		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
 		ortho.set(maxID, 1);
 		return ortho;
+		*/
 	}
 	
 	protected SimpleMatrix normalize(SimpleMatrix matrix){

@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.rsom.IRSOM;
 import dk.stcl.core.som.ISOM;
@@ -111,6 +112,8 @@ public class RSomLabeler {
 
 	
 	private SimpleMatrix orthogonalize(SimpleMatrix m) {
+		return Orthogonalizer.orthogonalize(m);
+		/*
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;
 		for (int i = 0; i < m.getNumElements(); i++){
@@ -124,6 +127,7 @@ public class RSomLabeler {
 		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
 		ortho.set(maxID, 1);
 		return ortho;
+		*/
 	}
 
 

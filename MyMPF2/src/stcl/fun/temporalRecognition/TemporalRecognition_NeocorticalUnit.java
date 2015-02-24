@@ -52,7 +52,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		
 		//Label
 		int[] labels = createLabels();
-		RSomLabeler labeler = new RSomLabeler();
+		TemporalLabeler_NU labeler = new TemporalLabeler_NU();
 		labeler.label(nu, sequences, labels);
 		
 		//Evaluate

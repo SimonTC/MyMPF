@@ -26,16 +26,16 @@ public class FirstOrderPredictor {
 	/**
 	 * Predicts which spatial SOM model will be active at time t+1 given the current input at time t.
 	 * To correctly be able to predict staying in the same state, the input has to be highly orthogonal. That is, one element == 1 and the rest == 0
-	 * @param inputMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
+	 * @param currentStateProbabilitiesMatrix matrix containing the probabilities that model (i,j) in the spatial som is the correct model for the input to the spatial pooler at time t.
 	 * @param curLearningRate
 	 * @param associate if this is true the association matrix will be updated. Should be false when learning is disabled
 	 * @return matrix[I x J] containing the probability that model (i,j) in the spatial som will be active at time t + 1.
 	 */
-	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate){
+	public SimpleMatrix predict(SimpleMatrix currentStateProbabilitiesMatrix, double curLearningRate, boolean associate){
 		
 		//Transform input matrix to vector of size IJ
-		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
-		inputVector.reshape(1, inputMatrix.numCols() * inputMatrix.numRows());
+		SimpleMatrix currentStateProbabilitiesVector = new SimpleMatrix(currentStateProbabilitiesMatrix);
+		currentStateProbabilitiesVector.reshape(1, currentStateProbabilitiesMatrix.numCols() * currentStateProbabilitiesMatrix.numRows());
 		
 		/*
 		System.out.println("Input vector before");
@@ -50,17 +50,17 @@ public class FirstOrderPredictor {
 		
 		//Association
 		if (associate){
-			association(inputVector, curLearningRate);
+			association(currentStateProbabilitiesVector, curLearningRate);
 		}
 		
 		//Prediction
-		SimpleMatrix output = prediction(inputVector);
+		SimpleMatrix output = prediction(currentStateProbabilitiesVector);
 		
 		//Transform outputVector to matrix
-		output.reshape(inputMatrix.numRows(), inputMatrix.numCols());		
+		output.reshape(currentStateProbabilitiesMatrix.numRows(), currentStateProbabilitiesMatrix.numCols());		
 		
 		//Save input vector
-		inputVectorBefore = inputVector;
+		inputVectorBefore = currentStateProbabilitiesVector;
 		
 		/*
 		System.out.println("Conditional prediction matrix");
@@ -77,15 +77,15 @@ public class FirstOrderPredictor {
 	
 	/**
 	 * Associates the current som activations with the som activations at time t-1
-	 * @param inputVector
+	 * @param currentStateProbabilitiesVector
 	 * @param curLearningRate
 	 */
-	private void association(SimpleMatrix inputVector, double curLearningRate){
-		for (int h = 0; h < inputVector.numCols(); h++){
-			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
+	private void association(SimpleMatrix currentStateProbabilitiesVector, double curLearningRate){
+		for (int h = 0; h < currentStateProbabilitiesVector.numCols(); h++){
+			double delta1 = inputVectorBefore.get(h) - currentStateProbabilitiesVector.get(h);
 			if (delta1 < 0) delta1 = 0;
-			for (int k = 0; k <inputVector.numCols(); k++){
-				double now = inputVector.get(k);
+			for (int k = 0; k <currentStateProbabilitiesVector.numCols(); k++){
+				double now = currentStateProbabilitiesVector.get(k);
 				double before = inputVectorBefore.get(k);
 				double delta2 = now - before;
 				if (delta2 < 0) delta2 = 0;
@@ -104,11 +104,11 @@ public class FirstOrderPredictor {
 	
 	/**
 	 * Predict the som activations at time t+1 given the current input 
-	 * @param inputVector
+	 * @param currentStateProbabilitiesVector
 	 * @return
 	 */
-	private SimpleMatrix prediction(SimpleMatrix inputVector){
-		SimpleMatrix outputVector = new SimpleMatrix(inputVector);
+	private SimpleMatrix prediction(SimpleMatrix currentStateProbabilitiesVector){
+		SimpleMatrix outputVector = new SimpleMatrix(currentStateProbabilitiesVector);
 		double sum = 0;
 		for (int k = 0; k < outputVector.numCols(); k++){
 			//Calculate P(W_k) = P(W_k | W_0) x P(W_0) +  P(W_k | W_1) x P(W_1) + ... + P(W_k | W_H) x P(W_H)
@@ -117,7 +117,7 @@ public class FirstOrderPredictor {
 			SimpleMatrix conditionalPropbVector = conditionalPredictionMatrix.extractVector(true, k);
 						
 			//Then multiply by P(W_h)
-			SimpleMatrix probabilityVector = conditionalPropbVector.elementMult(inputVector);
+			SimpleMatrix probabilityVector = conditionalPropbVector.elementMult(currentStateProbabilitiesVector);
 			
 			//Then calculate sum and add to outputVector
 			double tmp = probabilityVector.elementSum();

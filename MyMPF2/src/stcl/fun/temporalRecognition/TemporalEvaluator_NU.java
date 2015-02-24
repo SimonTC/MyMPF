@@ -23,15 +23,15 @@ public class TemporalEvaluator_NU {
 	    	//Choose sequence	    	
 	    	curSeqID = rand.nextInt(sequences.size());
 	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
-	    	
+	    	SimpleMatrix ffOUtput;
 	    	for (SimpleMatrix input : curSequence){
 	    		if (rand.nextDouble() < noise)  input = joker;
 
-	    		SimpleMatrix ffOUtput = nu.feedForward(input);
+	    		ffOUtput = nu.feedForward(input);
 	    		nu.feedBackward(ffOUtput);    		
 	    	}
 	    	
-	    	SomNode bmu = nu.getTemporalPooler().getRSOM().getBMU();
+	    	SomNode bmu = nu.findTemporalBMU();
 	    	int bmuLabel = bmu.getLabel();
 	    	int correctLabel = sequenceLabels[curSeqID];
 	    	if (bmuLabel != correctLabel) error++;

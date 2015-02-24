@@ -23,6 +23,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = false;
+	private boolean usePrediction = false;
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
 	private SimpleMatrix bigO;
@@ -183,7 +184,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		double activationCodingFactor_Temporal = 0.125;
 		double initialPredictionLearningRate = 1;
 		
-		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, true, decay);
+		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, decay);
 	}
 	
 	private void buildSequences(){

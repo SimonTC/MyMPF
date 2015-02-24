@@ -1,14 +1,17 @@
 package stcl.algo.brain;
 
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderPredictor;
 
-public class NeoCorticalUnit {
+public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
@@ -257,6 +260,22 @@ public class NeoCorticalUnit {
 	
 	public void setDebug(boolean debug){
 		DEBUG = debug;
+	}
+	
+	public SomNode findTemporalBMU(){
+		int maxID = -1;
+		double maxValue = Double.NEGATIVE_INFINITY;
+		
+		for (int i = 0; i < ffOutput.getNumElements(); i++){
+			double v = ffOutput.get(i);
+			if (v > maxValue){
+				maxValue = v;
+				maxID = i;
+			}
+		}
+		
+		SomNode bmu = temporalPooler.getRSOM().getNode(maxID);
+		return bmu;
 	}
 
 }

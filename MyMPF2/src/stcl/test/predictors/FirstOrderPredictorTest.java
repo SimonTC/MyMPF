@@ -97,7 +97,7 @@ public class FirstOrderPredictorTest {
 					System.out.println();
 				}
 			}
-			//curLearningRate = initialLearning * Math.exp(-(double) i / iterations);
+			curLearningRate = initialLearning * Math.exp(-(double) i / iterations);
 			if ( curLearningRate < 0.01) curLearningRate = 0.01;
 		}
 		return expectedTransferMatrix;

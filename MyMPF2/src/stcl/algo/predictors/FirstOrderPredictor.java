@@ -84,7 +84,6 @@ public class FirstOrderPredictor {
 		for (int h = 0; h < inputVector.numCols(); h++){
 			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
 			if (delta1 < 0) delta1 = 0;
-			double sum = 0;
 			for (int k = 0; k <inputVector.numCols(); k++){
 				double now = inputVector.get(k);
 				double before = inputVectorBefore.get(k);
@@ -94,16 +93,12 @@ public class FirstOrderPredictor {
 					delta1 = 1;
 					delta2 = 1;
 				}
-				double tmp = conditionalPredictionMatrix.get(k, h) + delta1 * delta2 * curLearningRate;
-				conditionalPredictionMatrix.set(k, h, tmp);
-				sum += tmp;
-			}
-			if (sum > 0){
-				SimpleMatrix column = conditionalPredictionMatrix.extractVector(false, h);
-				column = column.scale(1/sum);
-				conditionalPredictionMatrix.insertIntoThis(0, h, column);
-			}
+				double value = delta1 * delta2;
+				conditionalPredictionMatrix.addTransition(h, k, value);
+			}			
 		}
+		
+		conditionalPredictionMatrix.updateTransitionProbabilityMatrix(curLearningRate);
 
 	}
 	
@@ -146,7 +141,7 @@ public class FirstOrderPredictor {
 	}
 	
 	public SimpleMatrix getConditionalPredictionMatrix(){
-		return this.conditionalPredictionMatrix;
+		return this.conditionalPredictionMatrix.getTransitionProbabilityMatrix();
 	}
 
 }

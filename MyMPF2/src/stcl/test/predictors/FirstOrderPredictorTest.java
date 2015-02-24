@@ -97,7 +97,7 @@ public class FirstOrderPredictorTest {
 					System.out.println();
 				}
 			}
-			curLearningRate = initialLearning * Math.exp(-(double) i / iterations);
+			//curLearningRate = initialLearning * Math.exp(-(double) i / iterations);
 			if ( curLearningRate < 0.01) curLearningRate = 0.01;
 		}
 		return expectedTransferMatrix;
@@ -107,11 +107,11 @@ public class FirstOrderPredictorTest {
 	public void testPredict_ComplexSequence	() {
 		predictor = new FirstOrderPredictor(2);
 		//Sequence: 1 2 2 4 3 1 2 4 4 2
-		//SimpleMatrix[] sequence = {in1, in2, in2, in4, in3, in1, in2, in4, in4, in2};
+		SimpleMatrix[] sequence = {in1, in2, in2, in4, in3, in1, in2, in4, in4, in2};
 		
-		SimpleMatrix[] sequence = {in1, in2, in2, in4, in3};
+		//SimpleMatrix[] sequence = {in1, in2, in2, in4, in3};
 		
-		SimpleMatrix m = runSequence(sequence, 100000, false);
+		SimpleMatrix m = runSequence(sequence, 1000, false);
 		
 		
 		double[][] expectedTransitionProbabilities = {

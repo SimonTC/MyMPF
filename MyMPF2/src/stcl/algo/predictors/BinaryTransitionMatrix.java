@@ -24,16 +24,20 @@ public class BinaryTransitionMatrix {
 		this.memorySize = memorySize;
 	}
 	
-	public void addTransition(int fromState, int toState){
-		Transition removedTransition = null;
-		if (transitions.size() >= memorySize){
-			removedTransition = removeFirstTransition();			
+	/**
+	 * Adds the given transition to the short term memory if the value is > 0
+	 * @param fromState
+	 * @param toState
+	 * @param value
+	 */
+	public void addTransition(int fromState, int toState, double value){
+		if (value > 0){
+			if (transitions.size() >= memorySize){
+				removeFirstTransition();			
+			}
+			
+			addNewTransition(fromState, toState, value);	
 		}
-		
-		Transition newTransition = addNewTransition(fromState, toState);
-		
-		updateTransitionrobabilityMatrix(removedTransition, newTransition);
-		
 	}
 	
 	private Transition removeFirstTransition(){
@@ -46,12 +50,12 @@ public class BinaryTransitionMatrix {
 		return oldTransition;
 	}
 	
-	private Transition addNewTransition(int fromState, int toState){
-		Transition newTransition = new Transition(fromState, toState);
+	private Transition addNewTransition(int fromState, int toState, double value){
+		Transition newTransition = new Transition(toState, fromState, value);
 		transitions.addLast(newTransition);
-		double value = transitionCount.get(fromState, toState);
-		value += newTransition.getValue();
-		transitionCount.set(fromState, toState, value);
+		double oldCountValue = transitionCount.get(toState, fromState);
+		double newCountValue = oldCountValue +  newTransition.getValue();
+		transitionCount.set(toState, fromState, newCountValue);
 		return newTransition;
 	}
 	
@@ -60,27 +64,30 @@ public class BinaryTransitionMatrix {
 	 * @param removedTransition
 	 * @param newTransition
 	 */
-	private void updateTransitionrobabilityMatrix(Transition removedTransition, Transition newTransition){
-		int newColumn = newTransition.getFromState();
-		
-		updateProbabilityColumn(newColumn);
-		
-		if (removedTransition != null){
-			int oldColumn = removedTransition.getFromState();
-			if (newColumn != oldColumn){
-				updateProbabilityColumn(oldColumn);
-			}
-		}		
+	public void updateTransitionProbabilityMatrix(double learningRate){
+		SimpleMatrix delta = new SimpleMatrix(transitionCount);
+		normalizeColumns(delta);
+		for (int i = 0; i < delta.getNumElements(); i++){
+			double d = delta.get(i) - transitionProbability.get(i);
+			if (d < 0) d = 0;
+			delta.set(i, d);
+		}
+		//delta = delta.minus(transitionProbability);
+		delta = delta.scale(learningRate);
+		transitionProbability = transitionProbability.plus(delta);
+		normalizeColumns(transitionProbability);
 	}
 	
-	private void updateProbabilityColumn(int columnID){
-		SimpleMatrix column = transitionCount.extractVector(false, columnID);
-		double sum = column.elementSum();
-		if (sum != 0) column = column.divide(sum);
-		transitionProbability.setColumn(columnID, 0, column.getMatrix().data);
+	private void normalizeColumns(SimpleMatrix m){
+		for (int col = 0; col < m.numCols(); col++){
+			SimpleMatrix column = m.extractVector(false, col);
+			double sum = column.elementSum();
+			if (sum != 0) column = column.divide(sum);
+			m.setColumn(col, 0, column.getMatrix().data);
+		}
 	}
 	
-	public SimpleMatrix getTransitionrobabilityMatrix(){
+	public SimpleMatrix getTransitionProbabilityMatrix(){
 		return transitionProbability;
 	}
 	
@@ -88,11 +95,11 @@ public class BinaryTransitionMatrix {
 		private int fromState, toState;
 		private double value;
 		
-		public Transition(int fromState, int toState){
+		public Transition(int toState, int fromState){
 			this(fromState, toState, 1);
 		}
 		
-		public Transition(int fromState, int toState, double value){
+		public Transition(int toState, int fromState, double value){
 			this.fromState = fromState;
 			this.toState = toState;
 			this.value = value;
@@ -110,6 +117,11 @@ public class BinaryTransitionMatrix {
 			return value;
 		}
 		
+	}
+
+	public SimpleMatrix extractVector(boolean extractRow , int element) {
+		SimpleMatrix vector = transitionProbability.extractVector(extractRow, element);
+		return vector;
 	}
 
 }

@@ -182,7 +182,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		double stdDev_temporal = 2;
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor_Temporal = 0.125;
-		double initialPredictionLearningRate = 1;
+		double initialPredictionLearningRate = 0.5;
 		
 		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, decay);
 	}

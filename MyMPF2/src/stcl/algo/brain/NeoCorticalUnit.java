@@ -168,6 +168,7 @@ public class NeoCorticalUnit{
 			if (DEBUG)predictionMatrix.print();
 			if (DEBUG)System.out.println();
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
+			biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
 			//Normalize
 			if (DEBUG)System.out.println("Bias matrix, not normalized");
@@ -206,8 +207,9 @@ public class NeoCorticalUnit{
 	 */
 	private SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
 		
-		//return orthogonalization_AsInSomActivation(m);
+		return orthogonalization_NormDist(m);
 		
+		/*
 		int maxID = -1;
 		int id = 0;
 		double max = Double.NEGATIVE_INFINITY;
@@ -225,7 +227,7 @@ public class NeoCorticalUnit{
 		SimpleMatrix orthogonalized = new SimpleMatrix(m.numRows(), m.numCols());
 		orthogonalized.set(maxID, 1);
 		return orthogonalized;
-		
+		*/
 	
 	}
 	
@@ -241,24 +243,31 @@ public class NeoCorticalUnit{
 	private SimpleMatrix orthogonalization_NormDist(SimpleMatrix m){
 		double mean = 1;
 		double stddev = 0.1; //TODO: make to parameter
+		double maxInput = m.elementMaxAbs();
 		SimpleMatrix o = m.minus(mean);
 		o = o.elementPower(2);
 		o = o.divide(-2 * Math.pow(stddev, 2));
 		o = o.elementExp();
 		o = o.scale(1 / stddev * Math.sqrt(2 * Math.PI));
 		
+		double maxValue = o.elementMaxAbs();
+		if (maxInput > 0.7){
+			maxValue = gaussValue(1, mean, stddev);
+		}
+		
+		o = o.divide(maxValue);
+		
 		return o;
 	}
 	
-	/*
-	private double gaussValue(double x){ //TODO: rename
-		double mean = 1;
-		double stddev = 0.1; //TODO: make to parameter
+	
+	private double gaussValue(double x, double mean, double stddev){ //TODO: rename
 		
-		double v = 1 / (stddev * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((x - mean),2) / 2 * Math.pow(stddev, 2);
+		double v = 1 / (stddev * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((x - mean),2) / 2 * Math.pow(stddev, 2));
+		return v;
 	}
 	
-	*/
+	
 	
 	
 	public void flushTemporalMemory(){

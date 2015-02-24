@@ -6,7 +6,8 @@ public class Orthogonalizer {
 	
 	public static SimpleMatrix orthogonalize(SimpleMatrix m){
 		//return aggressiveOrthogonalization(m);
-		return orthogonalization_AsOriginalPaper(m);
+		//return orthogonalization_AsOriginalPaper(m);
+		return orthogonalization_NormDist2(m);
 	}
 	
 	private static SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
@@ -67,6 +68,18 @@ public class Orthogonalizer {
 		
 		double v = 1 / (stddev * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((x - mean),2) / 2 * Math.pow(stddev, 2));
 		return v;
+	}
+	
+	private static SimpleMatrix orthogonalization_NormDist2(SimpleMatrix m){
+		double mean = 1;
+		double stddev = 0.1; //TODO: make to parameter
+		SimpleMatrix o = m.minus(mean);
+		o = o.elementPower(2);
+		o = o.divide(-2 * Math.pow(stddev, 2));
+		o = o.elementExp();
+		o = o.scale(1 / stddev * Math.sqrt(2 * Math.PI));
+		
+		return o;
 	}
 
 }

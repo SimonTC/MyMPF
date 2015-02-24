@@ -5,9 +5,9 @@ import org.ejml.simple.SimpleMatrix;
 public class Orthogonalizer {
 	
 	public static SimpleMatrix orthogonalize(SimpleMatrix m){
-		//return aggressiveOrthogonalization(m);
+		return aggressiveOrthogonalization(m);
 		//return orthogonalization_AsOriginalPaper(m);
-		return orthogonalization_NormDist2(m);
+		//return orthogonalization_NormDist2(m);
 	}
 	
 	private static SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){

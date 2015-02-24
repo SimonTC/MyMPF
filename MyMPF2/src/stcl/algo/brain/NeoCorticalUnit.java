@@ -205,6 +205,9 @@ public class NeoCorticalUnit{
 	 * @return
 	 */
 	private SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
+		
+		//return orthogonalization_AsInSomActivation(m);
+		
 		int maxID = -1;
 		int id = 0;
 		double max = Double.NEGATIVE_INFINITY;
@@ -222,8 +225,41 @@ public class NeoCorticalUnit{
 		SimpleMatrix orthogonalized = new SimpleMatrix(m.numRows(), m.numCols());
 		orthogonalized.set(maxID, 1);
 		return orthogonalized;
+		
 	
 	}
+	
+	private SimpleMatrix orthogonalization_AsInSomActivation(SimpleMatrix m){
+		
+		SimpleMatrix orthogonalized = m.elementPower(2);
+		orthogonalized = orthogonalized.divide(-0.01 * Math.pow(0.5, 2));
+		orthogonalized = orthogonalized.elementExp();
+		return orthogonalized;
+		
+	}
+	
+	private SimpleMatrix orthogonalization_NormDist(SimpleMatrix m){
+		double mean = 1;
+		double stddev = 0.1; //TODO: make to parameter
+		SimpleMatrix o = m.minus(mean);
+		o = o.elementPower(2);
+		o = o.divide(-2 * Math.pow(stddev, 2));
+		o = o.elementExp();
+		o = o.scale(1 / stddev * Math.sqrt(2 * Math.PI));
+		
+		return o;
+	}
+	
+	/*
+	private double gaussValue(double x){ //TODO: rename
+		double mean = 1;
+		double stddev = 0.1; //TODO: make to parameter
+		
+		double v = 1 / (stddev * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((x - mean),2) / 2 * Math.pow(stddev, 2);
+	}
+	
+	*/
+	
 	
 	public void flushTemporalMemory(){
 		temporalPooler.flushTemporalMemory();

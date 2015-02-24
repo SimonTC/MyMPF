@@ -23,7 +23,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = false;
-	private boolean usePrediction = false;
+	private boolean usePrediction = true;
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
 	private SimpleMatrix bigO;

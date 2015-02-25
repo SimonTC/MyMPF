@@ -2,19 +2,25 @@ package stcl.algo.predictors;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class CopyOfFirstOrderPredictor {
+import stcl.algo.util.Normalizer;
+
+public class FirstOrderMM_Original {
 
 	private SimpleMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;
 	
 	private SimpleMatrix inputVectorBefore;
+	private double decay;
 
-	public CopyOfFirstOrderPredictor(int inputMatrixSize) {
+	public FirstOrderMM_Original(int inputMatrixSize) {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
-		//conditionalPredictionMatrix.set(1); //Initialize to 1. 
-											//TODO: Does this make sense?
+		conditionalPredictionMatrix.set(1); //Initialize to 1. 
+		Normalizer.normalize(conditionalPredictionMatrix);
+		
+		this.decay = 0.95; //TODO: Move to parameter. This decay is used in original paper
+											
 	} 
 	
 	/**
@@ -38,20 +44,10 @@ public class CopyOfFirstOrderPredictor {
 		//Transform input matrix to vector of size IJ
 		SimpleMatrix inputVector = new SimpleMatrix(inputMatrix);
 		inputVector.reshape(1, inputMatrix.numCols() * inputMatrix.numRows());
-		
-		/*
-		System.out.println("Input vector before");
-		inputVectorBefore.print();
-		System.out.println();
-		
-		
-		System.out.println("Input vector now");
-		inputVector.print();
-		System.out.println();
-		*/
-		
+
 		//Association
 		if (associate){
+			decay();
 			association(inputVector, curLearningRate);
 		}
 		
@@ -86,22 +82,21 @@ public class CopyOfFirstOrderPredictor {
 		for (int h = 0; h < inputVector.numCols(); h++){
 			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
 			if (delta1 < 0) delta1 = 0;
-			double sum = 0;
-			for (int k = 0; k <inputVector.numCols(); k++){
+			for (int k = 0; k <inputVector.numRows(); k++){
+				
+				if (k == h) continue; //We skip if transisitons are between same state
 				double now = inputVector.get(k);
 				double before = inputVectorBefore.get(k);
 				double delta2 = now - before;
 				if (delta2 < 0) delta2 = 0;
+				
 				double tmp = conditionalPredictionMatrix.get(k, h) + delta1 * delta2 * curLearningRate;
 				conditionalPredictionMatrix.set(k, h, tmp);
-				sum += tmp;
 			}
-			if (sum > 0){
-				SimpleMatrix column = conditionalPredictionMatrix.extractVector(false, h);
-				column = column.scale(1/sum);
-				conditionalPredictionMatrix.insertIntoThis(0, h, column);
-			}
+
 		}
+		
+		Normalizer.normalizeColumns(conditionalPredictionMatrix);
 
 	}
 	
@@ -145,6 +140,15 @@ public class CopyOfFirstOrderPredictor {
 	
 	public SimpleMatrix getConditionalPredictionMatrix(){
 		return this.conditionalPredictionMatrix;
+	}
+	
+	/**
+	 * Decays the conditional prediction matrix with the given decay value
+	 * @param decay
+	 */
+	private void decay(){
+		conditionalPredictionMatrix.scale(decay);
+		Normalizer.normalizeColumns(conditionalPredictionMatrix);
 	}
 
 }

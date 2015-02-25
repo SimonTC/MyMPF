@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.som.ISOM;
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.predictors.CopyOfFirstOrderPredictor;
+import stcl.algo.predictors.FirstOrderMM_Original;
 import stcl.algo.predictors.FirstOrderPredictor;
 
 public class Demo {
@@ -23,7 +23,7 @@ public class Demo {
 		
 		SpatialPooler pooler = new SpatialPooler(rand, 3, 10, 0.1, 2, 0.125);
 		//FirstOrderPredictor predictor = new FirstOrderPredictor(10);
-		CopyOfFirstOrderPredictor predictor = new CopyOfFirstOrderPredictor(10);
+		FirstOrderMM_Original predictor = new FirstOrderMM_Original(10);
 		
 		red = 0;
 		green = 0;

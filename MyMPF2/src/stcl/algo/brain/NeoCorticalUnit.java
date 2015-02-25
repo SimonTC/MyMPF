@@ -10,6 +10,7 @@ import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderPredictor;
+import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
 public class NeoCorticalUnit{
@@ -149,9 +150,8 @@ public class NeoCorticalUnit{
 	}
 	
 	private SimpleMatrix normalize(SimpleMatrix m){
-		double sum = m.elementSum();
-		SimpleMatrix normalized = m.scale(1/sum);
-		return normalized;
+		Normalizer.normalize(m);
+		return m;
 	}
 	
 	/**

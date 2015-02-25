@@ -70,49 +70,19 @@ public class NeoCorticalUnit{
 		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
-		if (DEBUG) System.out.println("****************************** FF start *************************");
-		
-		if (DEBUG)System.out.println("FF input");
-		if (DEBUG)inputVector.print();
-		if (DEBUG)System.out.println();
-		
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
 		
-		if (DEBUG)System.out.println("Likelihood that SOM model ij is best to describe the current input");
-		if (DEBUG)spatialFFOutputMatrix.print();
-		if (DEBUG)System.out.println();
-		
-		//Bias output by the prediction from t-1
-		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix.elementMult(biasMatrix);	
-		
-		if (DEBUG)System.out.println("Bias matrix");
-		if (DEBUG)biasMatrix.print();
-		if (DEBUG)System.out.println();
-		
-		//Normalize output
-		double sum = spatialFFOutputMatrixBiased.elementSum();
-		spatialFFOutputMatrixBiased = spatialFFOutputMatrixBiased.scale(1/sum);
-		
-		if (DEBUG)System.out.println("Biased Likelihood that SOM model ij is best to describe the current input");
-		if (DEBUG)spatialFFOutputMatrixBiased.print();
-		if (DEBUG)System.out.println();
-		
 		//Orthogonalize output
-		SimpleMatrix spatialFFOutputMatrixOrthogonalized =  aggressiveOrthogonalization(spatialFFOutputMatrixBiased);
-		
-		if (DEBUG)System.out.println("Orthogonalized biased Likelihood that SOM model ij is best to describe the current input");
-		if (DEBUG)spatialFFOutputMatrixOrthogonalized.print();
-		if (DEBUG)System.out.println();
+		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrix);
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			SimpleMatrix tmp = aggressiveOrthogonalization(spatialFFOutputMatrix);
-			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning);
+			predictionMatrix = predictor.predict(spatialFFOutputOrthogonalized, curPredictionLearningRate, learning);
 		} 		
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = spatialFFOutputMatrixOrthogonalized.getMatrix().data;		
+		double[] spatialFFOutputDataVector = spatialFFOutputOrthogonalized.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
@@ -120,14 +90,6 @@ public class NeoCorticalUnit{
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
 		
 		ffOutput = temporalFFOutputMatrix;
-		
-		if (DEBUG)System.out.println("Likelihood that we currently are in sequence hk");
-		if (DEBUG)ffOutput.print();
-		if (DEBUG)System.out.println();
-		
-		if (DEBUG)System.out.println();
-		if (DEBUG)System.out.println("****************************** FF end *************************");
-		if (DEBUG)System.out.println();
 		
 		return ffOutput;
 	}
@@ -142,56 +104,42 @@ public class NeoCorticalUnit{
 		//Test input
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
-		
-		if (DEBUG)System.out.println("****************************** FB start *************************");
-		
-		if (DEBUG)System.out.println("FB input");
-		if (DEBUG)inputMatrix.print();
-		if (DEBUG)System.out.println();
+
+		//Normalize
+		SimpleMatrix normalizedInput = normalize(inputMatrix);
 		
 		//Selection of best temporal model
-		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(inputMatrix);
+		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(normalizedInput);
+		
+		//Add noise
+		 //Happens in pooler
+		
+		//Normalize
+		SimpleMatrix normalizedTemporalPoolerFBOutput = normalize(temporalPoolerFBOutput);
 		
 		//Transformation into matrix
-		temporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize);
-
-		if (DEBUG)System.out.println("Likelihood that the next input is best described by model ij given that we are in sequence k");
-		if (DEBUG)temporalPoolerFBOutput.print();
-		if (DEBUG)System.out.println();
-
+		normalizedTemporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
 		
 		//Combine FB output from temporal pooler with bias and prediction (if enabled)
-		SimpleMatrix biasedTemporalFBOutput = temporalPoolerFBOutput;
+		SimpleMatrix biasedTemporalFBOutput = normalizedTemporalPoolerFBOutput;
 		
 		if (useMarkovPrediction){
 			biasMatrix = biasedTemporalFBOutput;
-			if (DEBUG)System.out.println("Prediction matrix");
-			if (DEBUG)predictionMatrix.print();
-			if (DEBUG)System.out.println();
+
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 			biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
-			//Normalize
-			if (DEBUG)System.out.println("Bias matrix, not normalized");
-			if (DEBUG)biasMatrix.print();
-			if (DEBUG)System.out.println();
+			SimpleMatrix biasMatrixNormalized = normalize(biasMatrix);
+
 			
-			double sum = biasMatrix.elementSum();
-			biasMatrix = biasMatrix.scale(1/sum);
-			
-			if (DEBUG)System.out.println("Bias matrix, normalized");
-			if (DEBUG)biasMatrix.print();
-			if (DEBUG)System.out.println();
-			
-			biasedTemporalFBOutput = biasMatrix;
+			biasedTemporalFBOutput = biasMatrixNormalized;
 		} 		
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
 		
-		if (DEBUG)System.out.println("Expected input next step");
-		if (DEBUG)spatialPoolerFBOutputVector.print();
-		if (DEBUG)System.out.println();
+		//Add noise
+			//Happens in pooler
 		
 		fbOutput = spatialPoolerFBOutputVector;
 		
@@ -200,13 +148,19 @@ public class NeoCorticalUnit{
 		return fbOutput;
 	}
 	
+	private SimpleMatrix normalize(SimpleMatrix m){
+		double sum = m.elementSum();
+		SimpleMatrix normalized = m.scale(1/sum);
+		return normalized;
+	}
+	
 	/**
 	 * Orthgonalizes the matrix by setting all values to zero except for the highest value
 	 * Only works with matrices containing non-negative values
 	 * @param m
 	 * @return
 	 */
-	private SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
+	private SimpleMatrix orthogonalize(SimpleMatrix m){
 		
 		return Orthogonalizer.orthogonalize(m);
 		

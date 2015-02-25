@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.util.Normalizer;
+
 /**
  * This class is used by the predictors to keep track of transitions.
  * The binary trasition matrix only work with binary transitions, and only when there is one significant transition pr. tick
@@ -13,13 +15,13 @@ import org.ejml.simple.SimpleMatrix;
 public class BinaryTransitionMatrix {
 	
 	private SimpleMatrix transitionCount;
-	private SimpleMatrix transitionProbability;
+	private SimpleMatrix transitionProbabilityMatrix;
 	private LinkedList<Transition> transitions;
 	private int memorySize;
 
 	public BinaryTransitionMatrix(int inputMatrixSize, int memorySize) {
 		transitionCount = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
-		transitionProbability = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
+		transitionProbabilityMatrix = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
 		transitions = new LinkedList<>();
 		this.memorySize = memorySize;
 	}
@@ -66,29 +68,22 @@ public class BinaryTransitionMatrix {
 	 */
 	public void updateTransitionProbabilityMatrix(double learningRate){
 		SimpleMatrix delta = new SimpleMatrix(transitionCount);
-		normalizeColumns(delta);
+		Normalizer.normalizeColumns(delta);
 		for (int i = 0; i < delta.getNumElements(); i++){
-			double d = delta.get(i) - transitionProbability.get(i);
+			double d = delta.get(i) - transitionProbabilityMatrix.get(i);
 			if (d < 0) d = 0;
 			delta.set(i, d);
 		}
 		//delta = delta.minus(transitionProbability);
 		delta = delta.scale(learningRate);
-		transitionProbability = transitionProbability.plus(delta);
-		normalizeColumns(transitionProbability);
+		transitionProbabilityMatrix = transitionProbabilityMatrix.plus(delta);
+		Normalizer.normalizeColumns(transitionProbabilityMatrix);
 	}
 	
-	private void normalizeColumns(SimpleMatrix m){
-		for (int col = 0; col < m.numCols(); col++){
-			SimpleMatrix column = m.extractVector(false, col);
-			double sum = column.elementSum();
-			if (sum != 0) column = column.divide(sum);
-			m.setColumn(col, 0, column.getMatrix().data);
-		}
-	}
+
 	
 	public SimpleMatrix getTransitionProbabilityMatrix(){
-		return transitionProbability;
+		return transitionProbabilityMatrix;
 	}
 	
 	private class Transition{
@@ -120,8 +115,13 @@ public class BinaryTransitionMatrix {
 	}
 
 	public SimpleMatrix extractVector(boolean extractRow , int element) {
-		SimpleMatrix vector = transitionProbability.extractVector(extractRow, element);
+		SimpleMatrix vector = transitionProbabilityMatrix.extractVector(extractRow, element);
 		return vector;
+	}
+	
+	public void decayProbabilityMatrix(double decay){
+		transitionProbabilityMatrix = transitionProbabilityMatrix.scale(decay);
+		Normalizer.normalizeColumns(transitionProbabilityMatrix);
 	}
 
 }

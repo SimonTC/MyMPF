@@ -23,7 +23,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = false;
-	private boolean usePrediction = true;
+	private boolean usePrediction = false;
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
 	private SimpleMatrix bigO;
@@ -54,7 +54,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		//Label
 		int[] labels = createLabels();
 		TemporalLabeler_NU labeler = new TemporalLabeler_NU();
-		labeler.label(nu, sequences, labels);
+		labeler.label(nu, sequences, labels, true);
 		
 		//Evaluate
 		double noise = 0.0;

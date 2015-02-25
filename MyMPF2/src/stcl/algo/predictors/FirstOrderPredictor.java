@@ -6,13 +6,14 @@ public class FirstOrderPredictor {
 
 	private BinaryTransitionMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;
-	
+	private double decayFactor;
 	private SimpleMatrix inputVectorBefore;
 
 	public FirstOrderPredictor(int inputMatrixSize) {
 		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new BinaryTransitionMatrix(predictionMatrixSize, 100); //TODO: Move to parameter
+		this.decayFactor = 0.95; //TODO: Set as parameter. Parameter taken form original predictor code
 	} 
 	
 	/**
@@ -37,19 +38,9 @@ public class FirstOrderPredictor {
 		SimpleMatrix currentStateProbabilitiesVector = new SimpleMatrix(currentStateProbabilitiesMatrix);
 		currentStateProbabilitiesVector.reshape(1, currentStateProbabilitiesMatrix.numCols() * currentStateProbabilitiesMatrix.numRows());
 		
-		/*
-		System.out.println("Input vector before");
-		inputVectorBefore.print();
-		System.out.println();
-		
-		
-		System.out.println("Input vector now");
-		inputVector.print();
-		System.out.println();
-		*/
-		
 		//Association
 		if (associate){
+			conditionalPredictionMatrix.decayProbabilityMatrix(decayFactor);
 			association(currentStateProbabilitiesVector, curLearningRate);
 		}
 		
@@ -61,15 +52,7 @@ public class FirstOrderPredictor {
 		
 		//Save input vector
 		inputVectorBefore = currentStateProbabilitiesVector;
-		
-		/*
-		System.out.println("Conditional prediction matrix");
-		conditionalPredictionMatrix.print();
-		System.out.println();
-		
-		System.out.println("*************************************************************");
-		System.out.println();
-		*/
+
 		
 		//Return output
 		return output;

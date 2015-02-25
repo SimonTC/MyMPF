@@ -9,6 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.predictors.FirstOrderMM_Original;
 import stcl.algo.predictors.FirstOrderPredictor;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
@@ -18,6 +19,7 @@ public class NeoCorticalUnit{
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
 	private FirstOrderPredictor predictor;
+	//FirstOrderMM_Original predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	

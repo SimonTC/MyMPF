@@ -25,9 +25,9 @@ public class Demo {
 		//FirstOrderPredictor predictor = new FirstOrderPredictor(10);
 		FirstOrderMM_Original predictor = new FirstOrderMM_Original(10);
 		
-		red = 0;
-		green = 0;
-		blue = 0;
+		red = rand.nextDouble();
+		green = rand.nextDouble();
+		blue = rand.nextDouble();
 		
 		double[] predictedColor = null;
 		double initialLearning = 1;
@@ -44,9 +44,10 @@ public class Demo {
 			double[][] inputData = {currentColor};
 			SimpleMatrix input = new SimpleMatrix(inputData);
 			
+			
+			
 			SimpleMatrix ffOutput = pooler.feedForward(input, false);
-			double sum = ffOutput.elementSum();
-			ffOutput = ffOutput.divide(sum);
+			
 			SimpleMatrix predictionMatrix = predictor.predict(ffOutput, curLearningRate, true);
 			
 			predictedColor = nextColor(predictionMatrix, pooler);
@@ -81,14 +82,13 @@ public class Demo {
 	}
 	
 	private double distance(double[] prediction, double[] actual){
-		double[][] pred = {prediction};
-		double[][] act = {actual};
+		double dist = 0.0;
 		
-		SimpleMatrix predMatrix = new SimpleMatrix(pred);
-		SimpleMatrix actMatrix = new SimpleMatrix(act);
+		for (int i = 0 ; i < prediction.length; i++){
+			dist += Math.abs(prediction[i] - actual[i]);
+		}
 		
-		SimpleMatrix diff = predMatrix.minus(actMatrix);
-		double dist = diff.normF();
+		dist = dist / prediction.length;
 		
 		return dist;
 	}

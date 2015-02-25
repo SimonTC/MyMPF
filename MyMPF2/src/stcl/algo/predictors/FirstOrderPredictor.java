@@ -2,7 +2,7 @@ package stcl.algo.predictors;
 
 import org.ejml.simple.SimpleMatrix;
 
-public class FirstOrderPredictor {
+public class FirstOrderPredictor implements Predictor{
 
 	private BinaryTransitionMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;

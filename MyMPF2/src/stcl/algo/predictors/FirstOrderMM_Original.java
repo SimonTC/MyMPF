@@ -4,7 +4,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
 
-public class FirstOrderMM_Original {
+public class FirstOrderMM_Original implements Predictor {
 
 	private SimpleMatrix conditionalPredictionMatrix;
 	private int predictionMatrixSize;
@@ -17,7 +17,7 @@ public class FirstOrderMM_Original {
 		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
 		conditionalPredictionMatrix = new SimpleMatrix(predictionMatrixSize, predictionMatrixSize);
 		conditionalPredictionMatrix.set(1); //Initialize to 1. 
-		Normalizer.normalize(conditionalPredictionMatrix);
+		conditionalPredictionMatrix = Normalizer.normalize(conditionalPredictionMatrix);
 		
 		this.decay = 0.95; //TODO: Move to parameter. This decay is used in original paper
 											
@@ -79,12 +79,13 @@ public class FirstOrderMM_Original {
 	 * @param curLearningRate
 	 */
 	private void association(SimpleMatrix inputVector, double curLearningRate){
-		for (int h = 0; h < inputVector.numCols(); h++){
+		int numberOfModels = inputVector.numCols();
+		for (int h = 0; h < numberOfModels; h++){
 			double delta1 = inputVectorBefore.get(h) - inputVector.get(h);
 			if (delta1 < 0) delta1 = 0;
-			for (int k = 0; k <inputVector.numRows(); k++){
+			for (int k = 0; k <numberOfModels; k++){ 
 				
-				if (k == h) continue; //We skip if transisitons are between same state
+				if (k == h) continue; //We skip if transitions are between same state
 				double now = inputVector.get(k);
 				double before = inputVectorBefore.get(k);
 				double delta2 = now - before;
@@ -96,7 +97,7 @@ public class FirstOrderMM_Original {
 
 		}
 		
-		Normalizer.normalizeColumns(conditionalPredictionMatrix);
+		conditionalPredictionMatrix = Normalizer.normalizeColumns(conditionalPredictionMatrix);
 
 	}
 	
@@ -125,15 +126,7 @@ public class FirstOrderMM_Original {
 		}
 		
 		//Normalize output vector
-		if (sum == 0){ //With no prior knowledge everything is possible
-			outputVector.set(1);
-			sum = outputVector.elementSum();
-		}
-		
-		outputVector = outputVector.scale(1/sum);
-			
-			
-		
+		outputVector = Normalizer.normalize(outputVector);	
 		
 		return outputVector;		
 	}
@@ -148,7 +141,7 @@ public class FirstOrderMM_Original {
 	 */
 	private void decay(){
 		conditionalPredictionMatrix.scale(decay);
-		Normalizer.normalizeColumns(conditionalPredictionMatrix);
+		conditionalPredictionMatrix = Normalizer.normalizeColumns(conditionalPredictionMatrix);
 	}
 
 }

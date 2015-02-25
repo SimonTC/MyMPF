@@ -68,7 +68,7 @@ public class BinaryTransitionMatrix {
 	 */
 	public void updateTransitionProbabilityMatrix(double learningRate){
 		SimpleMatrix delta = new SimpleMatrix(transitionCount);
-		Normalizer.normalizeColumns(delta);
+		delta = Normalizer.normalizeColumns(delta);
 		for (int i = 0; i < delta.getNumElements(); i++){
 			double d = delta.get(i) - transitionProbabilityMatrix.get(i);
 			if (d < 0) d = 0;
@@ -77,7 +77,7 @@ public class BinaryTransitionMatrix {
 		//delta = delta.minus(transitionProbability);
 		delta = delta.scale(learningRate);
 		transitionProbabilityMatrix = transitionProbabilityMatrix.plus(delta);
-		Normalizer.normalizeColumns(transitionProbabilityMatrix);
+		transitionProbabilityMatrix = Normalizer.normalizeColumns(transitionProbabilityMatrix);
 	}
 	
 
@@ -121,7 +121,7 @@ public class BinaryTransitionMatrix {
 	
 	public void decayProbabilityMatrix(double decay){
 		transitionProbabilityMatrix = transitionProbabilityMatrix.scale(decay);
-		Normalizer.normalizeColumns(transitionProbabilityMatrix);
+		transitionProbabilityMatrix = Normalizer.normalizeColumns(transitionProbabilityMatrix);
 	}
 
 }

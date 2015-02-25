@@ -11,6 +11,7 @@ import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.predictors.Predictor;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class TemporalRecognition_NeocorticalUnit {
@@ -24,6 +25,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = false;
 	private boolean usePrediction = true;
+	private boolean evaluate = true;
 	private SimpleMatrix bigT;
 	private SimpleMatrix smallO;
 	private SimpleMatrix bigO;
@@ -31,7 +33,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private SimpleMatrix blank;
 	private SimpleMatrix joker;
 	
-	int FRAMES_PER_SECOND = 10;
+	int FRAMES_PER_SECOND = 1;
     int SKIP_TICKS = 1000 / FRAMES_PER_SECOND;
 	
 	public static void main(String[] args){
@@ -56,22 +58,25 @@ public class TemporalRecognition_NeocorticalUnit {
 		TemporalLabeler_NU labeler = new TemporalLabeler_NU();
 		labeler.label(nu, sequences, labels, true);
 		
+		if (evaluate){
 		//Evaluate
-		double noise = 0.0;
-		for (int i = 0; i < 100; i++){
-			//nu.setDebug(true);
-			TemporalEvaluator_NU evaluator = new TemporalEvaluator_NU();
-			double fitness = evaluator.evaluate(nu, sequences, labels, joker, noise, 1000, rand);			
-			System.out.println("Fitness: " + fitness);
-			noise += 0.01;
+			double noise = 0.0;
+			for (int i = 0; i < 100; i++){
+				//nu.setDebug(true);
+				TemporalEvaluator_NU evaluator = new TemporalEvaluator_NU();
+				double fitness = evaluator.evaluate(nu, sequences, labels, joker, noise, 1000, rand);			
+				System.out.println("Fitness: " + fitness);
+				noise += 0.01;
+			}
 		}
 		System.out.println();
 		System.out.println("RSOM labels");
 		nu.getTemporalPooler().getRSOM().printLabelMap();
 		
-		/*
+		
 		//Print models
 	    System.out.println("SOM models:");
+	    SpatialPooler spatialPooler = nu.getSpatialPooler();
 	    for (SomNode n : spatialPooler.getSOM().getNodes()){
 	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
 	    	vector.reshape(5,5);
@@ -81,6 +86,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	    }
 	    
 	    System.out.println("Rsom models:");
+	    TemporalPooler temporalPooler = nu.getTemporalPooler();
 	    System.out.println();
 	    for (SomNode n : temporalPooler.getRSOM().getNodes()){
 	    	SimpleMatrix vector = new SimpleMatrix(n.getVector());
@@ -89,8 +95,14 @@ public class TemporalRecognition_NeocorticalUnit {
 	    	System.out.println(vector.elementSum());
 	    	System.out.println();
 	    }
+	    
+		System.out.println("Transition probabilities:");
+	    Predictor predictor = nu.getPredictor();
+		SimpleMatrix transitionProbabilities = predictor.getConditionalPredictionMatrix();
+		transitionProbabilities.print();
+		System.out.println();
 
-		*/
+		
 		if (VISUALIZE_RESULT){
 			nu.flushTemporalMemory();
 			nu.setLearning(false);
@@ -113,7 +125,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	    
 	    for (int i = 0; i < maxIterations; i++){
 	    	//Flush memory
-	    	nu.flushTemporalMemory();
+	    	//nu.flushTemporalMemory();
 	    	
 	    	//Choose sequence	    	
 	    	curSeqID = rand.nextInt(sequences.size());
@@ -121,7 +133,17 @@ public class TemporalRecognition_NeocorticalUnit {
 	    	
 	    	for (SimpleMatrix input : curSequence){
 	    		SimpleMatrix ffOUtput = nu.feedForward(input);
-	    		nu.feedBackward(ffOUtput);
+	    		SimpleMatrix fbOUtput = nu.feedBackward(ffOUtput);
+	    		
+	    		
+	    		/*
+	    		Predictor predictor = nu.getPredictor();
+	    		SimpleMatrix transitionProbabilities = predictor.getConditionalPredictionMatrix();
+	    		
+	    		System.out.println("Transition probabilities:");
+	    		transitionProbabilities.print();
+	    		System.out.println();
+	    		*/
 	    		
 	    		if (visualize){
 		    		//Update graphics
@@ -220,10 +242,10 @@ public class TemporalRecognition_NeocorticalUnit {
 		sequences.add(seq7);
 		sequences.add(seq8);
 		
-		sequences.add(seq9);
-		sequences.add(seq10);
-		sequences.add(seq11);
-		sequences.add(seq12);
+		//sequences.add(seq9);
+		//sequences.add(seq10);
+		//sequences.add(seq11);
+		//sequences.add(seq12);
 		
 		//sequences.add(seq13);
 		

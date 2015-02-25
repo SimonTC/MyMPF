@@ -11,6 +11,7 @@ import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderMM_Original;
 import stcl.algo.predictors.FirstOrderPredictor;
+import stcl.algo.predictors.Predictor;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
@@ -18,8 +19,8 @@ public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	private FirstOrderPredictor predictor;
-	//FirstOrderMM_Original predictor;
+	//private FirstOrderPredictor predictor;
+	private Predictor predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	
@@ -76,18 +77,12 @@ public class NeoCorticalUnit{
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
 		
-		//Bias output by the prediction from t-1
-		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix;//spatialFFOutputMatrix.elementMult(biasMatrix);	
-				
-		//Normalize output
-		Normalizer.normalize(spatialFFOutputMatrixBiased);
-		
 		//Orthogonalize output
-		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrixBiased);
+		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrix);
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			SimpleMatrix tmp = orthogonalize(spatialFFOutputMatrix);
+			SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(spatialFFOutputMatrix);			
 			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning);
 		} 		
 		
@@ -95,6 +90,9 @@ public class NeoCorticalUnit{
 		double[] spatialFFOutputDataVector = spatialFFOutputOrthogonalized.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
+		
+		//Aggressive orthogonalization
+		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
@@ -139,10 +137,10 @@ public class NeoCorticalUnit{
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 			biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
-			SimpleMatrix biasMatrixNormalized = normalize(biasMatrix);
+			biasMatrix = normalize(biasMatrix);
 
 			
-			biasedTemporalFBOutput = biasMatrixNormalized;
+			biasedTemporalFBOutput = biasMatrix;
 		} 		
 		
 		//Selection of best spatial mode
@@ -159,8 +157,7 @@ public class NeoCorticalUnit{
 	}
 	
 	private SimpleMatrix normalize(SimpleMatrix m){
-		Normalizer.normalize(m);
-		return m;
+		return Normalizer.normalize(m);
 	}
 	
 	/**
@@ -287,6 +284,10 @@ public class NeoCorticalUnit{
 		
 		SomNode bmu = temporalPooler.getRSOM().getNode(maxID);
 		return bmu;
+	}
+	
+	public Predictor getPredictor(){
+		return predictor;
 	}
 
 }

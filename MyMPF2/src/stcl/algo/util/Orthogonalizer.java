@@ -10,7 +10,7 @@ public class Orthogonalizer {
 		//return orthogonalization_NormDist2(m);
 	}
 	
-	private static SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
+	public static SimpleMatrix aggressiveOrthogonalization(SimpleMatrix m){
 
 		int maxID = -1;
 		int id = 0;

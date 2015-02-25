@@ -76,12 +76,19 @@ public class NeoCorticalUnit{
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
 		
+		//Bias output by the prediction from t-1
+		SimpleMatrix spatialFFOutputMatrixBiased = spatialFFOutputMatrix;//spatialFFOutputMatrix.elementMult(biasMatrix);	
+				
+		//Normalize output
+		Normalizer.normalize(spatialFFOutputMatrixBiased);
+		
 		//Orthogonalize output
-		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrix);
+		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrixBiased);
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			predictionMatrix = predictor.predict(spatialFFOutputOrthogonalized, curPredictionLearningRate, learning);
+			SimpleMatrix tmp = orthogonalize(spatialFFOutputMatrix);
+			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning);
 		} 		
 		
 		//Transform spatial output matrix to vector

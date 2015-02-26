@@ -119,8 +119,8 @@ public class TemporalRecognition_RSOM2 {
 	    		
 	    		rsom.step(input);
 	    		rsom.computeActivationMatrix();
-	    		System.out.println("Leaky differences:");
-	    		rsom.getLeakyDifferencesMap();
+	    		//System.out.println("Leaky differences:");
+	    		//rsom.getLeakyDifferencesMap();
 
 	    		
 	    		if (visualize){
@@ -215,15 +215,15 @@ public class TemporalRecognition_RSOM2 {
 		//sequences.add(seq2);
 		//sequences.add(seq3);
 		
-		//sequences.add(seq4);
-		//sequences.add(seq5);
+		sequences.add(seq4);
+		sequences.add(seq5);
 		//sequences.add(seq6);
 		
 		sequences.add(seq7);
 		sequences.add(seq8);
 		
-		//sequences.add(seq9);
-		//sequences.add(seq10);
+		sequences.add(seq9);
+		sequences.add(seq10);
 		//sequences.add(seq11);
 		//sequences.add(seq12);
 		

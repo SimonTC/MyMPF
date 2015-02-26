@@ -73,7 +73,7 @@ public class RsomEvaluator {
 	    	
 	    	for (SimpleMatrix input : curSequence){
 	    		if (rand.nextDouble() < noise) input = joker;
-	    		rsom.step(input);    		
+	    		SomNode bmu = rsom.step(input);    		
 	    	}
 	    	
 	    	SomNode bmu = rsom.getBMU();
@@ -85,7 +85,7 @@ public class RsomEvaluator {
 	    if (error == 0){
 	    	fitness = 1;
 	    } else {
-	    	fitness = (double) 1 - error / iterations;
+	    	fitness =  1 - ( (double) error / iterations);
 	    }
 	    
 		return fitness;

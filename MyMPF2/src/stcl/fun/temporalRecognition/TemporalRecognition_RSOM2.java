@@ -26,7 +26,7 @@ public class TemporalRecognition_RSOM2 {
 	
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
-	private final boolean VISUALIZE_RESULT = true;
+	private final boolean VISUALIZE_RESULT = false;
 	private boolean usePrediction = true;
 	private boolean evaluate = true;
 	private SimpleMatrix bigT;
@@ -66,7 +66,7 @@ public class TemporalRecognition_RSOM2 {
 		if (evaluate){
 		//Evaluate
 			double noise = 0.0;
-			for (int i = 0; i < 100; i++){
+			for (int i = 0; i <= 100; i++){
 				//nu.setDebug(true);
 				RsomEvaluator evaluator = new RsomEvaluator();
 				double fitness = evaluator.evaluate(rsom, sequences, labels, joker, noise, 1000, rand);			
@@ -161,37 +161,51 @@ public class TemporalRecognition_RSOM2 {
 	}
 	
 	private void setupExperiment(int maxIterations, Random rand){
-		buildSequences();
+		//buildSequences();
+		buildUniqueSequences(9, 1);
 		buildPoolers(maxIterations, rand);		
 	}
 	
 	private void buildPoolers(int maxIterations, Random rand){
-		
-		//Spatial pooler
-		int spatialInputLength = joker.getNumElements();
-		int spatialMapSize = 3;
-		double spatialInitialLearningRate = 0.1;
-		double stddev_spatial = 2;
-		double activationCodingFactor_spatial = 0.125;
 
 		
 		//Temporal pooler
-		int temporalInputLength = spatialMapSize * spatialMapSize;
 		int temporalMapSize = 3;
-		double decay = 0.3;
-		double stdDev_temporal = 2;
-		double temporalLearningRate = 0.1;
+		double decay = 1;
+		double temporalLearningRate = 1;
 		double activationCodingFactor_Temporal = 0.125;
-		double initialPredictionLearningRate = 0.5;
 		
 		rsom = new RSOM_Simple(temporalMapSize, joker.getNumElements(), rand, temporalLearningRate, activationCodingFactor_Temporal, maxIterations, decay);
 		
 
 	}
 	
+	private void buildUniqueSequences(int numSequences, int sequenceLength){
+		int number = 0;
+		int maxNumber = numSequences * sequenceLength - 1;
+		sequences = new ArrayList<SimpleMatrix[]>();
+		
+		for (int seq = 0; seq < numSequences; seq++){
+			SimpleMatrix[] sequence = new SimpleMatrix[sequenceLength];
+			for (int i = 0; i < sequenceLength; i++){
+				double[][] data = {{number}};
+				SimpleMatrix m = new SimpleMatrix(data);
+				//m = m.divide(maxNumber);
+				sequence[i] = m;
+				number++;
+			}
+			sequences.add(sequence);
+		}
+		
+		double[][] jokerData = {{0}};
+		joker = new SimpleMatrix(jokerData);
+	}
+	
 	private void buildSequences(){
 		createFigures();
 		sequences = new ArrayList<SimpleMatrix[]>();
+		
+		
 
 		SimpleMatrix[] seq1 = {bigT};
 		SimpleMatrix[] seq2 = {bigO};
@@ -215,12 +229,12 @@ public class TemporalRecognition_RSOM2 {
 		//sequences.add(seq2);
 		//sequences.add(seq3);
 		
-		sequences.add(seq4);
-		sequences.add(seq5);
+		//sequences.add(seq4);
+		//sequences.add(seq5);
 		//sequences.add(seq6);
 		
-		sequences.add(seq7);
-		sequences.add(seq8);
+		//sequences.add(seq7);
+		//sequences.add(seq8);
 		
 		sequences.add(seq9);
 		sequences.add(seq10);
@@ -228,10 +242,14 @@ public class TemporalRecognition_RSOM2 {
 		//sequences.add(seq12);
 		
 		//sequences.add(seq13);
+		 
+		 
 		
 	}
 	
 	private void createFigures(){		
+		
+		
 		double[][] bigTData = {
 				{1,0,0,0,0}};
 		bigT = new SimpleMatrix(bigTData);

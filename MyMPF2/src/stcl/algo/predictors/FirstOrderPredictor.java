@@ -5,14 +5,17 @@ import org.ejml.simple.SimpleMatrix;
 public class FirstOrderPredictor implements Predictor{
 
 	private BinaryTransitionMatrix conditionalPredictionMatrix;
-	private int predictionMatrixSize;
 	private double decayFactor;
 	private SimpleMatrix inputVectorBefore;
 
 	public FirstOrderPredictor(int inputMatrixSize) {
-		inputVectorBefore = new SimpleMatrix(1, inputMatrixSize * inputMatrixSize);
-		predictionMatrixSize = inputMatrixSize * inputMatrixSize;
-		conditionalPredictionMatrix = new BinaryTransitionMatrix(predictionMatrixSize, 100); //TODO: Move to parameter
+		this(inputMatrixSize, inputMatrixSize);
+	} 
+	
+	public FirstOrderPredictor(int inputMatrixRows, int inputMatrixColumns) {
+		inputVectorBefore = new SimpleMatrix(inputMatrixRows, inputMatrixColumns);
+		int conditionalMatrixSize = inputMatrixRows * inputMatrixColumns;
+		conditionalPredictionMatrix = new BinaryTransitionMatrix(conditionalMatrixSize, 100); //TODO: Move to parameter
 		this.decayFactor = 0.95; //TODO: Set as parameter. Parameter taken form original predictor code
 	} 
 	

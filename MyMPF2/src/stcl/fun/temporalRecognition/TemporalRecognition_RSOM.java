@@ -11,7 +11,6 @@ import stcl.graphics.MovingLinesGUI_Prediction;
 import dk.stcl.core.basic.ISomBasics;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.rsom.IRSOM;
-import dk.stcl.core.rsom.RSOM_Online;
 import dk.stcl.core.rsom.RSOM_SemiOnline;
 import dk.stcl.core.rsom.RSOM_Simple;
 import dk.stcl.core.som.ISOM;
@@ -28,7 +27,7 @@ public class TemporalRecognition_RSOM {
 	
 	
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
 	private final boolean VISUALIZE_RESULT = true;
 	private final int GUI_SIZE = 500;

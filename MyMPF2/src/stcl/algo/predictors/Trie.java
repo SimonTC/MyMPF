@@ -14,6 +14,7 @@ public class Trie<T> {
 	/**
 	 * Add the given sequence to the Trie
 	 * @param sequence
+	 * @return true if the sequence is new
 	 */
 	public void add(LinkedList<T> sequence){
 		LinkedList<T> copy = new LinkedList<T>(sequence);
@@ -25,16 +26,19 @@ public class Trie<T> {
 	 * @param sequences
 	 */
 	public void remove(LinkedList<T> sequence){
-		root.removeSequence(sequence);
+		LinkedList<T> copy = new LinkedList<T>(sequence);
+		root.removeSequence(copy);
 	}
 	
 	/**
-	 * Returns the number of times the given sequence has been observed in the data set
+	 * Returns the number of times the given sequence has been observed in the data set.
+	 * Does not change the trie.
 	 * @param sequence
 	 * @return
 	 */
 	public int findSequenceCount(LinkedList<T> sequence){
-		return root.findSequenceCount(sequence);
+		LinkedList<T> copy = new LinkedList<T>(sequence);
+		return root.findSequenceCount(copy);
 	}
 	
 	public void printTrie(int maxDepth){
@@ -42,6 +46,16 @@ public class Trie<T> {
 			String s = root.writeSequence("", depth);
 			System.out.println(s);
 		}
+	}
+	
+	public void incrementSequenceCount(LinkedList<T> sequence){
+		LinkedList<T> copy = new LinkedList<T>(sequence);
+		root.incrementSequenceCount(copy);
+	}
+	
+	public void updateCounts(LinkedList<T> sequence){
+		LinkedList<T> copy = new LinkedList<T>(sequence);
+		root.updateCount(copy);
 	}
 	
 	
@@ -63,15 +77,29 @@ public class Trie<T> {
 		 * @param sequence the sequence of symbols coming after this node
 		 */
 		public void addSequence(LinkedList<T> sequence){
-			count++;			
-			if (sequence.isEmpty()) return; //Don't do anything if this node is last in the sequence
-			T childSymbol = sequence.poll();
-			Node correctChild = children.get(childSymbol);
-			if (correctChild == null){
-				correctChild = addNewChild(childSymbol);
-			} 
-
-			correctChild.addSequence(sequence);
+		//	if (increment) count++;			
+			if (!sequence.isEmpty()){
+				T childSymbol = sequence.poll();
+				Node correctChild = children.get(childSymbol);
+				if (correctChild == null){
+					correctChild = addNewChild(childSymbol);
+				} 
+	
+				correctChild.addSequence(sequence);
+			} else {
+				count++;
+			}
+			
+		}
+		
+		public void updateCount(LinkedList<T> sequence){
+			count++;
+			if (!sequence.isEmpty()){
+				T childSymbol = sequence.poll();
+				Node correctChild = children.get(childSymbol);
+				if (correctChild == null) return;
+				correctChild.updateCount(sequence);
+			}
 		}
 		
 		/**
@@ -104,9 +132,21 @@ public class Trie<T> {
 			if(!sequence.isEmpty()){
 				T childSymbol = sequence.removeFirst();
 				Node correctChild = children.get(childSymbol);
+				if (correctChild == null) return 0;
 				return correctChild.findSequenceCount(sequence);
 			} else {
 				return count;
+			}
+		}
+		
+		public void incrementSequenceCount(LinkedList<T> sequence){
+			if(!sequence.isEmpty()){
+				T childSymbol = sequence.removeFirst();
+				Node correctChild = children.get(childSymbol);
+				correctChild.incrementSequenceCount(sequence);
+			} else {
+				count++;
+				return;
 			}
 		}
 		

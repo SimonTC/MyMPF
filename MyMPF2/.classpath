@@ -6,6 +6,8 @@
 	<classpathentry kind="lib" path="lib/jmathplot.jar"/>
 	<classpathentry kind="lib" path="lib/matrix/EJML-core-0.26.jar" sourcepath="lib/matrix/EJML-core-0.26-sources.jar"/>
 	<classpathentry kind="lib" path="lib/MySOM_Core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Simon/Desktop/VOMM.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/VOMM/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

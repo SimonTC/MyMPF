@@ -1,6 +1,8 @@
-package stcl.algo.predictors;
+package stcl.test.predictors;
 
 import java.util.LinkedList;
+
+import stcl.algo.util.trie.Trie;
 
 public class ActiveLeZi {
 	

@@ -10,7 +10,7 @@ import stcl.algo.util.Normalizer;
 import stcl.algo.util.trie.TrieNode;
 
 /**
- * VOMM that is capable of working with fuzzy inputs (probability distribuions as inputs
+ * VOMM that is capable of working with fuzzy inputs (probability distributions as inputs)
  * @author Simon
  *
  * @param <T>
@@ -32,15 +32,16 @@ public class Predictor_VOMM implements Predictor{
 	}
 
 	@Override
+	/**
+	 * Returns a probability matrix over all possible symbols.
+	 * Contains the probability of seeing a symbol given the current context.
+	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate) {	
 			vomm.setLearning(associate);
 			vomm.setLearningRate(curLearningRate);
 			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
 			inputProbabilities.addLast(inputMatrix.elementMaxAbs());
 			if (inputProbabilities.size() > markovOrder) inputProbabilities.removeFirst();
-			
-			double sum = inputMatrix.elementSum();
-			boolean b = Double.isNaN(sum);
 			
 			//int mostProbableInput = findInputByRoulette(inputMatrix); //findMostProbableInput(inputMatrix);			
 			int mostProbableInput = findMostProbableInput(inputMatrix);	

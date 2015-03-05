@@ -1,11 +1,14 @@
 package stcl.algo.poolers;
 
+import java.text.Normalizer;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
 public class TemporalPooler extends SpatialPooler  {
 
+	private RSOM rsom; 	
+	
 	public TemporalPooler(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
 			double activationCodingFactor, double decay) {
@@ -14,9 +17,6 @@ public class TemporalPooler extends SpatialPooler  {
 		rsom = new RSOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev, decay);
 	}
 
-	private RSOM rsom; 
-	
-	
 	
 	
 	@Override
@@ -57,8 +57,7 @@ public class TemporalPooler extends SpatialPooler  {
 		model = addNoise(model, curNoiseMagnitude);
 		
 		//Normalize
-		double sum = model.elementSum();
-		model = model.scale(1/sum);
+		model = normalize(model);
 		
 		return model;		
 	}

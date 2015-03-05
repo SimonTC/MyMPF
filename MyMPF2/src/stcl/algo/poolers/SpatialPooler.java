@@ -130,7 +130,7 @@ public class SpatialPooler {
 	}
 	
 	protected SimpleMatrix chooseRandom(SimpleMatrix input){
-		//Transform bias matrix into vector
+		//Transform matrix into vector
 		double[] vector = input.getMatrix().data;
 		
 		//Choose random number between 0 and 1

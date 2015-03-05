@@ -28,6 +28,8 @@ public class VOMM<T> {
 	private boolean learning;
 	private T currentSymbol;
 	private HashMap<T, Double> probabilityDistribution;
+	private LinkedList<TrieNode<T>> currentNodeSequence;
+	
 	
 	public VOMM(int markovOrder, double learningRate) {
 		trie = new Trie<T>();
@@ -52,59 +54,12 @@ public class VOMM<T> {
 	 * Predicts the next symbol in the sequence.
 	 * Call {@link #addSymbol(Object)} before calling this to add a new symbol to the memory.
 	 * @param symbol
-	 * @return
+	 * @return the next most probable symbol
 	 */
 	public T predict(){
 		
 		if (learning){
-			SimpleMatrix errorVector = new SimpleMatrix(1, markovOrder);
-			errorVector.set(1);
-			boolean clean;
-			boolean[] notUsingModel = new boolean[markovOrder];
-			int modelsUsed = markovOrder;
-			do{
-				clean = true;
-				for (int i = 0; i < markovOrder; i++){
-					//Compute error
-					if (notUsingModel[i]){
-						errorVector.set(i, 0); //We don't want it error to influence the differential computation
-					}else{
-						T prediction = predictions.get(i);
-						errorVector.set(i, 1);
-						if (prediction != null){
-							if (prediction.equals(currentSymbol)) {
-								errorVector.set(i, 0);
-							}
-						}
-					}
-				}
-					
-				//Compute differential error vector
-				SimpleMatrix differentialErrorVector = new SimpleMatrix(errorVector);
-				double errorSum = errorVector.elementSum();
-				double delta = (double) 1 / modelsUsed * errorSum;
-				differentialErrorVector = differentialErrorVector.minus(delta);
-					
-				//Update weight vector
-				for (int j = 0; j < weightVector.getNumElements(); j++){
-					if (!notUsingModel[j]){
-						double newValue = weightVector.get(j) - learningRate * differentialErrorVector.get(j);
-						if (newValue <= 0) {
-							newValue = 0;
-							clean = false;
-							notUsingModel[j] = true;
-							modelsUsed--;
-						}
-						if (newValue > 1) newValue = 1;
-						weightVector.set(j, newValue);
-					}
-				}				
-				
-			} while (!clean);
-			
-			//Normalize weight vector
-			double sum = weightVector.elementSum();
-			weightVector = weightVector.divide(sum);
+			doLearning();
 		}
 
 		//Do prediction
@@ -115,11 +70,14 @@ public class VOMM<T> {
 		for ( int i = 0; i < markovOrder; i++){ //Make sure we don't get out of bounds in the start of the training
 			if (memory.size() >= i + 1){
 				double maxMarkovProbability = Double.NEGATIVE_INFINITY;			
+				//Update context
 				T c = memory.get(memory.size() - (i + 1));
 				context.addFirst(c);
+				
+				//Find the set of possible next symbols
 				HashMap<T, TrieNode<T>> possibleNextNodes = trie.findChildrenOfLastNode(context);
 				if (possibleNextNodes != null){
-					for (T s : possibleNextNodes.keySet()){
+					for (T s : possibleNextNodes.keySet()){ //Calculate probability of each symbol given the current context
 						double probability = possibleNextNodes.get(s).getProbability();
 						
 						if (probability > maxMarkovProbability){
@@ -148,7 +106,84 @@ public class VOMM<T> {
 	}
 	
 	/**
-	 * Adds the given symbol to the memory and adds all possible contexts in the memory to the trie
+	 * Performs the learning algorithm for the VOMM and updates the weight vector
+	 */
+	private void doLearning(){
+		SimpleMatrix errorVector;
+		boolean clean;
+		boolean[] notUsingModel = new boolean[markovOrder];
+		int modelsUsed = markovOrder;
+		do{
+			clean = true;
+			errorVector = computeErrorVector(notUsingModel);
+		
+			SimpleMatrix differentialErrorVector = computeDifferentialErrorVector(errorVector, modelsUsed);
+				
+			//Update weight vector
+			for (int j = 0; j < weightVector.getNumElements(); j++){
+				if (!notUsingModel[j]){
+					double newValue = weightVector.get(j) - learningRate * differentialErrorVector.get(j);
+					if (newValue <= 0) {
+						newValue = 0;
+						clean = false;
+						notUsingModel[j] = true;
+						modelsUsed--;
+					}
+					if (newValue > 1) newValue = 1;
+					weightVector.set(j, newValue);
+				}
+			}				
+			
+		} while (!clean);
+		
+		//Normalize weight vector
+		double sum = weightVector.elementSum();
+		weightVector = weightVector.divide(sum);
+	}
+	
+	/**
+	 * Computes a binary error vector for each of the markov models
+	 * @param listOfModelsNotInUse boolean list of same length as the number of markov models. If the entry for a particular markov model is true, its error is set to zero such that it doesn't influence later calculations
+	 * @return
+	 */
+	private SimpleMatrix computeErrorVector(boolean[] listOfModelsNotInUse){
+		SimpleMatrix errorVector = new SimpleMatrix(1, markovOrder);
+		errorVector.set(1);
+		for (int i = 0; i < markovOrder; i++){
+			//Compute error
+			if (listOfModelsNotInUse[i]){
+				errorVector.set(i, 0); //We don't want it error to influence the differential computation
+			}else{
+				T prediction = predictions.get(i);
+				errorVector.set(i, 1);
+				if (prediction != null){
+					if (prediction.equals(currentSymbol)) {
+						errorVector.set(i, 0);
+					}
+				}
+			}
+		}
+		
+		return errorVector;
+	}
+	
+	/**
+	 * Calculates the differential error vector
+	 * @param errorVector vector of error values
+	 * @param modelsUsed number of models currently in use
+	 * @return 
+	 */
+	private SimpleMatrix computeDifferentialErrorVector(SimpleMatrix errorVector, int modelsUsed){
+		SimpleMatrix differentialErrorVector = new SimpleMatrix(errorVector);
+		double errorSum = errorVector.elementSum();
+		double delta = (double) 1 / modelsUsed * errorSum;
+		differentialErrorVector = differentialErrorVector.minus(delta);
+		return differentialErrorVector;
+	}
+	
+	/**
+	 * Adds the given symbol to the memory and adds all possible contexts in the memory to the trie.
+	 * Updates the current node sequence if learning.
 	 * @param symbol
 	 */
 	public void addSymbol(T symbol){		
@@ -156,14 +191,16 @@ public class VOMM<T> {
 		memory.addLast(symbol);			
 		if (memory.size() > trieDepth) memory.removeFirst();
 		
+		LinkedList<T> context = new LinkedList<T>();
 		if (learning) {
 			//Update trie based on all contexts in the memory to the trie
-			LinkedList<T> context = new LinkedList<T>();
 			for (int j = 1; j <= memory.size(); j++){
 				T c = memory.get(memory.size() - j);
 				context.addFirst(c);
-				trie.add(context);
+				currentNodeSequence = trie.add(context);
 			}
+		} else {
+			currentNodeSequence = trie.findNodeSequence(context);
 		}
 	}
 	
@@ -181,10 +218,17 @@ public class VOMM<T> {
 		return -sum;
 	}
 	
+	/**
+	 * Return the map of probabilities for the seen symbols
+	 * @return
+	 */
 	public HashMap<T, Double> getCurrentProbabilityDistribution(){
 		return probabilityDistribution;
 	}
 	
+	/**
+	 * Prints the trie
+	 */
 	public void printTrie(){
 		trie.printTrie(memory.size());
 	}
@@ -193,7 +237,19 @@ public class VOMM<T> {
 		this.learning = learning;
 	}
 	
+	/**
+	 * Clear out the memory of the VOMM.
+	 * The Trie is not changed
+	 */
 	public void flushMemory(){
 		memory = new LinkedList<T>();
+	}
+	
+	public LinkedList<T> getMemory(){
+		return memory;
+	}
+	
+	public LinkedList<TrieNode<T>> getCurrentNodeSequence(){
+		return currentNodeSequence;
 	}
 }

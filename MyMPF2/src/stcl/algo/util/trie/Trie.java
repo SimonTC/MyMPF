@@ -14,11 +14,13 @@ public class Trie<T> {
 	/**
 	 * Add the given sequence to the Trie
 	 * @param sequence
-	 * @return true if the sequence is new
+	 * @return the sequence of trieNodes corresponding to the symbol sequence
 	 */
-	public void add(LinkedList<T> sequence){
+	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence){
+		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();
 		LinkedList<T> copy = copySequence(sequence);
-		root.addSequence(copy);
+		nodeSequence = root.addSequence(copy, nodeSequence);
+		return nodeSequence;
 	}
 	
 	/**
@@ -39,6 +41,17 @@ public class Trie<T> {
 	public int findSequenceCount(LinkedList<T> sequence){
 		LinkedList<T> copy = copySequence(sequence);
 		return root.findSequenceCount(copy);
+	}
+	
+	/**
+	 *  * Recursively converts the given symbol sequence into a node sequence and calculates the probabiities of seeing the children of the last node in the sequence.
+	 *  Doesn't change the Data structure other than calulating probabilities
+	 */
+	public LinkedList<TrieNode<T>> findNodeSequence(LinkedList<T> sequence){
+		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();
+		LinkedList<T> copy = copySequence(sequence);
+		nodeSequence = root.findNodeSequence(copy, nodeSequence);
+		return nodeSequence;
 	}
 	
 	public void printTrie(int maxDepth){

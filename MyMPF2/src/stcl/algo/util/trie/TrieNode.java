@@ -20,20 +20,21 @@ public class TrieNode<T>{
 	 * Adds an occurrence of this sequence to the node.
 	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
 	 * If no child-node corresponds to the next symbol, a new child is created.
-	 * @param sequence the sequence of symbols coming after this node
+	 * @param symbolSequence the sequence of symbols coming after this node
 	 */
-	public void addSequence(LinkedList<T> sequence){
-	//	if (increment) count++;			
-		if (!sequence.isEmpty()){
-			T childSymbol = sequence.poll();
+	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
+		if (!symbolSequence.isEmpty()){
+			T childSymbol = symbolSequence.removeFirst();
 			TrieNode<T> correctChild = children.get(childSymbol);
 			if (correctChild == null){
 				correctChild = addNewChild(childSymbol);
 			} 
-			correctChild.addSequence(sequence);
+			nodeSequence.addFirst(correctChild);
+			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence);
 		} else {
 			count++;
 		}
+		return nodeSequence;
 		
 	}
 	
@@ -150,6 +151,30 @@ public class TrieNode<T>{
 				n.setProbability(probability);				
 			}
 			return children;				
+		}
+	}
+	
+	/**
+	 * Recursively converts the given symbol sequence into a node sequence and calculates the probabiities of seeing the children of the last node in the sequence
+	 * @param symbolSequence
+	 * @param nodeSequence
+	 * @return
+	 */
+	public LinkedList<TrieNode<T>> findNodeSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
+		if(!symbolSequence.isEmpty()){
+			//Send question further down
+			T childSymbol = symbolSequence.removeFirst();
+			TrieNode<T> correctChild = children.get(childSymbol);
+			if (correctChild == null) return null;
+			nodeSequence.addFirst(correctChild);;
+			return correctChild.findNodeSequence(symbolSequence, nodeSequence);
+		} else {
+			//Calculate probabilities
+			for (TrieNode<T> n : children.values()){
+				double probability = n.getCount() / (double) count;
+				n.setProbability(probability);				
+			}
+			return nodeSequence;				
 		}
 	}
 	

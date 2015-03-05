@@ -2,6 +2,7 @@ package stcl.algo.predictors;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -38,7 +39,12 @@ public class Predictor_VOMM implements Predictor{
 			inputProbabilities.addLast(inputMatrix.elementMaxAbs());
 			if (inputProbabilities.size() > markovOrder) inputProbabilities.removeFirst();
 			
-			int mostProbableInput = findMostProbableInput(inputMatrix);			
+			double sum = inputMatrix.elementSum();
+			boolean b = Double.isNaN(sum);
+			
+			//int mostProbableInput = findInputByRoulette(inputMatrix); //findMostProbableInput(inputMatrix);			
+			int mostProbableInput = findMostProbableInput(inputMatrix);	
+			//System.out.println("Input seen by predictor: " + mostProbableInput);
 			vomm.addSymbol(mostProbableInput);
 			Integer prediction = vomm.predict();
 			if (prediction == null){
@@ -74,6 +80,25 @@ public class Predictor_VOMM implements Predictor{
 		return d;
 	}
 	
+	private int findInputByRoulette(SimpleMatrix probabilityMatrix){
+		Random rand = new Random();
+		double v = rand.nextDouble();
+		double sum = 0;
+		boolean found = false;
+		int id = -1;
+		int i = 0;
+		do{
+			double d = probabilityMatrix.get(i);
+			sum += d;
+			if (sum >= v){
+				found = true;
+				id = 1;
+			}
+			i++;
+		} while (!found && i < probabilityMatrix.getNumElements());
+		return id;
+	}
+	
 	private int findMostProbableInput(SimpleMatrix probabilityMatrix){
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;
@@ -84,7 +109,11 @@ public class Predictor_VOMM implements Predictor{
 				max = value;
 			}
 		}		
+		if (maxID == -1){
+			System.out.println();
+		}
 		return maxID;
+		
 	}
 
 	@Override
@@ -100,7 +129,6 @@ public class Predictor_VOMM implements Predictor{
 	public int getNextPredictedSymbol(){
 		return predictedNextSymbol;
 	}
-	
 	
 
 }

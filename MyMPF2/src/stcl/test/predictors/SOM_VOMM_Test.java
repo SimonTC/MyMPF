@@ -13,7 +13,7 @@ import stcl.algo.util.Normalizer;
 
 public class SOM_VOMM_Test {
 	
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private Stack<Level> levels;
 	private int[] finalSequence;
 	private SOM som;
@@ -21,6 +21,8 @@ public class SOM_VOMM_Test {
 	private SimpleMatrix biasMatrix;
 	private double curPrediction;
 	
+	private double noiseFactor_Eval = 2.0;
+	private double noiseFactor_Train = 0.0;
 
 	public static void main(String[] args) {
 		SOM_VOMM_Test t = new SOM_VOMM_Test();
@@ -30,65 +32,85 @@ public class SOM_VOMM_Test {
 	
 	public void run(){
 		
-		double biasFactor = 0;
-		
-		int maxIterations = 40;
-		
-		double totalError = 0;
-		for (int i = 0; i < maxIterations; i++){
-			buildSequence();
-			predictor = new Predictor_VOMM(5, 0.1);
-			som = new SOM(2, 1, rand, 0.1, 0.125, 1);
-			double error = runExeriment(100, true);
-			totalError += error;
-			System.out.println(i + " " + error);
-			System.out.println();
+	
+		int maxIterations = 10;
+
+		for (double d = 0; d <= 1; d = d + 0.1){
+			double totalError = 0;
+			for (int i = 0; i < maxIterations; i++){
+				buildSequence();
+				predictor = new Predictor_VOMM(5, 0.1);
+				som = new SOM(4, 1, rand, 0.1, 0.125, 2);
+				runTraining(noiseFactor_Train, 20);
+				//som.setLearning(false);
+				double error = runEvaluation(noiseFactor_Eval, 20, d);
+				totalError += error;
+			}
+			double avgMSQE = totalError / (double) maxIterations;
+			System.out.println(avgMSQE);
 		}
-		double avgMSQE = totalError / (double) maxIterations;
-		System.out.println( "MSQE: " + avgMSQE);
 		
 		
 
 	}
 	
-	private double runExeriment(int iterations, boolean bias){
-		double error = 1;
-		curPrediction = 0;
-		for (int i = 1; i <= iterations; i++){
-			error = runTraining(bias);
+	private double runEvaluation(double noise, int iterations, double biasFactor){
+		double MSQE = 0;
+		for (int iteration = 0; iteration < iterations; iteration++){
+			double totalError = 0;
+			for (int i : finalSequence){
+				double error = Math.pow(curPrediction - (double)i, 2);
+				totalError += error;
+				double d = i + (0.5 - rand.nextDouble()) * noise;
+				double[] input = {d};
+				som.step(input);
+				SimpleMatrix spatialOutput = som.computeActivationMatrix();
+				
+				//Normalize
+				spatialOutput = Normalizer.normalize(spatialOutput);
+				
+				//Bias
+				SimpleMatrix biasedOutput = spatialOutput;
+				if (biasMatrix!= null){
+					biasedOutput = spatialOutput.plus(biasFactor, biasMatrix);
+				}
 			
-			System.out.println(error);
+				biasedOutput = Normalizer.normalize(biasedOutput);
+				
+				//Predict
+				biasMatrix = predictor.predict(biasedOutput, 0.1, true);
+				
+				int predictionID = predictor.getNextPredictedSymbol();
+				curPrediction = som.getSomMap().get(predictionID).getVector().get(0);	
+			}
+			MSQE += totalError / finalSequence.length;
 		}
-		return error;
+		return MSQE / (double) iterations;
 	}
 	
-	private double runTraining(boolean bias){
-		double totalError = 0;
-		for (int i : finalSequence){
-			double error = Math.pow(curPrediction - (double)i, 2);
-			totalError += error;
-			double[] input = {i};
-			som.step(input);
-			SimpleMatrix spatialOutput = som.computeActivationMatrix();
-			
-			//Normalize
-			spatialOutput = Normalizer.normalize(spatialOutput);
-			
-			//Bias
-			SimpleMatrix biasedOutput = spatialOutput;
-			if (biasMatrix!= null){
-				if (bias) biasedOutput = spatialOutput.elementMult(biasMatrix);
+	private void runTraining(double noise, int iterations){
+		for (int iteration = 0; iteration < iterations; iteration++){
+			for (int i : finalSequence){
+				double d = i + (0.5 - rand.nextDouble()) * noise;
+				double[] input = {d};
+				som.step(input);
+				SimpleMatrix spatialOutput = som.computeActivationMatrix();
+				
+				//Normalize
+				spatialOutput = Normalizer.normalize(spatialOutput);
+				
+				//Predict
+				biasMatrix = predictor.predict(spatialOutput, 0.1, true);
 			}
-			
-			biasedOutput = Normalizer.normalize(biasedOutput);
-			
-			//Predict
-			biasMatrix = predictor.predict(biasedOutput, 0.1, true);
-			int predictionID = predictor.getNextPredictedSymbol();
-			curPrediction = som.getSomMap().get(predictionID).getVector().get(0);			
 		}
-		double MSQE = totalError / finalSequence.length;
-		return MSQE;
+	}
+	
+	private boolean isMatrixOK(SimpleMatrix m){
+		for (double d : m.getMatrix().data){
+			if (Double.isNaN(d)) return false;
+			if (Double.isInfinite(d)) return false;
+		}
+		return true;
 	}
 	
 	private void buildSequence(){

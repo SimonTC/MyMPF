@@ -4,9 +4,11 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Normalizer {
 	
+	private final static double e = 0.000000001; 
+	
 	public static SimpleMatrix normalize(SimpleMatrix m){
 		double sum = m.elementSum();
-		if (sum > 0){
+		if (sum > 0 + e){ //Need to add e to counter oo small values.
 			m = m.scale(1/sum);
 		} 
 		return m;

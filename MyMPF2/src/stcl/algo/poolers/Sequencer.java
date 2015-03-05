@@ -21,6 +21,8 @@ public class Sequencer {
 	
 	private LinkedList<Double> entropyHistory;
 	private int entropyHistoryLength;
+	private boolean learning;
+	private double predictionLearningRate;
 	
 	
 	public Sequencer(int markovOrder, double predictionLearningRate, int poolerMapSize, int inputLength, Random rand, double poolerLearningRate, double activationCodingFactor, double stdDev, double decayFactor ) {
@@ -31,6 +33,8 @@ public class Sequencer {
 		
 		entropyHistoryLength = markovOrder * 10; //Arbitrarily chosen number
 		entropyHistory = new LinkedList<Double>();
+		learning = true;
+		this.predictionLearningRate = predictionLearningRate;
 	}
 	
 	/**
@@ -51,7 +55,11 @@ public class Sequencer {
 		rsom.step(inputVector);
 		
 		//Predict next input
-		prediction = predictor.predict(inputVector, 0.1, true);
+		if (learning){
+			prediction = predictor.predict(inputVector, predictionLearningRate, learning);
+		} else {
+			prediction = predictor.predict(inputVector, 0, false);
+		}
 		
 		//Calculate entropy
 		currentEntropy = predictor.calculateEntropy();
@@ -97,7 +105,7 @@ public class Sequencer {
 	/**
 	 * 
 	 * @param inputMatrix matrix containing probabilities of entering the different temporal groups next time step
-	 * @return
+	 * @return probability of seeing the different spatial models
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		
@@ -144,6 +152,14 @@ public class Sequencer {
 
 		return maxID;
 		
+	}
+	
+	public void setLearning(boolean learning){
+		this.learning = learning;
+	}
+	
+	public RSOM getRsom(){
+		return rsom;
 	}
 	
 }

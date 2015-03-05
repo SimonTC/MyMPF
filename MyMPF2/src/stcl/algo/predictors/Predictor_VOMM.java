@@ -31,30 +31,33 @@ public class Predictor_VOMM implements Predictor{
 	}
 
 	@Override
-	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate) {
+	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate) {	
 			vomm.setLearning(associate);
 			vomm.setLearningRate(curLearningRate);
+			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
 			inputProbabilities.addLast(inputMatrix.elementMaxAbs());
 			if (inputProbabilities.size() > markovOrder) inputProbabilities.removeFirst();
 			
 			int mostProbableInput = findMostProbableInput(inputMatrix);			
 			vomm.addSymbol(mostProbableInput);
-			predictedNextSymbol = vomm.predict();
-			
-			double sequenceProbability = calculateProbabilityOfNodeSequence();
-			
-			double scaling = (1-sequenceProbability) * ((double) 1 / inputMatrix.getNumElements());
-			
-			HashMap<Integer, Double> probabilityOfSymbols =  vomm.getCurrentProbabilityDistribution();
-			
-			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
-			
-			for (int i = 0; i < probabilityMatrix.getNumElements(); i++){
-				double symbolProbability = probabilityOfSymbols.get(i);
-				symbolProbability = symbolProbability * sequenceProbability + scaling;
-				probabilityMatrix.set(i, symbolProbability);				
-			}
-			
+			Integer prediction = vomm.predict();
+			if (prediction == null){
+				probabilityMatrix.set(1);
+				predictedNextSymbol = 0; //Set prediction some value.
+			} else {
+				predictedNextSymbol = prediction.intValue();
+				double sequenceProbability = calculateProbabilityOfNodeSequence();
+				
+				double scaling = (1-sequenceProbability) * ((double) 1 / inputMatrix.getNumElements());
+				
+				HashMap<Integer, Double> probabilityOfSymbols =  vomm.getCurrentProbabilityDistribution();
+				
+				for (int i : probabilityOfSymbols.keySet()){
+					double symbolProbability = probabilityOfSymbols.get(i);
+					symbolProbability = symbolProbability * sequenceProbability + scaling;
+					probabilityMatrix.set(i, symbolProbability);				
+				}
+			}			
 			
 			//Normalize
 			probabilityMatrix = Normalizer.normalize(probabilityMatrix);

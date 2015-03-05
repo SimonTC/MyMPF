@@ -101,7 +101,6 @@ public class VOMM<T> {
 				}	
 			}
 		}
-
 		return predictedNextSymbol;
 	}
 	
@@ -235,6 +234,10 @@ public class VOMM<T> {
 	
 	public void setLearning(boolean learning){
 		this.learning = learning;
+	}
+	
+	public void setLearningRate(double newLearningRate){
+		learningRate = newLearningRate;
 	}
 	
 	/**

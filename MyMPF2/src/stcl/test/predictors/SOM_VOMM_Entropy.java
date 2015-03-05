@@ -11,7 +11,7 @@ import stcl.algo.poolers.SOM;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 
-public class SOM_VOMM_Test {
+public class SOM_VOMM_Entropy {
 	
 	private Random rand = new Random(1234);
 	private Stack<Level> levels;
@@ -21,11 +21,11 @@ public class SOM_VOMM_Test {
 	private SimpleMatrix biasMatrix;
 	private double curPrediction;
 	
-	private double noiseFactor_Eval = 2.0;
+	private double noiseFactor_Eval = 0.0;
 	private double noiseFactor_Train = 0.0;
 
 	public static void main(String[] args) {
-		SOM_VOMM_Test t = new SOM_VOMM_Test();
+		SOM_VOMM_Entropy t = new SOM_VOMM_Entropy();
 		t.run();
 
 	}
@@ -34,21 +34,25 @@ public class SOM_VOMM_Test {
 		
 	
 		int maxIterations = 10;
-
-		for (double d = 0; d <= 1; d = d + 0.1){
+		double d = 0;
+		//for (double d = 0; d <= 1; d = d + 0.1){
 			double totalError = 0;
 			for (int i = 0; i < maxIterations; i++){
 				buildSequence();
 				predictor = new Predictor_VOMM(5, 0.1);
 				som = new SOM(4, 1, rand, 0.1, 0.125, 2);
-				runTraining(noiseFactor_Train, 20);
+				//runTraining(noiseFactor_Train, 20);
 				//som.setLearning(false);
+				System.out.println("Input Error Entropy Prediction");
 				double error = runEvaluation(noiseFactor_Eval, 20, d);
 				totalError += error;
 			}
 			double avgMSQE = totalError / (double) maxIterations;
-			System.out.println(avgMSQE);
-		}
+			System.out.println();
+			System.out.println("Avg MSQE: " +  avgMSQE);
+			System.out.println("*******************************************");
+			System.out.println();
+		//}
 	}
 	
 	private double runEvaluation(double noise, int iterations, double biasFactor){
@@ -77,8 +81,11 @@ public class SOM_VOMM_Test {
 				//Predict
 				biasMatrix = predictor.predict(biasedOutput, 0.1, true);
 				
+				double entropy = predictor.calculateEntropy();
+				
 				int predictionID = predictor.getNextPredictedSymbol();
 				curPrediction = som.getSomMap().get(predictionID).getVector().get(0);	
+				System.out.println(i + " " + error + " " + entropy + " " + curPrediction);
 			}
 			MSQE += totalError / finalSequence.length;
 		}
@@ -131,7 +138,7 @@ public class SOM_VOMM_Test {
 	 * @return The top level
 	 */
 	private Stack<Level>  createLevels(int numLevels, int alphabetSize, int minBlockLength, int maxBlockLength){
-		Stack<Level> levels = new Stack<SOM_VOMM_Test.Level>();
+		Stack<Level> levels = new Stack<SOM_VOMM_Entropy.Level>();
 		
 		Level firstLevel = new Level(alphabetSize, minBlockLength, maxBlockLength, null);
 		levels.push(firstLevel);

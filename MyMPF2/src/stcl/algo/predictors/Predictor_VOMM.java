@@ -130,5 +130,9 @@ public class Predictor_VOMM implements Predictor{
 		return predictedNextSymbol;
 	}
 	
+	public double calculateEntropy(){
+		return vomm.calculateEntropy();
+	}
+	
 
 }

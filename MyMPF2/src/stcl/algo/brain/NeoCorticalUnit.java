@@ -12,6 +12,7 @@ import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderMM_Original;
 import stcl.algo.predictors.FirstOrderPredictor;
 import stcl.algo.predictors.Predictor;
+import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
@@ -56,7 +57,8 @@ public class NeoCorticalUnit{
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, 0.3); //TODO: Move all parameters out
-		predictor = new FirstOrderPredictor(spatialMapSize);
+		predictor = new Predictor_VOMM(1, 0.1);
+		//predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(temporalMapSize, temporalMapSize);
@@ -82,8 +84,8 @@ public class NeoCorticalUnit{
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(spatialFFOutputMatrix);			
-			predictionMatrix = predictor.predict(tmp, curPredictionLearningRate, learning);
+			//SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(spatialFFOutputMatrix);			
+			predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate, learning);
 		} 		
 		
 		//Transform spatial output matrix to vector
@@ -135,7 +137,7 @@ public class NeoCorticalUnit{
 			biasMatrix = biasedTemporalFBOutput;
 
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
-			biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
+			//biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
 			biasMatrix = normalize(biasMatrix);
 

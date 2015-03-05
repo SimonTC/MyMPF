@@ -29,12 +29,13 @@ public class Sequencer {
 		predictor = new Predictor_VOMM(markovOrder, predictionLearningRate);
 		rsom = new RSOM(poolerMapSize, inputLength, rand, poolerLearningRate, activationCodingFactor, stdDev, decayFactor);
 		this.markovOrder = markovOrder;
-		cumulativeProbabilityOfHavingSeenInput = new SimpleMatrix(poolerMapSize, poolerMapSize);
+		cumulativeProbabilityOfHavingSeenInput = new SimpleMatrix(1, inputLength);
 		
 		entropyHistoryLength = markovOrder * 10; //Arbitrarily chosen number
 		entropyHistory = new LinkedList<Double>();
 		learning = true;
 		this.predictionLearningRate = predictionLearningRate;
+		currentSequence = new LinkedList<SimpleMatrix>();
 	}
 	
 	/**
@@ -67,7 +68,8 @@ public class Sequencer {
 		if (entropyHistory.size() > entropyHistoryLength) entropyHistory.removeFirst();
 		entropyThreshold = calculateAverage(entropyHistory);
 		
-		SimpleMatrix output = null;
+		SimpleMatrix output = null; //Shoudl be set to null but now we just use activation
+		output = rsom.computeActivationMatrix();
 		if (currentEntropy > entropyThreshold){
 			//Calculate probabilities of each of the temporal groups being the ones that started the sequence
 				//Done by calculating the certainty of having observed each of the inputs in the start and multiplying it with the frequency in the temporal groups
@@ -82,7 +84,7 @@ public class Sequencer {
 				SimpleMatrix inputProbabilityMatrix = inputFrequencies.elementMult(inputProbability);
 				double groupCertainty = 1;
 				for (double d : inputProbabilityMatrix.getMatrix().data){
-					groupCertainty *= d;
+					groupCertainty *= d; //TODO: This might lead to very low values
 				}
 				temporalGroupCertaintyMatrix.set(temporalGroup.getId(), groupCertainty);
 			}
@@ -90,7 +92,7 @@ public class Sequencer {
 			output = temporalGroupCertaintyMatrix;
 			
 			//OR: return current activation matrix from pooler signifying which temporal group we are in now
-			output = rsom.computeActivationMatrix();
+			//output = rsom.computeActivationMatrix();
 						
 			//Reset current sequence and set last input to start of new sequence (not sure about last part)
 			currentSequence = new LinkedList<SimpleMatrix>(); 

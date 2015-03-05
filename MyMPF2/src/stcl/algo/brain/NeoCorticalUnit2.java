@@ -44,15 +44,14 @@ public class NeoCorticalUnit2{
 	/**
 	 * 
 	 * @param rand
-	 * @param maxIterations
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
 	 * @param initialPredictionLearningRate
-	 * @param useMarkovPrediction
+	 * @param markovOrder
 	 * @param decayFactor
 	 */
-	public NeoCorticalUnit2(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, double decayFactor) {
+	public NeoCorticalUnit2(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, double decayFactor, double biasFactor) {
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		sequencer = new Sequencer(markovOrder, initialPredictionLearningRate, temporalMapSize, spatialMapSize * spatialMapSize, rand, 0.1, 0.125, 2, decayFactor);
@@ -67,6 +66,7 @@ public class NeoCorticalUnit2{
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
 		this.learning = true;
+		this.biasFactor = biasFactor;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -77,10 +77,12 @@ public class NeoCorticalUnit2{
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
 		
+		SimpleMatrix normalized = Normalizer.normalize(spatialFFOutputMatrix);
+		
 		//Bias
-		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
+		SimpleMatrix biasedOutput = normalized;
 		if (biasMatrix!= null){
-			biasedOutput = spatialFFOutputMatrix.plus(biasFactor, biasMatrix);
+			biasedOutput = normalized.plus(biasFactor, biasMatrix);
 		}
 	
 		biasedOutput = Normalizer.normalize(biasedOutput);
@@ -93,7 +95,7 @@ public class NeoCorticalUnit2{
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = sequencer.feedForward(temporalFFInputVector);
 		
-		ffOutput = temporalFFOutputMatrix;
+		ffOutput = Normalizer.normalize(temporalFFOutputMatrix);
 		
 		return ffOutput;
 	}
@@ -113,6 +115,9 @@ public class NeoCorticalUnit2{
 		SimpleMatrix fbSequencerOutput = sequencer.feedBackward(inputMatrix);
 		
 		biasMatrix = fbSequencerOutput;
+		
+		//Transformation into matrix
+		fbSequencerOutput.reshape(spatialMapSize, spatialMapSize); 
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(fbSequencerOutput);

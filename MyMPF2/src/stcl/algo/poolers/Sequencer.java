@@ -50,7 +50,7 @@ public class Sequencer {
 	 */
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		
-		/*
+		
 		//Save inputvector in sequence memory
 		currentSequence.addLast(inputVector);
 		
@@ -60,7 +60,7 @@ public class Sequencer {
 		
 		//Update temporal pooler
 		rsom.step(inputVector);
-		*/
+		
 		
 		//Predict next input
 		if (learning){

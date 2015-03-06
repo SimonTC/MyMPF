@@ -9,7 +9,7 @@ import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
 
 public class Connection {
-	private NeoCorticalUnit in, out;
+	private NU in, out;
 	private BiasUnit bias;
 	private RewardCorrelator correlator;
 	private SimpleMatrix correlationMatrix;
@@ -20,7 +20,7 @@ public class Connection {
 	 * A connection connects two neocortical units.
 	 * Signals sent through the connection are biased by the bias unit used
 	 */
-	public Connection(NeoCorticalUnit in, NeoCorticalUnit out, Random rand, double biasInfluence, double maxReward, double alpha) {
+	public Connection(NU in, NU out, Random rand, double biasInfluence, double maxReward, double alpha) {
 		this.in = in;
 		this.out = out;
 		int inputMatrixSize = in.getTemporalPooler().getMapSize();

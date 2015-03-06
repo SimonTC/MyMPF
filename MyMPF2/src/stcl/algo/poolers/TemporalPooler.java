@@ -40,8 +40,8 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	/**
 	 * 
-	 * @param inputMatrix
-	 * @return vector
+	 * @param inputMatrix containing probabiliites of being in the dfferent temporal groups in the model
+	 * @return vector containing probabilities of seeing the different spatial models in the current temporal group
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
@@ -49,7 +49,7 @@ public class TemporalPooler extends SpatialPooler  {
 		if (inputMatrix.numCols() != mapSize || inputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the temporal pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(inputMatrix);
+		SimpleMatrix model = chooseRandom(inputMatrix, rsom);
 		
 		//Add noise
 		model = addNoise(model, curNoiseMagnitude);

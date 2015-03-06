@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.SomBasics;
+import dk.stcl.core.som.ISOM;
 import stcl.algo.util.Orthogonalizer;
 
 public class SpatialPooler {
@@ -78,17 +80,17 @@ public class SpatialPooler {
 		if (feedBackwardInputMatrix.numCols() != mapSize || feedBackwardInputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix);
+		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
 		
 		return model;		
 	}
 	
 	/**
-	 * Use roulette emthod to choose a random model
+	 * Use roulette method to choose a random model from the given SOmBAsics object
 	 * @param input
 	 * @return
 	 */
-	protected SimpleMatrix chooseRandom(SimpleMatrix input){
+	protected SimpleMatrix chooseRandom(SimpleMatrix input, SomBasics map){
 		//Transform matrix into vector
 		double[] vector = input.getMatrix().data;
 		
@@ -105,7 +107,7 @@ public class SpatialPooler {
 		id--; //We have to subtract to be sure we get the correct model
 		
 		//Choose model from som
-		SimpleMatrix model = som.getNode(id).getVector();
+		SimpleMatrix model = map.getNode(id).getVector();
 		
 		//System.out.println("Chose model: " + id);
 		

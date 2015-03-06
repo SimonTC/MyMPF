@@ -8,6 +8,7 @@ import dk.stcl.core.som.ISOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.predictors.FirstOrderMM_Original;
 import stcl.algo.predictors.FirstOrderPredictor;
+import stcl.algo.predictors.Predictor_VOMM;
 
 public class Demo {
 	
@@ -23,7 +24,8 @@ public class Demo {
 		
 		SpatialPooler pooler = new SpatialPooler(rand, 3, 10, 0.1, 2, 0.125);
 		//FirstOrderPredictor predictor = new FirstOrderPredictor(10);
-		FirstOrderMM_Original predictor = new FirstOrderMM_Original(10);
+		//FirstOrderMM_Original predictor = new FirstOrderMM_Original(10);
+		Predictor_VOMM predictor = new Predictor_VOMM(5, 0.1, rand);
 		
 		red = rand.nextDouble();
 		green = rand.nextDouble();
@@ -42,11 +44,9 @@ public class Demo {
 			double[] currentColor = {red, green, blue};
 			
 			double[][] inputData = {currentColor};
-			SimpleMatrix input = new SimpleMatrix(inputData);
+			SimpleMatrix input = new SimpleMatrix(inputData);			
 			
-			
-			
-			SimpleMatrix ffOutput = pooler.feedForward(input, false);
+			SimpleMatrix ffOutput = pooler.feedForward(input);
 			
 			SimpleMatrix predictionMatrix = predictor.predict(ffOutput, curLearningRate, true);
 			
@@ -54,7 +54,7 @@ public class Demo {
 			
 			double error = distance(predictedColor, currentColor);
 			
-			System.out.println("Iteration: " + i + " Error " + error);
+			System.out.println(i + " " + error);
 			
 			curLearningRate = initialLearning * Math.exp(-(double) i / iterations);
 			if ( curLearningRate < 0.01) curLearningRate = 0.01;
@@ -111,6 +111,28 @@ public class Demo {
 		
 		//Choose model from som
 		SimpleMatrix model = som.getNode(id).getVector();
+		
+		//System.out.println("Chose model: " + id);
+		
+		return model;
+		
+	}
+	
+	private SimpleMatrix chooseMax(SimpleMatrix m, ISOM som){
+		
+		//Go through bias vector until value is >= random number
+		double max = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		for (int i = 0; i < m.getNumElements(); i++){
+			double value = m.get(i);
+			if (value > max){
+				maxID = i;
+				max = value;
+			}
+		}		
+		
+		//Choose model from som
+		SimpleMatrix model = som.getNode(maxID).getVector();
 		
 		//System.out.println("Chose model: " + id);
 		

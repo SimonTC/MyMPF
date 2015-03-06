@@ -54,10 +54,10 @@ public class Connection {
 		
 		//Convert to matrix
 		int size = in.getTemporalPooler().getMapSize();
-		fbInputMatrix.reshape(size, size);
+		SimpleMatrix fb = new SimpleMatrix(size, size, true, fbInputMatrix.getMatrix().data);
 		
 		//Bias output
-		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fbInputMatrix, correlationMatrix, noiseMagnitude);
+		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fb, correlationMatrix, noiseMagnitude);
 		
 		//Feed to in unit
 		SimpleMatrix ffOutput = in.feedBackward(biasedMatrix);

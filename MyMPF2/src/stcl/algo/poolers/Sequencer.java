@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.predictors.Predictor_VOMM;
+import stcl.algo.util.Normalizer;
 
 public class Sequencer {
 	private Predictor_VOMM predictor;
@@ -23,9 +24,11 @@ public class Sequencer {
 	private int entropyHistoryLength;
 	private boolean learning;
 	private double predictionLearningRate;
+	private double biasFactor;
+	private Random rand;
 	
 	
-	public Sequencer(int markovOrder, double predictionLearningRate, int poolerMapSize, int inputLength, Random rand, double poolerLearningRate, double activationCodingFactor, double stdDev, double decayFactor ) {
+	public Sequencer(int markovOrder, double predictionLearningRate, int poolerMapSize, int inputLength, Random rand, double poolerLearningRate, double activationCodingFactor, double stdDev, double decayFactor, double biasFactor ) {
 		predictor = new Predictor_VOMM(markovOrder, predictionLearningRate);
 		rsom = new RSOM(poolerMapSize, inputLength, rand, poolerLearningRate, activationCodingFactor, stdDev, decayFactor);
 		this.markovOrder = markovOrder;
@@ -36,6 +39,8 @@ public class Sequencer {
 		learning = true;
 		this.predictionLearningRate = predictionLearningRate;
 		currentSequence = new LinkedList<SimpleMatrix>();
+		this.biasFactor = biasFactor;
+		this.rand = rand;
 	}
 	
 	/**
@@ -45,6 +50,7 @@ public class Sequencer {
 	 */
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		
+		/*
 		//Save inputvector in sequence memory
 		currentSequence.addLast(inputVector);
 		
@@ -54,6 +60,7 @@ public class Sequencer {
 		
 		//Update temporal pooler
 		rsom.step(inputVector);
+		*/
 		
 		//Predict next input
 		if (learning){
@@ -68,9 +75,10 @@ public class Sequencer {
 		if (entropyHistory.size() > entropyHistoryLength) entropyHistory.removeFirst();
 		entropyThreshold = calculateAverage(entropyHistory);
 		
-		SimpleMatrix output = null; //Shoudl be set to null but now we just use activation
-		output = rsom.computeActivationMatrix();
+		SimpleMatrix output = null; //Should be set to null but now we just use activation
+		//output = rsom.computeActivationMatrix();
 		if (currentEntropy > entropyThreshold){
+			/*
 			//Calculate probabilities of each of the temporal groups being the ones that started the sequence
 				//Done by calculating the certainty of having observed each of the inputs in the start and multiplying it with the frequency in the temporal groups
 				int length = currentSequence.size() > markovOrder ? markovOrder : currentSequence.size();
@@ -90,6 +98,7 @@ public class Sequencer {
 			}
 			
 			output = temporalGroupCertaintyMatrix;
+			*/
 			
 			//OR: return current activation matrix from pooler signifying which temporal group we are in now
 			//output = rsom.computeActivationMatrix();
@@ -117,14 +126,18 @@ public class Sequencer {
 			//Bias current prediction by the information given in the fb input matrix
 			
 			//Choose most probable temporal group 
-			int maxID = findIDOfMaxElement(inputMatrix);
+			//int maxID = findIDOfMaxElement(inputMatrix);
+			int id = chooseRandom(inputMatrix);
 			
 			//Get weigths of most probable model
-			SimpleMatrix weights = rsom.getNode(maxID).getVector();
+			SimpleMatrix weights = rsom.getNode(id).getVector();
 			
 			//Bias current prediction with weights from next temporal group
 			//TODO: Multiplying or adding?
-			output = prediction.elementMult(weights);
+			//output = prediction.elementMult(weights);
+			output = prediction.plus(biasFactor, weights);
+			
+			output = Normalizer.normalize(output);
 			
 		} 
 		
@@ -152,7 +165,31 @@ public class Sequencer {
 			}
 		}		
 
-		return maxID;
+		return maxID;		
+	}
+	
+	/**
+	 * Use roulette emthod to choose a random model
+	 * @param m
+	 * @return
+	 */
+	private int chooseRandom(SimpleMatrix m){
+		//Transform matrix into vector
+		double[] vector = m.getMatrix().data;
+		
+		//Choose random number between 0 and 1
+		double d = rand.nextDouble();
+		
+		//Go through bias vector until value is >= random number
+		double tmp = 0;
+		int id = 0;
+		while (tmp < d && id < vector.length){
+			tmp += vector[id++];
+		}
+		
+		id--; //We have to subtract to be sure we get the correct model
+		
+		return id;
 		
 	}
 	

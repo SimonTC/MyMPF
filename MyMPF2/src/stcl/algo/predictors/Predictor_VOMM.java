@@ -22,12 +22,14 @@ public class Predictor_VOMM implements Predictor{
 	private LinkedList<Double> inputProbabilities;
 	private int predictedNextSymbol;
 	private SimpleMatrix probabilityMatrix;
+	private Random rand;
 
-	public Predictor_VOMM(int markovOrder, double learningRate) {
+	public Predictor_VOMM(int markovOrder, double learningRate, Random rand) {
 		vomm = new VOMM<Integer>(markovOrder, learningRate);
 		inputProbabilities = new LinkedList<Double>();
 		this.markovOrder = markovOrder;
 		predictedNextSymbol = -1;
+		this.rand = rand;
 		
 	}
 
@@ -82,7 +84,6 @@ public class Predictor_VOMM implements Predictor{
 	}
 	
 	private int findInputByRoulette(SimpleMatrix probabilityMatrix){
-		Random rand = new Random();
 		double v = rand.nextDouble();
 		double sum = 0;
 		boolean found = false;
@@ -110,9 +111,6 @@ public class Predictor_VOMM implements Predictor{
 				max = value;
 			}
 		}		
-		if (maxID == -1){
-			System.out.println();
-		}
 		return maxID;
 		
 	}
@@ -133,6 +131,10 @@ public class Predictor_VOMM implements Predictor{
 	
 	public double calculateEntropy(){
 		return vomm.calculateEntropy();
+	}
+	
+	public void printModel(){
+		vomm.printTrie();
 	}
 	
 

@@ -7,7 +7,11 @@ import java.util.Stack;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
+import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit2;
+import stcl.algo.brain.NeoCorticalUnit3;
+import stcl.algo.brain.SOM_VOMM;
 import stcl.algo.poolers.SOM;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
@@ -17,11 +21,13 @@ public class NU2_Test {
 	private Random rand = new Random(1234);
 	private Stack<Level> levels;
 	private int[] finalSequence;
-	private NeoCorticalUnit2 nu;
+	private NU nu;
 	private double curPrediction;
 	
-	private double noiseFactor_Eval = 2.0;
+	private double noiseFactor_Eval = 0.0;
 	private double noiseFactor_Train = 0.0;
+	
+	private SimpleMatrix equalDistribution;
 
 	public static void main(String[] args) {
 		NU2_Test t = new NU2_Test();
@@ -34,14 +40,20 @@ public class NU2_Test {
 	
 		int maxIterations = 10;
 
-		for (double biasFactor = 0; biasFactor <= 1; biasFactor = biasFactor + 0.1){
+		for (double biasFactor = 0.0; biasFactor <= 1; biasFactor = biasFactor + 0.1){
 			double totalError = 0;
 			for (int i = 0; i < maxIterations; i++){
-				buildSequence();
-				nu = new NeoCorticalUnit2(rand, 1, 3, 4, 0.1, 3, 0.3, biasFactor);
-				runTraining(noiseFactor_Train, 20);
+				
+				setupExperiment(biasFactor);
+				
+				runTraining(noiseFactor_Train, 20);	
+				
+				//nu.printModel();
+				
 				//som.setLearning(false);
+				
 				double error = runEvaluation(noiseFactor_Eval, 20, biasFactor);
+				
 				totalError += error;
 			}
 			double avgMSQE = totalError / (double) maxIterations;
@@ -49,27 +61,64 @@ public class NU2_Test {
 		}
 	}
 	
+	private void setupExperiment(double biasFactor){
+		buildSequence();
+		int temporalMapSize = 4;
+		int inputLength = 1;
+		int spatialMapSize = 4;
+		double predictionLearningRate = 0.1;
+		int markovOrder = 5;
+		double decayFactor = 0.3;
+		
+		//nu = new NeoCorticalUnit2(rand, inputLength, spatialMapSize, temporalMapSize, predictionLearningRate, markovOrder, decayFactor, biasFactor);
+		//nu = new NeoCorticalUnit3(spatialMapSize, inputLength, rand, markovOrder, biasFactor);
+		nu = new SOM_VOMM(spatialMapSize, inputLength, rand, markovOrder, biasFactor);
+		
+		
+		equalDistribution = new SimpleMatrix(temporalMapSize, temporalMapSize);
+		equalDistribution.set(1);
+		equalDistribution = Normalizer.normalize(equalDistribution);
+	}
+	
+	private void printSOMMap(SOM som){
+		System.out.println("SOM weights");
+		String s = "";
+		for (SomNode n : som.getSomMap().getNodes()){
+			s += n.getVector().get(0) + "  ";
+		}
+		System.out.println(s);
+	}
+	
 	private double runEvaluation(double noise, int iterations, double biasFactor){
+		
 		double MSQE = 0;
 		for (int iteration = 0; iteration < iterations; iteration++){
-			double totalError = 0;
-			for (int i : finalSequence){
-				double error = Math.pow(curPrediction - (double)i, 2);
-				totalError += error;
-				double d = i + (0.5 - rand.nextDouble()) * noise;
-				double[][] input = {{d}};
-				
-				SimpleMatrix inputVector = new SimpleMatrix(input);
-
-				SimpleMatrix ffOut = nu.feedForward(inputVector);
-				
-				SimpleMatrix fbOut = nu.feedBackward(ffOut);
-				
-				curPrediction = fbOut.get(0);	
-			}
-			MSQE += totalError / finalSequence.length;
+			double error = doSequence(noise, biasFactor);
+			
+			MSQE += error / finalSequence.length;
 		}
 		return MSQE / (double) iterations;
+	}
+	
+	private double doSequence(double noise, double biasFactor){
+		double totalError = 0;
+		for (int i : finalSequence){
+			double error = Math.pow(curPrediction - (double)i, 2);
+			totalError += error;
+			double d = i + (0.5 - rand.nextDouble()) * noise;
+			//if( biasFactor > 0) System.out.print(d + " ");
+			double[][] input = {{d}};
+			
+			SimpleMatrix inputVector = new SimpleMatrix(input);
+
+			SimpleMatrix spatialOutput = nu.feedForward(inputVector);
+			
+			SimpleMatrix fbOut = nu.feedBackward(equalDistribution);
+			
+			curPrediction = fbOut.get(0);	
+			//if( biasFactor > 0) System.out.println(curPrediction);
+		}
+		return totalError;
 	}
 	
 	private void runTraining(double noise, int iterations){
@@ -82,7 +131,7 @@ public class NU2_Test {
 
 				SimpleMatrix ffOut = nu.feedForward(inputVector);
 				
-				SimpleMatrix fbOut = nu.feedBackward(ffOut);
+				SimpleMatrix fbOut = nu.feedBackward(equalDistribution);
 			}
 		}
 	}

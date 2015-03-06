@@ -129,6 +129,11 @@ public class SpatialPooler {
 		return m;
 	}
 	
+	/**
+	 * Use roulette emthod to choose a random model
+	 * @param input
+	 * @return
+	 */
 	protected SimpleMatrix chooseRandom(SimpleMatrix input){
 		//Transform matrix into vector
 		double[] vector = input.getMatrix().data;

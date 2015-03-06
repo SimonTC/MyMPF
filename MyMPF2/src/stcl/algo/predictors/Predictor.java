@@ -9,5 +9,7 @@ public interface Predictor {
 	public void flush();
 	
 	public SimpleMatrix getConditionalPredictionMatrix();
+	
+	public void printModel();
 
 }

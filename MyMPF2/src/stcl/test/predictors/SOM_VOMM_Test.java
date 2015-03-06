@@ -7,6 +7,7 @@ import java.util.Stack;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SOM;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
@@ -21,7 +22,7 @@ public class SOM_VOMM_Test {
 	private SimpleMatrix biasMatrix;
 	private double curPrediction;
 	
-	private double noiseFactor_Eval = 2.0;
+	private double noiseFactor_Eval = 0.5;
 	private double noiseFactor_Train = 0.0;
 
 	public static void main(String[] args) {
@@ -35,15 +36,16 @@ public class SOM_VOMM_Test {
 	
 		int maxIterations = 10;
 
-		for (double d = 0; d <= 1; d = d + 0.1){
+		for (double biasFactor = 0.0; biasFactor <= 1; biasFactor = biasFactor + 0.1){
 			double totalError = 0;
 			for (int i = 0; i < maxIterations; i++){
-				buildSequence();
-				predictor = new Predictor_VOMM(5, 0.1);
-				som = new SOM(4, 1, rand, 0.1, 0.125, 2);
-				runTraining(noiseFactor_Train, 20);
-				//som.setLearning(false);
-				double error = runEvaluation(noiseFactor_Eval, 20, d);
+				
+				setupExperiment();
+				
+				runTraining(noiseFactor_Train, 20, biasFactor);
+				
+				double error = runEvaluation(noiseFactor_Eval, 20, biasFactor);
+				
 				totalError += error;
 			}
 			double avgMSQE = totalError / (double) maxIterations;
@@ -51,41 +53,77 @@ public class SOM_VOMM_Test {
 		}
 	}
 	
+	private void setupExperiment(){
+		buildSequence();
+		int inputLength = 1;
+		int spatialMapSize = 4;
+		double predictionLearningRate = 0.1;
+		int markovOrder = 5;
+		double spatialLearningRate = 0.1;
+		double activationCodingFactor = 0.125;
+		double stdDev = 2;
+		
+		predictor = new Predictor_VOMM(markovOrder, predictionLearningRate, rand);
+		som = new SOM(spatialMapSize, inputLength, rand, spatialLearningRate, activationCodingFactor, stdDev);
+		
+		
+	}
+	
+	private void printSOMMap(SOM som){
+		System.out.println("SOM weights");
+		String s = "";
+		for (SomNode n : som.getSomMap().getNodes()){
+			s += n.getVector().get(0) + "  ";
+		}
+		System.out.println(s);
+	}
+	
 	private double runEvaluation(double noise, int iterations, double biasFactor){
 		double MSQE = 0;
 		for (int iteration = 0; iteration < iterations; iteration++){
-			double totalError = 0;
-			for (int i : finalSequence){
-				double error = Math.pow(curPrediction - (double)i, 2);
-				totalError += error;
-				double d = i + (0.5 - rand.nextDouble()) * noise;
-				double[] input = {d};
-				som.step(input);
-				SimpleMatrix spatialOutput = som.computeActivationMatrix();
-				
-				//Normalize
-				spatialOutput = Normalizer.normalize(spatialOutput);
-				
-				//Bias
-				SimpleMatrix biasedOutput = spatialOutput;
-				if (biasMatrix!= null){
-					biasedOutput = spatialOutput.plus(biasFactor, biasMatrix);
-				}
+			double error = doSequence(noise, biasFactor);
 			
-				biasedOutput = Normalizer.normalize(biasedOutput);
-				
-				//Predict
-				biasMatrix = predictor.predict(biasedOutput, 0.1, true);
-				
-				int predictionID = predictor.getNextPredictedSymbol();
-				curPrediction = som.getSomMap().get(predictionID).getVector().get(0);	
-			}
-			MSQE += totalError / finalSequence.length;
+			MSQE += error / finalSequence.length;
 		}
 		return MSQE / (double) iterations;
 	}
 	
-	private void runTraining(double noise, int iterations){
+	private double doSequence(double noise, double biasFactor){
+		double totalError = 0;
+		for (int i : finalSequence){
+			double error = Math.pow(curPrediction - (double)i, 2);
+			totalError += error;
+			double d = i + (0.5 - rand.nextDouble()) * noise;
+			//if( biasFactor > 0) System.out.print(d + " ");
+			double[] input = {d};
+			
+			som.step(input);
+			SimpleMatrix spatialOutput = som.computeActivationMatrix();
+			
+			//Normalize
+			spatialOutput = Normalizer.normalize(spatialOutput);
+			
+			//Bias
+			SimpleMatrix biasedOutput = spatialOutput;
+			if (biasMatrix!= null){
+				biasedOutput = spatialOutput.plus(biasFactor, biasMatrix);
+			}
+		
+			biasedOutput = Normalizer.normalize(biasedOutput);
+			
+			//Predict
+			biasMatrix = predictor.predict(biasedOutput, 0.1, true);
+			
+			int predictionID = predictor.getNextPredictedSymbol();
+			curPrediction = som.getSomMap().get(predictionID).getVector().get(0);	
+			//if( biasFactor > 0) System.out.println(curPrediction);
+		}
+		
+		return totalError;
+	
+	}
+	
+	private void runTraining(double noise, int iterations, double biasFactor){
 		for (int iteration = 0; iteration < iterations; iteration++){
 			for (int i : finalSequence){
 				double d = i + (0.5 - rand.nextDouble()) * noise;

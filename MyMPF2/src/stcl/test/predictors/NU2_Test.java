@@ -9,6 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.NU;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.NeoCorticalUnit2;
 import stcl.algo.brain.NeoCorticalUnit3;
 import stcl.algo.brain.SOM_VOMM;
@@ -70,9 +71,10 @@ public class NU2_Test {
 		int markovOrder = 5;
 		double decayFactor = 0.3;
 		
+		nu = new NeoCorticalUnit(rand, inputLength, spatialMapSize, temporalMapSize, predictionLearningRate, true, decayFactor);
 		//nu = new NeoCorticalUnit2(rand, inputLength, spatialMapSize, temporalMapSize, predictionLearningRate, markovOrder, decayFactor, biasFactor);
 		//nu = new NeoCorticalUnit3(spatialMapSize, inputLength, rand, markovOrder, biasFactor);
-		nu = new SOM_VOMM(spatialMapSize, inputLength, rand, markovOrder, biasFactor);
+		//nu = new SOM_VOMM(spatialMapSize, inputLength, rand, markovOrder, biasFactor);
 		
 		
 		equalDistribution = new SimpleMatrix(temporalMapSize, temporalMapSize);

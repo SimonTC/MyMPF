@@ -76,15 +76,12 @@ public class NeoCorticalUnit2 implements NU{
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
 		//Spatial classification
-		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
-		
-		//Normalize output
-		SimpleMatrix normalized = Normalizer.normalize(spatialFFOutputMatrix);
+		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Bias
-		SimpleMatrix biasedOutput = normalized;
+		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
 		if (biasMatrix!= null){
-			biasedOutput = normalized.plus(biasFactor, biasMatrix);
+			biasedOutput = spatialFFOutputMatrix.plus(biasFactor, biasMatrix);
 		}
 		
 		//Normalize

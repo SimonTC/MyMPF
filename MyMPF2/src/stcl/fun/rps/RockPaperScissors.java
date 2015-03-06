@@ -68,10 +68,10 @@ public class RockPaperScissors {
 			SimpleMatrix ffOutput1 = conn.feedForward(combinedInput, externalReward, 0.1);
 			
 			//Reshape ff output from unit 1
-			ffOutput1.reshape(1, 100);
+			SimpleMatrix out = new SimpleMatrix(1, 100, true, ffOutput1.getMatrix().data);
 			
 			//Feed through unit 2
-			SimpleMatrix ffOutput = unit2.feedForward(ffOutput1);
+			SimpleMatrix ffOutput = unit2.feedForward(out);
 			
 			//Feed back through unit 2
 			unit2.feedBackward(ffOutput);
@@ -80,8 +80,7 @@ public class RockPaperScissors {
 			SimpleMatrix fbOutput = conn.feedBack(0.1);
 			
 			//Collect next action and prediction
-			prediction = fbOutput;
-			prediction.reshape(5, 5);			
+			prediction = new SimpleMatrix(5, 5, true, fbOutput.getMatrix().data);		
 			
 			curInput++;
 			if (curInput >= sequence.length){

@@ -7,6 +7,7 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
+import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.FirstOrderMM_Original;
@@ -16,7 +17,7 @@ import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
-public class NeoCorticalUnit{
+public class NeoCorticalUnit implements NU{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
@@ -57,7 +58,7 @@ public class NeoCorticalUnit{
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, 0.3); //TODO: Move all parameters out
-		predictor = new Predictor_VOMM(1, 0.1);
+		predictor = new Predictor_VOMM(5, 0.1, rand);
 		//predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -77,24 +78,17 @@ public class NeoCorticalUnit{
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
 		//Spatial classification
-		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector, false);
-		
-		//Orthogonalize output
-		SimpleMatrix spatialFFOutputOrthogonalized =  orthogonalize(spatialFFOutputMatrix);
+		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			//SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(spatialFFOutputMatrix);			
 			predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate, learning);
 		} 		
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = spatialFFOutputOrthogonalized.getMatrix().data;		
+		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-		
-		//Aggressive orthogonalization
-		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
@@ -290,6 +284,17 @@ public class NeoCorticalUnit{
 	
 	public Predictor getPredictor(){
 		return predictor;
+	}
+
+	@Override
+	public SOM getSOM() {
+		return spatialPooler.getSOM();
+	}
+
+	@Override
+	public void printModel() {
+		predictor.printModel();
+		
 	}
 
 }

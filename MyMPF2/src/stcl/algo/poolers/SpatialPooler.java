@@ -50,10 +50,9 @@ public class SpatialPooler {
 	/**
 	 * 
 	 * @param feedForwardInputVector
-	 * @param orthogonalize if true output is orthogonalized. 
-	 * @return Returns a probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input
+	 * @return Returns a probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input.
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector, boolean orthogonalize){
+	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
 		//Test input
 		if (!feedForwardInputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
 		if (feedForwardInputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
@@ -64,30 +63,14 @@ public class SpatialPooler {
 		//Compute ActivationMatrix
 		activationMatrix = som.computeActivationMatrix();
 		
-		//Normalize activation matrix
-		//activationMatrix = normalize(activationMatrix);
-		
-		//Orthogonalize activation matrix
-		if (orthogonalize){
-			activationMatrix = orthogonalize(activationMatrix);
-		}
-		
 		return activationMatrix;
 	}
 	
-	/**
-	 * 
-	 * @param feedForwardInputVector
-	 * @return orthogonalized probability matrix. The value of cell (i,j) in the output matrix is the probability that SOM-model (i,j) is an accurate model of the observed input
-	 */
-	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
-		return feedForward(feedForwardInputVector, true);
-	}
-	
+		
 	/**
 	 * 
 	 * @param feedBackwardInputMatrix
-	 * @return vector Returns a vector with the values that are expected to be observed at time t+1
+	 * @return vector Returns a vector with the values that are expected to be observed at time t+1. The vector is choosed by roulette based on the weights in the feedBackwardInputMatrix.
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix feedBackwardInputMatrix){
 		//Test input
@@ -97,36 +80,7 @@ public class SpatialPooler {
 		//Choose random model from som by roulette selection based on the input
 		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix);
 		
-		//Add noise
-		model = addNoise(model, curNoiseMagnitude);
-		
-		return model;
-		
-	}
-	
-	protected SimpleMatrix orthogonalize(SimpleMatrix m) {
-		return Orthogonalizer.orthogonalize(m);
-		/*
-		double max = Double.NEGATIVE_INFINITY;
-		int maxID = -1;
-		for (int i = 0; i < m.getNumElements(); i++){
-			double value = m.get(i);
-			if (value > max){
-				max = value;
-				maxID = i;
-			}
-		}
-		
-		SimpleMatrix ortho = new SimpleMatrix(m.numRows(), m.numCols());
-		ortho.set(maxID, 1);
-		return ortho;
-		*/
-	}
-	
-	protected SimpleMatrix normalize(SimpleMatrix matrix){
-		double sum = matrix.elementSum();
-		SimpleMatrix m = matrix.scale(1/sum);
-		return m;
+		return model;		
 	}
 	
 	/**

@@ -29,7 +29,7 @@ public class Sequencer {
 	
 	
 	public Sequencer(int markovOrder, double predictionLearningRate, int poolerMapSize, int inputLength, Random rand, double poolerLearningRate, double activationCodingFactor, double stdDev, double decayFactor, double biasFactor ) {
-		predictor = new Predictor_VOMM(markovOrder, predictionLearningRate);
+		predictor = new Predictor_VOMM(markovOrder, predictionLearningRate, rand);
 		rsom = new RSOM(poolerMapSize, inputLength, rand, poolerLearningRate, activationCodingFactor, stdDev, decayFactor);
 		this.markovOrder = markovOrder;
 		cumulativeProbabilityOfHavingSeenInput = new SimpleMatrix(1, inputLength);
@@ -121,7 +121,7 @@ public class Sequencer {
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		
 		SimpleMatrix output = prediction;
-				
+				/*
 		if (currentEntropy > entropyThreshold){
 			//Bias current prediction by the information given in the fb input matrix
 			
@@ -140,7 +140,7 @@ public class Sequencer {
 			output = Normalizer.normalize(output);
 			
 		} 
-		
+		*/
 		return output;
 	}
 	

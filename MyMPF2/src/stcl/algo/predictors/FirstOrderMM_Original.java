@@ -144,4 +144,10 @@ public class FirstOrderMM_Original implements Predictor {
 		conditionalPredictionMatrix = Normalizer.normalizeColumns(conditionalPredictionMatrix);
 	}
 
+	@Override
+	public void printModel() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

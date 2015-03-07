@@ -130,4 +130,10 @@ public class FirstOrderPredictor implements Predictor{
 		return this.conditionalPredictionMatrix.getTransitionProbabilityMatrix();
 	}
 
+	@Override
+	public void printModel() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

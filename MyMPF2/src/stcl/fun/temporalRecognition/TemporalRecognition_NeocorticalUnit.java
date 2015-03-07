@@ -205,8 +205,9 @@ public class TemporalRecognition_NeocorticalUnit {
 		double temporalLearningRate = 0.1;
 		double activationCodingFactor_Temporal = 0.125;
 		double initialPredictionLearningRate = 0.5;
+		int markovOrder = 1;
 		
-		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, decay);
+		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, decay, markovOrder);
 	}
 	
 	private void buildSequences(){

@@ -84,6 +84,30 @@ public class NeoCorticalUnit3 implements NU{
 		
 	}
 
+	@Override
+	public SpatialPooler getSpatialPooler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public TemporalPooler getTemporalPooler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SimpleMatrix getFfOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SimpleMatrix getFbOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 }

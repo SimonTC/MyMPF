@@ -188,4 +188,10 @@ public class NeoCorticalUnit2 implements NU{
 		
 	}
 
+	@Override
+	public TemporalPooler getTemporalPooler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

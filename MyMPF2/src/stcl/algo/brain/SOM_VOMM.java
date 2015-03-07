@@ -5,6 +5,8 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.poolers.SOM;
+import stcl.algo.poolers.SpatialPooler;
+import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 
@@ -71,6 +73,34 @@ public class SOM_VOMM implements NU {
 	public void printModel() {
 		predictor.printModel();
 		
+	}
+
+
+	@Override
+	public SpatialPooler getSpatialPooler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public TemporalPooler getTemporalPooler() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public SimpleMatrix getFfOutput() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public SimpleMatrix getFbOutput() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

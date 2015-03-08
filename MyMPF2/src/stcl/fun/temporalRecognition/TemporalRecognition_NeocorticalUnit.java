@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NU;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor;

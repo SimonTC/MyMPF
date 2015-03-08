@@ -4,9 +4,9 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.som.ISOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.predictors.Predictor_VOMM;
+import dk.stcl.core.som.ISOM;
 
 public class Demo {
 	

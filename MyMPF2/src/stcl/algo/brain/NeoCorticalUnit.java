@@ -1,19 +1,16 @@
 package stcl.algo.brain;
 
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
-import stcl.algo.util.Orthogonalizer;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class NeoCorticalUnit implements NU{
 	

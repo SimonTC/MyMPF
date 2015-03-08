@@ -3,7 +3,6 @@ package stcl.algo.poolers;
 import java.util.Random;
 
 import dk.stcl.core.rsom.RSOM_SemiOnline;
-import dk.stcl.core.rsom.RSOM_Simple;
 
 public class RSOM extends RSOM_SemiOnline {
 

@@ -9,7 +9,6 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NU;
-import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import dk.stcl.core.basic.containers.SomNode;

@@ -1,9 +1,6 @@
 package stcl.test.predictors;
 
-import java.util.LinkedList;
-
 import stcl.algo.predictors.VOMM;
-import stcl.algo.util.trie.Trie;
 
 public class VOMMTest {
 

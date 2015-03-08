@@ -1,18 +1,16 @@
 package stcl.test.predictors;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Stack;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SOM;
-import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class NU2_Test {
 	

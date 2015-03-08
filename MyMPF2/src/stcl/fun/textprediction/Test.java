@@ -2,11 +2,8 @@ package stcl.fun.textprediction;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
-
-import javax.swing.text.html.HTMLDocument.RunElement;
 
 import stcl.algo.predictors.VOMM;
 

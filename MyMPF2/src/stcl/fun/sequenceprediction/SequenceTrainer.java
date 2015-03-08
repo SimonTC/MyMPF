@@ -1,16 +1,15 @@
 package stcl.fun.sequenceprediction;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.NU;
 import stcl.algo.poolers.RSOM;
 import stcl.algo.poolers.SOM;
 import stcl.algo.util.Normalizer;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class SequenceTrainer {
 	private ArrayList<double[]> possibleSequences; //All possible sequences

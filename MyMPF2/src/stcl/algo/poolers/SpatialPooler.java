@@ -5,8 +5,6 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.SomBasics;
-import dk.stcl.core.som.ISOM;
-import stcl.algo.util.Orthogonalizer;
 
 public class SpatialPooler {
 	

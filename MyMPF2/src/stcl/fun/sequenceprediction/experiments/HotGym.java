@@ -10,7 +10,6 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
-import org.math.plot.Plot2DPanel;
 
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;

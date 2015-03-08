@@ -7,7 +7,6 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
-import stcl.algo.util.Normalizer;
 import stcl.fun.sequenceprediction.SequenceBuilder;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 

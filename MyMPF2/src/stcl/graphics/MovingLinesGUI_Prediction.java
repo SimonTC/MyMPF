@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.NU;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
@@ -92,7 +92,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		this(spatialPooler.getSOM(), temporalPooler.getRSOM());
 	}
 	
-	public MovingLinesGUI_Prediction(NeoCorticalUnit unit) {
+	public MovingLinesGUI_Prediction(NU unit) {
 		this(unit.getSpatialPooler(), unit.getTemporalPooler());
 	}
 	
@@ -101,7 +101,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 	 * @param inputVector
 	 * @param unit
 	 */
-	public void updateData(SimpleMatrix inputVector, NeoCorticalUnit unit){
+	public void updateData(SimpleMatrix inputVector, NU unit){
 		this.updateData(inputVector, unit.getSpatialPooler(), unit.getTemporalPooler());
 		
 		//Get predicted next output

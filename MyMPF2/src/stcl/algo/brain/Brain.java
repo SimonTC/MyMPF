@@ -10,8 +10,8 @@ import stcl.algo.brain.rewardCorrelators.RewardFunction;
 
 public class Brain {
 	
-	private NeoCorticalUnit nu1;
-	private NeoCorticalUnit nu2;
+	private NU nu1;
+	private NU nu2;
 	
 	private Random rand;
 	private int maxIterations;
@@ -62,9 +62,9 @@ public class Brain {
 		
 		bias = new BiasUnit(ffOutputU1Before.numRows(), historyInfluence, rand);
 		
-		nu1 = new NeoCorticalUnit(rand, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, constantLeakyCoefficient,markovOrder);
+		nu1 = new NeoCorticalUnit4(rand, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
 		
-		nu2 = new NeoCorticalUnit(rand, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, constantLeakyCoefficient,markovOrder);
+		nu2 = new NeoCorticalUnit4(rand, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
 	}
 	
 	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){
@@ -101,8 +101,8 @@ public class Brain {
 	}
 	
 	public void newIteration(){
-		nu1.flushTemporalMemory();
-		nu2.flushTemporalMemory();
+		nu1.flush();
+		nu2.flush();
 	}
 
 }

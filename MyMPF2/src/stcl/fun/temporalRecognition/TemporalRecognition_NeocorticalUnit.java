@@ -7,19 +7,19 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.NU;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor;
 import stcl.graphics.MovingLinesGUI_Prediction;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class TemporalRecognition_NeocorticalUnit {
 	private ArrayList<SimpleMatrix[]> sequences;
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private NeoCorticalUnit nu;
+	private NU nu;
 	
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;
@@ -50,7 +50,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		
 		//Train
 		training(ITERATIONS, rand, VISUALIZE_TRAINING);
-		nu.flushTemporalMemory();
+		nu.flush();
 		nu.setLearning(false);
 		
 		//Label
@@ -104,7 +104,7 @@ public class TemporalRecognition_NeocorticalUnit {
 
 		
 		if (VISUALIZE_RESULT){
-			nu.flushTemporalMemory();
+			nu.flush();
 			nu.setLearning(false);
 			 setupGraphics();
 			 training(ITERATIONS, rand, true);			 

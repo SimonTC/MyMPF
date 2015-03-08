@@ -7,13 +7,14 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.NU;
+import stcl.algo.brain.NeoCorticalUnit4;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class SequencePrediction {
 	
 	private MovingLinesGUI_Prediction frame;
-	private NeoCorticalUnit unit;
+	private NU unit;
 	private Random rand = new Random();
 	private ArrayList<SimpleMatrix[]> sequences;
 	private final int NUM_ITERAIONS = 80000;
@@ -47,14 +48,14 @@ public class SequencePrediction {
 		if (VISUALIZE_TRAINING) setupGraphics();
 		runExperiment(VISUALIZE_TRAINING);
 		
-		unit.flushTemporalMemory();
+		unit.flush();
 		unit.setLearning(false);
 		
 		evaluate(1000);
 		
 		if (VISUALIZE_RESULT){
 			unit.setLearning(false);
-			unit.flushTemporalMemory();
+			unit.flush();
 			setupGraphics();
 			runExperiment(true);
 		}
@@ -151,7 +152,7 @@ public class SequencePrediction {
 		boolean useFirstOrderPrediction = true;
 		double decay = 0.7;
 		int markovOrder = 1;
-		unit = new NeoCorticalUnit(rand, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction, decay, markovOrder);
+		unit = new NeoCorticalUnit4(rand, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction,  markovOrder);
 		
 		
 	}

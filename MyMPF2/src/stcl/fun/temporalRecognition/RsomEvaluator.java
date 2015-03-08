@@ -5,11 +5,10 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
-import dk.stcl.core.rsom.IRSOM;
-import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.rsom.IRSOM;
 
 public class RsomEvaluator {
 	

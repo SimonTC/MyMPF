@@ -6,7 +6,6 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Connection;
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.NeoCorticalUnit4;
 
 public class RockPaperScissors {

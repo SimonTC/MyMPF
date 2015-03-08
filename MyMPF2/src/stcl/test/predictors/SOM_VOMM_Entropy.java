@@ -39,7 +39,7 @@ public class SOM_VOMM_Entropy {
 			double totalError = 0;
 			for (int i = 0; i < maxIterations; i++){
 				buildSequence();
-				predictor = new Predictor_VOMM(5, 0.1);
+				predictor = new Predictor_VOMM(5, 0.1, rand);
 				som = new SOM(4, 1, rand, 0.1, 0.125, 2);
 				//runTraining(noiseFactor_Train, 20);
 				//som.setLearning(false);

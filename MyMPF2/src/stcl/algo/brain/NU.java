@@ -25,4 +25,6 @@ public interface NU {
 	public SimpleMatrix getFbOutput();
 	
 	public void flush();
+	
+	public void setLearning(boolean learning);
 }

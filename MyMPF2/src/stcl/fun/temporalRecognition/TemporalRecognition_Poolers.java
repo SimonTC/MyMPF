@@ -7,7 +7,6 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
 import stcl.graphics.MovingLinesGUI_Prediction;

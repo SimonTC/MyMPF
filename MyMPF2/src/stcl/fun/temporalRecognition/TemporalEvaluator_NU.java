@@ -5,12 +5,12 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.NU;
 import dk.stcl.core.basic.containers.SomNode;
 
 public class TemporalEvaluator_NU {
 
-	public double evaluate(NeoCorticalUnit nu, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels, SimpleMatrix joker, double noise, int iterations, Random rand){
+	public double evaluate(NU nu, ArrayList<SimpleMatrix[]> sequences, int[] sequenceLabels, SimpleMatrix joker, double noise, int iterations, Random rand){
 		assert sequences.size() == sequenceLabels.length : "The number of labels does not equal the number of sequences!";
 		
 	    int curSeqID = 0;
@@ -18,7 +18,7 @@ public class TemporalEvaluator_NU {
 	    
 	    for (int i = 0; i < iterations; i++){
 	    	//Flush memory
-	    	nu.flushTemporalMemory();
+	    	nu.flush();
 	    	
 	    	//Choose sequence	    	
 	    	curSeqID = rand.nextInt(sequences.size());
@@ -31,7 +31,7 @@ public class TemporalEvaluator_NU {
 	    		nu.feedBackward(ffOUtput);    		
 	    	}
 	    	
-	    	SomNode bmu = nu.findTemporalBMU();
+	    	SomNode bmu = nu.getTemporalPooler().getRSOM().getBMU();
 	    	int bmuLabel = bmu.getLabel();
 	    	int correctLabel = sequenceLabels[curSeqID];
 	    	if (bmuLabel != correctLabel) error++;

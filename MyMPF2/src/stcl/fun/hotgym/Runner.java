@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 import org.math.plot.Plot2DPanel;
 
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.NeoCorticalUnit4;
 
 public class Runner {
 	private ArrayList<Double> data;
@@ -43,7 +43,7 @@ public class Runner {
 					}
 					
 					//Create neocortical unit
-					NeoCorticalUnit nu = createUnit(iterations);
+					NeoCorticalUnit4 nu = createUnit(iterations);
 					
 					//Do test
 					test(iterations, nu, data);
@@ -54,7 +54,7 @@ public class Runner {
 				}
 	}
 	
-	private void test(int iterations, NeoCorticalUnit unit, ArrayList<Double> data){
+	private void test(int iterations, NeoCorticalUnit4 unit, ArrayList<Double> data){
 		SimpleMatrix ffOutput;
 		SimpleMatrix fbOutput;
 		double error;
@@ -64,7 +64,7 @@ public class Runner {
 			xValues = new ArrayList<Double>();
 			output.add((double) 0);
 			double mse = 0;
-			unit.flushTemporalMemory();
+			unit.flush();
 			for (int i = 0; i < data.size() - 1; i++){
 				xValues.add((double) (i+1)); 
 				double input = data.get(i);
@@ -135,7 +135,7 @@ public class Runner {
 		return arr;
 	}
 	
-	private NeoCorticalUnit createUnit(int maxIterations){
+	private NeoCorticalUnit4 createUnit(int maxIterations){
 		Random rand = new Random();
 		int ffInputLength = 1;
 		int spatialMapSize = 10;
@@ -145,7 +145,7 @@ public class Runner {
 		double leakyCoefficient = 0.3;		
 		int markovOrder = 1;
 		
-		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient, markovOrder);
+		NeoCorticalUnit4 nu = new NeoCorticalUnit4(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
 		
 		return nu;
 	}

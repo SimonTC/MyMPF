@@ -8,8 +8,6 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.graphics.MovingLinesGUI_Prediction;
-import dk.stcl.core.basic.ISomBasics;
-import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.rsom.IRSOM;
 import dk.stcl.core.rsom.RSOM_SemiOnline;
 import dk.stcl.core.rsom.RSOM_Simple;

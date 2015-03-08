@@ -7,15 +7,10 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.graphics.MovingLinesGUI_Prediction;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.rsom.RSOM_Simple;
 import dk.stcl.core.som.SOM_SemiOnline;
-import stcl.algo.brain.NeoCorticalUnit;
-import stcl.algo.poolers.RSOM;
-import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.predictors.Predictor;
-import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class TemporalRecognition_RSOM2 {
 	private ArrayList<SimpleMatrix[]> sequences;

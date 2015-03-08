@@ -13,7 +13,6 @@ import org.ejml.simple.SimpleMatrix;
 import org.math.plot.Plot2DPanel;
 
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.NeoCorticalUnit4;
 import stcl.algo.util.Normalizer;
 import stcl.fun.sequenceprediction.SequenceTrainer;

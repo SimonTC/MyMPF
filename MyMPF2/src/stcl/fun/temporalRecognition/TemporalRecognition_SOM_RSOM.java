@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.util.Orthogonalizer;
+import stcl.graphics.MovingLinesGUI_Prediction;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.rsom.IRSOM;
 import dk.stcl.core.rsom.RSOM_SemiOnline;
@@ -14,10 +16,6 @@ import dk.stcl.core.rsom.RSOM_Simple;
 import dk.stcl.core.som.ISOM;
 import dk.stcl.core.som.SOM_SemiOnline;
 import dk.stcl.core.som.SOM_Simple;
-import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.util.Orthogonalizer;
-import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class TemporalRecognition_SOM_RSOM {
 	private ArrayList<SimpleMatrix[]> sequences;

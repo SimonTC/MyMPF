@@ -23,8 +23,7 @@ public class RSOMTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		
-		rsom = new RSOM(rsomSize, rsomSize, inputVectorLength, rand, leakyCoefficient);
+		rsom = new RSOM(rsomSize, inputVectorLength, rand, 0.1, 0.125, 2, leakyCoefficient);
 	}
 
 	@Test

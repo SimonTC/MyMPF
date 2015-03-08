@@ -54,7 +54,8 @@ public class NeoCorticalUnit4 implements NU{
 	 * @param useMarkovPrediction
 	 * @param decayFactor
 	 */
-	public NeoCorticalUnit4(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, double decayFactor, int markovOrder) {
+	public NeoCorticalUnit4(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
+		double decay = calculateDecay(markovOrder, 0.01);
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, 0.3); //TODO: Move all parameters out
@@ -71,6 +72,17 @@ public class NeoCorticalUnit4 implements NU{
 		this.temporalMapSize = temporalMapSize;
 		this.learning = true;
 	}
+	
+	/**
+	 * Calculate the decay which will have the first input in a sequence have a t least minInfluence influence on the difference vector in the rsom
+	 * @param memoryLength
+	 * @param minInfluence
+	 * @return
+	 */
+	private double calculateDecay(int memoryLength, double minInfluence){
+		double decay = 1 - Math.pow(minInfluence, 1 / memoryLength);
+		return decay;
+ 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		//Test input

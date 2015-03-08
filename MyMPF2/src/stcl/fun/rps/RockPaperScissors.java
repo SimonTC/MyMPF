@@ -46,8 +46,8 @@ public class RockPaperScissors {
 		boolean useMarkovPrediction = true;
 		double decayFactor = 0.3;
 		int markovOrder = 2;
-		unit1 = new NeoCorticalUnit4(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor, markovOrder);
-		unit2 = new NeoCorticalUnit4(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, decayFactor,markovOrder);
+		unit1 = new NeoCorticalUnit4(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction,  markovOrder);
+		unit2 = new NeoCorticalUnit4(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
 		conn = new Connection(unit1, unit2, rand, 0.3, 2, 0.3);
 	}
 	
@@ -68,11 +68,11 @@ public class RockPaperScissors {
 			double predictionError = diff.normF();
 			int labelError = labelID == labelSequence[curInput] ? 0 : 1;
 			
-			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
 			
 			externalReward = reward(labelID, curActionID);
 			
-			System.out.println(i + " " + externalReward);
+			//System.out.println(i + " " + externalReward);
 			
 			//Reshape input to vector
 			input.reshape(1, 25);

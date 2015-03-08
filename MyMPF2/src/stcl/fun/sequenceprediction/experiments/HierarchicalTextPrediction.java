@@ -39,13 +39,14 @@ public class HierarchicalTextPrediction {
 		ArrayList<double[]> sequences = new ArrayList<double[]>();
 		sequences.add(sequence);
 		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand);
-		trainer.train(brain, 0);
+		boolean calculateErrorAsDistance = false;
+		trainer.train(brain, 0, calculateErrorAsDistance);
 	}
 	
 	private void setupBrain(int numUnits){
 		int temporalMapSize = 4;
 		int inputLength = 1;
-		int spatialMapSize = 2;
+		int spatialMapSize = 5;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 5;
 
@@ -64,10 +65,11 @@ public class HierarchicalTextPrediction {
 	
 	private void buildSequence(){
 		SequenceBuilder builder = new SequenceBuilder();
-		int numLevels = 4;
-		int alphabetSize = 3;
+		
 		int minBlockLength = 3;
-		int maxBlockLength = 3;
+		int maxBlockLength = 9;
+		int alphabetSize = 8;		
+		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
 		double[] doubleSequence = new double[intSequence.length];
 		for (int i = 0; i < intSequence.length; i++){

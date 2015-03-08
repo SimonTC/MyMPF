@@ -36,9 +36,10 @@ public class SequenceTrainer {
 	 * Trains the brain on a trainingset generated when the sequenceTrainer was instantiated
 	 * @param brain
 	 * @param noiseMagnitude
+	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(ArrayList<NU> brain, double noiseMagnitude){
-		return train(brain, noiseMagnitude, trainingSet);
+	public ArrayList<Double> train(ArrayList<NU> brain, double noiseMagnitude, boolean calculateErrorAsDistance){
+		return train(brain, noiseMagnitude, trainingSet, calculateErrorAsDistance);
 	}
 	
 	/**
@@ -47,17 +48,18 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(ArrayList<NU> brain, double noiseMagnitude, ArrayList<double[]> givenTrainingSet){
+	public ArrayList<Double> train(ArrayList<NU> brain, double noiseMagnitude, ArrayList<double[]> givenTrainingSet, boolean calculateErrorAsDistance){
 		ArrayList<Double> errors = new ArrayList<Double>(); 
 		int counter = 1;
 		int numSequences = givenTrainingSet.size();
 		for (double[] sequence : givenTrainingSet){
 			//flush(brain);
-			double error = doSequence(brain, noiseMagnitude, sequence);
+			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance);
 			//SOM som = brain.get(0).getSOM(); printSomMap(som);
 			errors.add(error);
-			System.out.printf("Sequence " +counter + " of " + numSequences + " MSE: %1$.3f", error);
-			System.out.println();
+			//System.out.printf("Sequence " +counter + " of " + numSequences + " MSE: %1$.3f", error);
+			System.out.println( error);
+			//System.out.println();
 			counter++;
 		}
 		return errors;
@@ -73,11 +75,15 @@ public class SequenceTrainer {
 		System.out.println();
 	}
 	
-	private double doSequence(ArrayList<NU> brain, double noiseMagnitude, double[] sequence){
+	private double doSequence(ArrayList<NU> brain, double noiseMagnitude, double[] sequence, boolean calculateErrorAsDistance){
 		double prediction = 0;
 		double totalError = 0;
 		for (double d : sequence){
-			totalError += calculateErrorAsDistance(prediction, d);
+			if (calculateErrorAsDistance) {
+				totalError += calculateErrorAsDistance(prediction, d);
+			} else {
+				totalError += calculateErrorAsBoolean(prediction, d);
+			}
 			SimpleMatrix output = step(brain, noiseMagnitude, d);
 			prediction = output.get(0);
 		}
@@ -149,6 +155,13 @@ public class SequenceTrainer {
 	private double calculateErrorAsDistance(double prediction, double actual){
 		double error = Math.pow(prediction - actual, 2);
 		return error;
+	}
+	
+	private double calculateErrorAsBoolean(double prediction, double actual){
+		float actual_int = Math.round(actual);
+		float prediction_int = Math.round(prediction);
+		if (actual_int != prediction_int) return 1;
+		return 0;
 	}
 	
 	private double addNoise(double value, double noiseMagnitude){

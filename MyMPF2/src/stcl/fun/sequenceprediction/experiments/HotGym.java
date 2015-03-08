@@ -57,7 +57,8 @@ public class HotGym {
 			list.add(data);
 			Random rand = new Random();
 			SequenceTrainer trainer = new SequenceTrainer(list, ITERATIONS, rand );
-			ArrayList<Double> errors = trainer.train(brain, 0);
+			boolean calculateErrorAsDistance = true;
+			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance);
 					
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

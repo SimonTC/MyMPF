@@ -1,4 +1,4 @@
-package stcl.fun.sequenceprediction;
+package stcl.fun.sequenceprediction_figures;
 
 import java.util.ArrayList;
 import java.util.Random;

@@ -271,7 +271,7 @@ public class NeoCorticalUnit4 implements NU{
 	
 	
 	
-	public void flushTemporalMemory(){
+	public void flush(){
 		temporalPooler.flushTemporalMemory();
 		biasMatrix.set(1);
 		predictor.flush();
@@ -338,5 +338,4 @@ public class NeoCorticalUnit4 implements NU{
 		predictor.printModel();
 		
 	}
-
 }

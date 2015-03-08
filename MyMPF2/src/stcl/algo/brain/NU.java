@@ -23,4 +23,6 @@ public interface NU {
 	public SimpleMatrix getFfOutput();
 
 	public SimpleMatrix getFbOutput();
+	
+	public void flush();
 }

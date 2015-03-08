@@ -27,7 +27,8 @@ public class TemporalEvaluator_NU {
 	    	for (SimpleMatrix input : curSequence){
 	    		if (rand.nextDouble() < noise)  input = joker;
 
-	    		ffOUtput = nu.feedForward(input);
+	    		nu.feedForward(input);
+	    		ffOUtput = nu.getFfOutput();
 	    		nu.feedBackward(ffOUtput);    		
 	    	}
 	    	

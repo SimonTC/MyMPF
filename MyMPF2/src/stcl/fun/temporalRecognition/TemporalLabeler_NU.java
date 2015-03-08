@@ -54,7 +54,8 @@ public class TemporalLabeler_NU {
 			SimpleMatrix[] sequence = sequences.get(sequenceID);
 			SimpleMatrix ffOUtput = null;		
 			for (SimpleMatrix m : sequence){
-	    		ffOUtput = nu.feedForward(m);
+	    		nu.feedForward(m);
+	    		ffOUtput = nu.getFfOutput();
 	    		nu.feedBackward(ffOUtput);
 			}
 			

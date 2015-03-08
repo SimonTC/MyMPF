@@ -5,6 +5,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.predictors.Predictor;
 
 public interface NU {
 	
@@ -27,4 +28,6 @@ public interface NU {
 	public void flush();
 	
 	public void setLearning(boolean learning);
+	
+	public Predictor getPredictor();
 }

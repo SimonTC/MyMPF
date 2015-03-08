@@ -133,8 +133,10 @@ public class TemporalRecognition_NeocorticalUnit {
 	    	SimpleMatrix[] curSequence = sequences.get(curSeqID);
 	    	
 	    	for (SimpleMatrix input : curSequence){
-	    		SimpleMatrix ffOUtput = nu.feedForward(input);
-	    		SimpleMatrix fbOUtput = nu.feedBackward(ffOUtput);
+	    		nu.feedForward(input);
+	    		SimpleMatrix ffOUtput = nu.getFfOutput();
+	    		nu.feedBackward(ffOUtput);
+	    		SimpleMatrix fbOUtput = nu.getFbOutput();
 	    		
 	    		
 	    		/*
@@ -160,7 +162,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	    		}
 	    	}
     		
-    		nu.sensitize(i);
+    		//nu.sensitize(i);
 	    }
 
 	}
@@ -208,7 +210,7 @@ public class TemporalRecognition_NeocorticalUnit {
 		double initialPredictionLearningRate = 0.5;
 		int markovOrder = 1;
 		
-		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, decay, markovOrder);
+		nu = new NeoCorticalUnit(rand, spatialInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, usePrediction, markovOrder);
 	}
 	
 	private void buildSequences(){

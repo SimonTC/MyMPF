@@ -58,9 +58,8 @@ public class NeoCorticalUnit4 implements NU{
 		double decay = calculateDecay(markovOrder, 0.01);
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
-		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, 0.3); //TODO: Move all parameters out
+		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, decay); //TODO: Move all parameters out
 		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
-		//predictor = new FirstOrderPredictor(spatialMapSize);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(temporalMapSize, temporalMapSize);
@@ -107,9 +106,9 @@ public class NeoCorticalUnit4 implements NU{
 			double predictionInfluence = calculatePredictionBias(predictionEntropy, spatialEntropy);
 			//if (predictionInfluence > 0) System.out.println("Prediction does have an influence");
 			biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
-		}
-		
-		
+			//biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
+			biasedOutput = Normalizer.normalize(biasedOutput);
+		}		
 		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = biasedOutput.getMatrix().data;		

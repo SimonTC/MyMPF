@@ -64,7 +64,7 @@ public class HierarchicalTextPrediction {
 	
 	private void buildSequence(){
 		SequenceBuilder builder = new SequenceBuilder();
-		int numLevels = 3;
+		int numLevels = 4;
 		int alphabetSize = 3;
 		int minBlockLength = 3;
 		int maxBlockLength = 3;

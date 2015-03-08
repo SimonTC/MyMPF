@@ -93,7 +93,8 @@ public class RockPaperScissors {
 			SimpleMatrix out = new SimpleMatrix(1, 100, true, ffOutput1.getMatrix().data);
 			
 			//Feed through unit 2
-			SimpleMatrix ffOutput = unit2.feedForward(out);
+			unit2.feedForward(out);
+			SimpleMatrix ffOutput = unit2.getFfOutput();
 			
 			//Feed back through unit 2
 			unit2.feedBackward(ffOutput);

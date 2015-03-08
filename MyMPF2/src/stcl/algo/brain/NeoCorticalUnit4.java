@@ -37,6 +37,10 @@ public class NeoCorticalUnit4 implements NU{
 	
 	private boolean learning;
 	
+	private boolean needHelp;
+	private double entropyThreshold; //The exponential moving average of the prediction entropy
+	private double entropyDiscountingFactor;
+	
 	//Learning rates
 	private double curPredictionLearningRate; //TODO: Find correct name for it
 											  //TODO: Does the prediction learning rate change?
@@ -56,6 +60,7 @@ public class NeoCorticalUnit4 implements NU{
 	 */
 	public NeoCorticalUnit4(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
 		double decay = calculateDecay(markovOrder, 0.01);
+		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, decay); //TODO: Move all parameters out
@@ -70,6 +75,8 @@ public class NeoCorticalUnit4 implements NU{
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
 		this.learning = true;
+		needHelp = false;
+		entropyThreshold = 0;
 	}
 	
 	/**
@@ -100,8 +107,12 @@ public class NeoCorticalUnit4 implements NU{
 		//TODO: Should biasing happen before prediction?
 		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
 		
+		double predictionEntropy = calculateEntropy(predictionMatrix);
+		if (predictionEntropy >= entropyThreshold) needHelp = true;
+		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+		
 		if (biasMatrix!= null){
-			double predictionEntropy = calculateEntropy(predictionMatrix);
+			
 			double spatialEntropy = calculateEntropy(spatialFFOutputMatrix);
 			double predictionInfluence = calculatePredictionBias(predictionEntropy, spatialEntropy);
 			//if (predictionInfluence > 0) System.out.println("Prediction does have an influence");
@@ -120,7 +131,8 @@ public class NeoCorticalUnit4 implements NU{
 		
 		ffOutput = temporalFFOutputMatrix;
 		
-		return ffOutput;
+		if (needHelp) return ffOutput;
+		return null;
 	}
 	
 	private double calculateEntropy(SimpleMatrix m){
@@ -165,42 +177,39 @@ public class NeoCorticalUnit4 implements NU{
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
-		//Normalize
-		SimpleMatrix normalizedInput = normalize(inputMatrix);
-		
-		//Selection of best temporal model
-		SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(normalizedInput);
-		
-		//Normalize
-		SimpleMatrix normalizedTemporalPoolerFBOutput = normalize(temporalPoolerFBOutput);
-		
-		//Transformation into matrix
-		normalizedTemporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
-		
-		//Combine FB output from temporal pooler with bias and prediction (if enabled)
-		SimpleMatrix biasedTemporalFBOutput = normalizedTemporalPoolerFBOutput;
-		
-		if (useMarkovPrediction){
-			biasMatrix = biasedTemporalFBOutput;
-
+		if (needHelp){
+			//Normalize
+			SimpleMatrix normalizedInput = normalize(inputMatrix);
+			
+			//Selection of best temporal model
+			SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(normalizedInput);
+			
+			//Normalize
+			SimpleMatrix normalizedTemporalPoolerFBOutput = normalize(temporalPoolerFBOutput);
+			
+			//Transformation into matrix
+			normalizedTemporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
+			
+			//Combine FB output from temporal pooler with bias and prediction (if enabled)
+			biasMatrix = normalizedTemporalPoolerFBOutput;
+			
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 			//biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
-			biasMatrix = normalize(biasMatrix);
-
+			biasMatrix = normalize(biasMatrix);			
 			
-			biasedTemporalFBOutput = biasMatrix;
-		} 		
+		} else {
+			biasMatrix = predictionMatrix;
+		}
+		
+		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
 		
-		//Add noise
-			//Happens in pooler
-		
 		fbOutput = spatialPoolerFBOutputVector;
 		
-		if (DEBUG)System.out.println("****************************** FB end *************************");
+		needHelp = false;
 		
 		return fbOutput;
 	}
@@ -208,79 +217,6 @@ public class NeoCorticalUnit4 implements NU{
 	private SimpleMatrix normalize(SimpleMatrix m){
 		return Normalizer.normalize(m);
 	}
-	
-	/**
-	 * Orthgonalizes the matrix by setting all values to zero except for the highest value
-	 * Only works with matrices containing non-negative values
-	 * @param m
-	 * @return
-	 */
-	private SimpleMatrix orthogonalize(SimpleMatrix m){
-		
-		return Orthogonalizer.orthogonalize(m);
-		
-		//return orthogonalization_NormDist(m);
-		
-		/*
-		int maxID = -1;
-		int id = 0;
-		double max = Double.NEGATIVE_INFINITY;
-		double value = 0;
-		
-		for (double d : m.getMatrix().data){
-			value = d;
-			if (d > max){
-				max = d;
-				maxID = id;
-			}
-			id++;
-		}
-		
-		SimpleMatrix orthogonalized = new SimpleMatrix(m.numRows(), m.numCols());
-		orthogonalized.set(maxID, 1);
-		return orthogonalized;
-		*/
-	
-	}
-	
-	private SimpleMatrix orthogonalization_AsInSomActivation(SimpleMatrix m){
-		
-		SimpleMatrix orthogonalized = m.elementPower(2);
-		orthogonalized = orthogonalized.divide(-0.01 * Math.pow(0.5, 2));
-		orthogonalized = orthogonalized.elementExp();
-		return orthogonalized;
-		
-	}
-	
-	private SimpleMatrix orthogonalization_NormDist(SimpleMatrix m){
-		double mean = 1;
-		double stddev = 0.1; //TODO: make to parameter
-		double maxInput = m.elementMaxAbs();
-		SimpleMatrix o = m.minus(mean);
-		o = o.elementPower(2);
-		o = o.divide(-2 * Math.pow(stddev, 2));
-		o = o.elementExp();
-		o = o.scale(1 / stddev * Math.sqrt(2 * Math.PI));
-		
-		double maxValue = o.elementMaxAbs();
-		if (maxInput > 0.7){
-			maxValue = gaussValue(1, mean, stddev);
-		}
-		
-		o = o.divide(maxValue);
-		
-		return o;
-	}
-	
-	
-	private double gaussValue(double x, double mean, double stddev){ //TODO: rename
-		
-		double v = 1 / (stddev * Math.sqrt(2 * Math.PI)) * Math.exp(-Math.pow((x - mean),2) / 2 * Math.pow(stddev, 2));
-		return v;
-	}
-	
-	
-	
 	
 	public void flush(){
 		temporalPooler.flushTemporalMemory();

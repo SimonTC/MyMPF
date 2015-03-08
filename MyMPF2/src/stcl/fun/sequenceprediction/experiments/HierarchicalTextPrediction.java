@@ -32,7 +32,7 @@ public class HierarchicalTextPrediction {
 	
 	private void setupExperiment(){
 		buildSequence();
-		setupBrain(1);
+		setupBrain(2);
 	}
 	
 	private void runExperiment(int iterations){
@@ -56,19 +56,15 @@ public class HierarchicalTextPrediction {
 		for (int i = 0; i < numUnits - 1; i++){
 			NU nu = new NeoCorticalUnit4(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, predictionLearningRate, true, markovOrder);
 			brain.add(nu);
-		}
-		
-		
-		
-		
+		}		
 	}
 	
 	private void buildSequence(){
 		SequenceBuilder builder = new SequenceBuilder();
 		
 		int minBlockLength = 3;
-		int maxBlockLength = 9;
-		int alphabetSize = 8;		
+		int maxBlockLength = 3;
+		int alphabetSize = 4;		
 		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
 		double[] doubleSequence = new double[intSequence.length];

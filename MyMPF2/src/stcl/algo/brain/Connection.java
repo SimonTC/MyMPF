@@ -39,7 +39,8 @@ public class Connection {
 		temporalFFActivationMatrixBefore = temporalFFActivationMatrixNow;
 		
 		//Feed input vector to first unit
-		temporalFFActivationMatrixNow = in.feedForward(ffInputVector);
+		in.feedForward(ffInputVector);
+		temporalFFActivationMatrixNow = in.getFfOutput();
 		
 		//Do reward correlation
 		double internalReward = rewardFunction.calculateReward(externalReward);
@@ -60,7 +61,8 @@ public class Connection {
 		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fb, correlationMatrix, noiseMagnitude);
 		
 		//Feed to in unit
-		SimpleMatrix ffOutput = in.feedBackward(biasedMatrix);
+		in.feedBackward(biasedMatrix);
+		SimpleMatrix ffOutput = in.getFbOutput();
 		
 		return ffOutput;
 	}

@@ -108,8 +108,7 @@ public class NeoCorticalUnit implements NU{
 		
 		ffOutput = temporalFFOutputMatrix;
 		
-		if (needHelp) return ffOutput;
-		return null;
+		return ffOutput;
 	}
 	
 	private double calculateEntropy(SimpleMatrix m){

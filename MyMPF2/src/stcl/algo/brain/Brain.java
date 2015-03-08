@@ -62,9 +62,9 @@ public class Brain {
 		
 		bias = new BiasUnit(ffOutputU1Before.numRows(), historyInfluence, rand);
 		
-		nu1 = new NeoCorticalUnit4(rand, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
+		nu1 = new NeoCorticalUnit(rand, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
 		
-		nu2 = new NeoCorticalUnit4(rand, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
+		nu2 = new NeoCorticalUnit(rand, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
 	}
 	
 	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){

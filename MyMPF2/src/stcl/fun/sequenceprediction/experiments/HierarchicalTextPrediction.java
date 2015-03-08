@@ -6,7 +6,7 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit4;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.Normalizer;
 import stcl.fun.sequenceprediction.SequenceBuilder;
 import stcl.fun.sequenceprediction.SequenceTrainer;
@@ -51,10 +51,10 @@ public class HierarchicalTextPrediction {
 		int markovOrder = 5;
 
 		brain = new ArrayList<NU>();
-		NU nu1 = new NeoCorticalUnit4(rand, inputLength, spatialMapSize, temporalMapSize, predictionLearningRate, true, markovOrder); //First one is special
+		NU nu1 = new NeoCorticalUnit(rand, inputLength, spatialMapSize, temporalMapSize, predictionLearningRate, true, markovOrder); //First one is special
 		brain.add(nu1);
 		for (int i = 0; i < numUnits - 1; i++){
-			NU nu = new NeoCorticalUnit4(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, predictionLearningRate, true, markovOrder);
+			NU nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, predictionLearningRate, true, markovOrder);
 			brain.add(nu);
 		}		
 	}

@@ -6,7 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Connection;
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit4;
+import stcl.algo.brain.NeoCorticalUnit;
 
 public class RockPaperScissors {
 
@@ -45,8 +45,8 @@ public class RockPaperScissors {
 		boolean useMarkovPrediction = true;
 		double decayFactor = 0.3;
 		int markovOrder = 2;
-		unit1 = new NeoCorticalUnit4(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction,  markovOrder);
-		unit2 = new NeoCorticalUnit4(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
+		unit1 = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction,  markovOrder);
+		unit2 = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
 		conn = new Connection(unit1, unit2, rand, 0.3, 2, 0.3);
 	}
 	

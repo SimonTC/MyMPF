@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit4;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class SequencePrediction {
@@ -152,7 +152,7 @@ public class SequencePrediction {
 		boolean useFirstOrderPrediction = true;
 		double decay = 0.7;
 		int markovOrder = 1;
-		unit = new NeoCorticalUnit4(rand, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction,  markovOrder);
+		unit = new NeoCorticalUnit(rand, inputLenght, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useFirstOrderPrediction,  markovOrder);
 		
 		
 	}

@@ -17,7 +17,7 @@ import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
-public class NeoCorticalUnit4 implements NU{
+public class NeoCorticalUnit implements NU{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
@@ -58,7 +58,7 @@ public class NeoCorticalUnit4 implements NU{
 	 * @param useMarkovPrediction
 	 * @param decayFactor
 	 */
-	public NeoCorticalUnit4(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
 		double decay = calculateDecay(markovOrder, 0.01);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file

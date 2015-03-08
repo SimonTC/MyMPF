@@ -13,7 +13,7 @@ import org.ejml.simple.SimpleMatrix;
 import org.math.plot.Plot2DPanel;
 
 import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit4;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.Normalizer;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 
@@ -130,7 +130,7 @@ public class HotGym {
 		int markovOrder = 1;
 		
 		//NU nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient, markovOrder);
-		NU nu = new NeoCorticalUnit4(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
+		NU nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
 		uniformDistribution = new SimpleMatrix(spatialMapSize, temporalMapSize);
 		uniformDistribution.set(1);
 		uniformDistribution = Normalizer.normalize(uniformDistribution);

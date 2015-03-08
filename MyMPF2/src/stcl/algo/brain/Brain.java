@@ -1,5 +1,6 @@
 package stcl.algo.brain;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
@@ -7,102 +8,110 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
+import stcl.algo.poolers.RSOM;
+import stcl.algo.util.Normalizer;
 
 public class Brain {
 	
-	private NU nu1;
-	private NU nu2;
+	private ArrayList<NeoCorticalUnit> unitlist;
 	
-	private Random rand;
-	private int maxIterations;
-	private int ffInputLength1;
-	private int ffInputLength2;
-	private int spatialMapSize1;
-	private int spatialMapSize2;
-	private int temporalMapSize1;
-	private int temporalMapSize2;
-	
-	private double biasInfluence;
-	private double constantPredictionLearningRate;
-	private boolean useMarkovPrediction;
-	private double constantLeakyCoefficient;
-	
-	private double noiseMagnitude;
-	
-	private RewardCorrelator rewardCorrelator1;
-	private RewardFunction rewardFunction;
-	private BiasUnit bias;
-	
-	private SimpleMatrix ffOutputU1Before;
-	
-	public Brain() {
-		rand = new Random();
-		maxIterations = 100;
-		ffInputLength1 = 16 * 16;
-		spatialMapSize1 = 5;
-		temporalMapSize1 = 5;
-		ffInputLength2 = temporalMapSize1 * temporalMapSize1;
-		temporalMapSize2 = 5;
-		
-		biasInfluence = 0.1;
-		constantPredictionLearningRate = 0.6;
-		useMarkovPrediction = true;
-		constantLeakyCoefficient = 0.3;
-		int markovOrder = 2;
-		
-		noiseMagnitude = 0.05;
-		
-		double maxReward = 1;
-		double historyInfluence = 0.3;		
-		rewardFunction = new RewardFunction(maxReward, historyInfluence);
-		
-		rewardCorrelator1 = new RewardCorrelator(temporalMapSize1);
-		
-		ffOutputU1Before = new SimpleMatrix(temporalMapSize1, temporalMapSize1);
-		
-		bias = new BiasUnit(ffOutputU1Before.numRows(), historyInfluence, rand);
-		
-		nu1 = new NeoCorticalUnit(rand, ffInputLength1, spatialMapSize1, temporalMapSize1, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
-		
-		nu2 = new NeoCorticalUnit(rand, ffInputLength2, spatialMapSize2, temporalMapSize2, constantPredictionLearningRate, useMarkovPrediction, markovOrder);
+	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
+		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
 	}
 	
-	public SimpleMatrix activate(SimpleMatrix inputVector, double reward){
-		//Feed input vector forward through unit 1
-		SimpleMatrix ffOutputU1 = nu1.feedForward(inputVector);
+	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder){
+		unitlist = new ArrayList<NeoCorticalUnit>();
+		NeoCorticalUnit nu1 = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder); //First one is special
+		unitlist.add(nu1);
+		for (int i = 0; i < numUnits - 1; i++){
+			NeoCorticalUnit nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
+			unitlist.add(nu);
+		}	
+	}
+	
+	/**
+	 * 
+	 * @param brain
+	 * @param noiseMagnitude
+	 * @param input
+	 * @return feed back output from the brain
+	 */
+	public SimpleMatrix step(SimpleMatrix inputVector){
+		SimpleMatrix uniformDistribution = null;
+		
+		//Feed forward
+		SimpleMatrix ffInput = inputVector;
+		int i = 0;
+		boolean cont = true;
+		do {
+			NeoCorticalUnit nu = unitlist.get(i);
+			SimpleMatrix m = resizeToFitFFPass(ffInput, nu);
+			SimpleMatrix inputToNextLayer = nu.feedForward(m);
+			//System.out.println( i + " Entropy " + nu.getEntropy() + " Threshold: " + nu.getEntropyThreshold());
+			cont = nu.needHelp();
+			if (cont) {
+				ffInput = inputToNextLayer;
+			} else {
+				ffInput = null;
+			}
+			i++;
+		} while (i < unitlist.size() && cont);
+		
+		//Feed back
+		if (uniformDistribution == null){
+			RSOM rsom = unitlist.get(unitlist.size() - 1).getTemporalPooler().getRSOM();
+			int rows = rsom.getHeight();
+			int cols = rsom.getWidth();
+			uniformDistribution = createUniformDistribution(rows, cols);
+		}
+		
+		SimpleMatrix fbInput = uniformDistribution;
+		for (int j = unitlist.size()-1; j >= 0; j--){
+			NeoCorticalUnit nu = unitlist.get(j);
+			SimpleMatrix m = resizeToFitFBPass(fbInput, nu);
+			fbInput = nu.feedBackward(m);
+		}
+		
+		return fbInput; //The last fb input is the output of the brain
+	}
+	
+	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
+		int rows = rsom.getHeight();
+		int cols = rsom.getWidth();
+		
+		m.reshape(rows, cols);
+		return m;
+	}
+	
+	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		int rows = 1;
+		int cols = unitToFit.getSOM().getInputVectorLength();
 				
-		//Do reward correlation
-		double internalReward = rewardFunction.calculateReward(reward);
-		SimpleMatrix correlationMatrix = rewardCorrelator1.correlateReward(ffOutputU1Before, internalReward, 0.3);
-		ffOutputU1Before = ffOutputU1;
-		
-		//Transform output matrix to vector
-		SimpleMatrix ffInputU2 = new SimpleMatrix(ffOutputU1);
-		ffInputU2.reshape(1, ffInputU2.numCols() * ffInputU2.numRows());
-		
-		//Send unit one's output to unit 2
-		//SimpleMatrix ffOutputU2 = nu2.feedBackward(ffInputU2);
-		SimpleMatrix ffOutputU2 = nu2.feedForward(ffInputU2);
-		
-		//Give some fb input to unit 2
-		SimpleMatrix fbInputU2 = SimpleMatrix.random(ffOutputU2.numRows(), ffOutputU2.numCols(), 0, 1, rand);
-		
-		//Collect FB output from unit 2
-		SimpleMatrix fbOutputU2 = nu2.feedBackward(fbInputU2);
-		
-		//Bias fb output from unit 2
-		SimpleMatrix biasedFBOutputU2 = bias.biasFBSpatialOutput(fbOutputU2, correlationMatrix, noiseMagnitude);
-		
-		//Give FB output from unit 2 to unit 1
-		SimpleMatrix fbOutputU1 = nu1.feedBackward(biasedFBOutputU2);
-		
-		//Return something
-		return fbOutputU1;		
+		m.reshape(rows, cols);
+		return m;
 	}
 	
-	public void newIteration(){
-		nu1.flush();
-		nu2.flush();
+	private SimpleMatrix createUniformDistribution(int rows, int columns){
+		SimpleMatrix m = new SimpleMatrix(rows, columns);
+		m.set(1);
+		m = Normalizer.normalize(m);
+		return m;
 	}
+	
+	public void setLearning(boolean learning){
+		for (NeoCorticalUnit nu : unitlist) nu.setLearning(learning);
+	}
+	
+	public void flush(){
+		for (NeoCorticalUnit nu : unitlist) nu.flush();
+	}
+
+
+	
+	
+	
 
 }

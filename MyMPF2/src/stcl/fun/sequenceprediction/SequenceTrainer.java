@@ -106,13 +106,20 @@ public class SequenceTrainer {
 		//Feed forward
 		SimpleMatrix ffInput = inputVector;
 		int i = 0;
+		boolean cont = true;
 		do {
 			NU nu = brain.get(i);
 			SimpleMatrix m = resizeToFitFFPass(ffInput, nu);
 			SimpleMatrix inputToNextLayer = nu.feedForward(m);
-			ffInput = inputToNextLayer;
+			//System.out.println( i + " Entropy " + nu.getEntropy() + " Threshold: " + nu.getEntropyThreshold());
+			cont = nu.needHelp();
+			if (cont) {
+				ffInput = inputToNextLayer;
+			} else {
+				ffInput = null;
+			}
 			i++;
-		} while (i < brain.size() && ffInput != null);
+		} while (i < brain.size() && cont);
 		
 		//Feed back
 		if (uniformDistribution == null){

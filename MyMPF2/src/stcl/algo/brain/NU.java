@@ -47,4 +47,8 @@ public interface NU {
 	 * @return
 	 */
 	public boolean needHelp();
+	
+	public double getEntropy();
+	
+	public double getEntropyThreshold();
 }

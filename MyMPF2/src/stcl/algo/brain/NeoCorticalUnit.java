@@ -27,8 +27,6 @@ public class NeoCorticalUnit implements NU{
 	private int spatialMapSize;
 	private int temporalMapSize;
 	
-	private boolean learning;
-	
 	private boolean needHelp;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
@@ -61,7 +59,6 @@ public class NeoCorticalUnit implements NU{
 		this.useMarkovPrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
-		this.learning = true;
 		needHelp = false;
 		entropyThreshold = 0;
 	}
@@ -208,7 +205,6 @@ public class NeoCorticalUnit implements NU{
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
 		predictor.setLearning(learning);
-		this.learning = learning;
 	}
 
 	public SpatialPooler getSpatialPooler() {

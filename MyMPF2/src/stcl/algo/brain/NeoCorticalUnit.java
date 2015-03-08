@@ -258,4 +258,9 @@ public class NeoCorticalUnit implements NU{
 		predictor.printModel();
 		
 	}
+
+	@Override
+	public boolean needHelp() {
+		return needHelp;
+	}
 }

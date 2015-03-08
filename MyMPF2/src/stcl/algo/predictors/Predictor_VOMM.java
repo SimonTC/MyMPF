@@ -36,6 +36,7 @@ public class Predictor_VOMM implements Predictor{
 	/**
 	 * Returns a probability matrix over all possible symbols.
 	 * Contains the probability of seeing a symbol given the current context.
+	 * 
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix) {	
 			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());

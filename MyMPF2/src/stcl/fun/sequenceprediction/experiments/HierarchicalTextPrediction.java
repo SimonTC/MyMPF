@@ -63,8 +63,8 @@ public class HierarchicalTextPrediction {
 		SequenceBuilder builder = new SequenceBuilder();
 		
 		int minBlockLength = 3;
-		int maxBlockLength = 3;
-		int alphabetSize = 4;		
+		int maxBlockLength = 9;
+		int alphabetSize = 8;		
 		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
 		double[] doubleSequence = new double[intSequence.length];

@@ -28,6 +28,7 @@ public class NeoCorticalUnit implements NU{
 	private int temporalMapSize;
 	
 	private boolean needHelp;
+	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
 	
@@ -87,7 +88,7 @@ public class NeoCorticalUnit implements NU{
 			predictionMatrix = predictor.predict(spatialFFOutputMatrix);
 		} 		
 		
-		double predictionEntropy = calculateEntropy(predictionMatrix);
+		predictionEntropy = calculateEntropy(predictionMatrix);
 		if (predictionEntropy >= entropyThreshold) needHelp = true;
 		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		

@@ -5,13 +5,14 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.predictors.FirstOrderPredictor;
+import stcl.algo.predictors.Predictor;
+import stcl.algo.predictors.Predictor_VOMM;
 
 public class PredictorTesting {
 	private SimpleMatrix a,b,c;
 	private ArrayList<SimpleMatrix> possibleLetters;
 	private ArrayList<SimpleMatrix[]> sequences;
-	private FirstOrderPredictor predictor;
+	private Predictor predictor;
 	private Random rand = new Random(1234);
 	public PredictorTesting() {
 		// TODO Auto-generated constructor stub
@@ -30,7 +31,7 @@ public class PredictorTesting {
 	
 	private void setupExperiment(){
 		buildSequences();
-		predictor = new FirstOrderPredictor(1,2);
+		predictor = new Predictor_VOMM(1,0.1,rand);
 	}
 	
 	private void runTraining(int iterations){
@@ -40,7 +41,7 @@ public class PredictorTesting {
 			SimpleMatrix[] sequence = sequences.get(seqID);
 			
 			for (SimpleMatrix m : sequence){
-				SimpleMatrix output = predictor.predict(m, 1, true);
+				SimpleMatrix output = predictor.predict(m);
 				System.out.println(calculateEntropy(output));				
 			}
 		}

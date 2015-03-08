@@ -10,8 +10,6 @@ import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.predictors.FirstOrderMM_Original;
-import stcl.algo.predictors.FirstOrderPredictor;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;

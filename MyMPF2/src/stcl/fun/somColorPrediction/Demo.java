@@ -6,8 +6,6 @@ import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.som.ISOM;
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.predictors.FirstOrderMM_Original;
-import stcl.algo.predictors.FirstOrderPredictor;
 import stcl.algo.predictors.Predictor_VOMM;
 
 public class Demo {

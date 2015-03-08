@@ -38,9 +38,7 @@ public class Predictor_VOMM implements Predictor{
 	 * Returns a probability matrix over all possible symbols.
 	 * Contains the probability of seeing a symbol given the current context.
 	 */
-	public SimpleMatrix predict(SimpleMatrix inputMatrix, double curLearningRate, boolean associate) {	
-			vomm.setLearning(associate);
-			vomm.setLearningRate(curLearningRate);
+	public SimpleMatrix predict(SimpleMatrix inputMatrix) {	
 			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
 			inputProbabilities.addLast(inputMatrix.elementMaxAbs());
 			if (inputProbabilities.size() > markovOrder) inputProbabilities.removeFirst();
@@ -52,7 +50,7 @@ public class Predictor_VOMM implements Predictor{
 			Integer prediction = vomm.predict();
 			if (prediction == null){
 				probabilityMatrix.set(1);
-				predictedNextSymbol = 0; //Set prediction some value.
+				predictedNextSymbol = 0; //Set prediction to some value.
 			} else {
 				predictedNextSymbol = prediction.intValue();
 				double sequenceProbability = calculateProbabilityOfNodeSequence();
@@ -135,6 +133,18 @@ public class Predictor_VOMM implements Predictor{
 	
 	public void printModel(){
 		vomm.printTrie();
+	}
+
+	@Override
+	public void setLearning(boolean learning) {
+		vomm.setLearning(learning);
+		
+	}
+
+	@Override
+	public void setLEarningRate(double learningRate) {
+		vomm.setLearningRate(learningRate);
+		
 	}
 	
 

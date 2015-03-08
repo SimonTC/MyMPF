@@ -64,9 +64,9 @@ public class Sequencer {
 		
 		//Predict next input
 		if (learning){
-			prediction = predictor.predict(inputVector, predictionLearningRate, learning);
+			prediction = predictor.predict(inputVector);
 		} else {
-			prediction = predictor.predict(inputVector, 0, false);
+			prediction = predictor.predict(inputVector);
 		}
 		
 		//Calculate entropy
@@ -195,6 +195,7 @@ public class Sequencer {
 	
 	public void setLearning(boolean learning){
 		this.learning = learning;
+		predictor.setLearning(learning);
 	}
 	
 	public RSOM getRsom(){

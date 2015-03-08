@@ -79,7 +79,7 @@ public class SOM_VOMM_Entropy {
 				biasedOutput = Normalizer.normalize(biasedOutput);
 				
 				//Predict
-				biasMatrix = predictor.predict(biasedOutput, 0.1, true);
+				biasMatrix = predictor.predict(biasedOutput);
 				
 				double entropy = predictor.calculateEntropy();
 				
@@ -104,7 +104,7 @@ public class SOM_VOMM_Entropy {
 				spatialOutput = Normalizer.normalize(spatialOutput);
 				
 				//Predict
-				biasMatrix = predictor.predict(spatialOutput, 0.1, true);
+				biasMatrix = predictor.predict(spatialOutput);
 			}
 		}
 	}

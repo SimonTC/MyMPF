@@ -136,4 +136,22 @@ public class FirstOrderPredictor implements Predictor{
 		
 	}
 
+	@Override
+	public SimpleMatrix predict(SimpleMatrix inputMatrix) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setLearning(boolean learning) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setLEarningRate(double learningRate) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

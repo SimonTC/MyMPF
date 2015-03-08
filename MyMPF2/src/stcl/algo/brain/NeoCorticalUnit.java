@@ -21,7 +21,6 @@ public class NeoCorticalUnit implements NU{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
-	//private FirstOrderPredictor predictor;
 	private Predictor_VOMM predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
@@ -33,17 +32,11 @@ public class NeoCorticalUnit implements NU{
 	private int spatialMapSize;
 	private int temporalMapSize;
 	
-	private boolean DEBUG = false;
-	
 	private boolean learning;
 	
 	private boolean needHelp;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
-	
-	//Learning rates
-	private double curPredictionLearningRate; //TODO: Find correct name for it
-											  //TODO: Does the prediction learning rate change?
 	
 	private boolean useMarkovPrediction;
 	
@@ -70,7 +63,6 @@ public class NeoCorticalUnit implements NU{
 		ffOutput = new SimpleMatrix(temporalMapSize, temporalMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
-		this.curPredictionLearningRate = initialPredictionLearningRate;
 		this.useMarkovPrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
@@ -100,26 +92,19 @@ public class NeoCorticalUnit implements NU{
 		
 		//Predict next input
 		if (useMarkovPrediction){
-			predictionMatrix = predictor.predict(spatialFFOutputMatrix, curPredictionLearningRate, learning);
+			predictionMatrix = predictor.predict(spatialFFOutputMatrix);
 		} 		
-		
-		//Bias
-		//TODO: Should biasing happen before prediction?
-		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
 		
 		double predictionEntropy = calculateEntropy(predictionMatrix);
 		if (predictionEntropy >= entropyThreshold) needHelp = true;
 		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		
-		if (biasMatrix!= null){
-			
-			double spatialEntropy = calculateEntropy(spatialFFOutputMatrix);
-			double predictionInfluence = calculatePredictionBias(predictionEntropy, spatialEntropy);
-			//if (predictionInfluence > 0) System.out.println("Prediction does have an influence");
-			biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
-			//biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
-			biasedOutput = Normalizer.normalize(biasedOutput);
-		}		
+		//Bias
+		//TODO: Should biasing happen before prediction?
+		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
+		biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
+		//biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
+		biasedOutput = Normalizer.normalize(biasedOutput);
 		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = biasedOutput.getMatrix().data;		
@@ -227,6 +212,7 @@ public class NeoCorticalUnit implements NU{
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
+		predictor.setLearning(learning);
 		this.learning = learning;
 	}
 
@@ -249,10 +235,6 @@ public class NeoCorticalUnit implements NU{
 	public void sensitize(int iteration){
 		spatialPooler.sensitize(iteration);
 		temporalPooler.sensitize(iteration);
-	}
-	
-	public void setDebug(boolean debug){
-		DEBUG = debug;
 	}
 	
 	public SomNode findTemporalBMU(){

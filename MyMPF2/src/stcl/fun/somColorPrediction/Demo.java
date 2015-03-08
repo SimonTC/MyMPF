@@ -48,7 +48,7 @@ public class Demo {
 			
 			SimpleMatrix ffOutput = pooler.feedForward(input);
 			
-			SimpleMatrix predictionMatrix = predictor.predict(ffOutput, curLearningRate, true);
+			SimpleMatrix predictionMatrix = predictor.predict(ffOutput);
 			
 			predictedColor = nextColor(predictionMatrix, pooler);
 			

@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.brain.Brain;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.Normalizer;
@@ -45,9 +46,7 @@ public class HotGym {
 			}
 					
 			//Create neocortical unit
-			ArrayList<NU> brain = new ArrayList<NU>();
-			NU nu = createUnit(iterations);
-			brain.add(nu);
+			Brain brain = createUnit(iterations);
 					
 			
 			//Do test
@@ -56,7 +55,9 @@ public class HotGym {
 			Random rand = new Random();
 			SequenceTrainer trainer = new SequenceTrainer(list, ITERATIONS, rand );
 			boolean calculateErrorAsDistance = true;
-			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance);
+			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance, null);
+			
+			for ( double d : errors) System.out.println(d);
 					
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -119,21 +120,16 @@ public class HotGym {
 	
 	
 	
-	private NU createUnit(int maxIterations){
+	private Brain createUnit(int maxIterations){
 		Random rand = new Random();
 		int ffInputLength = 1;
 		int spatialMapSize = 10;
 		int temporalMapSize = 10;
-		double initialPredictionLearningRate = 0.1;
-		boolean useMarkovPrediction = true;
 		int markovOrder = 1;
 		
-		//NU nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, leakyCoefficient, markovOrder);
-		NU nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder);
-		uniformDistribution = new SimpleMatrix(spatialMapSize, temporalMapSize);
-		uniformDistribution.set(1);
-		uniformDistribution = Normalizer.normalize(uniformDistribution);
-		return nu;
+		Brain brain = new Brain(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+
+		return brain;
 	}
 	
 	private double[] loadData(String filePath) throws FileNotFoundException{

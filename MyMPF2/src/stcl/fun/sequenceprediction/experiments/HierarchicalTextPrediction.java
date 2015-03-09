@@ -1,5 +1,6 @@
 package stcl.fun.sequenceprediction.experiments;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -8,6 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.Brain;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.util.FileWriter;
 import stcl.fun.sequenceprediction.SequenceBuilder;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 
@@ -16,42 +18,53 @@ public class HierarchicalTextPrediction {
 	Random rand = new Random(1234);
 	Brain brain;
 	double[] sequence;
+	FileWriter writer;
 	
 	SimpleMatrix uniformDistribution;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		String filepath = "D:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		htp.run();
+		htp.run(filepath);
 
 	}
 	
-	public void run(){
+	public void run(String logFilepath) throws IOException{
 		setupExperiment();
+		writer = new FileWriter();
+		writer.openFile(logFilepath, false);
 		runExperiment(100);
+		writer.closeFile();
 	}
 	
 	private void setupExperiment(){
 		buildSequence();
-		setupBrain(2);
+		setupBrain(1);
 	}
 	
 	private void runExperiment(int iterations){
+				
 		ArrayList<double[]> sequences = new ArrayList<double[]>();
 		sequences.add(sequence);
 		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand);
 		boolean calculateErrorAsDistance = false;
-		trainer.train(brain, 0, calculateErrorAsDistance);
+		//Train
+		trainer.train(brain, 0, calculateErrorAsDistance, null);
+		
+		//Evaluate
+		brain.setLearning(false);
+		brain.flush();
+		trainer.train(brain, 0, calculateErrorAsDistance, writer);
 	}
 	
 	private void setupBrain(int numUnits){
 		int temporalMapSize = 4;
 		int inputLength = 1;
-		int spatialMapSize = 5;
+		int spatialMapSize = 4;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 5;
 		
 		brain = new Brain(numUnits, rand, inputLength, spatialMapSize, temporalMapSize, markovOrder);
-
 			
 	}
 	
@@ -60,7 +73,7 @@ public class HierarchicalTextPrediction {
 		
 		int minBlockLength = 3;
 		int maxBlockLength = 3;
-		int alphabetSize = 3;		
+		int alphabetSize = 4;		
 		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
 		double[] doubleSequence = new double[intSequence.length];

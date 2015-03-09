@@ -10,6 +10,7 @@ import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
+import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
 public class NeoCorticalUnit implements NU{

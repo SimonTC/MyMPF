@@ -129,6 +129,20 @@ public class Brain {
 				
 	}
 	
+	public int[] collectBMUs(boolean spatial){
+		int[] bmus = new int[unitlist.size()];
+		for (int i = 0; i < unitlist.size(); i++){
+			if (spatial) {
+				bmus[i] = unitlist.get(i).getSOM().getBMU().getId();
+			} else {
+				bmus[i] = unitlist.get(i).getTemporalPooler().getRSOM().getBMU().getId();
+			}
+		}
+		return bmus;
+	}
+	
+	
+	
 	private double calculateEntropy(SimpleMatrix m){
 		double sum = 0;
 		for (Double d : m.getMatrix().data){

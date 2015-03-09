@@ -1,5 +1,6 @@
 package stcl.fun.sequenceprediction;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,6 +10,7 @@ import stcl.algo.brain.Brain;
 import stcl.algo.brain.NU;
 import stcl.algo.poolers.RSOM;
 import stcl.algo.poolers.SOM;
+import stcl.algo.util.FileWriter;
 import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
@@ -38,8 +40,8 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(Brain brain, double noiseMagnitude, boolean calculateErrorAsDistance){
-		return train(brain, noiseMagnitude, trainingSet, calculateErrorAsDistance);
+	public ArrayList<Double> train(Brain brain, double noiseMagnitude, boolean calculateErrorAsDistance, FileWriter writer){
+		return train(brain, noiseMagnitude, trainingSet, calculateErrorAsDistance, writer);
 	}
 	
 	/**
@@ -48,14 +50,13 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<double[]> givenTrainingSet, boolean calculateErrorAsDistance){
+	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<double[]> givenTrainingSet, boolean calculateErrorAsDistance, FileWriter writer){
 		ArrayList<Double> errors = new ArrayList<Double>(); 
 		int counter = 1;
 		int numSequences = givenTrainingSet.size();
 		for (double[] sequence : givenTrainingSet){
-			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance);
+			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance, writer);
 			errors.add(error);
-			System.out.println(error);
 			counter++;
 		}
 		return errors;
@@ -71,10 +72,11 @@ public class SequenceTrainer {
 		System.out.println();
 	}
 	
-	private double doSequence(Brain brain, double noiseMagnitude, double[] sequence, boolean calculateErrorAsDistance){
+	private double doSequence(Brain brain, double noiseMagnitude, double[] sequence, boolean calculateErrorAsDistance, FileWriter writer){
 		double prediction = 0;
 		double totalError = 0;
 		for (double d : sequence){
+			
 			if (calculateErrorAsDistance) {
 				totalError += calculateErrorAsDistance(prediction, d);
 			} else {
@@ -82,9 +84,42 @@ public class SequenceTrainer {
 			}
 			SimpleMatrix output = step(brain, noiseMagnitude, d);
 			prediction = output.get(0);
+			if (writer != null) writeInfo(writer, brain, d, prediction);
 		}
 		double MSQE = totalError / (double) sequence.length;
 		return MSQE;
+	}
+	
+	private void writeInfo(FileWriter writer, Brain brain, double input, double prediction){
+		double[] predictionEntropies = brain.collectPredictionEntropies();
+		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
+		int[] spatialBMUs = brain.collectBMUs(true);
+		int[] temporalBMUs = brain.collectBMUs(false);
+		
+		String line = "";
+		line += input + ";";
+		line += prediction + ";";
+		for (double d : predictionEntropies){
+			line += d + ";";
+ 		}
+		for (double d : spatialFFOutEntropies){
+			line += d + ";";
+ 		}
+		for (int i : spatialBMUs){
+			line += i + ";";
+		}
+		for (int i : temporalBMUs){
+			line += i + ";";
+		}
+		
+		
+		line = line.substring(0, line.length() - 1); //Remove last semi-colon
+		try {
+			writer.writeLine(line);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**

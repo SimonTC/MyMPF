@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.SomBasics;
 
 public class SpatialPooler {
@@ -62,6 +63,9 @@ public class SpatialPooler {
 		
 		//Compute ActivationMatrix
 		activationMatrix = som.computeActivationMatrix();
+		
+		//Normalize
+		//activationMatrix = Normalizer.normalize(activationMatrix);
 		
 		return activationMatrix;
 	}

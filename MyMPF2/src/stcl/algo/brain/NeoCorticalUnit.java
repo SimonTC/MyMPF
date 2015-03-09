@@ -110,7 +110,7 @@ public class NeoCorticalUnit implements NU{
 		
 		ffOutput = temporalFFOutputMatrix;
 		
-	
+		if (needHelp) temporalPooler.flushTemporalMemory();
 		
 		return ffOutput;
 	}

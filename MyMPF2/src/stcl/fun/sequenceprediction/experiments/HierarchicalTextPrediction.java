@@ -44,7 +44,7 @@ public class HierarchicalTextPrediction {
 	
 	private void setupExperiment(){
 		buildSequence();
-		setupBrain(1);
+		setupBrain(2);
 	}
 	
 	private void runExperiment(int iterations){

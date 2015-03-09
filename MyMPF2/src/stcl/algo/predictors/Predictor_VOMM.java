@@ -40,14 +40,19 @@ public class Predictor_VOMM implements Predictor{
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix) {	
 			probabilityMatrix = new SimpleMatrix(inputMatrix.numRows(), inputMatrix.numCols());
-			inputProbabilities.addLast(inputMatrix.elementMaxAbs());
+			
+			//Find the id of that symbol which we are most probably observing now
+			int mostProbableInputID = findMostProbableInput(inputMatrix);	
+			
+			///Add probability that the most probable symbol is indeed the symbol we are observing
+			inputProbabilities.addLast(inputMatrix.get(mostProbableInputID));
 			if (inputProbabilities.size() > markovOrder) inputProbabilities.removeFirst();
 			
-			//int mostProbableInput = findInputByRoulette(inputMatrix); //findMostProbableInput(inputMatrix);			
-			int mostProbableInput = findMostProbableInput(inputMatrix);	
-			//System.out.println("Input seen by predictor: " + mostProbableInput);
-			vomm.addSymbol(mostProbableInput);
+			//Predict the id of the next input
+			vomm.addSymbol(mostProbableInputID);
 			Integer prediction = vomm.predict();
+			
+			//Calculate the probability distribution over all possible symbols
 			if (prediction == null){
 				probabilityMatrix.set(1);
 				predictedNextSymbol = 0; //Set prediction to some value.
@@ -99,6 +104,11 @@ public class Predictor_VOMM implements Predictor{
 		return id;
 	}
 	
+	/**
+	 * Finds the id of the element with the highest value
+	 * @param probabilityMatrix
+	 * @return
+	 */
 	private int findMostProbableInput(SimpleMatrix probabilityMatrix){
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;

@@ -84,7 +84,7 @@ public class NeoCorticalUnit implements NU{
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
-		//Predict next input
+		//Predict next spatialFFOutputMatrix
 		if (useMarkovPrediction){
 			predictionMatrix = predictor.predict(spatialFFOutputMatrix);
 		} 		

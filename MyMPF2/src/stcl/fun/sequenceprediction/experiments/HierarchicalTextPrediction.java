@@ -33,7 +33,7 @@ public class HierarchicalTextPrediction {
 		setupExperiment();
 		writer = new FileWriter();
 		writer.openFile(logFilepath, false);
-		runExperiment(100);
+		runExperiment(200);
 		writer.closeFile();
 	}
 	

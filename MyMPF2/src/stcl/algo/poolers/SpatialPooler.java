@@ -65,7 +65,7 @@ public class SpatialPooler {
 		activationMatrix = som.computeActivationMatrix();
 		
 		//Normalize
-		//activationMatrix = Normalizer.normalize(activationMatrix);
+		activationMatrix = Normalizer.normalize(activationMatrix);
 		
 		return activationMatrix;
 	}

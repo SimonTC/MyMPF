@@ -47,7 +47,7 @@ public class NeoCorticalUnit implements NU{
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
 		double decay = calculateDecay(markovOrder, 0.01);
-		entropyDiscountingFactor = 0.3;//decay; //TODO: Does this make sense?
+		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, 2, 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, decay); //TODO: Move all parameters out

@@ -108,6 +108,15 @@ public class Brain {
 	public void flush(){
 		for (NeoCorticalUnit nu : unitlist) nu.flush();
 	}
+	
+	public double[] getEntropies(){
+		double[] entropies = new double[unitlist.size()];
+		for (int i = 0; i < unitlist.size(); i++){
+			entropies[i] = unitlist.get(i).getEntropy();
+		}
+		return entropies;
+				
+	}
 
 
 	

@@ -28,13 +28,15 @@ public class Test {
 	
 	public void run(String filepath) throws FileNotFoundException{
 		predictor = new VOMM<String>(5, 0.1);
-		movingAverage = 0;
-		hits =  new LinkedList<Integer>();
-		for (int i = 0; i < 1; i++){
+		for (int i = 0; i < 10; i++){
+			movingAverage = 0;
+			movingSum = 0;
+			hits =  new LinkedList<Integer>();
 			runExperimentRound_WithSpace(filepath);
+			System.out.println("Average: " + movingAverage);
 		}
 		
-		writeSomething("the", 100);
+		writeSomething("the", 200);
 		//System.out.println();
 		
 		//predictor.printTrie();
@@ -103,7 +105,7 @@ public class Test {
 				predictedSymbol = predictor.predict();
 			}
 			
-			System.out.println("Fitness: " + movingAverage);
+			//System.out.println("Fitness: " + movingAverage);
 		
 			
 			curLine.close();

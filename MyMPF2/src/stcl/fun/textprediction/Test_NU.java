@@ -2,6 +2,7 @@ package stcl.fun.textprediction;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
+import stcl.algo.util.FileWriter;
 
 public class Test_NU {
 	private int windowLength = 1000;
@@ -20,30 +22,36 @@ public class Test_NU {
 
 	public static void main(String[] args) {
 		Test_NU t = new Test_NU();
-		String filepath = "D:/Users/Simon/Documents/Experiments/VOMM/Book";
+		String filepath = "D:/Users/Simon/Documents/Experiments/VOMM/Book_500";
 		int numUnits = 1;
 		int markovOrder = 5;
 		try {
 			t.run(filepath, numUnits, markovOrder);
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}	
 	
-	public void run(String filepath, int numUnits, int markovOrder) throws FileNotFoundException{
+	public void run(String filepath, int numUnits, int markovOrder) throws IOException{
 		
 		brain = new Brain(numUnits, rand, 1, 10, 4, markovOrder);
-		
+		FileWriter writer = new FileWriter();
+		writer.openFile(filepath + "_log", false);
+		writer.closeFile();
 		for (int i = 0; i < 10; i++){
+			writer.openFile(filepath + "_log", true);
 			movingAverage = 0;
 			movingSum = 0;
 			hits =  new LinkedList<Integer>();
 			brain.flush();
-			runExperimentRound_WithSpace(filepath);
+			runExperimentRound_WithSpace(filepath, writer);
 			System.out.println("Average: " + movingAverage);
+			writer.closeFile();
 		}
+		
+		writer.closeFile();
 		
 		writeSomething("the", 200);
 		//System.out.println();
@@ -86,23 +94,28 @@ public class Test_NU {
 		brain.setLearning(true);
 	}
 	
-	public void runExperimentRound_WithSpace(String dataFilePath) throws FileNotFoundException{
+	public void runExperimentRound_WithSpace(String dataFilePath, FileWriter writer) throws FileNotFoundException{
 		File file = new File(dataFilePath);
 		Scanner inputFile;
 		inputFile = new Scanner(file);
 		char predictedChar = 0;
 		
+		try {
+			writer.writeLine("");
+			writer.writeLine("Input;Prediction;Entropies");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		while (inputFile.hasNext()){
 			Scanner curLine = new Scanner(inputFile.nextLine());
 			
 			String line = curLine.nextLine();
-			String cleanedLine = line.replaceAll("[^\\p{L}\\p{M}\\p{P}\\p{Nd}\\s]+", ""); //Remove unwanted characters
+			String cleanedLine = cleanString(line);
 			for (int i = 0; i < cleanedLine.length(); i++){
-				String symbol = cleanedLine.substring(i, i+1);
-				symbol = symbol.toLowerCase();
-				
 				//Get ASCII value
-				char character = symbol.charAt(0);
+				char character = cleanedLine.charAt(i);
 				
 				//Normalize
 				double inputValue = convertCharToDouble(character);
@@ -125,7 +138,9 @@ public class Test_NU {
 				SimpleMatrix prediction = brain.step(inputVector);
 				
 				//Convert prediction to symbol
-				predictedChar = convertDoubleToCharacter(prediction.get(0));			
+				predictedChar = convertDoubleToCharacter(prediction.get(0));		
+				
+				writeInfo(writer, brain, character, predictedChar);
 			}
 			
 			//System.out.println("Fitness: " + movingAverage);
@@ -134,6 +149,29 @@ public class Test_NU {
 			curLine.close();
 		}
 		inputFile.close();
+	}
+	
+	private String cleanString(String string){
+		String cleanedString = string.toLowerCase();
+		cleanedString = cleanedString.replaceAll("[^a-z\\s]", ""); //Removes everything but small letters and space
+		cleanedString = cleanedString.replaceAll("\\s{2,}", " "); //Replaces all double space with single space
+		return cleanedString;
+	}
+	
+	private void writeInfo(FileWriter writer, Brain brain, char input, char prediction){
+		double[] entropies = brain.getEntropies();
+		String line = "";
+		line += input + ";";
+		line += prediction + ";";
+		for (double d : entropies){
+			line += d + ";";
+ 		}
+		try {
+			writer.writeLine(line);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private char convertDoubleToCharacter(double d){

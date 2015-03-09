@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.Brain;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
@@ -55,12 +56,16 @@ public class HierarchicalTextPrediction {
 		brain.setLearning(false);
 		brain.flush();
 		trainer.train(brain, 0, calculateErrorAsDistance, writer);
+		
+		for (SomNode n : brain.getUnitList().get(0).getSOM().getNodes()){
+			n.getVector().print();
+		}
 	}
 	
 	private void setupBrain(int numUnits){
 		int temporalMapSize = 4;
 		int inputLength = 1;
-		int spatialMapSize = 4;
+		int spatialMapSize = 3;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 5;
 		

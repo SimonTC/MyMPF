@@ -25,7 +25,7 @@ public interface NU {
 	
 	public SOM getSOM();
 	
-	public void printModel();
+	public void printPredictionModel();
 	
 	public SpatialPooler getSpatialPooler() ;
 

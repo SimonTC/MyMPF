@@ -150,6 +150,10 @@ public class Brain {
 		}
 		return -sum;
 	}
+	
+	public ArrayList<NeoCorticalUnit> getUnitList(){
+		return unitlist;
+	};
 
 
 	

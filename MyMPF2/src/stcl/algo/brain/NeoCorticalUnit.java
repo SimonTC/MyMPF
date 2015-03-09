@@ -72,7 +72,7 @@ public class NeoCorticalUnit implements NU{
 	 * @return
 	 */
 	private double calculateDecay(int memoryLength, double minInfluence){
-		double decay = 1 - Math.pow(minInfluence, 1 / memoryLength);
+		double decay = 1 - Math.pow(minInfluence, 1.0 / memoryLength);
 		return decay;
  	}
 	
@@ -109,6 +109,8 @@ public class NeoCorticalUnit implements NU{
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
 		
 		ffOutput = temporalFFOutputMatrix;
+		
+	
 		
 		return ffOutput;
 	}
@@ -198,7 +200,9 @@ public class NeoCorticalUnit implements NU{
 	
 	public void flush(){
 		temporalPooler.flushTemporalMemory();
-		biasMatrix.set(1);
+		biasMatrix.set(0);
+		//predictionMatrix.set(1);
+		//predictionMatrix = normalize(predictionMatrix);
 		predictor.flush();
 	}
 	

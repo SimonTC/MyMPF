@@ -16,7 +16,7 @@ import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HierarchicalTextPrediction {
 	
-	Random rand = new Random();
+	Random rand = new Random(1234);
 	Brain brain;
 	double[] sequence;
 	FileWriter writer;
@@ -31,13 +31,14 @@ public class HierarchicalTextPrediction {
 	}
 	
 	public void run(String logFilepath) throws IOException{
-		for (int i = 0; i < 10; i++){
-			setupExperiment();
+		//for (int i = 0; i < 10; i++){
+		int i = 0;	
+		setupExperiment();
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			runExperiment(100);
 			writer.closeFile();
-		}
+		//}
 		System.out.println("finished");
 	}
 	
@@ -78,7 +79,7 @@ public class HierarchicalTextPrediction {
 		
 		int minBlockLength = 3;
 		int maxBlockLength = 3;
-		int alphabetSize = 5;		
+		int alphabetSize = 3;		
 		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
 		double[] doubleSequence = new double[intSequence.length];

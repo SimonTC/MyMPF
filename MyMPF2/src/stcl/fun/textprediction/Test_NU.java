@@ -40,7 +40,7 @@ public class Test_NU {
 		FileWriter writer = new FileWriter();
 		writer.openFile(filepath + "_log", false);
 		writer.closeFile();
-		for (int i = 0; i < 10; i++){
+		for (int i = 0; i < 3; i++){
 			writer.openFile(filepath + "_log", true);
 			movingAverage = 0;
 			movingSum = 0;
@@ -159,11 +159,15 @@ public class Test_NU {
 	}
 	
 	private void writeInfo(FileWriter writer, Brain brain, char input, char prediction){
-		double[] entropies = brain.getEntropies();
+		double[] predictionEntropies = brain.collectPredictionEntropies();
+		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
 		String line = "";
 		line += input + ";";
 		line += prediction + ";";
-		for (double d : entropies){
+		for (double d : predictionEntropies){
+			line += d + ";";
+ 		}
+		for (double d : spatialFFOutEntropies){
 			line += d + ";";
  		}
 		try {

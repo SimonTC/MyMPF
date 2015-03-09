@@ -31,9 +31,9 @@ public interface NU {
 
 	public TemporalPooler getTemporalPooler() ;
 	
-	public SimpleMatrix getFfOutput();
+	public SimpleMatrix getFFOutput();
 
-	public SimpleMatrix getFbOutput();
+	public SimpleMatrix getFBOutput();
 	
 	public void flush();
 	

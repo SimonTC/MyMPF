@@ -28,7 +28,7 @@ public class TemporalEvaluator_NU {
 	    		if (rand.nextDouble() < noise)  input = joker;
 
 	    		nu.feedForward(input);
-	    		ffOUtput = nu.getFfOutput();
+	    		ffOUtput = nu.getFFOutput();
 	    		nu.feedBackward(ffOUtput);    		
 	    	}
 	    	

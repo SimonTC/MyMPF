@@ -93,7 +93,7 @@ public class RockPaperScissors {
 			
 			//Feed through unit 2
 			unit2.feedForward(out);
-			SimpleMatrix ffOutput = unit2.getFfOutput();
+			SimpleMatrix ffOutput = unit2.getFFOutput();
 			
 			//Feed back through unit 2
 			unit2.feedBackward(ffOutput);

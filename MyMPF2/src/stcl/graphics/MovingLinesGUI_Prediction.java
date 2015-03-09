@@ -104,7 +104,7 @@ public class MovingLinesGUI_Prediction extends JFrame {
 		this.updateData(inputVector, unit.getSpatialPooler(), unit.getTemporalPooler());
 		
 		//Get predicted next output
-		SimpleMatrix expectedInput = unit.getFbOutput();
+		SimpleMatrix expectedInput = unit.getFBOutput();
 		expectedInput.reshape(singleSomModelWidth, singleSomModelWidth);
 		predictedInput.updateData(expectedInput);
 		predictedInput.repaint();

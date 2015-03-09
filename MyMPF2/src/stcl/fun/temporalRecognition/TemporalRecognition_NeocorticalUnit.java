@@ -134,9 +134,9 @@ public class TemporalRecognition_NeocorticalUnit {
 	    	
 	    	for (SimpleMatrix input : curSequence){
 	    		nu.feedForward(input);
-	    		SimpleMatrix ffOUtput = nu.getFfOutput();
+	    		SimpleMatrix ffOUtput = nu.getFFOutput();
 	    		nu.feedBackward(ffOUtput);
-	    		SimpleMatrix fbOUtput = nu.getFbOutput();
+	    		SimpleMatrix fbOUtput = nu.getFBOutput();
 	    		
 	    		
 	    		/*

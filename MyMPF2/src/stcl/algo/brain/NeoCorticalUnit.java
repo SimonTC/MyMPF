@@ -215,11 +215,11 @@ public class NeoCorticalUnit implements NU{
 		return temporalPooler;
 	}
 
-	public SimpleMatrix getFfOutput() {
+	public SimpleMatrix getFFOutput() {
 		return ffOutput;
 	}
 
-	public SimpleMatrix getFbOutput() {
+	public SimpleMatrix getFBOutput() {
 		return fbOutput;
 	}
 	

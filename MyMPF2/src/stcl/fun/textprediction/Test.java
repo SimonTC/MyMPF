@@ -16,7 +16,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		Test t = new Test();
-		String filepath = "C:/Users/Simon/Documents/Experiments/VOMM/Book_500";
+		String filepath = "D:/Users/Simon/Documents/Experiments/VOMM/Book_500";
 		try {
 			t.run(filepath);
 		} catch (FileNotFoundException e) {
@@ -27,7 +27,7 @@ public class Test {
 	}	
 	
 	public void run(String filepath) throws FileNotFoundException{
-		predictor = new VOMM<String>(4, 0.5);
+		predictor = new VOMM<String>(5, 0.1);
 		movingAverage = 0;
 		hits =  new LinkedList<Integer>();
 		for (int i = 0; i < 1; i++){
@@ -58,59 +58,18 @@ public class Test {
 			System.out.print(nextSymbol);
 			entropy[i] = predictor.calculateEntropy();
 		}
+		/*
 		System.out.println();
 		for (double d : entropy){
 			System.out.println(d);
 		}
+		*/
 		
 		predictor.setLearning(true);
 	}
 	
 	
-	/*
-	public void runExperimentRound(String dataFilePath) throws FileNotFoundException{
-		File file = new File(dataFilePath);
-		Scanner inputFile;
-		inputFile = new Scanner(file);
-		String predictedSymbol = null;
-		
-		while (inputFile.hasNext()){
-			Scanner curLine = new Scanner(inputFile.nextLine());
-			
-			String line = curLine.next();
-			String words[] = line.split(" ");
-			for (String word : words){
-				String[] symbols = word.split("");
-				for (String symbol : symbols){
-					//Was prediction correct?
-					symbol = symbol.toLowerCase();
-					if (predictedSymbol != null){
-						int hit = 0;
-						if (predictedSymbol.equals(symbol)) hit = 1;
-						
-						hits.addLast(hit);
-						movingSum += hit;
-						if (hits.size() > windowLength){
-							int value = hits.removeFirst();
-							movingSum -= value;
-						}
-						movingAverage = (double) movingSum / hits.size();
-						
-						//System.out.println("Fitness: " + movingAverage);
-					}		
-					//Feed symbol to model
-					predictor.addSymbol(symbol);;
-					//Predict
-					predictedSymbol = predictor.predict(symbol);
-				}
-			}
-		
-			
-			curLine.close();
-		}
-		inputFile.close();
-	}
-	*/
+	
 	public void runExperimentRound_WithSpace(String dataFilePath) throws FileNotFoundException{
 		File file = new File(dataFilePath);
 		Scanner inputFile;
@@ -144,7 +103,7 @@ public class Test {
 				predictedSymbol = predictor.predict();
 			}
 			
-			//System.out.println("Fitness: " + movingAverage);
+			System.out.println("Fitness: " + movingAverage);
 		
 			
 			curLine.close();

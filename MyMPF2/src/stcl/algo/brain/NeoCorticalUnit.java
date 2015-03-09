@@ -51,7 +51,7 @@ public class NeoCorticalUnit implements NU{
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
-		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, 5, 0.125, decay); //TODO: Move all parameters out
+		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay); //TODO: Move all parameters out
 		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);

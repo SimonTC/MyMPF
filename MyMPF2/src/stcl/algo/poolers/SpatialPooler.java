@@ -82,13 +82,14 @@ public class SpatialPooler {
 		if (feedBackwardInputMatrix.numCols() != mapSize || feedBackwardInputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
+		//SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
+		SimpleMatrix model = chooseMax(feedBackwardInputMatrix, som);
 		
 		return model;		
 	}
 	
 	/**
-	 * Use roulette method to choose a random model from the given SOmBAsics object
+	 * Use roulette method to choose a random model from the given SomBasics object
 	 * @param input
 	 * @return
 	 */
@@ -117,7 +118,13 @@ public class SpatialPooler {
 		
 	}
 	
-	protected SimpleMatrix chooseMax(SimpleMatrix input){
+	/**
+	 * Choose the most probable model from the given SomBasics object
+	 * @param input
+	 * @param map
+	 * @return
+	 */
+	protected SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
 		//Transform bias matrix into vector
 		double[] vector = input.getMatrix().data;
 		
@@ -137,7 +144,7 @@ public class SpatialPooler {
 		//System.out.println("Chose model: " + maxID);
 		
 		//Choose model from som
-		SimpleMatrix model = som.getNode(maxID).getVector();
+		SimpleMatrix model = map.getNode(maxID).getVector();
 		
 		return model;
 		

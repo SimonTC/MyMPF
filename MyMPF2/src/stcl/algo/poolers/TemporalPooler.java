@@ -49,7 +49,8 @@ public class TemporalPooler extends SpatialPooler  {
 		if (inputMatrix.numCols() != mapSize || inputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the temporal pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		SimpleMatrix model = chooseRandom(inputMatrix, rsom);
+		//SimpleMatrix model = chooseRandom(inputMatrix, rsom);
+		SimpleMatrix model = chooseMax(inputMatrix, rsom);
 		
 		//Add noise
 		model = addNoise(model, curNoiseMagnitude);

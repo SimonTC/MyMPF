@@ -25,7 +25,7 @@ public class HotGym {
 	private JFrame frame;
 	
 	private final int ITERATIONS = 10;
-	boolean sin = false;
+	boolean sin = true;
 	SimpleMatrix uniformDistribution;
 	
 	public static void main(String[] args){

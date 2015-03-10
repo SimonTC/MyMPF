@@ -25,7 +25,7 @@ public class HierarchicalTextPrediction {
 	SimpleMatrix uniformDistribution;
 
 	public static void main(String[] args) throws IOException {
-		String filepath = "C:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
+		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
 		htp.run(filepath);
 

@@ -15,6 +15,7 @@ import stcl.algo.brain.Brain;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.Normalizer;
+import stcl.fun.sequenceprediction.CopyOfSequenceTrainer;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HotGym {
@@ -24,7 +25,7 @@ public class HotGym {
 	private JFrame frame;
 	
 	private final int ITERATIONS = 10;
-	boolean sin = true;
+	boolean sin = false;
 	SimpleMatrix uniformDistribution;
 	
 	public static void main(String[] args){
@@ -53,7 +54,7 @@ public class HotGym {
 			ArrayList<double[]> list = new ArrayList<double[]>();
 			list.add(data);
 			Random rand = new Random();
-			SequenceTrainer trainer = new SequenceTrainer(list, ITERATIONS, rand );
+			CopyOfSequenceTrainer trainer = new CopyOfSequenceTrainer(list, ITERATIONS, rand );
 			boolean calculateErrorAsDistance = true;
 			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance, null);
 			

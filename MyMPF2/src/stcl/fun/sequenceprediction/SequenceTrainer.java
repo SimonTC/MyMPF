@@ -20,12 +20,19 @@ public class SequenceTrainer {
 	protected ArrayList<SimpleMatrix[]> trainingSet; //The list used when training
 	private Random rand;
 	
-	public SequenceTrainer(ArrayList<double[]> sequences, int numIterations, Random rand) {
-		
+	public SequenceTrainer(ArrayList<double[]> sequences, int numIterations, Random rand) {		
 		this.rand = rand;
 		ArrayList<SimpleMatrix[]> possibleSequences = convertDoubleSequencesToMatrixSequences(sequences);
 		buildTrainingSet(possibleSequences, numIterations);
 	}
+	
+
+	public SequenceTrainer(ArrayList<SimpleMatrix[]> sequences, int numIterations, Random rand, int blob) {
+		
+		this.rand = rand;
+		buildTrainingSet(sequences, numIterations);
+	}
+
 	private ArrayList<SimpleMatrix[]> convertDoubleSequencesToMatrixSequences(ArrayList<double[]> sequences){
 		ArrayList<SimpleMatrix[]> matrixSequences = new ArrayList<SimpleMatrix[]>();
 		for (double[] seq : sequences){
@@ -155,7 +162,7 @@ public class SequenceTrainer {
 			ps.printf(format,d);
 		}
 		
-		return ps.toString();
+		return stream.toString();
 	}
 	
 	/**

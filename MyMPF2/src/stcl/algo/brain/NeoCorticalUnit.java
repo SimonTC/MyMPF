@@ -29,12 +29,12 @@ public class NeoCorticalUnit implements NU{
 	private int temporalMapSize;
 	
 	private boolean needHelp;
-	private boolean neededHelpBefore; //Used in reporting
 	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
 	
 	private boolean useMarkovPrediction;
+	private boolean active;
 	
 	private int stepsSinceSequenceStart;
 	private SimpleMatrix temporalProbabilityMatrixToSend;
@@ -88,6 +88,8 @@ public class NeoCorticalUnit implements NU{
 		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
+		active = true;
+		
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
@@ -98,7 +100,6 @@ public class NeoCorticalUnit implements NU{
 		
 		predictionEntropy = calculateEntropy(predictionMatrix);
 		if (predictionEntropy >= entropyThreshold) needHelp = true;
-		neededHelpBefore = needHelp;
 		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		
 		//Bias
@@ -204,6 +205,7 @@ public class NeoCorticalUnit implements NU{
 		fbOutput = spatialPoolerFBOutputVector;
 		
 		needHelp = false;
+		active = false;
 		
 		return fbOutput;
 	}
@@ -293,7 +295,8 @@ public class NeoCorticalUnit implements NU{
 		return entropyThreshold;
 	}
 	
-	public boolean neededHelpBefore(){
-		return neededHelpBefore;
+	public boolean active(){
+		return active;
 	}
+
 }

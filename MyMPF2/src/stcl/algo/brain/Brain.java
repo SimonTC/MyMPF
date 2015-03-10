@@ -13,11 +13,19 @@ import stcl.algo.util.Normalizer;
 
 public class Brain {
 	
-	private ArrayList<NeoCorticalUnit> unitlist;
+	protected ArrayList<NeoCorticalUnit> unitlist;
+	private SimpleMatrix uniformDistribution;
 	
 	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
 		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		
+		RSOM rsom = unitlist.get(unitlist.size() - 1).getTemporalPooler().getRSOM();
+		int rows = rsom.getHeight();
+		int cols = rsom.getWidth();
+		uniformDistribution = createUniformDistribution(rows, cols);
 	}
+	
+	
 	
 	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder){
 		unitlist = new ArrayList<NeoCorticalUnit>();
@@ -37,9 +45,14 @@ public class Brain {
 	 * @return feed back output from the brain
 	 */
 	public SimpleMatrix step(SimpleMatrix inputVector){
-		SimpleMatrix uniformDistribution = null;
+		feedForward(inputVector);
 		
-		//Feed forward
+		SimpleMatrix output = feedBackward();
+		
+		return output;
+	}
+	
+	protected SimpleMatrix feedForward(SimpleMatrix inputVector){
 		SimpleMatrix ffInput = inputVector;
 		int i = 0;
 		boolean cont = true;
@@ -57,14 +70,10 @@ public class Brain {
 			i++;
 		} while (i < unitlist.size() && cont);
 		
-		//Feed back
-		if (uniformDistribution == null){
-			RSOM rsom = unitlist.get(unitlist.size() - 1).getTemporalPooler().getRSOM();
-			int rows = rsom.getHeight();
-			int cols = rsom.getWidth();
-			uniformDistribution = createUniformDistribution(rows, cols);
-		}
-		
+		return ffInput;
+	}
+	
+	protected SimpleMatrix feedBackward(){
 		SimpleMatrix fbInput = uniformDistribution;
 		for (int j = unitlist.size()-1; j >= 0; j--){
 			NeoCorticalUnit nu = unitlist.get(j);
@@ -107,58 +116,6 @@ public class Brain {
 	
 	public void flush(){
 		for (NeoCorticalUnit nu : unitlist) nu.flush();
-	}
-	
-	public double[] collectPredictionEntropies(){
-		double[] entropies = new double[unitlist.size()];
-		for (int i = 0; i < unitlist.size(); i++){
-			entropies[i] = unitlist.get(i).getEntropy();
-		}
-		return entropies;
-				
-	}
-	
-	public double[] collectSpatialFFEntropies(){
-		double[] entropies = new double[unitlist.size()];
-		for (int i = 0; i < unitlist.size(); i++){
-			SimpleMatrix activation = unitlist.get(i).getSpatialPooler().getActivationMatrix();
-			SimpleMatrix normalized = Normalizer.normalize(activation);
-			entropies[i] = calculateEntropy(normalized);
-		}
-		return entropies;
-				
-	}
-	
-	public int[] collectBMUs(boolean spatial){
-		int[] bmus = new int[unitlist.size()];
-		for (int i = 0; i < unitlist.size(); i++){
-			if (spatial) {
-				bmus[i] = unitlist.get(i).getSOM().getBMU().getId();
-			} else {
-				bmus[i] = unitlist.get(i).getTemporalPooler().getRSOM().getBMU().getId();
-			}
-		}
-		return bmus;
-	}
-	
-	public int[] collectHelpStatus(){
-		int[] status = new int[unitlist.size()];
-		for (int i = 0; i < unitlist.size(); i++){
-			boolean needHelp = unitlist.get(i).neededHelpBefore();
-			status[i] = needHelp ? 1 : 0;
-		}
-		
-		return status;
-	}
-	
-	
-	
-	private double calculateEntropy(SimpleMatrix m){
-		double sum = 0;
-		for (Double d : m.getMatrix().data){
-			if (d != 0) sum += d * Math.log(d);
-		}
-		return -sum;
 	}
 	
 	public ArrayList<NeoCorticalUnit> getUnitList(){

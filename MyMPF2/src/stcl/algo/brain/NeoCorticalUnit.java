@@ -179,6 +179,7 @@ public class NeoCorticalUnit implements NU{
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
+		//needHelp = true;
 		if (needHelp){
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
@@ -196,13 +197,15 @@ public class NeoCorticalUnit implements NU{
 			biasMatrix = normalizedTemporalPoolerFBOutput;
 			
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
-			//biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
+			
 			
 			biasMatrix = normalize(biasMatrix);			
 			
 		} else {
 			biasMatrix = predictionMatrix;
 		}
+		
+		biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		

@@ -36,15 +36,18 @@ public class HierarchicalTextPrediction {
 	}
 	
 	public void run(String logFilepath) throws IOException{
-		//for (int i = 0; i < 10; i++){
-		int i = 0;	
-		setupExperiment(3);
-			double error = runExperiment(100, true);
+		double totalError = 0;
+		int iterations = 10;
+		for (int i = 0; i < iterations; i++){
+		//int i = 0;	
+			setupExperiment(3);
+			totalError += runExperiment(100, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
 			writer.closeFile();
-		//}
+		}
+		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
 	}
 	

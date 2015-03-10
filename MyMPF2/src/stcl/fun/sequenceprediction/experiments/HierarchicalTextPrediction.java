@@ -31,8 +31,8 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		htp.run(filepath);
-		//htp.run_Staggered(filepath);
+		//htp.run(filepath);
+		htp.run_Staggered(filepath);
 	}
 	
 	public void run(String logFilepath) throws IOException{
@@ -40,8 +40,8 @@ public class HierarchicalTextPrediction {
 		int iterations = 10;
 		for (int i = 0; i < iterations; i++){
 		//int i = 0;	
-			setupExperiment(3);
-			totalError += runExperiment(100, true);
+			setupExperiment(4);
+			totalError += runExperiment(200, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
@@ -58,6 +58,11 @@ public class HierarchicalTextPrediction {
 		setupExperiment(1);
 		runExperiment(100, true);
 		
+		writer = new FileWriter();
+		writer.openFile(logFilepath + "Staggered_Level1", false);
+		writeInfo(writer, brain);
+		writer.closeFile();
+		
 		//Train second level unit
 		sequence = createSequenceForNextUnit();
 		setupBrain(1);
@@ -65,7 +70,7 @@ public class HierarchicalTextPrediction {
 		
 		
 		writer = new FileWriter();
-		writer.openFile(logFilepath + "Staggered_" + i, false);
+		writer.openFile(logFilepath + "Staggered_Level2" , false);
 		writeInfo(writer, brain);
 		writer.closeFile();
 

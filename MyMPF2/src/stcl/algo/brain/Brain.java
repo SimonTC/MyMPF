@@ -46,9 +46,9 @@ public class Brain {
 	 * @return feed back output from the brain
 	 */
 	public SimpleMatrix step(SimpleMatrix inputVector){
-		feedForward(inputVector);
+		SimpleMatrix m = feedForward(inputVector);
 		
-		SimpleMatrix output = feedBackward();
+		SimpleMatrix output = feedBackward(m);
 		
 		return output;
 	}
@@ -74,8 +74,10 @@ public class Brain {
 		return ffInput;
 	}
 	
-	protected SimpleMatrix feedBackward(){
-		SimpleMatrix fbInput = uniformDistribution;
+	protected SimpleMatrix feedBackward(SimpleMatrix fbInput){
+		if (fbInput == null) {
+			fbInput = uniformDistribution;
+		}
 		for (int j = unitlist.size()-1; j >= 0; j--){
 			NeoCorticalUnit nu = unitlist.get(j);
 			SimpleMatrix m = resizeToFitFBPass(fbInput, nu);

@@ -23,7 +23,7 @@ public class Test_NU {
 	public static void main(String[] args) {
 		Test_NU t = new Test_NU();
 		String filepath = "D:/Users/Simon/Documents/Experiments/VOMM/Book_500";
-		int numUnits = 1;
+		int numUnits = 2;
 		int markovOrder = 5;
 		try {
 			t.run(filepath, numUnits, markovOrder);
@@ -40,7 +40,7 @@ public class Test_NU {
 		FileWriter writer = new FileWriter();
 		writer.openFile(filepath + "_log", false);
 		writer.closeFile();
-		for (int i = 0; i < 3; i++){
+		for (int i = 0; i < 10; i++){
 			writer.openFile(filepath + "_log", true);
 			movingAverage = 0;
 			movingSum = 0;
@@ -140,7 +140,7 @@ public class Test_NU {
 				//Convert prediction to symbol
 				predictedChar = convertDoubleToCharacter(prediction.get(0));		
 				
-				writeInfo(writer, brain, character, predictedChar);
+				//writeInfo(writer, brain, character, predictedChar);
 			}
 			
 			//System.out.println("Fitness: " + movingAverage);

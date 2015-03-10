@@ -76,7 +76,7 @@ public class Brain_DataCollector extends Brain {
 		receivedInputs.add(inputVector);
 		
 		//Feed forward
-		feedForward(inputVector);
+		SimpleMatrix m = feedForward(inputVector);
 		
 		//Collect Feedforward info
 		activeStatuses.add(collectActiveStatus());
@@ -87,7 +87,7 @@ public class Brain_DataCollector extends Brain {
 		FFOutputs.add(collectOutputs(true));
 		
 		//Feed back
-		SimpleMatrix output = feedBackward();
+		SimpleMatrix output = feedBackward(m);
 		FBOutputs.add(collectOutputs(false));
 		
 		//Collect feed back info

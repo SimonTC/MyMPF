@@ -205,7 +205,7 @@ public class NeoCorticalUnit implements NU{
 			biasMatrix = predictionMatrix;
 		}
 		
-		biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
+		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		

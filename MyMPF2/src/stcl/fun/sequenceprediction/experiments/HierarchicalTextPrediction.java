@@ -20,7 +20,7 @@ import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HierarchicalTextPrediction {
 	
-	Random rand = new Random(1234);
+	Random rand = new Random(12345);
 	Brain_DataCollector brain;
 	SimpleMatrix[] sequence;
 	FileWriter writer;

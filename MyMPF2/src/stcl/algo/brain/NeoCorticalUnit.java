@@ -40,6 +40,8 @@ public class NeoCorticalUnit implements NU{
 	private SimpleMatrix temporalProbabilityMatrixToSend;
 	private int markovOrder;
 	
+	private int oldBMU;
+	
 	/**
 	 * 
 	 * @param rand
@@ -52,7 +54,7 @@ public class NeoCorticalUnit implements NU{
 	 * @param decayFactor
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
-		double decay = calculateDecay(markovOrder, 0.01);
+		double decay = calculateDecay(markovOrder, 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
@@ -70,6 +72,7 @@ public class NeoCorticalUnit implements NU{
 		entropyThreshold = 0;
 		stepsSinceSequenceStart = 0;
 		this.markovOrder = markovOrder;
+		oldBMU = -1;
 	}
 	
 	/**
@@ -118,6 +121,15 @@ public class NeoCorticalUnit implements NU{
 		
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
+		
+		
+		int bmu = temporalPooler.getRSOM().getBMU().getId();
+		if (oldBMU != bmu){
+			needHelp = true;
+			oldBMU = bmu;
+		} else {
+			needHelp = false;
+		}
 		
 		ffOutput = temporalFFOutputMatrix;
 		

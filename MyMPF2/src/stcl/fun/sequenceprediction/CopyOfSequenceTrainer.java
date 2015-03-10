@@ -14,33 +14,20 @@ import stcl.algo.util.FileWriter;
 import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
-public class SequenceTrainer {
-	protected ArrayList<SimpleMatrix[]> trainingSet; //The list used when training
+public class CopyOfSequenceTrainer {
+	private ArrayList<double[]> possibleSequences; //All possible sequences
+	protected ArrayList<double[]> trainingSet; //The list used when training
 	private Random rand;
 	
-	public SequenceTrainer(ArrayList<double[]> sequences, int numIterations, Random rand) {
-		
+	public CopyOfSequenceTrainer(ArrayList<double[]> sequences, int numIterations, Random rand) {
+		this.possibleSequences = sequences;
 		this.rand = rand;
-		ArrayList<SimpleMatrix[]> possibleSequences = convertDoubleSequencesToMatrixSequences(sequences);
-		buildTrainingSet(possibleSequences, numIterations);
-	}
-	private ArrayList<SimpleMatrix[]> convertDoubleSequencesToMatrixSequences(ArrayList<double[]> sequences){
-		ArrayList<SimpleMatrix[]> matrixSequences = new ArrayList<SimpleMatrix[]>();
-		for (double[] seq : sequences){
-			SimpleMatrix[] matrixSeq = new SimpleMatrix[seq.length];
-			for (int i = 0; i < seq.length; i++){
-				double d = seq[i];
-				double data[][] = {{d}};
-				SimpleMatrix m = new SimpleMatrix(data);
-				matrixSeq[i] = m;
-			}
-			matrixSequences.add(matrixSeq);
-		}
-		return matrixSequences;
+		
+		buildRandomList(possibleSequences, numIterations);
 	}
 	
-	private void buildTrainingSet(ArrayList<SimpleMatrix[]> possibleSequences, int numSequences){
-		trainingSet = new ArrayList<SimpleMatrix[]>();
+	private void buildRandomList(ArrayList<double[]> possibleSequences, int numSequences){
+		trainingSet = new ArrayList<double[]>();
 		for (int i = 0; i < numSequences; i++){
 			int id = rand.nextInt(possibleSequences.size());
 			trainingSet.add(possibleSequences.get(id));
@@ -63,12 +50,12 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<SimpleMatrix[]> givenTrainingSet, boolean calculateErrorAsDistance, FileWriter writer){
+	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<double[]> givenTrainingSet, boolean calculateErrorAsDistance, FileWriter writer){
 		ArrayList<Double> errors = new ArrayList<Double>(); 
 		int counter = 1;
 		int numSequences = givenTrainingSet.size();
-		for (SimpleMatrix[] sequence : givenTrainingSet){
-			double error = doSequence(brain, noiseMagnitude, sequence, writer);
+		for (double[] sequence : givenTrainingSet){
+			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance, writer);
 			errors.add(error);
 			counter++;
 		}
@@ -85,23 +72,25 @@ public class SequenceTrainer {
 		System.out.println();
 	}
 	
-	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, FileWriter writer){
-		SimpleMatrix prediction = null;
+	private double doSequence(Brain brain, double noiseMagnitude, double[] sequence, boolean calculateErrorAsDistance, FileWriter writer){
+		double prediction = 0;
 		double totalError = 0;
-		for (SimpleMatrix m : sequence){
+		for (double d : sequence){
 			
-			if (prediction != null){
-				totalError += calculateErrorAsDistance(prediction, m);
+			if (calculateErrorAsDistance) {
+				totalError += calculateErrorAsDistance(prediction, d);
+			} else {
+				totalError += calculateErrorAsBoolean(prediction, d);
 			}
-			SimpleMatrix output = step(brain, noiseMagnitude, m);
-			prediction = output;
-			if (writer != null) writeInfo(writer, brain, m, prediction);
+			SimpleMatrix output = step(brain, noiseMagnitude, d);
+			prediction = output.get(0);
+			if (writer != null) writeInfo(writer, brain, d, prediction);
 		}
 		double MSQE = totalError / (double) sequence.length;
 		return MSQE;
 	}
 	
-	private void writeInfo(FileWriter writer, Brain brain, SimpleMatrix input, SimpleMatrix prediction){
+	private void writeInfo(FileWriter writer, Brain brain, double input, double prediction){
 		double[] predictionEntropies = brain.collectPredictionEntropies();
 		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
 		int[] spatialBMUs = brain.collectBMUs(true);
@@ -109,8 +98,8 @@ public class SequenceTrainer {
 		int[] helpStatus = brain.collectHelpStatus();
 		
 		String line = "";
-		line += input.toString() + ";"; 
-		line += prediction.toString() + ";";
+		line += input + ";";
+		line += prediction + ";";
 		for (double d : predictionEntropies){
 			line += d + ";";
  		}
@@ -144,10 +133,12 @@ public class SequenceTrainer {
 	 * @param input
 	 * @return feed back output from the brain
 	 */
-	private SimpleMatrix step(Brain brain, double noiseMagnitude, SimpleMatrix input){
-		SimpleMatrix noisyInput = addNoise(input, noiseMagnitude);
-				
-		SimpleMatrix prediction =  brain.step(noisyInput);
+	private SimpleMatrix step(Brain brain, double noiseMagnitude, double input){
+		double d = addNoise(input, noiseMagnitude);
+		double[][] inputData = {{d}};
+		SimpleMatrix inputVector = new SimpleMatrix(inputData);		
+		
+		SimpleMatrix prediction =  brain.step(inputVector);
 		
 		return prediction;
 	}
@@ -171,12 +162,8 @@ public class SequenceTrainer {
 		return m;
 	}
 	
-	/**
-	 * Calculates the NormF of the difference between the two matrices
-	 */
-	private double calculateErrorAsDistance(SimpleMatrix prediction, SimpleMatrix actual){
-		SimpleMatrix diff = prediction.minus(actual);
-		double error = diff.normF();
+	private double calculateErrorAsDistance(double prediction, double actual){
+		double error = Math.pow(prediction - actual, 2);
 		return error;
 	}
 	
@@ -187,15 +174,9 @@ public class SequenceTrainer {
 		return 0;
 	}
 	
-	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
-		SimpleMatrix noisyMatrix = new SimpleMatrix(m);
-		for (int i = 0; i < noisyMatrix.getNumElements(); i++){
-			double d = noisyMatrix.get(i);
-			double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-			d += noise;
-			noisyMatrix.set(i,d);
-		}
-		return noisyMatrix;
+	private double addNoise(double value, double noiseMagnitude){
+		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
+		return value + noise;
 	}
 	
 	private SimpleMatrix createUniformDistribution(int rows, int columns){
@@ -205,7 +186,7 @@ public class SequenceTrainer {
 		return m;
 	}
 	
-	public ArrayList<SimpleMatrix[]> getTrainingSet(){
+	public ArrayList<double[]> getTrainingSet(){
 		return trainingSet;
 	}
 

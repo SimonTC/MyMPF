@@ -54,12 +54,12 @@ public class HierarchicalTextPrediction {
 		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand);
 		boolean calculateErrorAsDistance = false;
 		//Train
-		trainer.train(brain, 0, calculateErrorAsDistance, null);
+		trainer.train(brain, 0.0, calculateErrorAsDistance, null);
 		
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
-		ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance, writer);
+		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance, writer);
 		
 		double error = 0;
 		for (double d : errors){
@@ -95,6 +95,21 @@ public class HierarchicalTextPrediction {
 			doubleSequence[i] = intSequence[i];
 		}
 		sequence = doubleSequence;
+	}
+	
+	/**
+	 * 
+	 * @param i integer to convert to bitstring
+	 * @param length length of bit string. 0's will be added in front of the bit string if it is not long enough
+	 * @return
+	 */
+	private String intToBitString(int i, int length){
+		String s = Integer.toBinaryString(i);
+		while (s.length() < length){
+			s = "0" + s;
+		}
+		
+		return s;
 	}
 	
 

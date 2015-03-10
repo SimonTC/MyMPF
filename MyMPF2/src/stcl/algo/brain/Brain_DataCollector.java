@@ -150,6 +150,13 @@ public class Brain_DataCollector extends Brain {
 		}
 		return outputs;
 	}
+	
+	/**
+	 * Removes all collected data
+	 */
+	public void flushCollectedData(){
+		setupMemories();
+	}
 
 	/**
 	 * @return the receivedInputs

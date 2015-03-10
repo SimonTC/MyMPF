@@ -62,8 +62,8 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(Brain brain, double noiseMagnitude, boolean calculateErrorAsDistance, FileWriter writer){
-		return train(brain, noiseMagnitude, trainingSet, calculateErrorAsDistance, writer);
+	public ArrayList<Double> train(Brain brain, double noiseMagnitude, boolean calculateErrorAsDistance){
+		return train(brain, noiseMagnitude, trainingSet, calculateErrorAsDistance);
 	}
 	
 	/**
@@ -72,12 +72,12 @@ public class SequenceTrainer {
 	 * @param noiseMagnitude
 	 * @return a list with the MSQE of each sequence in the training set
 	 */
-	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<SimpleMatrix[]> givenTrainingSet, boolean calculateErrorAsDistance, FileWriter writer){
+	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<SimpleMatrix[]> givenTrainingSet, boolean calculateErrorAsDistance){
 		ArrayList<Double> errors = new ArrayList<Double>(); 
 		int counter = 1;
 		int numSequences = givenTrainingSet.size();
 		for (SimpleMatrix[] sequence : givenTrainingSet){
-			double error = doSequence(brain, noiseMagnitude, sequence, writer, calculateErrorAsDistance);
+			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance);
 			errors.add(error);
 			counter++;
 		}
@@ -94,7 +94,7 @@ public class SequenceTrainer {
 		System.out.println();
 	}
 	
-	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, FileWriter writer, boolean calculateErrorAsDistance){
+	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, boolean calculateErrorAsDistance){
 		SimpleMatrix prediction = null;
 		double totalError = 0;
 		for (SimpleMatrix m : sequence){
@@ -108,65 +108,9 @@ public class SequenceTrainer {
 			}
 			SimpleMatrix output = step(brain, noiseMagnitude, m);
 			prediction = output;
-			if (writer != null) writeInfo(writer, brain, m, prediction);
 		}
 		double MSQE = totalError / (double) sequence.length;
 		return MSQE;
-	}
-	
-	private void writeInfo(FileWriter writer, Brain brain, SimpleMatrix input, SimpleMatrix prediction){
-		double[] predictionEntropies = brain.collectPredictionEntropies();
-		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
-		int[] spatialBMUs = brain.collectBMUs(true);
-		int[] temporalBMUs = brain.collectBMUs(false);
-		int[] helpStatus = brain.collectHelpStatus();
-		
-		String line = "";
-		line += writeMatrixArray(input) + ";"; 
-		line += writeMatrixArray(prediction) + ";";
-		for (double d : predictionEntropies){
-			line += d + ";";
- 		}
-		for (double d : spatialFFOutEntropies){
-			line += d + ";";
- 		}
-		for (int i : spatialBMUs){
-			line += i + ";";
-		}
-		for (int i : temporalBMUs){
-			line += i + ";";
-		}
-		for (int i : helpStatus){
-			line += i + ";";
-		}
-		
-		
-		line = line.substring(0, line.length() - 1); //Remove last semi-colon
-		try {
-			writer.writeLine(line);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * All is pretty much taken from the Matrix.toString() metods in simpleMatrix
-	 * @param m
-	 * @return
-	 */
-	private String writeMatrixArray(SimpleMatrix m){
-		int numChar = 6;
-		int precision = 3;
-		String format = "%"+numChar+"."+precision+"f " + "  ";
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(stream);
-		
-		for (double d : m.getMatrix().data){
-			ps.printf(format,d);
-		}
-		
-		return stream.toString();
 	}
 	
 	/**

@@ -18,8 +18,9 @@ public class HierarchicalTextPrediction {
 	
 	Random rand = new Random(1234);
 	Brain brain;
-	double[] sequence;
+	SimpleMatrix[] sequence;
 	FileWriter writer;
+	int bitStringMaxSize;
 	
 	SimpleMatrix uniformDistribution;
 
@@ -49,9 +50,9 @@ public class HierarchicalTextPrediction {
 	
 	private double runExperiment(int iterations){
 				
-		ArrayList<double[]> sequences = new ArrayList<double[]>();
+		ArrayList<SimpleMatrix[]> sequences = new ArrayList<SimpleMatrix[]>();
 		sequences.add(sequence);
-		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand);
+		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand, -1);
 		boolean calculateErrorAsDistance = false;
 		//Train
 		trainer.train(brain, 0.0, calculateErrorAsDistance, null);
@@ -73,7 +74,7 @@ public class HierarchicalTextPrediction {
 	
 	private void setupBrain(int numUnits){
 		int temporalMapSize = 4;
-		int inputLength = 1;
+		int inputLength = bitStringMaxSize;
 		int spatialMapSize = 3;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 5;
@@ -90,11 +91,24 @@ public class HierarchicalTextPrediction {
 		int alphabetSize = 3;		
 		int numLevels = 4;
 		int[] intSequence = builder.buildSequence(rand, numLevels, alphabetSize, minBlockLength, maxBlockLength);
-		double[] doubleSequence = new double[intSequence.length];
+		
+		String tmp = Integer.toBinaryString(alphabetSize);
+		bitStringMaxSize = tmp.length();
+		
+		SimpleMatrix[] matrixSequence = new SimpleMatrix[intSequence.length];
 		for (int i = 0; i < intSequence.length; i++){
-			doubleSequence[i] = intSequence[i];
+			String bitString = intToBitString(intSequence[i], bitStringMaxSize);
+			double[] vector = new double[bitString.length()];
+			for (int j = 0; j < bitString.length(); j++) {
+				int value = Integer.parseInt(bitString.substring(j, j+1));
+				vector[j] = value;
+			}
+			
+			double[][] data = {vector};
+			SimpleMatrix m = new SimpleMatrix(data);			
+			matrixSequence[i] = m;
 		}
-		sequence = doubleSequence;
+		sequence = matrixSequence;
 	}
 	
 	/**

@@ -195,7 +195,7 @@ public class NeoCorticalUnit implements NU{
 			//Combine FB output from temporal pooler with bias and prediction (if enabled)
 			biasMatrix = normalizedTemporalPoolerFBOutput;
 			
-			//biasMatrix = biasMatrix.elementMult(predictionMatrix);
+			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 			//biasMatrix = biasMatrix.plus(0.5 / biasMatrix.getNumElements()); //Add small uniform mass
 			
 			biasMatrix = normalize(biasMatrix);			

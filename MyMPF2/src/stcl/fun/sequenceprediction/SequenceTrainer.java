@@ -95,6 +95,7 @@ public class SequenceTrainer {
 		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
 		int[] spatialBMUs = brain.collectBMUs(true);
 		int[] temporalBMUs = brain.collectBMUs(false);
+		int[] helpStatus = brain.collectHelpStatus();
 		
 		String line = "";
 		line += input + ";";
@@ -109,6 +110,9 @@ public class SequenceTrainer {
 			line += i + ";";
 		}
 		for (int i : temporalBMUs){
+			line += i + ";";
+		}
+		for (int i : helpStatus){
 			line += i + ";";
 		}
 		

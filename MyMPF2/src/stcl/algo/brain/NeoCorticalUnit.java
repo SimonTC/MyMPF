@@ -29,6 +29,7 @@ public class NeoCorticalUnit implements NU{
 	private int temporalMapSize;
 	
 	private boolean needHelp;
+	private boolean neededHelpBefore; //Used in reporting
 	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
@@ -91,6 +92,7 @@ public class NeoCorticalUnit implements NU{
 		
 		predictionEntropy = calculateEntropy(predictionMatrix);
 		if (predictionEntropy >= entropyThreshold) needHelp = true;
+		neededHelpBefore = needHelp;
 		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		
 		//Bias
@@ -277,5 +279,9 @@ public class NeoCorticalUnit implements NU{
 	@Override
 	public double getEntropyThreshold() {
 		return entropyThreshold;
+	}
+	
+	public boolean neededHelpBefore(){
+		return neededHelpBefore;
 	}
 }

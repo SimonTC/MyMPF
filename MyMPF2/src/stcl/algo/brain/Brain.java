@@ -141,6 +141,16 @@ public class Brain {
 		return bmus;
 	}
 	
+	public int[] collectHelpStatus(){
+		int[] status = new int[unitlist.size()];
+		for (int i = 0; i < unitlist.size(); i++){
+			boolean needHelp = unitlist.get(i).neededHelpBefore();
+			status[i] = needHelp ? 1 : 0;
+		}
+		
+		return status;
+	}
+	
 	
 	
 	private double calculateEntropy(SimpleMatrix m){

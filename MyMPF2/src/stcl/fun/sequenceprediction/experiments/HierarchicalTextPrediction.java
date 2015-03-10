@@ -122,7 +122,7 @@ public class HierarchicalTextPrediction {
 		int inputLength = sequence[0].getNumElements();
 		int spatialMapSize = 3;
 		double predictionLearningRate = 0.1;
-		int markovOrder = 5;
+		int markovOrder = 3;
 		
 		brain = new Brain_DataCollector(numUnits, rand, inputLength, spatialMapSize, temporalMapSize, markovOrder);
 			

@@ -57,17 +57,20 @@ public class HierarchicalTextPrediction {
 		int i = 0;	
 		//Train first level unit
 		setupExperiment(1);
-		runExperiment(100, true);
+		double error = runExperiment(100, true);
 		
 		writer = new FileWriter();
 		writer.openFile(logFilepath + "Staggered_Level1", false);
 		writeInfo(writer, brain);
 		writer.closeFile();
 		
+		System.out.printf("Error, staggered unit 1: %.3f", error );
+		System.out.println();
+		
 		//Train second level unit
 		sequence = createSequenceForNextUnit();
 		setupBrain(1);
-		double error = runExperiment(1, true);
+		error = runExperiment(1, true);
 		
 		
 		writer = new FileWriter();
@@ -75,7 +78,7 @@ public class HierarchicalTextPrediction {
 		writeInfo(writer, brain);
 		writer.closeFile();
 
-		System.out.printf("Error: %.3f", error );
+		System.out.printf("Error, staggered unit 2: %.3f", error );
 	}
 	
 	private SimpleMatrix[] createSequenceForNextUnit(){

@@ -121,12 +121,12 @@ public class NeoCorticalUnit implements NU{
 		
 		ffOutput = temporalFFOutputMatrix;
 		
-		/*
+		
 		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
 		stepsSinceSequenceStart++;
 		
 		ffOutput = temporalProbabilityMatrixToSend;
-		*/
+		
 		
 		ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		/*

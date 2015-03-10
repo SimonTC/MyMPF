@@ -36,10 +36,10 @@ public class HierarchicalTextPrediction {
 		setupExperiment();
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
-			runExperiment(100);
+			double error = runExperiment(100);
 			writer.closeFile();
 		//}
-		System.out.println("finished");
+		System.out.printf("Error: %.3f", error );
 	}
 	
 	private void setupExperiment(){
@@ -47,7 +47,7 @@ public class HierarchicalTextPrediction {
 		setupBrain(2);
 	}
 	
-	private void runExperiment(int iterations){
+	private double runExperiment(int iterations){
 				
 		ArrayList<double[]> sequences = new ArrayList<double[]>();
 		sequences.add(sequence);
@@ -59,7 +59,15 @@ public class HierarchicalTextPrediction {
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
-		trainer.train(brain, 0, calculateErrorAsDistance, writer);
+		ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance, writer);
+		
+		double error = 0;
+		for (double d : errors){
+			error += d;
+		}
+		
+		error = error / (double) errors.size();
+		return error;
 		
 	}
 	

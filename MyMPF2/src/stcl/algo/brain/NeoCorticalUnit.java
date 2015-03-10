@@ -118,14 +118,14 @@ public class NeoCorticalUnit implements NU{
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
 		
-		//ffOutput = temporalFFOutputMatrix;
+		ffOutput = temporalFFOutputMatrix;
 		
-		
+		/*
 		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
 		stepsSinceSequenceStart++;
 		
 		ffOutput = temporalProbabilityMatrixToSend;
-		
+		*/
 		return ffOutput;
 	}
 	

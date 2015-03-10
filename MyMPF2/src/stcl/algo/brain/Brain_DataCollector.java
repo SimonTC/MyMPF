@@ -33,6 +33,10 @@ public class Brain_DataCollector extends Brain {
 	private ArrayList<int[]> spatialBMUs;
 	private ArrayList<int[]> temporalBMUs;
 	
+	//Activations
+	private ArrayList<SimpleMatrix[]> temporalActivations;
+	private ArrayList<SimpleMatrix[]> spatialActivations;
+	
 	//Entropies in the units
 	private ArrayList<double[]> predictionEntropies;
 	
@@ -66,6 +70,10 @@ public class Brain_DataCollector extends Brain {
 		spatialBMUs = new ArrayList<int[]>();
 		temporalBMUs = new ArrayList<int[]>();
 		
+		//Activations
+		temporalActivations = new ArrayList<SimpleMatrix[]>();
+		spatialActivations = new ArrayList<SimpleMatrix[]>();
+		
 		//Entropies in the units
 		predictionEntropies = new ArrayList<double[]>();
 	}
@@ -85,6 +93,8 @@ public class Brain_DataCollector extends Brain {
 		spatialBMUs.add(collectBMUs(true));
 		temporalBMUs.add(collectBMUs(false));
 		FFOutputs.add(collectOutputs(true));
+		temporalActivations.add(collectActivations(false));
+		spatialActivations.add(collectActivations(true));
 		
 		//Feed back
 		SimpleMatrix output = feedBackward(m);
@@ -135,6 +145,20 @@ public class Brain_DataCollector extends Brain {
 		}
 		
 		return status;
+	}
+	
+	private SimpleMatrix[] collectActivations(boolean spatial){
+		SimpleMatrix[] activations = new SimpleMatrix[numUnits];
+		for (int i = 0; i < numUnits; i++){
+			SimpleMatrix m;
+			if (spatial){
+				m = unitlist.get(i).getSpatialPooler().getActivationMatrix();
+			} else {
+				m = unitlist.get(i).getTemporalPooler().getActivationMatrix();
+			}
+			activations[i] = m;
+		}
+		return activations;
 	}
 	
 	private SimpleMatrix[] collectOutputs(boolean feedForward){
@@ -223,5 +247,19 @@ public class Brain_DataCollector extends Brain {
 	
 	public int getNumUnits(){
 		return numUnits;
+	}
+
+	/**
+	 * @return the temporalActivations
+	 */
+	public ArrayList<SimpleMatrix[]> getTemporalActivations() {
+		return temporalActivations;
+	}
+
+	/**
+	 * @return the spatialActivations
+	 */
+	public ArrayList<SimpleMatrix[]> getSpatialActivations() {
+		return spatialActivations;
 	}
 }

@@ -31,7 +31,7 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		//htp.run(filepath);
+		htp.run(filepath);
 		htp.run_Staggered(filepath);
 	}
 	
@@ -187,6 +187,7 @@ public class HierarchicalTextPrediction {
 		ArrayList<int[]> temporalBMUs = brain.getTemporalBMUs();
 		ArrayList<boolean[]> helpStatuses = brain.getHelpStatuses();
 		ArrayList<boolean[]> activeStatuses = brain.getActiveStatuses();
+		ArrayList<SimpleMatrix[]> temporalActivations = brain.getTemporalActivations();
 		
 		//Write headers
 		int numUnits = brain.getNumUnits();
@@ -198,6 +199,7 @@ public class HierarchicalTextPrediction {
 		header += writeRepeatedString("Temporal BMU", numUnits, ";");
 		header += writeRepeatedString("Need help", numUnits, ";");
 		header += writeRepeatedString("Was active", numUnits, ";");
+		header += writeRepeatedString("Temporal activation", numUnits, ";");
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		try {
 			writer.writeLine(header);
@@ -227,6 +229,9 @@ public class HierarchicalTextPrediction {
 			for (boolean b : activeStatuses.get(k)){
 				int i = b ? 1 : 0;
 				line += i + ";";
+			}
+			for (SimpleMatrix m : temporalActivations.get(k)){
+				line += writeMatrixArray(m) + ";"; 
 			}
 			
 			

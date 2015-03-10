@@ -220,4 +220,8 @@ public class Brain_DataCollector extends Brain {
 	public ArrayList<double[]> getPredictionEntropies() {
 		return predictionEntropies;
 	}
+	
+	public int getNumUnits(){
+		return numUnits;
+	}
 }

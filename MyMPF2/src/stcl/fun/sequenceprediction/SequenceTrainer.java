@@ -103,7 +103,7 @@ public class SequenceTrainer {
 				if (calculateErrorAsDistance){
 					totalError += calculateErrorAsDistance(prediction, m);
 				} else {
-					totalError += calculateErrorAsBoolean(prediction, m, 0.2);
+					totalError += calculateErrorAsBoolean(prediction, m, 0.01);
 				}
 			}
 			SimpleMatrix output = step(brain, noiseMagnitude, m);

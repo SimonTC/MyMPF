@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
@@ -31,14 +32,14 @@ public class HierarchicalTextPrediction {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
 		htp.run(filepath);
-
+		//htp.run_Staggered(filepath);
 	}
 	
 	public void run(String logFilepath) throws IOException{
 		//for (int i = 0; i < 10; i++){
 		int i = 0;	
-		setupExperiment();
-			double error = runExperiment(100);
+		setupExperiment(3);
+			double error = runExperiment(100, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
@@ -47,12 +48,50 @@ public class HierarchicalTextPrediction {
 		System.out.printf("Error: %.3f", error );
 	}
 	
-	private void setupExperiment(){
-		buildSequence();
-		setupBrain(2);
+	public void run_Staggered(String logFilepath) throws IOException{
+
+		int i = 0;	
+		//Train first level unit
+		setupExperiment(1);
+		runExperiment(100, true);
+		
+		//Train second level unit
+		sequence = createSequenceForNextUnit();
+		setupBrain(1);
+		double error = runExperiment(1, true);
+		
+		
+		writer = new FileWriter();
+		writer.openFile(logFilepath + "Staggered_" + i, false);
+		writeInfo(writer, brain);
+		writer.closeFile();
+
+		System.out.printf("Error: %.3f", error );
 	}
 	
-	private double runExperiment(int iterations){
+	private SimpleMatrix[] createSequenceForNextUnit(){
+		//Only works when old brain consists of one unit
+		ArrayList<boolean[]> helpStatuses = brain.getHelpStatuses();
+		ArrayList<SimpleMatrix[]> ffOutputs = brain.getFFOutputs();
+		
+		ArrayList<SimpleMatrix> newInputs = new ArrayList<SimpleMatrix>();
+		for (int i = 0; i < ffOutputs.size(); i++){
+			if (helpStatuses.get(i)[0]) newInputs.add(ffOutputs.get(i)[0]);
+		}
+		
+		SimpleMatrix[] newSequence = new SimpleMatrix[newInputs.size()];
+		for (int i = 0; i < newInputs.size(); i++){
+			newSequence[i] = newInputs.get(i);
+		}
+		return newSequence;
+	}
+	
+	private void setupExperiment(int numUnits){
+		buildSequence();
+		setupBrain(numUnits);
+	}
+	
+	private double runExperiment(int iterations, boolean brainMemoryFlushBetweenTrainingAndEvaluation){
 				
 		ArrayList<SimpleMatrix[]> sequences = new ArrayList<SimpleMatrix[]>();
 		sequences.add(sequence);
@@ -65,7 +104,7 @@ public class HierarchicalTextPrediction {
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
-		brain.flushCollectedData();
+		if (brainMemoryFlushBetweenTrainingAndEvaluation) brain.flushCollectedData();
 		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance);
 		
 		double error = 0;
@@ -79,8 +118,8 @@ public class HierarchicalTextPrediction {
 	}
 	
 	private void setupBrain(int numUnits){
-		int temporalMapSize = 4;
-		int inputLength = bitStringMaxSize;
+		int temporalMapSize = 2;
+		int inputLength = sequence[0].getNumElements();
 		int spatialMapSize = 3;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 5;
@@ -142,14 +181,15 @@ public class HierarchicalTextPrediction {
 		ArrayList<boolean[]> activeStatuses = brain.getActiveStatuses();
 		
 		//Write headers
+		int numUnits = brain.getNumUnits();
 		String header = "";
 		header += writeRepeatedString("Input", 1, ";");
 		header += writeRepeatedString("Output", 1, ";");
-		header += writeRepeatedString("Prediction entropy", 2, ";");
-		header += writeRepeatedString("Spatial BMU", 2, ";");
-		header += writeRepeatedString("Temporal BMU", 2, ";");
-		header += writeRepeatedString("Need help", 2, ";");
-		header += writeRepeatedString("Was active", 2, ";");
+		header += writeRepeatedString("Prediction entropy",numUnits, ";");
+		header += writeRepeatedString("Spatial BMU", numUnits, ";");
+		header += writeRepeatedString("Temporal BMU", numUnits, ";");
+		header += writeRepeatedString("Need help", numUnits, ";");
+		header += writeRepeatedString("Was active", numUnits, ";");
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		try {
 			writer.writeLine(header);
@@ -211,11 +251,12 @@ public class HierarchicalTextPrediction {
 		int numChar = 6;
 		int precision = 3;
 		String format = "%"+numChar+"."+precision+"f " + "  ";
+		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(stream);
 		
 		for (double d : m.getMatrix().data){
-			ps.printf(format,d);
+			ps.printf(Locale.US, format, d);
 		}
 		
 		return stream.toString();

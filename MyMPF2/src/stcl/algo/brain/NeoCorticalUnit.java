@@ -105,8 +105,8 @@ public class NeoCorticalUnit implements NU{
 		//Bias
 		//TODO: Should biasing happen before prediction?
 		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
-		biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
-		//biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
+		//biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
+		biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
 		biasedOutput = Normalizer.normalize(biasedOutput);
 		
 		//Transform spatial output matrix to vector

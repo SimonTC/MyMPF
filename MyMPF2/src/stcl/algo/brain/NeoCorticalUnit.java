@@ -36,6 +36,10 @@ public class NeoCorticalUnit implements NU{
 	
 	private boolean useMarkovPrediction;
 	
+	private int stepsSinceSequenceStart;
+	private SimpleMatrix temporalProbabilityMatrixToSend;
+	private int markovOrder;
+	
 	/**
 	 * 
 	 * @param rand
@@ -64,6 +68,8 @@ public class NeoCorticalUnit implements NU{
 		this.temporalMapSize = temporalMapSize;
 		needHelp = false;
 		entropyThreshold = 0;
+		stepsSinceSequenceStart = 0;
+		this.markovOrder = markovOrder;
 	}
 	
 	/**
@@ -112,7 +118,13 @@ public class NeoCorticalUnit implements NU{
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
 		
-		ffOutput = temporalFFOutputMatrix;
+		//ffOutput = temporalFFOutputMatrix;
+		
+		
+		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
+		stepsSinceSequenceStart++;
+		
+		ffOutput = temporalProbabilityMatrixToSend;
 		
 		return ffOutput;
 	}

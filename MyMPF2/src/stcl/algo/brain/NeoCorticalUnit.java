@@ -121,14 +121,15 @@ public class NeoCorticalUnit implements NU{
 		
 		ffOutput = temporalFFOutputMatrix;
 		
+		/*
 		
 		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
 		stepsSinceSequenceStart++;
 		
 		ffOutput = temporalProbabilityMatrixToSend;
+		*/
 		
-		
-		ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
+		//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		/*
 		double max = ffOutput.elementMaxAbs();
 		ffOutput = ffOutput.divide(max);
@@ -181,6 +182,7 @@ public class NeoCorticalUnit implements NU{
 
 		//needHelp = true;
 		if (needHelp){
+			stepsSinceSequenceStart = 0;
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
 			

@@ -184,25 +184,6 @@ public class SequenceTrainer {
 		return prediction;
 	}
 	
-	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
-		
-		m.reshape(rows, cols);
-		return m;
-	}
-	
-	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		int rows = 1;
-		int cols = unitToFit.getSOM().getInputVectorLength();
-				
-		m.reshape(rows, cols);
-		return m;
-	}
-	
 	/**
 	 * Calculates the NormF of the difference between the two matrices
 	 */

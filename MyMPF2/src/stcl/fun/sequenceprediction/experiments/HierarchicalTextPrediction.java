@@ -32,6 +32,7 @@ public class HierarchicalTextPrediction {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
 		htp.run(filepath);
+		System.out.println();
 		htp.run_Staggered(filepath);
 	}
 	

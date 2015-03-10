@@ -114,7 +114,7 @@ public class NeoCorticalUnit implements NU{
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
-		//temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
+		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
 		//Temporal classification
 		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
@@ -128,7 +128,7 @@ public class NeoCorticalUnit implements NU{
 		ffOutput = temporalProbabilityMatrixToSend;
 		*/
 		
-		//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
+		ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		/*
 		double max = ffOutput.elementMaxAbs();
 		ffOutput = ffOutput.divide(max);

@@ -77,7 +77,7 @@ public class SequenceTrainer {
 		int counter = 1;
 		int numSequences = givenTrainingSet.size();
 		for (SimpleMatrix[] sequence : givenTrainingSet){
-			double error = doSequence(brain, noiseMagnitude, sequence, writer);
+			double error = doSequence(brain, noiseMagnitude, sequence, writer, calculateErrorAsDistance);
 			errors.add(error);
 			counter++;
 		}
@@ -94,13 +94,17 @@ public class SequenceTrainer {
 		System.out.println();
 	}
 	
-	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, FileWriter writer){
+	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, FileWriter writer, boolean calculateErrorAsDistance){
 		SimpleMatrix prediction = null;
 		double totalError = 0;
 		for (SimpleMatrix m : sequence){
 			
 			if (prediction != null){
-				totalError += calculateErrorAsDistance(prediction, m);
+				if (calculateErrorAsDistance){
+					totalError += calculateErrorAsDistance(prediction, m);
+				} else {
+					totalError += calculateErrorAsBoolean(prediction, m, 0.2);
+				}
 			}
 			SimpleMatrix output = step(brain, noiseMagnitude, m);
 			prediction = output;
@@ -154,8 +158,8 @@ public class SequenceTrainer {
 	private String writeMatrixArray(SimpleMatrix m){
 		int numChar = 6;
 		int precision = 3;
-		 String format = "%"+numChar+"."+precision+"f " + "  ";
-		 ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		String format = "%"+numChar+"."+precision+"f " + "  ";
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(stream);
 		
 		for (double d : m.getMatrix().data){
@@ -208,10 +212,19 @@ public class SequenceTrainer {
 		return error;
 	}
 	
-	private double calculateErrorAsBoolean(double prediction, double actual){
-		float actual_int = Math.round(actual);
-		float prediction_int = Math.round(prediction);
-		if (actual_int != prediction_int) return 1;
+	/**
+	 * If any of the values differs mpre than threshold from the corresponding value in the other matrix, the value 1 is returned. Otherwise 0
+	 * @param prediction
+	 * @param actual
+	 * @param threshold
+	 * @return
+	 */
+	private double calculateErrorAsBoolean(SimpleMatrix prediction, SimpleMatrix actual, double threshold){
+		for (int i = 0; i < prediction.getNumElements(); i++){
+			double diff = Math.abs(prediction.get(i) - actual.get(i));
+			if (diff > threshold) return 1;
+		}
+
 		return 0;
 	}
 	

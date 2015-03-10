@@ -1,6 +1,8 @@
 package stcl.fun.sequenceprediction;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -109,8 +111,8 @@ public class SequenceTrainer {
 		int[] helpStatus = brain.collectHelpStatus();
 		
 		String line = "";
-		line += input.toString() + ";"; 
-		line += prediction.toString() + ";";
+		line += writeMatrixArray(input) + ";"; 
+		line += writeMatrixArray(prediction) + ";";
 		for (double d : predictionEntropies){
 			line += d + ";";
  		}
@@ -135,6 +137,25 @@ public class SequenceTrainer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * All is pretty much taken from the Matrix.toString() metods in simpleMatrix
+	 * @param m
+	 * @return
+	 */
+	private String writeMatrixArray(SimpleMatrix m){
+		int numChar = 6;
+		int precision = 3;
+		 String format = "%"+numChar+"."+precision+"f " + "  ";
+		 ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(stream);
+		
+		for (double d : m.getMatrix().data){
+			ps.printf(format,d);
+		}
+		
+		return ps.toString();
 	}
 	
 	/**

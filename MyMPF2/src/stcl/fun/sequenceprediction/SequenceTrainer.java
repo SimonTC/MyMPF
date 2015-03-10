@@ -168,7 +168,7 @@ public class SequenceTrainer {
 	/**
 	 * 
 	 * @param brain
-	 * @param noiseMagnitude
+	 * @param noiseMagnitude 
 	 * @param input
 	 * @return feed back output from the brain
 	 */

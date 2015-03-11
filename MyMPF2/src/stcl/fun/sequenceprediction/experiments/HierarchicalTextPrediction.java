@@ -48,6 +48,8 @@ public class HierarchicalTextPrediction {
 			writeInfo(writer, brain);
 			writer.closeFile();
 			brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+			System.out.println();
+			brain.getUnitList().get(0).getSequencer().printTrie();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );

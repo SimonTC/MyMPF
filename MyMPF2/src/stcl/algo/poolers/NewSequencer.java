@@ -56,6 +56,7 @@ public class NewSequencer {
 		if (startNewSequence){
 			//Add the current sequence to our trie of sequences
 			LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence);
+			//printSequence(nodeList);
 			TrieNode<Integer> lastNodeInSequence = nodeList.peekFirst(); //First node in the node list corresponds to last node in the symbol sequence
 			int count = lastNodeInSequence.getCount();
 			int id = lastNodeInSequence.getSequenceID();
@@ -63,6 +64,7 @@ public class NewSequencer {
 			//Add sequence to sequence memory if there is room
 			if (id < 0){
 				if (sequenceMemory.size() < maxNumberOfSequencesInMemory){
+					//System.out.println(" --- Added");
 					//We still have room
 					sequenceMemory.add(nodeList);
 					int newID = sequenceMemory.size() - 1;
@@ -74,14 +76,31 @@ public class NewSequencer {
 				} else {
 					//We have to see if it can get a place by kicking somebody else out
 					if (count > currentMinCount){
+						//System.out.println(" --- Added");
 						//It will kick out the other one
 						TrieNode<Integer> oldNode = sequenceMemory.get(currentMinID).peekFirst();
+						//printSequence(sequenceMemory.get(currentMinID));
+						//System.out.println(" --- Removed");
 						oldNode.setSequenceID(-1);
 						sequenceMemory.set(currentMinID, nodeList);
 						lastNodeInSequence.setSequenceID(currentMinID);
+					} else {
+						//System.out.println(" --- Not added");
 					}
 				}
-			}		
+			} else { //Sequence already exists in memory. Update min count and min id
+				currentMinCount = Integer.MAX_VALUE;
+				for (int i = 0; i < sequenceMemory.size(); i++){
+					TrieNode<Integer> lastNode = sequenceMemory.get(i).peekFirst();
+					int nodeCount = lastNode.getCount();
+					if (nodeCount < currentMinCount){
+						currentMinCount = nodeCount;
+						currentMinID = lastNode.getSequenceID();
+					}
+				}
+				
+				//System.out.println(" --- Count++");
+			}
 			
 			//Calculate probability of having just exited the different sequences
 			for (int i = 0; i < sequenceMemory.size(); i++){
@@ -148,10 +167,18 @@ public class NewSequencer {
 	public void printSequenceMemory(){
 		System.out.println("Sequence memory:");
 		for (LinkedList<TrieNode<Integer>> sequence : sequenceMemory){
-			for (TrieNode<Integer> n : sequence){
-				System.out.print(n.getSymbol() + " ");
-			}
+			printSequence(sequence);
 			System.out.println();
 		}
+	}
+	
+	private void printSequence(LinkedList<TrieNode<Integer>> sequence){
+		Iterator<TrieNode<Integer>> iterator = sequence.descendingIterator();
+		while (iterator.hasNext()){
+			TrieNode<Integer> n = iterator.next();
+			System.out.print(n.getSymbol() + " ");
+		}
+		int count = sequence.peekFirst().getCount();
+		System.out.print(" ---- " + count);
 	}
 }

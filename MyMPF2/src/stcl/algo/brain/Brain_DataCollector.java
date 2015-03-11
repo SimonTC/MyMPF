@@ -163,9 +163,9 @@ public class Brain_DataCollector extends Brain {
 		for (int i = 0; i < numUnits; i++){
 			SimpleMatrix m;
 			if (spatial){
-				m = unitlist.get(i).getSpatialPooler().getActivationMatrix();
+				m = new SimpleMatrix(unitlist.get(i).getSpatialPooler().getActivationMatrix());
 			} else {
-				m = unitlist.get(i).getTemporalPooler().getActivationMatrix();
+				m = new SimpleMatrix(unitlist.get(i).getTemporalPooler().getActivationMatrix());
 			}
 			activations[i] = m;
 		}
@@ -177,9 +177,9 @@ public class Brain_DataCollector extends Brain {
 		for (int i = 0; i < numUnits; i++){
 			SimpleMatrix m;
 			if (feedForward){
-				m = unitlist.get(i).getFFOutput();
+				m = new SimpleMatrix(unitlist.get(i).getFFOutput());
 			} else {
-				m = unitlist.get(i).getFBOutput();
+				m = new SimpleMatrix(unitlist.get(i).getFBOutput());
 			}
 			outputs[i] = m;
 		}

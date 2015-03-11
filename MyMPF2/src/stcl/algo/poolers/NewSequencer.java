@@ -23,27 +23,27 @@ public class NewSequencer {
 	private int currentMinCount;
 	private int currentMinID;
 	private int maxNumberOfSequencesInMemory;
+	private int inputLength;
 	
 	
-	
-	public NewSequencer(int markovOrder, int mapSize) {
+	public NewSequencer(int markovOrder, int maxNumberOfSequencesInMemory, int inputLength) {
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
 		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
 		currentMinCount = Integer.MAX_VALUE;
 		currentMinID = -1;
-		
-		maxNumberOfSequencesInMemory = mapSize * mapSize;
+		this.inputLength = inputLength;
+		this.maxNumberOfSequencesInMemory = maxNumberOfSequencesInMemory;
 		sequenceProbabilities = new SimpleMatrix(1, maxNumberOfSequencesInMemory);
-		
 		reset();
 		
 		
 	}
 	
-	private void reset(){
+	public void reset(){
 		currentSequence = new LinkedList<Integer>();
 		currentInputProbabilitites = new LinkedList<SimpleMatrix>();
+		
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
@@ -61,7 +61,7 @@ public class NewSequencer {
 			int id = lastNode.getSequenceID();
 			
 			//Add sequence to sequence memory if there is room
-			if (id == -1){
+			if (id < 0){
 				if (sequenceMemory.size() < maxNumberOfSequencesInMemory){
 					//We still have room
 					sequenceMemory.add(nodeSequence);
@@ -123,8 +123,22 @@ public class NewSequencer {
 	}
 	
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
-		//Returns the probabilitites of the next input given the probabilitites of starting the different sequences
-		return null;
+		//Returns the probabilities of the next input given the probabilities of starting the different sequences
+		SimpleMatrix probabilities = new SimpleMatrix(1, inputLength);
+		Iterator<LinkedList<TrieNode<Integer>>> sequenceIterator = sequenceMemory.iterator();
+		while (sequenceIterator.hasNext()){
+			LinkedList<TrieNode<Integer>> sequence = sequenceIterator.next();
+			TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //TODO: Check that it is really correct
+			TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); //It doesnøt make sense, but I think it is correct 
+			int sequenceID = lastNodeInSequence.getSequenceID();
+			int inputID = firstNodeInSequence.getSymbol();
+			double probability = inputMatrix.get(sequenceID);
+			probabilities.set(inputID, probability);
+		}
+		
+		probabilities = Normalizer.normalize(probabilities);
+		
+		return probabilities;
 	}
 	
 	public void printTrie(){

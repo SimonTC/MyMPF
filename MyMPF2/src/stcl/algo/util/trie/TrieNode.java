@@ -15,7 +15,7 @@ public class TrieNode<T>{
 		this.count = 0;
 		this.symbol = symbol;
 		children = new HashMap<T, TrieNode<T>>();
-		sequenceID = -1;
+		sequenceID = -2;
 	}
 	
 	/**

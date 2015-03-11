@@ -62,7 +62,7 @@ public class NeoCorticalUnit implements NU{
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay); //TODO: Move all parameters out
-		sequencer = new NewSequencer(markovOrder, temporalMapSize);
+		sequencer = new NewSequencer(markovOrder, temporalMapSize * temporalMapSize, spatialMapSize * spatialMapSize);
 		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -201,14 +201,13 @@ public class NeoCorticalUnit implements NU{
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
-		needHelp = false;
 		if (needHelp){
 			stepsSinceSequenceStart = 0;
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
 			
 			//Selection of best temporal model
-			SimpleMatrix temporalPoolerFBOutput = temporalPooler.feedBackward(normalizedInput);
+			SimpleMatrix temporalPoolerFBOutput = sequencer.feedBackward(normalizedInput);
 			
 			//Normalize
 			SimpleMatrix normalizedTemporalPoolerFBOutput = normalize(temporalPoolerFBOutput);
@@ -249,10 +248,11 @@ public class NeoCorticalUnit implements NU{
 	
 	public void flush(){
 		temporalPooler.flushTemporalMemory();
-		biasMatrix.set(0);
+		biasMatrix.set(1);
 		//predictionMatrix.set(1);
 		//predictionMatrix = normalize(predictionMatrix);
 		predictor.flush();
+		sequencer.reset();
 	}
 	
 	public void setLearning(boolean learning){

@@ -47,7 +47,7 @@ public class HierarchicalTextPrediction {
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
 			writer.closeFile();
-			brain.getUnitList().get(0).getSequencer().printTrie();
+			//brain.getUnitList().get(0).getSequencer().printTrie();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
@@ -57,7 +57,7 @@ public class HierarchicalTextPrediction {
 
 		int i = 0;	
 		//Train first level unit
-		setupExperiment(1);
+		setupExperiment(4);
 		double error = runExperiment(100, true);
 		
 		writer = new FileWriter();
@@ -210,7 +210,7 @@ public class HierarchicalTextPrediction {
 		ArrayList<int[]> temporalBMUs = brain.getTemporalBMUs();
 		ArrayList<boolean[]> helpStatuses = brain.getHelpStatuses();
 		ArrayList<boolean[]> activeStatuses = brain.getActiveStatuses();
-		ArrayList<SimpleMatrix[]> temporalActivations = brain.getTemporalActivations();
+		ArrayList<SimpleMatrix[]> ffOutputs = brain.getFFOutputs();
 		
 		//Write headers
 		int numUnits = brain.getNumUnits();
@@ -223,7 +223,7 @@ public class HierarchicalTextPrediction {
 		//header += writeRepeatedString("Temporal BMU", numUnits, ";");
 		header += writeRepeatedString("Need help", numUnits, ";");
 		header += writeRepeatedString("Was active", numUnits, ";");
-		//header += writeRepeatedString("Temporal activation", numUnits, ";");
+		header += writeRepeatedString("FF Output", numUnits, ";");
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		try {
 			writer.writeLine(header);
@@ -259,11 +259,11 @@ public class HierarchicalTextPrediction {
 				int i = b ? 1 : 0;
 				line += i + ";";
 			}
-			/*
-			for (SimpleMatrix m : temporalActivations.get(k)){
+			
+			for (SimpleMatrix m : ffOutputs.get(k)){
 				line += writeMatrixArray(m) + ";"; 
 			}
-			*/
+			
 			
 			
 			line = line.substring(0, line.length() - 1); //Remove last semi-colon

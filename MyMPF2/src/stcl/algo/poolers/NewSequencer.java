@@ -2,6 +2,7 @@ package stcl.algo.poolers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.ejml.simple.SimpleMatrix;
@@ -47,7 +48,7 @@ public class NewSequencer {
 	
 	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
 		//Add input if we are still within the maximum length of a sequence
-		if (currentSequence.size() <= markovOrder) {
+		if (currentSequence.size() < markovOrder) {
 			currentSequence.addLast(spatialBMUID);
 			currentInputProbabilitites.addLast(probabilityVector);
 		}
@@ -55,7 +56,7 @@ public class NewSequencer {
 		if (startNewSequence){
 			//Add the current sequence to our trie of sequences
 			LinkedList<TrieNode<Integer>> nodeSequence = trie.add(currentSequence);
-			TrieNode<Integer> lastNode = nodeSequence.peekLast();
+			TrieNode<Integer> lastNode = nodeSequence.peekFirst();
 			int count = lastNode.getCount();
 			int id = lastNode.getSequenceID();
 			
@@ -63,8 +64,8 @@ public class NewSequencer {
 			if (id == -1){
 				if (sequenceMemory.size() < maxNumberOfSequencesInMemory){
 					//We still have room
+					sequenceMemory.add(nodeSequence);
 					int newID = sequenceMemory.size() - 1;
-					sequenceMemory.add(newID, nodeSequence);
 					lastNode.setSequenceID(newID);
 					if (count < currentMinCount){
 						currentMinCount = count;
@@ -100,13 +101,16 @@ public class NewSequencer {
 	private double calculateProbabilityOfSequence(LinkedList<TrieNode<Integer>> sequence){
 		double sequenceProbability = 1;
 		int count = 0;
-		for (int i = 0; i < sequence.size(); i++){
-			SimpleMatrix inputProbabilityMatrix = currentInputProbabilitites.get(i);
-			double probability = inputProbabilityMatrix.get(sequence.get(i).getSymbol());
+		Iterator<TrieNode<Integer>> sequenceIterator = sequence.iterator();
+		Iterator<SimpleMatrix> probabilityIterator = currentInputProbabilitites.iterator();
+		while (sequenceIterator.hasNext() && probabilityIterator.hasNext()){
+			SimpleMatrix inputProbabilityMatrix = probabilityIterator.next();
+			int inputID = sequenceIterator.next().getSymbol();
+			double probability = inputProbabilityMatrix.get(inputID);
 			sequenceProbability *= probability;
 			count++;
 		}
-		
+				
 		//If the length of the sequence is less than the markov order, the missing probabilitites are taken to be 1 / #possible inputs
 		int numPossibleInputs = currentInputProbabilitites.peek().getNumElements();
 		double generalProbability = 1.0 / numPossibleInputs;

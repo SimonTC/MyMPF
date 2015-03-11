@@ -41,7 +41,7 @@ public class HierarchicalTextPrediction {
 		int iterations = 10;
 		for (int i = 0; i < iterations; i++){
 		//int i = 0;	
-			setupExperiment(4);
+			setupExperiment(1);
 			totalError += runExperiment(200, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);

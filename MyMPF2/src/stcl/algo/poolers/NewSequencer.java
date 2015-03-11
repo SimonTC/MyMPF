@@ -55,18 +55,18 @@ public class NewSequencer {
 		
 		if (startNewSequence){
 			//Add the current sequence to our trie of sequences
-			LinkedList<TrieNode<Integer>> nodeSequence = trie.add(currentSequence);
-			TrieNode<Integer> lastNode = nodeSequence.peekFirst();
-			int count = lastNode.getCount();
-			int id = lastNode.getSequenceID();
+			LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence);
+			TrieNode<Integer> lastNodeInSequence = nodeList.peekFirst(); //First node in the node list corresponds to last node in the symbol sequence
+			int count = lastNodeInSequence.getCount();
+			int id = lastNodeInSequence.getSequenceID();
 			
 			//Add sequence to sequence memory if there is room
 			if (id < 0){
 				if (sequenceMemory.size() < maxNumberOfSequencesInMemory){
 					//We still have room
-					sequenceMemory.add(nodeSequence);
+					sequenceMemory.add(nodeList);
 					int newID = sequenceMemory.size() - 1;
-					lastNode.setSequenceID(newID);
+					lastNodeInSequence.setSequenceID(newID);
 					if (count < currentMinCount){
 						currentMinCount = count;
 						currentMinID = newID;
@@ -75,10 +75,10 @@ public class NewSequencer {
 					//We have to see if it can get a place by kicking somebody else out
 					if (count > currentMinCount){
 						//It will kick out the other one
-						TrieNode<Integer> oldNode = sequenceMemory.get(currentMinID).peekLast();
+						TrieNode<Integer> oldNode = sequenceMemory.get(currentMinID).peekFirst();
 						oldNode.setSequenceID(-1);
-						sequenceMemory.set(currentMinID, nodeSequence);
-						lastNode.setSequenceID(currentMinID);
+						sequenceMemory.set(currentMinID, nodeList);
+						lastNodeInSequence.setSequenceID(currentMinID);
 					}
 				}
 			}		

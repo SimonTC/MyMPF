@@ -102,7 +102,7 @@ public class NewSequencer {
 		double sequenceProbability = 1;
 		int count = 0;
 		Iterator<TrieNode<Integer>> sequenceIterator = sequence.iterator();
-		Iterator<SimpleMatrix> probabilityIterator = currentInputProbabilitites.iterator();
+		Iterator<SimpleMatrix> probabilityIterator = currentInputProbabilitites.descendingIterator(); //The probability list holds the inputs in the reverse form of the sequence list
 		while (sequenceIterator.hasNext() && probabilityIterator.hasNext()){
 			SimpleMatrix inputProbabilityMatrix = probabilityIterator.next();
 			int inputID = sequenceIterator.next().getSymbol();
@@ -143,5 +143,15 @@ public class NewSequencer {
 	
 	public void printTrie(){
 		trie.printTrie(markovOrder);
+	}
+	
+	public void printSequenceMemory(){
+		System.out.println("Sequence memory:");
+		for (LinkedList<TrieNode<Integer>> sequence : sequenceMemory){
+			for (TrieNode<Integer> n : sequence){
+				System.out.print(n.getSymbol() + " ");
+			}
+			System.out.println();
+		}
 	}
 }

@@ -47,7 +47,7 @@ public class HierarchicalTextPrediction {
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
 			writer.closeFile();
-			//brain.getUnitList().get(0).getSequencer().printTrie();
+			brain.getUnitList().get(0).getSequencer().printSequenceMemory();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
@@ -57,7 +57,7 @@ public class HierarchicalTextPrediction {
 
 		int i = 0;	
 		//Train first level unit
-		setupExperiment(4);
+		setupExperiment(1);
 		double error = runExperiment(100, true);
 		
 		writer = new FileWriter();

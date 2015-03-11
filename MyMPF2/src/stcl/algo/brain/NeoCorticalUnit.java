@@ -122,8 +122,10 @@ public class NeoCorticalUnit implements NU{
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
-		ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
+		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
+		ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
+		//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		/*
 		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
@@ -218,6 +220,7 @@ public class NeoCorticalUnit implements NU{
 			//Combine FB output from temporal pooler with bias and prediction (if enabled)
 			biasMatrix = normalizedTemporalPoolerFBOutput;
 			
+			//biasMatrix = biasMatrix.plus(1, predictionMatrix);
 			biasMatrix = biasMatrix.elementMult(predictionMatrix);
 			
 			

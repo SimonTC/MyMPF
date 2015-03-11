@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.Connection;
 import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.poolers.RSOM;
 
 public class RockPaperScissors {
 
@@ -95,6 +96,8 @@ public class RockPaperScissors {
 			unit2.feedForward(out);
 			SimpleMatrix ffOutput = unit2.getFFOutput();
 			
+			ffOutput = resizeToFitFBPass(ffOutput, unit2);
+			
 			//Feed back through unit 2
 			unit2.feedBackward(ffOutput);
 			
@@ -117,6 +120,25 @@ public class RockPaperScissors {
 				curInput = 0;
 			}
 		}
+	}
+	
+	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
+		int rows = rsom.getHeight();
+		int cols = rsom.getWidth();
+		
+		m.reshape(rows, cols);
+		return m;
+	}
+	
+	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		int rows = 1;
+		int cols = unitToFit.getSOM().getInputVectorLength();
+				
+		m.reshape(rows, cols);
+		return m;
 	}
 	
 	

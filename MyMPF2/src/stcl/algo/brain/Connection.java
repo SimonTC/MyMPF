@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
+import stcl.algo.poolers.RSOM;
 
 public class Connection {
 	private NU in, out;
@@ -42,11 +43,31 @@ public class Connection {
 		in.feedForward(ffInputVector);
 		temporalFFActivationMatrixNow = in.getFFOutput();
 		
+		
 		//Do reward correlation
 		double internalReward = rewardFunction.calculateReward(externalReward);
 		correlationMatrix = correlator.correlateReward(temporalFFActivationMatrixBefore, internalReward, curLearningRate);
 				
 		return new SimpleMatrix(temporalFFActivationMatrixNow);
+	}
+	
+	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
+		int rows = rsom.getHeight();
+		int cols = rsom.getWidth();
+		
+		m.reshape(rows, cols);
+		return m;
+	}
+	
+	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
+		SimpleMatrix m = new SimpleMatrix(matrixToResize);
+		int rows = 1;
+		int cols = unitToFit.getSOM().getInputVectorLength();
+				
+		m.reshape(rows, cols);
+		return m;
 	}
 	
 	public SimpleMatrix feedBack(double noiseMagnitude){

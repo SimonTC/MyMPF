@@ -31,7 +31,7 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		//htp.run(filepath);
+		htp.run(filepath);
 		System.out.println();
 		htp.run_Staggered(filepath);
 	}
@@ -41,15 +41,15 @@ public class HierarchicalTextPrediction {
 		int iterations = 10;
 		for (int i = 0; i < iterations; i++){
 		//int i = 0;	
-			setupExperiment(1);
+			setupExperiment(3);
 			totalError += runExperiment(200, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
 			writer.closeFile();
-			brain.getUnitList().get(0).getSequencer().printSequenceMemory();
-			System.out.println();
-			brain.getUnitList().get(0).getSequencer().printTrie();
+			//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+			//System.out.println();
+			//brain.getUnitList().get(0).getSequencer().printTrie();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
@@ -60,7 +60,7 @@ public class HierarchicalTextPrediction {
 		int i = 0;	
 		//Train first level unit
 		setupExperiment(1);
-		double error = runExperiment(100, true);
+		double error = runExperiment(200, true);
 		
 		writer = new FileWriter();
 		writer.openFile(logFilepath + "Staggered_Level1", false);
@@ -70,11 +70,11 @@ public class HierarchicalTextPrediction {
 		System.out.printf("Error, staggered unit 1: %.3f", error );
 		System.out.println();
 		
-		brain.getUnitList().get(0).getSequencer().printSequenceMemory();
-		System.out.println();
-		brain.getUnitList().get(0).getSequencer().printTrie();
+		//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+		//System.out.println();
+		//brain.getUnitList().get(0).getSequencer().printTrie();
 		
-		/*
+		
 		//Train second level unit
 		sequence = createSequenceForNextUnit();
 		setupBrain(1);
@@ -101,7 +101,7 @@ public class HierarchicalTextPrediction {
 		writer.closeFile();
 
 		System.out.printf("Error, staggered unit 3: %.3f", error );
-*/
+
 		
 		
 	}

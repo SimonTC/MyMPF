@@ -164,6 +164,16 @@ public class NewSequencer {
 		
 		sequenceProbabilities = Normalizer.normalize(sequenceProbabilities);
 		
+		//If the chance of beeing in a sequence is less than 10% we set it to zero
+		//This should make the output a bit more clean
+		for (int i = 0; i < sequenceProbabilities.getNumElements(); i++){
+			double probability = sequenceProbabilities.get(i);
+			if (probability < 0.1) probability = 0;
+			sequenceProbabilities.set(i, probability);
+		}
+		
+		sequenceProbabilities = Normalizer.normalize(sequenceProbabilities);
+		
 		if (startNewSequence) reset();
 		
 		return sequenceProbabilities;
@@ -228,6 +238,8 @@ public class NewSequencer {
 			if (sequence != null){
 				printSequence(sequence);
 				System.out.println();
+			} else {
+				System.out.println("Null");
 			}
 		}
 	}

@@ -14,7 +14,8 @@ public class Trie<T> {
 	/**
 	 * Add the given sequence to the Trie
 	 * @param sequence
-	 * @return the sequence of trieNodes corresponding to the symbol sequence
+	 * @return a list of trieNodes corresponding to the symbol sequence. 
+	 * The first node in the returned list corresponds to the last symbol in the input sequence
 	 */
 	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence){
 		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();
@@ -44,8 +45,12 @@ public class Trie<T> {
 	}
 	
 	/**
-	 *  * Recursively converts the given symbol sequence into a node sequence and calculates the probabiities of seeing the children of the last node in the sequence.
+	 *  Recursively converts the given symbol sequence into a node sequence and calculates the probabiities of seeing the children of the last node in the sequence.
 	 *  Doesn't change the Data structure other than calulating probabilities
+	 *  @param sequence
+	 * 	@return a list of trieNodes corresponding to the symbol sequence. 
+	 * 	The first node in the returned list corresponds to the last symbol in the input sequence
+	 *  
 	 */
 	public LinkedList<TrieNode<T>> findNodeSequence(LinkedList<T> sequence){
 		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();

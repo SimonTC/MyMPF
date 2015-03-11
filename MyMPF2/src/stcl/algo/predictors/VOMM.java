@@ -199,7 +199,7 @@ public class VOMM<T> {
 				currentNodeSequence = trie.add(context);
 			}
 		} else {
-			currentNodeSequence = trie.findNodeSequence(context);
+			currentNodeSequence = trie.findNodeSequence(memory);
 		}
 	}
 	

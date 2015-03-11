@@ -9,11 +9,13 @@ public class TrieNode<T>{
 	private int count; //Number of times a sequence ending with this node is observed in the data
 	private HashMap<T, TrieNode<T>> children;
 	private double probability; //Using when predicting symbols
+	private int sequenceID;
 	
 	public TrieNode(T symbol) {
 		this.count = 0;
 		this.symbol = symbol;
 		children = new HashMap<T, TrieNode<T>>();
+		sequenceID = -1;
 	}
 	
 	/**
@@ -226,5 +228,19 @@ public class TrieNode<T>{
 	
 	public double getProbability(){
 		return probability;
+	}
+
+	/**
+	 * @return the sequenceID
+	 */
+	public int getSequenceID() {
+		return sequenceID;
+	}
+
+	/**
+	 * @param sequenceID the sequenceID to set
+	 */
+	public void setSequenceID(int sequenceID) {
+		this.sequenceID = sequenceID;
 	}
 }

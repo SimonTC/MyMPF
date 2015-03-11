@@ -42,6 +42,7 @@ public class NeoCorticalUnit implements NU{
 	private int markovOrder;
 	
 	private int oldBMU;
+	private boolean entropyThresholdFrozen;
 	
 	private NewSequencer sequencer;
 	
@@ -77,6 +78,7 @@ public class NeoCorticalUnit implements NU{
 		stepsSinceSequenceStart = 0;
 		this.markovOrder = markovOrder;
 		oldBMU = -1;
+		entropyThresholdFrozen = false;
 	}
 	
 	/**
@@ -106,8 +108,11 @@ public class NeoCorticalUnit implements NU{
 		} 		
 		
 		predictionEntropy = calculateEntropy(predictionMatrix);
+		
 		if (predictionEntropy >= entropyThreshold) needHelp = true;
-		entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+		if (!entropyThresholdFrozen){
+			entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+		}
 		
 		//Bias
 		//TODO: Should biasing happen before prediction?
@@ -118,7 +123,7 @@ public class NeoCorticalUnit implements NU{
 		
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = biasedOutput.getMatrix().data;		
+		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
@@ -336,5 +341,13 @@ public class NeoCorticalUnit implements NU{
 	public NewSequencer getSequencer(){
 		return sequencer;
 	}
+
+	/**
+	 * @param entropyThresholdFrozen the entropyThresholdFrozen to set
+	 */
+	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
+		this.entropyThresholdFrozen = entropyThresholdFrozen;
+	}
+	
 
 }

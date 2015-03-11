@@ -24,12 +24,12 @@ public class NewSequencer {
 	private int currentMinID;
 	private int maxNumberOfSequencesInMemory;
 	private int inputLength;
+	private int elementsInMemory;
 	
 	
 	public NewSequencer(int markovOrder, int maxNumberOfSequencesInMemory, int inputLength) {
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
-		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
 		currentMinCount = Integer.MAX_VALUE;
 		currentMinID = -1;
 		this.inputLength = inputLength;
@@ -37,13 +37,23 @@ public class NewSequencer {
 		sequenceProbabilities = new SimpleMatrix(1, maxNumberOfSequencesInMemory);
 		reset();
 		
-		
+		//Fill the sequence memory up with null values
+		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
+		for (int i = 0; i < maxNumberOfSequencesInMemory; i++) sequenceMemory.add(null);
+		elementsInMemory = 0;
 	}
 	
 	public void reset(){
 		currentSequence = new LinkedList<Integer>();
 		currentInputProbabilitites = new LinkedList<SimpleMatrix>();
 		
+	}
+	
+	private int findNextFreeSpotInMemory(){
+		for (int i = 0; i < sequenceMemory.size(); i++){
+			if (sequenceMemory.get(i) == null) return i;
+		}
+		return -1;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
@@ -61,18 +71,15 @@ public class NewSequencer {
 			int count = lastNodeInSequence.getCount();
 			int id = lastNodeInSequence.getSequenceID();
 			
-			//Add sequence to sequence memory if there is room
+			//Add sequence to sequence memory if there is room / it is important enough
 			if (id < 0){
-				if (sequenceMemory.size() < maxNumberOfSequencesInMemory){
+				if (elementsInMemory < maxNumberOfSequencesInMemory){
 					//System.out.println(" --- Added");
 					//We still have room
-					sequenceMemory.add(nodeList);
-					int newID = sequenceMemory.size() - 1;
-					lastNodeInSequence.setSequenceID(newID);
-					if (count < currentMinCount){
-						currentMinCount = count;
-						currentMinID = newID;
-					}
+					int newID = findNextFreeSpotInMemory();
+					sequenceMemory.set(newID, nodeList);
+					lastNodeInSequence.setSequenceID(newID);					
+					elementsInMemory++;
 				} else {
 					//We have to see if it can get a place by kicking somebody else out
 					if (count > currentMinCount){
@@ -88,20 +95,50 @@ public class NewSequencer {
 						//System.out.println(" --- Not added");
 					}
 				}
-			} else { //Sequence already exists in memory. Update min count and min id
-				currentMinCount = Integer.MAX_VALUE;
-				for (int i = 0; i < sequenceMemory.size(); i++){
-					TrieNode<Integer> lastNode = sequenceMemory.get(i).peekFirst();
+			} 
+			
+			//Update counts
+			currentMinCount = Integer.MAX_VALUE;
+			int totalCount = 0;
+			int[] counts = new int[sequenceMemory.size()];
+			for (int i = 0; i < sequenceMemory.size(); i++){
+				LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
+				if (sequence != null){
+					TrieNode<Integer> lastNode = sequence.peekFirst();
 					int nodeCount = lastNode.getCount();
+					totalCount += nodeCount;
+					counts[i] = nodeCount;
 					if (nodeCount < currentMinCount){
 						currentMinCount = nodeCount;
 						currentMinID = lastNode.getSequenceID();
 					}
 				}
 				
-				//System.out.println(" --- Count++");
 			}
 			
+			//Go through the sequences to see if some of them should be removed
+			//Sequences will be removed if the have appeared less than 1 % of the time
+			for (int i = 0; i < counts.length; i++){
+				double frequency = (double)counts[i] / totalCount;
+				if (frequency < 0.01){
+					LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
+					if (sequence != null){
+						TrieNode<Integer> oldNode = sequence.peekFirst();
+						oldNode.setSequenceID(-1);
+						sequenceMemory.set(i, null);
+						elementsInMemory--;
+					}
+					
+				}
+			}
+			
+			
+				
+				
+				//System.out.println(" --- Count++");
+			
+			
+			/*
 			//Calculate probability of having just exited the different sequences
 			for (int i = 0; i < sequenceMemory.size(); i++){
 				LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
@@ -110,9 +147,24 @@ public class NewSequencer {
 			}
 			
 			sequenceProbabilities = Normalizer.normalize(sequenceProbabilities);
-			
 			reset();
+			*/
+			
 		}
+		
+		//Calculate probability of having just exited the different sequences
+		for (int i = 0; i < sequenceMemory.size(); i++){
+			LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
+			double probability = 0;
+			if (sequence != null){
+				probability = calculateProbabilityOfSequence(sequence);
+			}
+			sequenceProbabilities.set(i, probability);
+		}
+		
+		sequenceProbabilities = Normalizer.normalize(sequenceProbabilities);
+		
+		if (startNewSequence) reset();
 		
 		return sequenceProbabilities;
 	}
@@ -147,12 +199,18 @@ public class NewSequencer {
 		Iterator<LinkedList<TrieNode<Integer>>> sequenceIterator = sequenceMemory.iterator();
 		while (sequenceIterator.hasNext()){
 			LinkedList<TrieNode<Integer>> sequence = sequenceIterator.next();
-			TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //TODO: Check that it is really correct
-			TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); //It doesn't make sense, but I think it is correct 
-			int sequenceID = lastNodeInSequence.getSequenceID();
-			int inputID = firstNodeInSequence.getSymbol();
-			double probability = inputMatrix.get(sequenceID);
-			probabilities.set(inputID, probability);
+			if (sequence != null){
+				TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //TODO: Check that it is really correct
+				TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); //It doesn't make sense, but I think it is correct 
+				int sequenceID = lastNodeInSequence.getSequenceID();
+				int inputID = firstNodeInSequence.getSymbol();
+				double probability = inputMatrix.get(sequenceID);
+				double oldValue = probabilities.get(inputID);
+				double newValue = oldValue + probability;
+				probabilities.set(inputID, newValue);
+				
+			}
+			
 		}
 		
 		probabilities = Normalizer.normalize(probabilities);
@@ -167,8 +225,10 @@ public class NewSequencer {
 	public void printSequenceMemory(){
 		System.out.println("Sequence memory:");
 		for (LinkedList<TrieNode<Integer>> sequence : sequenceMemory){
-			printSequence(sequence);
-			System.out.println();
+			if (sequence != null){
+				printSequence(sequence);
+				System.out.println();
+			}
 		}
 	}
 	

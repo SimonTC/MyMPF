@@ -126,5 +126,9 @@ public class Brain {
 		return unitlist;
 	}
 	
+	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
+		for (NeoCorticalUnit nu : unitlist) nu.setEntropyThresholdFrozen(entropyThresholdFrozen);
+	}
+	
 
 }

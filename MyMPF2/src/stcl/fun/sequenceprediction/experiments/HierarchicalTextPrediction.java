@@ -31,7 +31,7 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		htp.run(filepath);
+		//htp.run(filepath);
 		System.out.println();
 		htp.run_Staggered(filepath);
 	}
@@ -70,6 +70,11 @@ public class HierarchicalTextPrediction {
 		System.out.printf("Error, staggered unit 1: %.3f", error );
 		System.out.println();
 		
+		brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+		System.out.println();
+		brain.getUnitList().get(0).getSequencer().printTrie();
+		
+		/*
 		//Train second level unit
 		sequence = createSequenceForNextUnit();
 		setupBrain(1);
@@ -96,7 +101,7 @@ public class HierarchicalTextPrediction {
 		writer.closeFile();
 
 		System.out.printf("Error, staggered unit 3: %.3f", error );
-
+*/
 		
 		
 	}
@@ -136,6 +141,7 @@ public class HierarchicalTextPrediction {
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
+		brain.setEntropyThresholdFrozen(true);
 		if (brainMemoryFlushBetweenTrainingAndEvaluation) brain.flushCollectedData();
 		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance);
 		

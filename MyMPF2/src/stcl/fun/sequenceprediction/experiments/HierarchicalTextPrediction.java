@@ -141,7 +141,7 @@ public class HierarchicalTextPrediction {
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
-		brain.setEntropyThresholdFrozen(true);
+		//brain.setEntropyThresholdFrozen(true);
 		if (brainMemoryFlushBetweenTrainingAndEvaluation) brain.flushCollectedData();
 		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance);
 		

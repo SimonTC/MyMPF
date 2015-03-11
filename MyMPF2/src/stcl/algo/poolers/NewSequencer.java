@@ -129,7 +129,7 @@ public class NewSequencer {
 		while (sequenceIterator.hasNext()){
 			LinkedList<TrieNode<Integer>> sequence = sequenceIterator.next();
 			TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //TODO: Check that it is really correct
-			TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); //It doesnøt make sense, but I think it is correct 
+			TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); //It doesn't make sense, but I think it is correct 
 			int sequenceID = lastNodeInSequence.getSequenceID();
 			int inputID = firstNodeInSequence.getSymbol();
 			double probability = inputMatrix.get(sequenceID);

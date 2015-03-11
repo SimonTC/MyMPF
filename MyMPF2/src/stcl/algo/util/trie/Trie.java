@@ -61,11 +61,19 @@ public class Trie<T> {
 		}
 	}
 	
+	/**
+	 * Increments the count of the last node in the given sequence
+	 * @param sequence
+	 */
 	public void incrementSequenceCount(LinkedList<T> sequence){
 		LinkedList<T> copy = copySequence(sequence);
 		root.incrementSequenceCount(copy);
 	}
 	
+	/**
+	 * Updates the counts for all nodes in the sequence
+	 * @param sequence
+	 */
 	public void updateCounts(LinkedList<T> sequence){
 		LinkedList<T> copy = copySequence(sequence);
 		root.updateCount(copy);
@@ -82,6 +90,11 @@ public class Trie<T> {
 		return prediction;
 	}
 	
+	/**
+	 * Creates a copy of the sequence
+	 * @param sequence
+	 * @return
+	 */
 	private LinkedList<T> copySequence(LinkedList<T> sequence){
 		LinkedList<T> copy = new LinkedList<T>(sequence);
 		return copy;

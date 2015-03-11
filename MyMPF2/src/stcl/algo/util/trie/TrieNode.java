@@ -38,6 +38,10 @@ public class TrieNode<T>{
 		
 	}
 	
+	/**
+	 * Updates the count of all nodes along the sequence
+	 * @param sequence
+	 */
 	public void updateCount(LinkedList<T> sequence){
 		count++;
 		if (!sequence.isEmpty()){
@@ -85,6 +89,10 @@ public class TrieNode<T>{
 		}
 	}
 	
+	/**
+	 * Increments the count of the last node in the sequence
+	 * @param sequence
+	 */
 	public void incrementSequenceCount(LinkedList<T> sequence){
 		if(!sequence.isEmpty()){
 			T childSymbol = sequence.removeFirst();

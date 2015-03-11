@@ -39,6 +39,7 @@ public class Brain_DataCollector extends Brain {
 	
 	//Entropies in the units
 	private ArrayList<double[]> predictionEntropies;
+	private ArrayList<double[]> entropiesThresholds;
 	
 	//Misc
 	private int numUnits;
@@ -76,6 +77,7 @@ public class Brain_DataCollector extends Brain {
 		
 		//Entropies in the units
 		predictionEntropies = new ArrayList<double[]>();
+		entropiesThresholds = new ArrayList<double[]>();
 	}
 
 	@Override
@@ -90,10 +92,11 @@ public class Brain_DataCollector extends Brain {
 		activeStatuses.add(collectActiveStatus());
 		helpStatuses.add(collectHelpStatus());
 		predictionEntropies.add(collectPredictionEntropies());
+		entropiesThresholds.add(collectEntropyThresholds());
 		spatialBMUs.add(collectBMUs(true));
-		temporalBMUs.add(collectBMUs(false));
+		//temporalBMUs.add(collectBMUs(false));
 		FFOutputs.add(collectOutputs(true));
-		temporalActivations.add(collectActivations(false));
+		//temporalActivations.add(collectActivations(false));
 		spatialActivations.add(collectActivations(true));
 		
 		//Feed back
@@ -113,6 +116,14 @@ public class Brain_DataCollector extends Brain {
 		}
 		return entropies;
 				
+	}
+	
+	private double[] collectEntropyThresholds(){
+		double[] thresholds = new double[numUnits];
+		for (int i = 0; i < numUnits; i++){
+			thresholds[i] = unitlist.get(i).getEntropyThreshold();
+		}
+		return thresholds;
 	}
 	
 	private int[] collectBMUs(boolean spatial){
@@ -261,5 +272,12 @@ public class Brain_DataCollector extends Brain {
 	 */
 	public ArrayList<SimpleMatrix[]> getSpatialActivations() {
 		return spatialActivations;
+	}
+
+	/**
+	 * @return the entropiesThresholds
+	 */
+	public ArrayList<double[]> getEntropiesThresholds() {
+		return entropiesThresholds;
 	}
 }

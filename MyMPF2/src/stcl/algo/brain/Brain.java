@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
+import stcl.algo.poolers.NewSequencer;
 import stcl.algo.poolers.RSOM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
@@ -123,11 +124,7 @@ public class Brain {
 	
 	public ArrayList<NeoCorticalUnit> getUnitList(){
 		return unitlist;
-	};
-
-
-	
-	
+	}
 	
 
 }

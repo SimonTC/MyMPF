@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.poolers.NewSequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
@@ -42,6 +43,8 @@ public class NeoCorticalUnit implements NU{
 	
 	private int oldBMU;
 	
+	private NewSequencer sequencer;
+	
 	/**
 	 * 
 	 * @param rand
@@ -54,11 +57,12 @@ public class NeoCorticalUnit implements NU{
 	 * @param decayFactor
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
-		double decay = calculateDecay(markovOrder,1);// 1.0 / markovOrder);
+		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay); //TODO: Move all parameters out
+		sequencer = new NewSequencer(markovOrder, temporalMapSize);
 		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -112,11 +116,15 @@ public class NeoCorticalUnit implements NU{
 		biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
 		biasedOutput = Normalizer.normalize(biasedOutput);
 		
+		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = biasedOutput.getMatrix().data;		
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
+		ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
+		
+		/*
 		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
 		//Temporal classification
@@ -133,7 +141,7 @@ public class NeoCorticalUnit implements NU{
 		}
 		
 		ffOutput = temporalFFOutputMatrix;
-		
+		*/
 		/*
 		
 		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
@@ -193,7 +201,7 @@ public class NeoCorticalUnit implements NU{
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
-		//needHelp = true;
+		needHelp = false;
 		if (needHelp){
 			stepsSinceSequenceStart = 0;
 			//Normalize
@@ -322,6 +330,10 @@ public class NeoCorticalUnit implements NU{
 	
 	public boolean active(){
 		return active;
+	}
+	
+	public NewSequencer getSequencer(){
+		return sequencer;
 	}
 
 }

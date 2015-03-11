@@ -47,6 +47,7 @@ public class HierarchicalTextPrediction {
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);
 			writer.closeFile();
+			brain.getUnitList().get(0).getSequencer().printTrie();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
@@ -203,7 +204,8 @@ public class HierarchicalTextPrediction {
 	private void writeInfo(FileWriter writer, Brain_DataCollector brain){
 		ArrayList<SimpleMatrix> brainInputs = brain.getReceivedInputs();
 		ArrayList<SimpleMatrix> brainOutputs = brain.getReturnedOutputs();
-		ArrayList<double[]> predictionEntropies = brain.getPredictionEntropies();		
+		ArrayList<double[]> predictionEntropies = brain.getPredictionEntropies();	
+		ArrayList<double[]> entropyThresholds = brain.getEntropiesThresholds();
 		ArrayList<int[]> spatialBMUs = brain.getSpatialBMUs();
 		ArrayList<int[]> temporalBMUs = brain.getTemporalBMUs();
 		ArrayList<boolean[]> helpStatuses = brain.getHelpStatuses();
@@ -216,11 +218,12 @@ public class HierarchicalTextPrediction {
 		header += writeRepeatedString("Input", 1, ";");
 		header += writeRepeatedString("Output", 1, ";");
 		header += writeRepeatedString("Prediction entropy",numUnits, ";");
+		header += writeRepeatedString("Entropy threshold", numUnits, ";");
 		header += writeRepeatedString("Spatial BMU", numUnits, ";");
-		header += writeRepeatedString("Temporal BMU", numUnits, ";");
+		//header += writeRepeatedString("Temporal BMU", numUnits, ";");
 		header += writeRepeatedString("Need help", numUnits, ";");
 		header += writeRepeatedString("Was active", numUnits, ";");
-		header += writeRepeatedString("Temporal activation", numUnits, ";");
+		//header += writeRepeatedString("Temporal activation", numUnits, ";");
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		try {
 			writer.writeLine(header);
@@ -237,12 +240,17 @@ public class HierarchicalTextPrediction {
 			for (double d : predictionEntropies.get(k)){
 				line += d + ";";
 	 		}
+			for (double d : entropyThresholds.get(k)){
+				line += d + ";";
+	 		}
 			for (int i : spatialBMUs.get(k)){
 				line += i + ";";
 			}
+			/*
 			for (int i : temporalBMUs.get(k)){
 				line += i + ";";
 			}
+			*/
 			for (boolean b : helpStatuses.get(k)){
 				int i = b ? 1 : 0;
 				line += i + ";";
@@ -251,9 +259,11 @@ public class HierarchicalTextPrediction {
 				int i = b ? 1 : 0;
 				line += i + ";";
 			}
+			/*
 			for (SimpleMatrix m : temporalActivations.get(k)){
 				line += writeMatrixArray(m) + ";"; 
 			}
+			*/
 			
 			
 			line = line.substring(0, line.length() - 1); //Remove last semi-colon

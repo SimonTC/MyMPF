@@ -156,9 +156,9 @@ public class HierarchicalTextPrediction {
 	}
 	
 	private void setupBrain(int numUnits){
-		int temporalMapSize = 2;
+		int temporalMapSize = 4;
 		int inputLength = sequence[0].getNumElements();
-		int spatialMapSize = 3;
+		int spatialMapSize = 5;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 3;
 		

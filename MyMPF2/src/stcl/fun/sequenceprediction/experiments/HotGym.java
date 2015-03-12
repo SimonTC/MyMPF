@@ -12,10 +12,6 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
-import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit;
-import stcl.algo.util.Normalizer;
-import stcl.fun.sequenceprediction.CopyOfSequenceTrainer;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HotGym {

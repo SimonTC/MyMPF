@@ -16,6 +16,7 @@ import stcl.algo.util.Orthogonalizer;
 public class Brain {
 	
 	protected ArrayList<NeoCorticalUnit> unitlist;
+	protected ArrayList<Connection> connectionList;
 	private SimpleMatrix uniformDistribution;
 	
 	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
@@ -31,10 +32,14 @@ public class Brain {
 	
 	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder){
 		unitlist = new ArrayList<NeoCorticalUnit>();
-		NeoCorticalUnit nu1 = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder); //First one is special
-		unitlist.add(nu1);
+		connectionList = new ArrayList<Connection>();
+		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder); //First one is special
+		unitlist.add(nu);
 		for (int i = 0; i < numUnits - 1; i++){
-			NeoCorticalUnit nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
+			NeoCorticalUnit in = nu;
+			Connection conn = new Connection(in, nu, rand, 0.3, 2, 0.3); //TODO: Base on parameters
+			connectionList.add(conn);
+			nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
 			unitlist.add(nu);
 		}	
 	}
@@ -47,6 +52,17 @@ public class Brain {
 	 * @return feed back output from the brain
 	 */
 	public SimpleMatrix step(SimpleMatrix inputVector){
+		return this.step(inputVector, 0);
+	}
+	
+	/**
+	 * 
+	 * @param brain
+	 * @param noiseMagnitude
+	 * @param input
+	 * @return feed back output from the brain
+	 */
+	public SimpleMatrix step(SimpleMatrix inputVector, double externalReward){
 		SimpleMatrix m = feedForward(inputVector);
 		
 		SimpleMatrix output = feedBackward(m);
@@ -55,6 +71,10 @@ public class Brain {
 	}
 	
 	protected SimpleMatrix feedForward(SimpleMatrix inputVector){
+		return this.feedForward(inputVector, 0);
+	}
+	
+	protected SimpleMatrix feedForward(SimpleMatrix inputVector, double externalReward){
 		SimpleMatrix ffInput = inputVector;
 		int i = 0;
 		boolean cont = true;
@@ -65,7 +85,13 @@ public class Brain {
 			//System.out.println( i + " Entropy " + nu.getEntropy() + " Threshold: " + nu.getEntropyThreshold());
 			cont = nu.needHelp();
 			if (cont) {
+				//Save ffinput
 				ffInput = inputToNextLayer;
+
+				//Update the connector
+				if (i < connectionList.size()){
+					connectionList.get(i).feedForward(ffInput, externalReward, 0.1);
+				}
 			} else {
 				ffInput = null;
 			}
@@ -82,7 +108,11 @@ public class Brain {
 		for (int j = unitlist.size()-1; j >= 0; j--){
 			NeoCorticalUnit nu = unitlist.get(j);
 			SimpleMatrix m = resizeToFitFBPass(fbInput, nu);
-			fbInput = nu.feedBackward(m);
+			SimpleMatrix inputToUnit = m;
+			if ( j < connectionList.size()){
+				inputToUnit = connectionList.get(j).feedBack(m, 0);
+			}
+			fbInput = nu.feedBackward(inputToUnit);
 		}
 		
 		return fbInput; //The last fb input is the output of the brain

@@ -19,7 +19,7 @@ public class RockPaperScissors_WithBrain {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 10000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithBrain runner = new RockPaperScissors_WithBrain();
@@ -67,9 +67,9 @@ public class RockPaperScissors_WithBrain {
 			double predictionError = diff.normF();
 			int labelError = labelID == labelSequence[curInput] ? 0 : 1;
 			
-			System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
-			
 			externalReward = reward(labelID, curActionID);
+			System.out.println("Iteration " + i + " Reward: " + externalReward);
+			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
 			
 			//System.out.println(i + " " + externalReward);
 			
@@ -85,7 +85,7 @@ public class RockPaperScissors_WithBrain {
 			//Combine with label
 			combinedInput = combinedInput.combine(0, input.END, label);
 			
-			SimpleMatrix fbOutput = brain.step(combinedInput);
+			SimpleMatrix fbOutput = brain.step(combinedInput, externalReward);
 			
 			//Collect next action and prediction		
 			curActionID = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 2)));
@@ -104,26 +104,6 @@ public class RockPaperScissors_WithBrain {
 			}
 		}
 	}
-	
-	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
-		
-		m.reshape(rows, cols);
-		return m;
-	}
-	
-	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		int rows = 1;
-		int cols = unitToFit.getSOM().getInputVectorLength();
-				
-		m.reshape(rows, cols);
-		return m;
-	}
-	
 	
 	private double reward(int opponentSymbol, int playerSymbol){
 		double reward = rewardMatrix.get(playerSymbol, opponentSymbol);

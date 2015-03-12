@@ -29,14 +29,14 @@ public class NewSequencer {
 	private boolean learning;
 	
 	
-	public NewSequencer(int markovOrder, int maxNumberOfSequencesInMemory, int inputLength) {
+	public NewSequencer(int markovOrder, int temporalGroupMapSize, int inputLength) {
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
 		currentMinCount = Integer.MAX_VALUE;
 		currentMinID = -1;
 		this.inputLength = inputLength;
-		this.maxNumberOfSequencesInMemory = maxNumberOfSequencesInMemory;
-		sequenceProbabilities = new SimpleMatrix(1, maxNumberOfSequencesInMemory);
+		this.maxNumberOfSequencesInMemory = temporalGroupMapSize;
+		sequenceProbabilities = new SimpleMatrix(temporalGroupMapSize, temporalGroupMapSize);
 		reset();
 		setLearning(true);
 		//Fill the sequence memory up with null values

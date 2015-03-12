@@ -10,82 +10,45 @@ import stcl.algo.brain.rewardCorrelators.RewardFunction;
 import stcl.algo.poolers.RSOM;
 
 public class Connection {
-	private NU in, out;
 	private BiasUnit bias;
 	private RewardCorrelator correlator;
 	private SimpleMatrix correlationMatrix;
 	private RewardFunction rewardFunction;
-	private SimpleMatrix temporalFFActivationMatrixNow, temporalFFActivationMatrixBefore;
+	private SimpleMatrix ffOutputBefore;
 	
 	/**
 	 * A connection connects two neocortical units.
 	 * Signals sent through the connection are biased by the bias unit used
 	 */
-	public Connection(NU in, NU out, Random rand, double biasInfluence, double maxReward, double alpha) {
-		this.in = in;
-		this.out = out;
+	public Connection(NeoCorticalUnit in, NeoCorticalUnit out, Random rand, double biasInfluence, double maxReward, double alpha) {
 		int inputMatrixSize = in.getTemporalPooler().getMapSize();
 		this.bias = new BiasUnit(inputMatrixSize, biasInfluence, rand);
 		this.correlator = new RewardCorrelator(inputMatrixSize);
 		this.rewardFunction = new RewardFunction(maxReward, alpha);
-		this.temporalFFActivationMatrixNow = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
+		ffOutputBefore = in.getFFOutput();
 	}
 	
 	/**
 	 * Feeds the input matrix forward without changing it
-	 * @param ffInputVector
+	 * @param ffOutputFromUnit1
 	 * @return
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix ffInputVector, double externalReward, double curLearningRate){
-		temporalFFActivationMatrixBefore = temporalFFActivationMatrixNow;
-		
-		//Feed input vector to first unit
-		in.feedForward(ffInputVector);
-		temporalFFActivationMatrixNow = in.getFFOutput();
-		
-		
+	public SimpleMatrix feedForward(SimpleMatrix ffOutputFromUnit1, double externalReward, double curLearningRate){
 		//Do reward correlation
 		double internalReward = rewardFunction.calculateReward(externalReward);
-		correlationMatrix = correlator.correlateReward(temporalFFActivationMatrixBefore, internalReward, curLearningRate);
+		correlationMatrix = correlator.correlateReward(ffOutputBefore, internalReward, curLearningRate);
+		
+		ffOutputBefore = ffOutputFromUnit1;
+		
+		return ffOutputFromUnit1;
+	}
+	
+	public SimpleMatrix feedBack(SimpleMatrix fbOutputFromUnit2, double noiseMagnitude){
 				
-		return new SimpleMatrix(temporalFFActivationMatrixNow);
-	}
-	
-	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
-		
-		m.reshape(rows, cols);
-		return m;
-	}
-	
-	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
-		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		int rows = 1;
-		int cols = unitToFit.getSOM().getInputVectorLength();
-				
-		m.reshape(rows, cols);
-		return m;
-	}
-	
-	public SimpleMatrix feedBack(double noiseMagnitude){
-		//Get fb outut from out unit
-		SimpleMatrix fbInputMatrix = out.getFBOutput();
-		
-		//Convert to matrix
-		int size = in.getTemporalPooler().getMapSize();
-		SimpleMatrix fb = new SimpleMatrix(size, size, true, fbInputMatrix.getMatrix().data);
-		
 		//Bias output
-		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fb, correlationMatrix, noiseMagnitude);
+		SimpleMatrix biasedMatrix = bias.biasFBSpatialOutput(fbOutputFromUnit2, correlationMatrix, noiseMagnitude);
 		
-		//Feed to in unit
-		in.feedBackward(biasedMatrix);
-		SimpleMatrix ffOutput = in.getFBOutput();
-		
-		return ffOutput;
+		return biasedMatrix;
 	}
 
 }

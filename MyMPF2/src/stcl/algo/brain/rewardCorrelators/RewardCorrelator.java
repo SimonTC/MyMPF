@@ -6,8 +6,8 @@ public class RewardCorrelator {
 	
 	private SimpleMatrix correlationMatrix;
 	
-	public RewardCorrelator(int inputMatrixSize) {
-		correlationMatrix = new SimpleMatrix(inputMatrixSize, inputMatrixSize);
+	public RewardCorrelator(int ffOutputMatrixSize) {
+		correlationMatrix = new SimpleMatrix(ffOutputMatrixSize, ffOutputMatrixSize);
 	}
 	
 	/**
@@ -22,7 +22,7 @@ public class RewardCorrelator {
 	 * @return
 	 */
 	public SimpleMatrix correlateReward(SimpleMatrix temporalActivationMatrix, double reward, double curLearningRate){
-		//Multiply input matrix by the learning rate input matrix
+		//Multiply input matrix by the learning rate
 		SimpleMatrix tau = temporalActivationMatrix.scale(curLearningRate); 
 		
 		//Multiply the tau value with the given reward
@@ -38,9 +38,7 @@ public class RewardCorrelator {
 		//Calculate correlation matrix
 		correlationMatrix = tmp.plus(learnedCorrelation);
 		
-		return correlationMatrix;
-		
-		
+		return correlationMatrix;		
 	}
 
 }

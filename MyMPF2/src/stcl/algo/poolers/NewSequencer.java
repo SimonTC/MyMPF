@@ -131,25 +131,6 @@ public class NewSequencer {
 					
 				}
 			}
-			
-			
-				
-				
-				//System.out.println(" --- Count++");
-			
-			
-			/*
-			//Calculate probability of having just exited the different sequences
-			for (int i = 0; i < sequenceMemory.size(); i++){
-				LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
-				double probability = calculateProbabilityOfSequence(sequence);
-				sequenceProbabilities.set(i, probability);
-			}
-			
-			sequenceProbabilities = Normalizer.normalize(sequenceProbabilities);
-			reset();
-			*/
-			
 		}
 		
 		//Calculate probability of having just exited the different sequences

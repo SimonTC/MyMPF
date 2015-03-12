@@ -31,9 +31,10 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "c:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		htp.run(filepath);
+		//htp.run(filepath);
 		System.out.println();
-		htp.run_Staggered(filepath);
+		//htp.run_Staggered(filepath);
+		htp.run_big(filepath);
 	}
 	
 	public void run(String logFilepath) throws IOException{
@@ -41,7 +42,7 @@ public class HierarchicalTextPrediction {
 		int iterations = 10;
 		for (int i = 0; i < iterations; i++){
 		//int i = 0;	
-			setupExperiment(3);
+			setupExperiment(4);
 			totalError += runExperiment(200, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
@@ -53,6 +54,24 @@ public class HierarchicalTextPrediction {
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
+	}
+	
+	public void run_big(String logFilepath) throws IOException{
+		System.out.println("Units;String presentations;Error");
+		int iterations = 10;
+		for (int numUnits = 1; numUnits <= 10; numUnits++){
+			for (int stringPresentations = 100; stringPresentations <= 1000; stringPresentations += 100){
+				double totalError = 0;
+				for (int i = 0; i < iterations; i++){
+					setupExperiment(numUnits);
+					totalError += runExperiment(stringPresentations, true);
+				}
+				double error = totalError / (double) iterations;
+				System.out.print(numUnits + ";" + stringPresentations + ";");
+				System.out.printf("%.3f", error );
+				System.out.println();
+			}
+		}
 	}
 	
 	public void run_Staggered(String logFilepath) throws IOException{

@@ -279,6 +279,7 @@ public class NeoCorticalUnit implements NU{
 		spatialPooler.setLearning(learning);
 		temporalPooler.setLearning(learning);
 		predictor.setLearning(learning);
+		sequencer.setLearning(learning);
 	}
 
 	public SpatialPooler getSpatialPooler() {

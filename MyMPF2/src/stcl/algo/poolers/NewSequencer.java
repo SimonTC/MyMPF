@@ -26,6 +26,8 @@ public class NewSequencer {
 	private int inputLength;
 	private int elementsInMemory;
 	
+	private boolean learning;
+	
 	
 	public NewSequencer(int markovOrder, int maxNumberOfSequencesInMemory, int inputLength) {
 		this.markovOrder = markovOrder;
@@ -36,7 +38,7 @@ public class NewSequencer {
 		this.maxNumberOfSequencesInMemory = maxNumberOfSequencesInMemory;
 		sequenceProbabilities = new SimpleMatrix(1, maxNumberOfSequencesInMemory);
 		reset();
-		
+		setLearning(true);
 		//Fill the sequence memory up with null values
 		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
 		for (int i = 0; i < maxNumberOfSequencesInMemory; i++) sequenceMemory.add(null);
@@ -63,72 +65,74 @@ public class NewSequencer {
 			currentInputProbabilitites.addLast(probabilityVector);
 		}
 		
-		if (startNewSequence){
-			//Add the current sequence to our trie of sequences
-			LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence);
-			//printSequence(nodeList);
-			TrieNode<Integer> lastNodeInSequence = nodeList.peekFirst(); //First node in the node list corresponds to last node in the symbol sequence
-			int count = lastNodeInSequence.getCount();
-			int id = lastNodeInSequence.getSequenceID();
-			
-			//Add sequence to sequence memory if there is room / it is important enough
-			if (id < 0){
-				if (elementsInMemory < maxNumberOfSequencesInMemory){
-					//System.out.println(" --- Added");
-					//We still have room
-					int newID = findNextFreeSpotInMemory();
-					sequenceMemory.set(newID, nodeList);
-					lastNodeInSequence.setSequenceID(newID);					
-					elementsInMemory++;
-				} else {
-					//We have to see if it can get a place by kicking somebody else out
-					if (count > currentMinCount){
-						//System.out.println(" --- Added");
-						//It will kick out the other one
-						TrieNode<Integer> oldNode = sequenceMemory.get(currentMinID).peekFirst();
-						//printSequence(sequenceMemory.get(currentMinID));
-						//System.out.println(" --- Removed");
-						oldNode.setSequenceID(-1);
-						sequenceMemory.set(currentMinID, nodeList);
-						lastNodeInSequence.setSequenceID(currentMinID);
-					} else {
-						//System.out.println(" --- Not added");
-					}
-				}
-			} 
-			
-			//Update counts
-			currentMinCount = Integer.MAX_VALUE;
-			int totalCount = 0;
-			int[] counts = new int[sequenceMemory.size()];
-			for (int i = 0; i < sequenceMemory.size(); i++){
-				LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
-				if (sequence != null){
-					TrieNode<Integer> lastNode = sequence.peekFirst();
-					int nodeCount = lastNode.getCount();
-					totalCount += nodeCount;
-					counts[i] = nodeCount;
-					if (nodeCount < currentMinCount){
-						currentMinCount = nodeCount;
-						currentMinID = lastNode.getSequenceID();
-					}
-				}
+		if (learning){
+			if (startNewSequence){
+				//Add the current sequence to our trie of sequences
+				LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence);
+				//printSequence(nodeList);
+				TrieNode<Integer> lastNodeInSequence = nodeList.peekFirst(); //First node in the node list corresponds to last node in the symbol sequence
+				int count = lastNodeInSequence.getCount();
+				int id = lastNodeInSequence.getSequenceID();
 				
-			}
-			
-			//Go through the sequences to see if some of them should be removed
-			//Sequences will be removed if the have appeared less than 1 % of the time
-			for (int i = 0; i < counts.length; i++){
-				double frequency = (double)counts[i] / totalCount;
-				if (frequency < 0.01){
+				//Add sequence to sequence memory if there is room / it is important enough
+				if (id < 0){
+					if (elementsInMemory < maxNumberOfSequencesInMemory){
+						//System.out.println(" --- Added");
+						//We still have room
+						int newID = findNextFreeSpotInMemory();
+						sequenceMemory.set(newID, nodeList);
+						lastNodeInSequence.setSequenceID(newID);					
+						elementsInMemory++;
+					} else {
+						//We have to see if it can get a place by kicking somebody else out
+						if (count > currentMinCount){
+							//System.out.println(" --- Added");
+							//It will kick out the other one
+							TrieNode<Integer> oldNode = sequenceMemory.get(currentMinID).peekFirst();
+							//printSequence(sequenceMemory.get(currentMinID));
+							//System.out.println(" --- Removed");
+							oldNode.setSequenceID(-1);
+							sequenceMemory.set(currentMinID, nodeList);
+							lastNodeInSequence.setSequenceID(currentMinID);
+						} else {
+							//System.out.println(" --- Not added");
+						}
+					}
+				} 
+				
+				//Update counts
+				currentMinCount = Integer.MAX_VALUE;
+				int totalCount = 0;
+				int[] counts = new int[sequenceMemory.size()];
+				for (int i = 0; i < sequenceMemory.size(); i++){
 					LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
 					if (sequence != null){
-						TrieNode<Integer> oldNode = sequence.peekFirst();
-						oldNode.setSequenceID(-1);
-						sequenceMemory.set(i, null);
-						elementsInMemory--;
+						TrieNode<Integer> lastNode = sequence.peekFirst();
+						int nodeCount = lastNode.getCount();
+						totalCount += nodeCount;
+						counts[i] = nodeCount;
+						if (nodeCount < currentMinCount){
+							currentMinCount = nodeCount;
+							currentMinID = lastNode.getSequenceID();
+						}
 					}
 					
+				}
+				
+				//Go through the sequences to see if some of them should be removed
+				//Sequences will be removed if the have appeared less than 1 % of the time
+				for (int i = 0; i < counts.length; i++){
+					double frequency = (double)counts[i] / totalCount;
+					if (frequency < 0.01){
+						LinkedList<TrieNode<Integer>> sequence = sequenceMemory.get(i);
+						if (sequence != null){
+							TrieNode<Integer> oldNode = sequence.peekFirst();
+							oldNode.setSequenceID(-1);
+							sequenceMemory.set(i, null);
+							elementsInMemory--;
+						}
+						
+					}
 				}
 			}
 		}
@@ -238,5 +242,13 @@ public class NewSequencer {
 		}
 		int count = sequence.peekFirst().getCount();
 		System.out.print(" ---- " + count);
+	}
+
+	public boolean isLearning() {
+		return learning;
+	}
+
+	public void setLearning(boolean learning) {
+		this.learning = learning;
 	}
 }

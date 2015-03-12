@@ -20,7 +20,7 @@ import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HierarchicalTextPrediction {
 	
-	Random rand = new Random(12345);
+	Random rand = new Random();
 	Brain_DataCollector brain;
 	SimpleMatrix[] sequence;
 	FileWriter writer;
@@ -31,19 +31,19 @@ public class HierarchicalTextPrediction {
 	public static void main(String[] args) throws IOException {
 		String filepath = "c:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
-		//htp.run(filepath);
+		htp.run(filepath);
 		System.out.println();
 		//htp.run_Staggered(filepath);
-		htp.run_big(filepath);
+		//htp.run_big(filepath);
 	}
 	
 	public void run(String logFilepath) throws IOException{
 		double totalError = 0;
-		int iterations = 10;
+		int iterations = 50;
 		for (int i = 0; i < iterations; i++){
 		//int i = 0;	
-			setupExperiment(4);
-			totalError += runExperiment(200, true);
+			setupExperiment(6);
+			totalError += runExperiment(100, true);
 			writer = new FileWriter();
 			writer.openFile(logFilepath + "_" + i, false);
 			writeInfo(writer, brain);

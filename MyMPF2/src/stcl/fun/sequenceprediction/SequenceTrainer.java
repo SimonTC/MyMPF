@@ -20,15 +20,26 @@ public class SequenceTrainer {
 	protected ArrayList<SimpleMatrix[]> trainingSet; //The list used when training
 	private Random rand;
 	
+	/**
+	 * Converts the arraylist of double arrays into an array list of simple matrices
+	 * @param sequences
+	 * @param numIterations
+	 * @param rand
+	 */
 	public SequenceTrainer(ArrayList<double[]> sequences, int numIterations, Random rand) {		
 		this.rand = rand;
 		ArrayList<SimpleMatrix[]> possibleSequences = convertDoubleSequencesToMatrixSequences(sequences);
 		buildTrainingSet(possibleSequences, numIterations);
-	}
+	}	
 	
-
+	/**
+	 * Builds a trainingset from the given sequences. The training set is built by choosing a random sequence for each iteration
+	 * @param sequences
+	 * @param numIterations
+	 * @param rand
+	 * @param blob Added because constructor apparently else would look like the constructor with a list of double arrays
+	 */
 	public SequenceTrainer(ArrayList<SimpleMatrix[]> sequences, int numIterations, Random rand, int blob) {
-		
 		this.rand = rand;
 		buildTrainingSet(sequences, numIterations);
 	}
@@ -74,26 +85,13 @@ public class SequenceTrainer {
 	 */
 	public ArrayList<Double> train(Brain brain, double noiseMagnitude, ArrayList<SimpleMatrix[]> givenTrainingSet, boolean calculateErrorAsDistance){
 		ArrayList<Double> errors = new ArrayList<Double>(); 
-		int counter = 1;
-		int numSequences = givenTrainingSet.size();
 		for (SimpleMatrix[] sequence : givenTrainingSet){
 			double error = doSequence(brain, noiseMagnitude, sequence, calculateErrorAsDistance);
 			errors.add(error);
-			counter++;
 		}
 		return errors;
 	}
-	
-	private void flush(ArrayList<NU> brain){
-		for (NU nu : brain) nu.flush();
-	}
-	
-	private void printSomMap(SOM som){
-		for (SomNode n : som.getNodes()) System.out.printf("%1$.4f " ,n.getVector().get(0) );
-		System.out.println();
-		System.out.println();
-	}
-	
+
 	private double doSequence(Brain brain, double noiseMagnitude, SimpleMatrix[] sequence, boolean calculateErrorAsDistance){
 		SimpleMatrix prediction = null;
 		double totalError = 0;
@@ -162,13 +160,6 @@ public class SequenceTrainer {
 			noisyMatrix.set(i,d);
 		}
 		return noisyMatrix;
-	}
-	
-	private SimpleMatrix createUniformDistribution(int rows, int columns){
-		SimpleMatrix m = new SimpleMatrix(rows, columns);
-		m.set(1);
-		m = Normalizer.normalize(m);
-		return m;
 	}
 	
 	public ArrayList<SimpleMatrix[]> getTrainingSet(){

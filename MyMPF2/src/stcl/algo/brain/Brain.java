@@ -130,5 +130,9 @@ public class Brain {
 		for (NeoCorticalUnit nu : unitlist) nu.setEntropyThresholdFrozen(entropyThresholdFrozen);
 	}
 	
+	public void setBiasBeforePrediction(boolean biasBeforePrediction) {
+		for (NeoCorticalUnit nu : unitlist) nu.setBiasBeforePrediction(biasBeforePrediction);
+	}
+	
 
 }

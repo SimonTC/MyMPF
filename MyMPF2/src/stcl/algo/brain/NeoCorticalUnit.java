@@ -43,6 +43,7 @@ public class NeoCorticalUnit implements NU{
 	
 	private int oldBMU;
 	private boolean entropyThresholdFrozen;
+	private boolean biasBeforePredicting;
 	
 	private NewSequencer sequencer;
 	
@@ -79,6 +80,7 @@ public class NeoCorticalUnit implements NU{
 		this.markovOrder = markovOrder;
 		oldBMU = -1;
 		entropyThresholdFrozen = false;
+		biasBeforePredicting = false;
 	}
 	
 	/**
@@ -102,9 +104,16 @@ public class NeoCorticalUnit implements NU{
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
+		//Bias output
+		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
+		
 		//Predict next spatialFFOutputMatrix
 		if (useMarkovPrediction){
-			predictionMatrix = predictor.predict(spatialFFOutputMatrix);
+			if (biasBeforePredicting) {
+				predictionMatrix = predictor.predict(biasedOutput);
+			} else {
+				predictionMatrix = predictor.predict(spatialFFOutputMatrix);
+			}
 		} 		
 		
 		predictionEntropy = calculateEntropy(predictionMatrix);
@@ -113,14 +122,6 @@ public class NeoCorticalUnit implements NU{
 		if (!entropyThresholdFrozen){
 			entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		}
-		
-		//Bias
-		//TODO: Should biasing happen before prediction?
-		SimpleMatrix biasedOutput = spatialFFOutputMatrix;
-		//biasedOutput = spatialFFOutputMatrix.plus(1, biasMatrix);
-		biasedOutput = spatialFFOutputMatrix.elementMult(biasMatrix);
-		biasedOutput = Normalizer.normalize(biasedOutput);
-		
 		
 		//Transform spatial output matrix to vector
 		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
@@ -162,6 +163,12 @@ public class NeoCorticalUnit implements NU{
 		ffOutput = Orthogonalizer.orthogonalize(ffOutput);
 		*/
 		return ffOutput;
+	}
+	
+	private SimpleMatrix biasMatrix(SimpleMatrix matrixToBias, SimpleMatrix biasMatrix){
+		SimpleMatrix biasedMatrix = matrixToBias.elementMult(biasMatrix);
+		biasedMatrix = Normalizer.normalize(biasedMatrix);
+		return biasedMatrix;
 	}
 	
 	private double calculateEntropy(SimpleMatrix m){
@@ -347,6 +354,10 @@ public class NeoCorticalUnit implements NU{
 	 */
 	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
 		this.entropyThresholdFrozen = entropyThresholdFrozen;
+	}
+	
+	public void setBiasBeforePrediction(boolean flag){
+		biasBeforePredicting = flag;
 	}
 	
 

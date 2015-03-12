@@ -43,6 +43,7 @@ public class Brain_DataCollector extends Brain {
 	
 	//Misc
 	private int numUnits;
+	private boolean collectData;
 
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
 			int spatialMapSize, int temporalMapSize, int markovOrder) {
@@ -50,6 +51,7 @@ public class Brain_DataCollector extends Brain {
 				markovOrder);
 		setupMemories();
 		this.numUnits = numUnits;
+		collectData = true;
 	}
 	
 	private void setupMemories(){
@@ -82,29 +84,30 @@ public class Brain_DataCollector extends Brain {
 
 	@Override
 	public SimpleMatrix step(SimpleMatrix inputVector) {
-		
-		receivedInputs.add(inputVector);
+		if (collectData)  receivedInputs.add(inputVector);
 		
 		//Feed forward
 		SimpleMatrix m = feedForward(inputVector);
 		
-		//Collect Feedforward info
-		activeStatuses.add(collectActiveStatus());
-		helpStatuses.add(collectHelpStatus());
-		predictionEntropies.add(collectPredictionEntropies());
-		entropiesThresholds.add(collectEntropyThresholds());
-		spatialBMUs.add(collectBMUs(true));
-		//temporalBMUs.add(collectBMUs(false));
-		FFOutputs.add(collectOutputs(true));
-		//temporalActivations.add(collectActivations(false));
-		spatialActivations.add(collectActivations(true));
+		if (collectData){
+			//Collect Feedforward info
+			activeStatuses.add(collectActiveStatus());
+			helpStatuses.add(collectHelpStatus());
+			predictionEntropies.add(collectPredictionEntropies());
+			entropiesThresholds.add(collectEntropyThresholds());
+			spatialBMUs.add(collectBMUs(true));
+			//temporalBMUs.add(collectBMUs(false));
+			FFOutputs.add(collectOutputs(true));
+			//temporalActivations.add(collectActivations(false));
+			spatialActivations.add(collectActivations(true));
+		}
 		
 		//Feed back
 		SimpleMatrix output = feedBackward(m);
-		FBOutputs.add(collectOutputs(false));
+		if (collectData) FBOutputs.add(collectOutputs(false));
 		
 		//Collect feed back info
-		returnedOutputs.add(output);
+		if (collectData) returnedOutputs.add(output);
 		
 		return output;
 	}
@@ -279,5 +282,9 @@ public class Brain_DataCollector extends Brain {
 	 */
 	public ArrayList<double[]> getEntropiesThresholds() {
 		return entropiesThresholds;
+	}
+
+	public void setCollectData(boolean collectData) {
+		this.collectData = collectData;
 	}
 }

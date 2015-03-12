@@ -2,6 +2,7 @@ package stcl.fun.sequenceprediction.experiments;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
@@ -12,6 +13,8 @@ import javax.swing.JFrame;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
+import stcl.algo.brain.Brain_DataCollector;
+import stcl.algo.util.FileWriter;
 import stcl.fun.sequenceprediction.SequenceTrainer;
 
 public class HotGym {
@@ -19,10 +22,14 @@ public class HotGym {
 	private ArrayList<Double> output;
 	private ArrayList<Double> xValues;
 	private JFrame frame;
+	private Brain_DataCollector brain;
 	
-	private final int ITERATIONS = 10;
-	boolean sin = true;
+	private final int ITERATIONS = 5;
+	
 	SimpleMatrix uniformDistribution;
+	
+	boolean sin = false;
+	boolean writeOutputsToFile = false;
 	
 	public static void main(String[] args){
 		HotGym runner = new HotGym();
@@ -33,6 +40,7 @@ public class HotGym {
 	public void start(){
 		//Load data
 		String dataFilePath = "D:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
+		//String dataFilePath = "c:/Users/Simon/Documents/Experiments/OMXC20/OMXC20_Normalized.csv";
 		int iterations = ITERATIONS;
 				
 		try {
@@ -43,7 +51,9 @@ public class HotGym {
 			}
 					
 			//Create neocortical unit
-			Brain brain = createBrain(iterations);
+			brain = createBrain(iterations);
+			brain.setCollectData(writeOutputsToFile);
+			
 								
 			//Do test
 			ArrayList<double[]> list = new ArrayList<double[]>();
@@ -54,6 +64,12 @@ public class HotGym {
 			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance);
 			
 			for ( double d : errors) System.out.println(d);
+			
+			if (writeOutputsToFile){
+				String datafolder = "c:/Users/Simon/Documents/Experiments/OMXC20";
+				writeOutputsToFile(datafolder);
+				System.out.println("Outputs written to " + datafolder);
+			}
 					
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -61,14 +77,31 @@ public class HotGym {
 		}
 	}
 	
-	private Brain createBrain(int maxIterations){
+	private void writeOutputsToFile(String dataFolder){
+		FileWriter writer = new FileWriter();
+		try {
+			writer.openFile(dataFolder + "/Predictions.csv", false);
+			//Collect output data
+			ArrayList<SimpleMatrix> outputs = brain.getReturnedOutputs();
+			for (SimpleMatrix m : outputs){
+				double d = m.get(0);
+				writer.writeLine("" + d);
+			}
+			writer.closeFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private Brain_DataCollector createBrain(int maxIterations){
 		Random rand = new Random();
 		int ffInputLength = 1;
 		int spatialMapSize = 10;
 		int temporalMapSize = 10;
-		int markovOrder = 1;
+		int markovOrder = 2;
 		
-		Brain brain = new Brain(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		Brain_DataCollector brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
 
 		return brain;
 	}

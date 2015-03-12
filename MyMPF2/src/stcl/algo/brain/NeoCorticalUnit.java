@@ -44,6 +44,7 @@ public class NeoCorticalUnit implements NU{
 	private int oldBMU;
 	private boolean entropyThresholdFrozen;
 	private boolean biasBeforePredicting;
+	private boolean useBiasedInputInSequencer;
 	
 	private NewSequencer sequencer;
 	
@@ -81,6 +82,7 @@ public class NeoCorticalUnit implements NU{
 		oldBMU = -1;
 		entropyThresholdFrozen = false;
 		biasBeforePredicting = false;
+		useBiasedInputInSequencer = false;
 	}
 	
 	/**
@@ -124,7 +126,12 @@ public class NeoCorticalUnit implements NU{
 		}
 		
 		//Transform spatial output matrix to vector
-		double[] spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;		
+		double[] spatialFFOutputDataVector;
+		if (useBiasedInputInSequencer){
+			spatialFFOutputDataVector = biasedOutput.getMatrix().data;		
+		} else {
+			spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;	
+		}
 		SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
@@ -358,6 +365,10 @@ public class NeoCorticalUnit implements NU{
 	
 	public void setBiasBeforePrediction(boolean flag){
 		biasBeforePredicting = flag;
+	}
+
+	public void setUseBiasedInputInSequencer(boolean useBiasedInputInSequencer) {
+		this.useBiasedInputInSequencer = useBiasedInputInSequencer;
 	}
 	
 

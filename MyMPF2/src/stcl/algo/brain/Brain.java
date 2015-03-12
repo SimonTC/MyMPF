@@ -134,5 +134,9 @@ public class Brain {
 		for (NeoCorticalUnit nu : unitlist) nu.setBiasBeforePrediction(biasBeforePrediction);
 	}
 	
+	public void setUseBiasedInputToSequencer(boolean flag) {
+		for (NeoCorticalUnit nu : unitlist) nu.setUseBiasedInputInSequencer(flag);
+	}
+	
 
 }

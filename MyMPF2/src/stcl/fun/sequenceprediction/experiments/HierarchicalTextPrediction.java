@@ -29,7 +29,7 @@ public class HierarchicalTextPrediction {
 	SimpleMatrix uniformDistribution;
 
 	public static void main(String[] args) throws IOException {
-		String filepath = "d:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
+		String filepath = "c:/Users/Simon/Documents/Experiments/HierarchicalTextPrediction/Log";
 		HierarchicalTextPrediction htp = new HierarchicalTextPrediction();
 		htp.run(filepath);
 		System.out.println();
@@ -60,7 +60,7 @@ public class HierarchicalTextPrediction {
 		int i = 0;	
 		//Train first level unit
 		setupExperiment(1);
-		double error = runExperiment(200, true);
+		double error = runExperiment(300, true);
 		
 		writer = new FileWriter();
 		writer.openFile(logFilepath + "Staggered_Level1", false);
@@ -135,13 +135,19 @@ public class HierarchicalTextPrediction {
 		SequenceTrainer trainer = new SequenceTrainer(sequences, iterations, rand, -1);
 		boolean calculateErrorAsDistance = false;
 		
+		//brain.setBiasBeforePrediction(false);
+		//brain.setUseBiasedInputToSequencer(true);
+		
 		//Train
 		trainer.train(brain, 0.0, calculateErrorAsDistance);
 		
 		//Evaluate
 		brain.setLearning(false);
 		brain.flush();
-		//brain.setEntropyThresholdFrozen(true);
+		
+		//brain.setEntropyThresholdFrozen(false);
+		//brain.setBiasBeforePrediction(true);
+		//brain.setUseBiasedInputToSequencer(true);
 		if (brainMemoryFlushBetweenTrainingAndEvaluation) brain.flushCollectedData();
 		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance);
 		
@@ -156,9 +162,9 @@ public class HierarchicalTextPrediction {
 	}
 	
 	private void setupBrain(int numUnits){
-		int temporalMapSize = 4;
+		int temporalMapSize = 2;
 		int inputLength = sequence[0].getNumElements();
-		int spatialMapSize = 5;
+		int spatialMapSize = 4;
 		double predictionLearningRate = 0.1;
 		int markovOrder = 3;
 		

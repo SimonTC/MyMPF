@@ -25,7 +25,7 @@ public class HotGym {
 	private JFrame frame;
 	
 	private final int ITERATIONS = 10;
-	boolean sin = false;
+	boolean sin = true;
 	SimpleMatrix uniformDistribution;
 	
 	public static void main(String[] args){
@@ -47,16 +47,15 @@ public class HotGym {
 			}
 					
 			//Create neocortical unit
-			Brain brain = createUnit(iterations);
-					
-			
+			Brain brain = createBrain(iterations);
+								
 			//Do test
 			ArrayList<double[]> list = new ArrayList<double[]>();
 			list.add(data);
 			Random rand = new Random();
-			CopyOfSequenceTrainer trainer = new CopyOfSequenceTrainer(list, ITERATIONS, rand );
+			SequenceTrainer trainer = new SequenceTrainer(list, ITERATIONS, rand );
 			boolean calculateErrorAsDistance = true;
-			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance, null);
+			ArrayList<Double> errors = trainer.train(brain, 0, calculateErrorAsDistance);
 			
 			for ( double d : errors) System.out.println(d);
 					
@@ -66,62 +65,7 @@ public class HotGym {
 		}
 	}
 	
-	private void test(int iterations, NU unit, ArrayList<Double> data){
-		SimpleMatrix ffOutput;
-		SimpleMatrix fbOutput;
-		double error;
-		
-		for (int iteration = 0; iteration < iterations; iteration++){
-			float start = System.nanoTime();
-			output = new ArrayList<Double>();
-			xValues = new ArrayList<Double>();
-			output.add((double) 0);
-			double mse = 0;
-			unit.flush();
-			for (int i = 0; i < data.size() - 1; i++){
-				xValues.add((double) (i+1)); 
-				double input = data.get(i);
-				double[][] inputDataVector = {{input}};
-				SimpleMatrix inputVector = new SimpleMatrix(inputDataVector);
-				double expectedOutput = data.get(i+1);
-				ffOutput = unit.feedForward(inputVector);
-				fbOutput = unit.feedBackward(uniformDistribution);
-				
-				double actualOutput = fbOutput.get(0);
-				
-				output.add(actualOutput);
-				
-				error = actualOutput - expectedOutput;;
-				error *= error;
-				mse += error;
-				
-				/*
-				System.out.printf("Exp: %1$.2f Act: %1$.2f", expectedOutput, actualOutput);
-				System.out.println();
-				*/
-				
-				
-				
-				
-			}	
-			float end = System.nanoTime();
-			float duration = end - start;
-			float duration_seconds = duration / 1000000000;
-			
-			
-			
-			mse *= (double) 1/data.size();
-			System.out.printf("Iteration: " + iteration + " MSE: %1$.4f" , mse);
-			System.out.println(" Duration: " + duration_seconds + " seconds");
-			System.out.println();
-			
-			
-		}
-	}
-	
-	
-	
-	private Brain createUnit(int maxIterations){
+	private Brain createBrain(int maxIterations){
 		Random rand = new Random();
 		int ffInputLength = 1;
 		int spatialMapSize = 10;

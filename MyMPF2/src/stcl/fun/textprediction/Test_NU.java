@@ -22,7 +22,7 @@ public class Test_NU {
 
 	public static void main(String[] args) {
 		Test_NU t = new Test_NU();
-		String filepath = "D:/Users/Simon/Documents/Experiments/VOMM/Book_500";
+		String filepath = "c:/Users/Simon/Documents/Experiments/VOMM/Book_500";
 		int numUnits = 2;
 		int markovOrder = 5;
 		try {

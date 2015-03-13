@@ -82,8 +82,8 @@ public class SpatialPooler {
 		if (feedBackwardInputMatrix.numCols() != mapSize || feedBackwardInputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input
-		//SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
-		SimpleMatrix model = chooseMax(feedBackwardInputMatrix, som);
+		SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
+		//SimpleMatrix model = chooseMax(feedBackwardInputMatrix, som);
 		
 		return model;		
 	}

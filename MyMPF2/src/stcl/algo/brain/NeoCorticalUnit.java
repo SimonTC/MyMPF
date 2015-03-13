@@ -51,13 +51,12 @@ public class NeoCorticalUnit implements NU{
 	/**
 	 * 
 	 * @param rand
-	 * @param maxIterations
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
 	 * @param initialPredictionLearningRate
 	 * @param useMarkovPrediction
-	 * @param decayFactor
+	 * @param markovOrder
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);

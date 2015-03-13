@@ -35,7 +35,7 @@ public class NewSequencer {
 		currentMinCount = Integer.MAX_VALUE;
 		currentMinID = -1;
 		this.inputLength = inputLength;
-		this.maxNumberOfSequencesInMemory = temporalGroupMapSize;
+		this.maxNumberOfSequencesInMemory = temporalGroupMapSize * temporalGroupMapSize;
 		sequenceProbabilities = new SimpleMatrix(temporalGroupMapSize, temporalGroupMapSize);
 		reset();
 		setLearning(true);

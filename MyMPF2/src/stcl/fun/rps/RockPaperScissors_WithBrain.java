@@ -40,8 +40,8 @@ public class RockPaperScissors_WithBrain {
 		createInputs();
 		createRewardMatrix();
 		int ffInputLength = rock.numCols() * rock.numCols() + 2; //Adding two for the label + action id
-		int spatialMapSize = 10;
-		int temporalMapSize = 10;
+		int spatialMapSize = 5;
+		int temporalMapSize = 5;
 		double initialPredictionLearningRate = 0.1;
 		boolean useMarkovPrediction = true;
 		double decayFactor = 0.3;

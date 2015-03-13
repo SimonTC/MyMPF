@@ -55,9 +55,6 @@ public class RockPaperScissors_WithBrainSimplified {
 		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
 		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
 		SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
-		int actionIDNow = 0;
-		int actionIDNext = 0;
-		int actionIDAfterNext = 0;
 
 		SimpleMatrix prediction = new SimpleMatrix(tmp);
 		int predictedLabel = 0;
@@ -70,7 +67,6 @@ public class RockPaperScissors_WithBrainSimplified {
 			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
-			int inputLabel = labelSequence[curInput];
 			
 			//Calculate prediction error
 			SimpleMatrix diff = input.minus(prediction);
@@ -78,6 +74,14 @@ public class RockPaperScissors_WithBrainSimplified {
 			
 			//Calculate reward
 			
+			if ( i > 3){ //To get out of wrong actions
+				int actionID = -1;
+				if (actionNow.minus(rock).normF() < 0.001) actionID = 0;
+				if (actionNow.minus(paper).normF() < 0.001) actionID = 1;
+				if (actionNow.minus(scissors).normF() < 0.001) actionID = 2;
+				
+				externalReward = reward(labelSequence[curInput], actionID);
+			}
 			
 			//Combine input with the action that will be performed at time t+1
 			SimpleMatrix combinedInput = input.combine(0, input.END, actionNext);
@@ -99,7 +103,7 @@ public class RockPaperScissors_WithBrainSimplified {
 			}
 			
 			//Print info
-			System.out.println(i + " Error: " + predictionError);
+			System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			
 			curInput++;
 			if (curInput >= sequence.length){

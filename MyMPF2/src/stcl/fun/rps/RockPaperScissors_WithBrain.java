@@ -53,25 +53,39 @@ public class RockPaperScissors_WithBrain {
 	private void runExperiment(int maxIterations){
 		int curInput = 0;
 		double externalReward = 0;
+		
 		double[][] tmp = {{0}};
-		SimpleMatrix curAction = new SimpleMatrix(tmp);
+		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
+		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
+		SimpleMatrix actionAfterNext= new SimpleMatrix(tmp); //m(t+2)
+		int actionIDNow = 0;
+		int actionIDNext = 0;
+		int actionIDAfterNext = 0;
+		
 		SimpleMatrix label = new SimpleMatrix(tmp);
 		SimpleMatrix prediction = new SimpleMatrix(5, 5);
 		int labelID = 0;
-		int curActionID = 0;
+		
 		for (int i = 0; i < maxIterations; i++){
+			//Update action chain
+			actionIDNow = actionIDNext;
+			actionIDNext = actionIDAfterNext;
+			actionIDAfterNext = -1; //Just to keep track			
+			
 			//Get input
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			label.set(labelSequence[curInput]);
+			
 			SimpleMatrix diff = input.minus(prediction);
 			double predictionError = diff.normF();
 			int labelError = labelID == labelSequence[curInput] ? 0 : 1;
 			
-			externalReward = reward(labelID, curActionID);
-			//System.out.println("Iteration " + i + " Reward: " + externalReward);
-			System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			externalReward = reward(labelID, actionIDNow);
 			
-			//System.out.println(i + " " + externalReward);
+			//System.out.println("Iteration " + i + " Reward: " + externalReward);
+			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			
+			System.out.println(i + " " + externalReward);
 			
 			//Reshape input to vector
 			input.reshape(1, 25);
@@ -80,20 +94,21 @@ public class RockPaperScissors_WithBrain {
 			input = addNoise(input, 0.0);
 			
 			//Combine with action vector
-			SimpleMatrix combinedInput = input.combine(0, input.END, curAction);
+			actionNext.set(actionIDNext);
+			SimpleMatrix combinedInput = input.combine(0, input.END, actionNext);
 			
 			//Combine with label
 			combinedInput = combinedInput.combine(0, input.END, label);
 			
 			SimpleMatrix fbOutput = brain.step(combinedInput, externalReward);
 			
-			//Collect next action and prediction		
-			curActionID = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 2)));
+			//Collect action that will be done at timestep t + 2	
 			
+			actionIDAfterNext = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 2)));
+			
+			//Collect prediction and label of input that we expect to see at timestep t + 1
 			labelID = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 1)));
-						
 			prediction = fbOutput.extractMatrix(0, 1, 0, fbOutput.getNumElements() - 2);
-			
 			prediction.reshape(5, 5);
 			
 			

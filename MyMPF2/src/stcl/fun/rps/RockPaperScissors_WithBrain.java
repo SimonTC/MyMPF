@@ -19,7 +19,7 @@ public class RockPaperScissors_WithBrain {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 2000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithBrain runner = new RockPaperScissors_WithBrain();
@@ -86,8 +86,8 @@ public class RockPaperScissors_WithBrain {
 			
 			//System.out.println(i + " " + inputLabel + " " + actionIDNow);
 			//System.out.println("Iteration " + i + " Reward: " + externalReward);
-			System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
-			
+			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			System.out.println(predictionError);
 			//System.out.println(i + " " + externalReward);
 			
 			//Reshape input to vector

@@ -6,6 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.SomBasics;
+import dk.stcl.core.basic.containers.SomNode;
 
 public class SpatialPooler {
 	
@@ -181,5 +182,14 @@ public class SpatialPooler {
 	
 	public void sensitize(int iteration){
 		som.sensitize(iteration);
+	}
+	
+	public void printModelWeigths(){
+		for (SomNode n :som.getNodes()){
+			for (double d : n.getVector().getMatrix().data){
+				System.out.printf("%.3f  ", d);
+			}
+			System.out.println();
+		}
 	}
 }

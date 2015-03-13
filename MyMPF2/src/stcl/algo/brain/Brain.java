@@ -37,7 +37,7 @@ public class Brain {
 		unitlist.add(nu);
 		for (int i = 0; i < numUnits - 1; i++){
 			NeoCorticalUnit in = nu;
-			Connection conn = new Connection(in, nu, rand, 0.3, 2, 0.3); //TODO: Base on parameters
+			Connection conn = new Connection(in, nu, rand, 0.3, 1, 0.3); //TODO: Base on parameters
 			connectionList.add(conn);
 			nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
 			unitlist.add(nu);

@@ -10,7 +10,7 @@ import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.RSOM;
 
-public class RockPaperScissors_WithBrain {
+public class RockPaperScissors_WithBrain_Simplified {
 
 	private Random rand = new Random(1234);
 	private Brain brain;
@@ -22,12 +22,12 @@ public class RockPaperScissors_WithBrain {
 	private final int ITERATIONS = 1000;
 	
 	public static void main(String[] args) {
-		RockPaperScissors_WithBrain runner = new RockPaperScissors_WithBrain();
+		RockPaperScissors_WithBrain_Simplified runner = new RockPaperScissors_WithBrain_Simplified();
 		runner.run();
 
 	}
 	
-	public RockPaperScissors_WithBrain() {
+	public RockPaperScissors_WithBrain_Simplified() {
 		// TODO Auto-generated constructor stub
 	}
 	

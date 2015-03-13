@@ -39,7 +39,7 @@ public class RockPaperScissors_WithBrain_Simplified {
 	private void setup(int maxIterations){
 		createInputs();
 		createRewardMatrix();
-		int ffInputLength = rock.numCols() * rock.numCols() + 2; //Adding two for the label + action id
+		int ffInputLength = 2; //Label and action
 		int spatialMapSize = 5;
 		int temporalMapSize = 5;
 		int markovOrder = 2;
@@ -52,15 +52,12 @@ public class RockPaperScissors_WithBrain_Simplified {
 		double externalReward = 0;
 		
 		double[][] tmp = {{0}};
-		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
 		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
-		SimpleMatrix actionAfterNext= new SimpleMatrix(tmp); //m(t+2)
 		int actionIDNow = 0;
 		int actionIDNext = 0;
 		int actionIDAfterNext = 0;
 		
-		SimpleMatrix label = new SimpleMatrix(tmp);
-		SimpleMatrix prediction = new SimpleMatrix(5, 5);
+		SimpleMatrix input = new SimpleMatrix(tmp);
 		int predictedLabel = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
@@ -70,47 +67,32 @@ public class RockPaperScissors_WithBrain_Simplified {
 			actionIDAfterNext = -1; //Just to keep track			
 			
 			//Get input
-			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
-			label.set(labelSequence[curInput]);
+			int inputLabel = labelSequence[curInput];
+			input.set(inputLabel);
+
+			//int labelError = predictedLabel == inputLabel ? 0 : 1;		
 			
-			SimpleMatrix diff = input.minus(prediction);
-			double predictionError = diff.normF();
-			int labelError = predictedLabel == labelSequence[curInput] ? 0 : 1;
+			externalReward = reward(inputLabel, actionIDNow);
+			System.out.println(inputLabel + " " + predictedLabel);
 			
-			int actualLabel = labelSequence[curInput];
-			externalReward = reward(actualLabel, actionIDNow);
-			
-			System.out.println(i + " " + actualLabel + " " + actionIDNow);
+			//System.out.println(i + " " + inputLabel + " " + actionIDNow);
 			//System.out.println("Iteration " + i + " Reward: " + externalReward);
-			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			//System.out.println("Iteration " + i + " labelError: " + labelError);
 			
 			//System.out.println(i + " " + externalReward);
-			
-			//Reshape input to vector
-			input.reshape(1, 25);
-			
-			//Add noise to input
-			input = addNoise(input, 0.0);
-			
+
 			//Combine with action vector
 			actionNext.set(actionIDNext);
 			SimpleMatrix combinedInput = input.combine(0, input.END, actionNext);
-			
-			//Combine with label
-			combinedInput = combinedInput.combine(0, input.END, label);
 			
 			SimpleMatrix fbOutput = brain.step(combinedInput, externalReward);
 			
 			//Collect action that will be done at timestep t + 2	
 			
-			actionIDAfterNext = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 2)));
+			actionIDAfterNext = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 1)));
 			
 			//Collect prediction and label of input that we expect to see at timestep t + 1
-			predictedLabel = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 1)));
-			prediction = fbOutput.extractMatrix(0, 1, 0, fbOutput.getNumElements() - 2);
-			prediction.reshape(5, 5);
-			
-			
+			predictedLabel = Math.round(Math.round(fbOutput.get(fbOutput.getNumElements() - 2)));			
 			
 			curInput++;
 			if (curInput >= sequence.length){
@@ -118,7 +100,7 @@ public class RockPaperScissors_WithBrain_Simplified {
 			}
 		}
 		
-		printInformation();
+		//printInformation();
 	}
 	
 	private void printInformation(){

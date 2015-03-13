@@ -64,6 +64,10 @@ public class RockPaperScissors_WithBrain {
 		int predictedLabel = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
+		if ( i == 500){
+				System.out.println();;
+			}
+			
 			//Update action chain
 			actionIDNow = actionIDNext;
 			actionIDNext = actionIDAfterNext;
@@ -77,12 +81,12 @@ public class RockPaperScissors_WithBrain {
 			double predictionError = diff.normF();
 			int labelError = predictedLabel == labelSequence[curInput] ? 0 : 1;
 			
-			int actualLabel = labelSequence[curInput];
-			externalReward = reward(actualLabel, actionIDNow);
+			int inputLabel = labelSequence[curInput];
+			externalReward = reward(inputLabel, actionIDNow);
 			
-			System.out.println(i + " " + actualLabel + " " + actionIDNow);
+			//System.out.println(i + " " + inputLabel + " " + actionIDNow);
 			//System.out.println("Iteration " + i + " Reward: " + externalReward);
-			//System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
+			System.out.println("Iteration " + i + " spatialError: " + predictionError + " labelError: " + labelError);
 			
 			//System.out.println(i + " " + externalReward);
 			
@@ -118,7 +122,7 @@ public class RockPaperScissors_WithBrain {
 			}
 		}
 		
-		printInformation();
+		//printInformation();
 	}
 	
 	private void printInformation(){

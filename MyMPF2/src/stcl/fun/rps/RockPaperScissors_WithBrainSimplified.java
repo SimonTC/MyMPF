@@ -98,8 +98,14 @@ public class RockPaperScissors_WithBrainSimplified {
 				actionAfterNext.set(max, 1);
 			}
 			
+			System.out.println("Spatial BMU: " + brain.getUnitList().get(0).getSOM().getBMU().getId());
+			
+			//System.out.println("Temporal groups in unit 1");
+			//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+			//System.out.println();
+			
 			//Print info
-			System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+			//System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			
 			curInput++;
 			if (curInput >= sequence.length){

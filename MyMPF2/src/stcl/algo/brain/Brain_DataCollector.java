@@ -116,7 +116,7 @@ public class Brain_DataCollector extends Brain {
 	
 
 	@Override
-	public SimpleMatrix step(SimpleMatrix inputVector) {
+	public SimpleMatrix step(SimpleMatrix inputVector, double externalReward) {
 		if (collectData)  receivedInput = inputVector;
 		
 		//Feed forward
@@ -164,17 +164,17 @@ public class Brain_DataCollector extends Brain {
 		
 		//Write header for unit files
 		header = "";
-		header += writeRepeatedString("Prediction entropy",numUnits, ";");
-		header += writeRepeatedString("Entropy threshold", numUnits, ";");
+		header += writeRepeatedString("Prediction entropy",1, ";");
+		header += writeRepeatedString("Entropy threshold", 1, ";");
 		
-		header += writeRepeatedString("Spatial BMU", numUnits, ";");
-		header += writeRepeatedString("Temporal BMU", numUnits, ";");
+		header += writeRepeatedString("Spatial BMU", 1, ";");
+		header += writeRepeatedString("Temporal BMU", 1, ";");
 		
-		header += writeRepeatedString("Need help", numUnits, ";");
-		header += writeRepeatedString("Was active", numUnits, ";");
+		header += writeRepeatedString("Need help", 1, ";");
+		header += writeRepeatedString("Was active", 1, ";");
 		
-		header += writeRepeatedString("Spatial activation", numUnits, ";");
-		header += writeRepeatedString("Temporal activation", numUnits, ";");
+		header += writeRepeatedString("Spatial activation", 1, ";");
+		header += writeRepeatedString("Temporal activation", 1, ";");
 		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		

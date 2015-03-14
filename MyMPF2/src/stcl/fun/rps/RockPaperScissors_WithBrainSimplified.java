@@ -5,11 +5,12 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
+import stcl.algo.brain.Brain_DataCollector;
 
 public class RockPaperScissors_WithBrainSimplified {
 
 	private Random rand = new Random(1234);
-	private Brain brain;
+	private Brain_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors;
 	private SimpleMatrix[] sequence;
 	private int[] labelSequence;
@@ -19,27 +20,27 @@ public class RockPaperScissors_WithBrainSimplified {
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithBrainSimplified runner = new RockPaperScissors_WithBrainSimplified();
-		runner.run();
-
+		String folder = "D:/Users/Simon/Documents/Experiments/RPS";
+		runner.run(folder);
 	}
 	
 	public RockPaperScissors_WithBrainSimplified() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void run(){
-		setup(ITERATIONS);
+	public void run(String dataFolder){
+		setup(ITERATIONS, dataFolder);
 		runExperiment(ITERATIONS);
 	}
 	
-	private void setup(int maxIterations){
+	private void setup(int maxIterations, String dataFolder){
 		createInputs();
 		createRewardMatrix();
 		int ffInputLength = rock.numCols() * rock.numRows() * 2; //Multiplying by two to make room for both input and action
 		int spatialMapSize = 3;
 		int temporalMapSize = 2;
 		int markovOrder = 2;
-		brain = new Brain(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		brain = new Brain_DataCollector(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false);
 		
 	}
 	
@@ -97,17 +98,8 @@ public class RockPaperScissors_WithBrainSimplified {
 				actionAfterNext.set(0);
 				actionAfterNext.set(max, 1);
 			}
-			
-			System.out.print(i + " " + brain.getUnitList().get(0).getSOM().getBMU().getId());
-			System.out.printf(" %.3f", brain.getUnitList().get(0).getEntropy());
-			System.out.printf(" %.3f", brain.getUnitList().get(0).getEntropyThreshold());
-			
-			//System.out.println("Temporal groups in unit 1");
-			//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
-			//System.out.println();
-			
-			//Print info
-			//System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+		
+			System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			
 			curInput++;
 			if (curInput >= sequence.length){

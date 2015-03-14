@@ -117,6 +117,7 @@ public class Brain_DataCollector extends Brain {
 
 	@Override
 	public SimpleMatrix step(SimpleMatrix inputVector, double externalReward) {
+		
 		if (collectData)  receivedInput = inputVector;
 		
 		//Feed forward

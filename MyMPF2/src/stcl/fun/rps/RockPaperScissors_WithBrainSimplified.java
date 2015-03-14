@@ -107,7 +107,7 @@ public class RockPaperScissors_WithBrainSimplified {
 			}
 			
 		}
-		
+		brain.closeFiles();
 		//printInformation();
 	}
 	

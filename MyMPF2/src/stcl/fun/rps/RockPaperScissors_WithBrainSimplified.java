@@ -98,7 +98,9 @@ public class RockPaperScissors_WithBrainSimplified {
 				actionAfterNext.set(max, 1);
 			}
 			
-			System.out.println("Spatial BMU: " + brain.getUnitList().get(0).getSOM().getBMU().getId());
+			System.out.print(i + " " + brain.getUnitList().get(0).getSOM().getBMU().getId());
+			System.out.printf(" %.3f", brain.getUnitList().get(0).getEntropy());
+			System.out.printf(" %.3f", brain.getUnitList().get(0).getEntropyThreshold());
 			
 			//System.out.println("Temporal groups in unit 1");
 			//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
@@ -114,7 +116,7 @@ public class RockPaperScissors_WithBrainSimplified {
 			
 		}
 		
-		printInformation();
+		//printInformation();
 	}
 	
 	private int maxID(SimpleMatrix m){
@@ -137,6 +139,10 @@ public class RockPaperScissors_WithBrainSimplified {
 	}
 	
 	private void printInformation(){
+		System.out.println("Sequences observed by unit 1:");
+		brain.getUnitList().get(0).getSequencer().printTrie();
+		
+		
 		System.out.println();
 		System.out.println("Spatial groups in unit 1");
 		brain.getUnitList().get(0).getSpatialPooler().printModelWeigths();

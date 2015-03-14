@@ -7,7 +7,6 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
@@ -20,7 +19,7 @@ public class TemporalRecognition_NeocorticalUnit {
 	private MovingLinesGUI_Prediction frame;
 	private Random rand = new Random(1234);
 	
-	private NU nu;
+	private NeoCorticalUnit nu;
 	
 	private final int ITERATIONS = 10000;
 	private final boolean VISUALIZE_TRAINING = false;

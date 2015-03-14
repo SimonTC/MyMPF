@@ -9,11 +9,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import dk.stcl.core.basic.containers.SomNode;
-import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
-import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.FileWriter;
 import stcl.fun.sequenceprediction.SequenceBuilder;
 import stcl.fun.sequenceprediction.SequenceTrainer;

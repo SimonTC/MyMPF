@@ -6,7 +6,6 @@ import java.util.Stack;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SOM;
 import stcl.algo.util.Normalizer;

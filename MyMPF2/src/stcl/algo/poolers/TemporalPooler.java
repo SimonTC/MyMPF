@@ -5,7 +5,6 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
-import stcl.algo.util.Orthogonalizer;
 
 public class TemporalPooler extends SpatialPooler  {
 

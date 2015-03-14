@@ -6,9 +6,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
-import org.ejml.simple.SimpleMatrix;
-
-import stcl.algo.brain.Brain;
 import stcl.algo.predictors.VOMM;
 
 public class Test_2 {

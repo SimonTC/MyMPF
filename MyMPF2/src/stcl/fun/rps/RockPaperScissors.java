@@ -5,14 +5,13 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Connection;
-import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.RSOM;
 
 public class RockPaperScissors {
 
 	private Random rand = new Random(1234);
-	private NU unit1, unit2;
+	private NeoCorticalUnit unit1, unit2;
 	private Connection conn;
 	private SimpleMatrix rock, paper, scissors;
 	private SimpleMatrix[] sequence;
@@ -122,7 +121,7 @@ public class RockPaperScissors {
 		}
 	}
 	
-	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
+	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
 		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
 		int rows = rsom.getHeight();
@@ -132,7 +131,7 @@ public class RockPaperScissors {
 		return m;
 	}
 	
-	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
+	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
 		int rows = 1;
 		int cols = unitToFit.getSOM().getInputVectorLength();

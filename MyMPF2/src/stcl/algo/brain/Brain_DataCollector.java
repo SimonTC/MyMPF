@@ -1,13 +1,9 @@
 package stcl.algo.brain;
 
-import org.ejml.simple.SimpleMatrix;
-
-import stcl.algo.util.Normalizer;
-
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.JSpinner.NumberEditor;
+import org.ejml.simple.SimpleMatrix;
 
 /**
  * The data collector brain works like the normal brain, but does also save all information that is received and sent out by the brain during its life time

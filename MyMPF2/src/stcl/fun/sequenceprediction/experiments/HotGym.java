@@ -12,7 +12,6 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
 import stcl.algo.util.FileWriter;
 import stcl.fun.sequenceprediction.SequenceTrainer;

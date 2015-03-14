@@ -5,10 +5,6 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
-import stcl.algo.brain.Connection;
-import stcl.algo.brain.NU;
-import stcl.algo.brain.NeoCorticalUnit;
-import stcl.algo.poolers.RSOM;
 
 public class RockPaperScissors_WithBrain {
 

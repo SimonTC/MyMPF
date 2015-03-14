@@ -158,26 +158,6 @@ public class Test_NU {
 		return cleanedString;
 	}
 	
-	private void writeInfo(FileWriter writer, Brain brain, char input, char prediction){
-		double[] predictionEntropies = brain.collectPredictionEntropies();
-		double[] spatialFFOutEntropies = brain.collectSpatialFFEntropies();
-		String line = "";
-		line += input + ";";
-		line += prediction + ";";
-		for (double d : predictionEntropies){
-			line += d + ";";
- 		}
-		for (double d : spatialFFOutEntropies){
-			line += d + ";";
- 		}
-		try {
-			writer.writeLine(line);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 	private char convertDoubleToCharacter(double d){
 		float f = Math.round(d * 255);
 		int i = (int) f;

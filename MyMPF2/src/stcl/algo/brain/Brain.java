@@ -5,13 +5,8 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.biasunits.BiasUnit;
-import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
-import stcl.algo.brain.rewardCorrelators.RewardFunction;
-import stcl.algo.poolers.NewSequencer;
 import stcl.algo.poolers.RSOM;
 import stcl.algo.util.Normalizer;
-import stcl.algo.util.Orthogonalizer;
 
 public class Brain {
 	
@@ -118,7 +113,7 @@ public class Brain {
 		return fbInput; //The last fb input is the output of the brain
 	}
 	
-	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NU unitToFit){
+	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
 		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
 		int rows = rsom.getHeight();
@@ -128,7 +123,7 @@ public class Brain {
 		return m;
 	}
 	
-	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NU unitToFit){
+	private SimpleMatrix resizeToFitFFPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
 		int rows = 1;
 		int cols = unitToFit.getSOM().getInputVectorLength();

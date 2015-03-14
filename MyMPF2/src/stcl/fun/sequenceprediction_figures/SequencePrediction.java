@@ -7,14 +7,13 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NU;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.graphics.MovingLinesGUI_Prediction;
 
 public class SequencePrediction {
 	
 	private MovingLinesGUI_Prediction frame;
-	private NU unit;
+	private NeoCorticalUnit unit;
 	private Random rand = new Random();
 	private ArrayList<SimpleMatrix[]> sequences;
 	private final int NUM_ITERAIONS = 80000;

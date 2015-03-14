@@ -7,7 +7,6 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
-import stcl.algo.poolers.RSOM;
 
 public class CopyOfConnection {
 	private NU in, out;

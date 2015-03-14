@@ -11,10 +11,9 @@ import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
-import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
-public class NeoCorticalUnit implements NU{
+public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
 	private TemporalPooler temporalPooler;
@@ -257,28 +256,23 @@ public class NeoCorticalUnit implements NU{
 		return predictor;
 	}
 
-	@Override
 	public SOM getSOM() {
 		return spatialPooler.getSOM();
 	}
 
-	@Override
 	public void printPredictionModel() {
 		predictor.printModel();
 		
 	}
 
-	@Override
 	public boolean needHelp() {
 		return needHelp;
 	}
 
-	@Override
 	public double getEntropy() {
 		return predictionEntropy;
 	}
 	
-	@Override
 	public double getEntropyThreshold() {
 		return entropyThreshold;
 	}

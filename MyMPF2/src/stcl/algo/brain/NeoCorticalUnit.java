@@ -36,12 +36,7 @@ public class NeoCorticalUnit implements NU{
 	
 	private boolean useMarkovPrediction;
 	private boolean active;
-	
-	private int stepsSinceSequenceStart;
-	private SimpleMatrix temporalProbabilityMatrixToSend;
-	private int markovOrder;
-	
-	private int oldBMU;
+
 	private boolean entropyThresholdFrozen;
 	private boolean biasBeforePredicting;
 	private boolean useBiasedInputInSequencer;
@@ -76,24 +71,10 @@ public class NeoCorticalUnit implements NU{
 		this.temporalMapSize = temporalMapSize;
 		needHelp = false;
 		entropyThreshold = 0;
-		stepsSinceSequenceStart = 0;
-		this.markovOrder = markovOrder;
-		oldBMU = -1;
 		entropyThresholdFrozen = false;
 		biasBeforePredicting = false;
 		useBiasedInputInSequencer = false;
 	}
-	
-	/**
-	 * Calculate the decay which will have the first input in a sequence have a t least minInfluence influence on the difference vector in the rsom
-	 * @param memoryLength
-	 * @param minInfluence
-	 * @return
-	 */
-	private double calculateDecay(int memoryLength, double minInfluence){
-		double decay = 1 - Math.pow(minInfluence, 1.0 / memoryLength);
-		return decay;
- 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		//Test input
@@ -135,78 +116,10 @@ public class NeoCorticalUnit implements NU{
 		temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 		
 		ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
-		//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
-		/*
-		temporalFFInputVector = Orthogonalizer.aggressiveOrthogonalization(temporalFFInputVector);
 		
-		//Temporal classification
-		SimpleMatrix temporalFFOutputMatrix = temporalPooler.feedForward(temporalFFInputVector);
-		
-		
-		int bmu = temporalPooler.getRSOM().getBMU().getId();
-		if (oldBMU != bmu){
-			needHelp = true;
-			oldBMU = bmu;
-			//temporalPooler.flushTemporalMemory();
-		} else {
-			needHelp = false;
-		}
-		
-		ffOutput = temporalFFOutputMatrix;
-		*/
-		/*
-		
-		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = temporalFFOutputMatrix;		
-		stepsSinceSequenceStart++;
-		
-		ffOutput = temporalProbabilityMatrixToSend;
-		*/
-		
-		//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
-		/*
-		double max = ffOutput.elementMaxAbs();
-		ffOutput = ffOutput.divide(max);
-		ffOutput = Orthogonalizer.orthogonalize(ffOutput);
-		*/
 		return ffOutput;
 	}
 	
-	private SimpleMatrix biasMatrix(SimpleMatrix matrixToBias, SimpleMatrix biasMatrix){
-		SimpleMatrix biasedMatrix = matrixToBias.elementMult(biasMatrix);
-		biasedMatrix = Normalizer.normalize(biasedMatrix);
-		return biasedMatrix;
-	}
-	
-	private double calculateEntropy(SimpleMatrix m){
-		double sum = 0;
-		for (Double d : m.getMatrix().data){
-			if (d != 0) sum += d * Math.log(d);
-		}
-		return -sum;
-	}
-	
-	/**
-	 * Calculates how much the prediction from last time step should influence the spatial output.
-	 * Two rules are followed:
-	 * 1) The lower the entropy of the prediction, the higher its influence should be
-	 * 2) The higher the entropy of the spatial activation matrix, the higher the influence of the prediction should be
-	 * 
-	 * ad 1) Low entropy signifies that the predictor is sure of what comes next and we should listen to it
-	 * ad 2) High entropy of the activation matrix signifies that the pooler doesn't know what it is looking at and needs help to decide by using the prediction
-	 * @param predictionEntropy
-	 * @return
-	 */
-	private double calculatePredictionBias(double predictionEntropy, double spatialEntropy){
-		double predictionEntropy_scaled = predictionEntropy > 1 ? 1 : predictionEntropy;
-		double spatialEntropy_scaled = spatialEntropy > 1 ? 1 : spatialEntropy;
-		
-		double predictionInfluence = 1 - predictionEntropy_scaled + spatialEntropy_scaled;
-		if (predictionInfluence < 0) predictionInfluence = 0;
-		if (predictionInfluence > 1) predictionInfluence = 1;
-		
-		return predictionEntropy;
-		
-	}
 	
 	/**
 	 * 
@@ -220,7 +133,6 @@ public class NeoCorticalUnit implements NU{
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
 		if (needHelp){
-			stepsSinceSequenceStart = 0;
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
 			
@@ -261,6 +173,31 @@ public class NeoCorticalUnit implements NU{
 		return fbOutput;
 	}
 	
+	/**
+	 * Calculate the decay which will have the first input in a sequence have a t least minInfluence influence on the difference vector in the rsom
+	 * @param memoryLength
+	 * @param minInfluence
+	 * @return
+	 */
+	private double calculateDecay(int memoryLength, double minInfluence){
+		double decay = 1 - Math.pow(minInfluence, 1.0 / memoryLength);
+		return decay;
+ 	}
+	
+	private SimpleMatrix biasMatrix(SimpleMatrix matrixToBias, SimpleMatrix biasMatrix){
+		SimpleMatrix biasedMatrix = matrixToBias.elementMult(biasMatrix);
+		biasedMatrix = Normalizer.normalize(biasedMatrix);
+		return biasedMatrix;
+	}
+	
+	private double calculateEntropy(SimpleMatrix m){
+		double sum = 0;
+		for (Double d : m.getMatrix().data){
+			if (d != 0) sum += d * Math.log(d);
+		}
+		return -sum;
+	}
+	
 	private SimpleMatrix normalize(SimpleMatrix m){
 		return Normalizer.normalize(m);
 	}
@@ -268,8 +205,6 @@ public class NeoCorticalUnit implements NU{
 	public void flush(){
 		temporalPooler.flushTemporalMemory();
 		biasMatrix.set(1);
-		//predictionMatrix.set(1);
-		//predictionMatrix = normalize(predictionMatrix);
 		predictor.flush();
 		sequencer.reset();
 	}

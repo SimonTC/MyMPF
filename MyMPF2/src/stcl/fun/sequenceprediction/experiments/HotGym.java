@@ -28,7 +28,7 @@ public class HotGym {
 	SimpleMatrix uniformDistribution;
 	
 	boolean sin = false;
-	boolean writeOutputsToFile = false;
+	boolean writeOutputsToFile = true;
 	
 	public static void main(String[] args){
 		HotGym runner = new HotGym();
@@ -38,7 +38,9 @@ public class HotGym {
 	
 	public void start(){
 		//Load data
-		String dataFilePath = "D:/Users/Simon/Documents/Experiments/Hotgym/data_normalized_3000.csv";
+		String folderPath = "D:/Users/Simon/Documents/Experiments/Hotgym";
+		String dataFilePath = folderPath + "/data_normalized_3000.csv";
+		String resultFolder = folderPath + "/results";
 		//String dataFilePath = "c:/Users/Simon/Documents/Experiments/OMXC20/OMXC20_Normalized.csv";
 		int iterations = ITERATIONS;
 				
@@ -50,10 +52,8 @@ public class HotGym {
 			}
 					
 			//Create neocortical unit
-			brain = createBrain(iterations);
-			brain.setCollectData(writeOutputsToFile);
-			
-								
+			brain = createBrain(iterations, resultFolder);
+							
 			//Do test
 			ArrayList<double[]> list = new ArrayList<double[]>();
 			list.add(data);
@@ -65,9 +65,8 @@ public class HotGym {
 			for ( double d : errors) System.out.println(d);
 			
 			if (writeOutputsToFile){
-				String datafolder = "c:/Users/Simon/Documents/Experiments/OMXC20";
-				writeOutputsToFile(datafolder);
-				System.out.println("Outputs written to " + datafolder);
+				System.out.println("Outputs written to " + resultFolder);
+				brain.closeFiles();
 			}
 					
 		} catch (FileNotFoundException e) {
@@ -76,31 +75,20 @@ public class HotGym {
 		}
 	}
 	
-	private void writeOutputsToFile(String dataFolder){
-		FileWriter writer = new FileWriter();
-		try {
-			writer.openFile(dataFolder + "/Predictions.csv", false);
-			//Collect output data
-			ArrayList<SimpleMatrix> outputs = brain.getReturnedOutputs();
-			for (SimpleMatrix m : outputs){
-				double d = m.get(0);
-				writer.writeLine("" + d);
-			}
-			writer.closeFile();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private Brain_DataCollector createBrain(int maxIterations){
+	private Brain_DataCollector createBrain(int maxIterations, String folderPath){
 		Random rand = new Random();
 		int ffInputLength = 1;
 		int spatialMapSize = 10;
 		int temporalMapSize = 10;
 		int markovOrder = 2;
 		
-		Brain_DataCollector brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		if (writeOutputsToFile){
+			brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, folderPath);
+			brain.openFiles(false);
+		} else {
+			brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		}
+		
 
 		return brain;
 	}

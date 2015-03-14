@@ -1,9 +1,16 @@
 package stcl.algo.brain;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
+
+import stcl.algo.util.FileWriter;
 
 /**
  * The data collector brain works like the normal brain, but does also save all information that is received and sent out by the brain during its life time
@@ -12,100 +19,217 @@ import org.ejml.simple.SimpleMatrix;
  */
 public class Brain_DataCollector extends Brain {
 	//Inputs and outputs to the brain
-	private ArrayList<SimpleMatrix> receivedInputs;
-	private ArrayList<SimpleMatrix> returnedOutputs;
+	private SimpleMatrix receivedInput;
+	private SimpleMatrix returnedOutput;
 	
 	//Inputs to and outputs from the units
-	private ArrayList<SimpleMatrix[]> FFOutputs;
-	private ArrayList<SimpleMatrix[]> FBOutputs;
+	private SimpleMatrix[] FFOutputs;
+	private SimpleMatrix[] FBOutputs;
+	
+	private SimpleMatrix[] FFInputs;
+	private SimpleMatrix[] FBInputs;
 	
 	//Help status of the units
-	private ArrayList<boolean[]> helpStatuses;
+	private boolean[] helpStatuses;
 	
 	//Active status of the units
-	private ArrayList<boolean[]> activeStatuses;
+	private boolean[] activeStatuses;
 	
 	//Spatial and temporal BMUs in the units
-	private ArrayList<int[]> spatialBMUs;
-	private ArrayList<int[]> temporalBMUs;
+	private int[] spatialBMUs;
+	private int[] temporalBMUs;
 	
 	//Activations
-	private ArrayList<SimpleMatrix[]> temporalActivations;
-	private ArrayList<SimpleMatrix[]> spatialActivations;
+	private SimpleMatrix[] temporalActivations;
+	private SimpleMatrix[] spatialActivations;
 	
 	//Entropies in the units
-	private ArrayList<double[]> predictionEntropies;
-	private ArrayList<double[]> entropiesThresholds;
+	private double[] predictionEntropies;
+	private double[] entropiesThresholds;
 	
 	//Misc
 	private int numUnits;
 	private boolean collectData;
 
+	private FileWriter brainWriter;
+	private FileWriter[] unitWriters;
+	
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
 			int spatialMapSize, int temporalMapSize, int markovOrder) {
+		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, "");
+		collectData = false;
+	}
+
+	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
+			int spatialMapSize, int temporalMapSize, int markovOrder, String parentFolder) {
 		super(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize,
 				markovOrder);
-		setupMemories();
+		
 		this.numUnits = numUnits;
-		collectData = true;
+		collectData = false;
+		if (!parentFolder.isEmpty()){
+			collectData = true;
+			try {
+				setupFiles(parentFolder, numUnits);
+				writeHeaders();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}		
 	}
 	
-	private void setupMemories(){
-		//Inputs and outputs to the brain
-		receivedInputs = new ArrayList<SimpleMatrix>();
-		returnedOutputs = new ArrayList<SimpleMatrix>();
-		
-		//Inputs to and outputs from the units
-		FFOutputs = new ArrayList<SimpleMatrix[]>();
-		FBOutputs = new ArrayList<SimpleMatrix[]>();
-		
-		//Help status of the units
-		helpStatuses = new ArrayList<boolean[]>();
-		
-		//Active status of the units
-		activeStatuses = new ArrayList<boolean[]>();
-		
-		//Spatial and Temporal BMUs in the units
-		spatialBMUs = new ArrayList<int[]>();
-		temporalBMUs = new ArrayList<int[]>();
-		
-		//Activations
-		temporalActivations = new ArrayList<SimpleMatrix[]>();
-		spatialActivations = new ArrayList<SimpleMatrix[]>();
-		
-		//Entropies in the units
-		predictionEntropies = new ArrayList<double[]>();
-		entropiesThresholds = new ArrayList<double[]>();
+	private void setupFiles(String parentFolder, int numUnits){
+		brainWriter = new FileWriter(parentFolder + "/brain.csv");
+		unitWriters = new FileWriter[numUnits];
+		for (int i = 0; i < numUnits; i++){
+			FileWriter f = new FileWriter(parentFolder + "/unit_" + i);
+			unitWriters[i] = f;
+		}		
 	}
+	
+	public void openFiles(boolean append){
+		try {
+			brainWriter.openFile(append);
+			for (FileWriter f : unitWriters){
+				f.openFile(append);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
+	public void closeFiles(){
+		try {
+			brainWriter.closeFile();
+			for (FileWriter f : unitWriters){
+				f.closeFile();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
+	
 
 	@Override
 	public SimpleMatrix step(SimpleMatrix inputVector) {
-		if (collectData)  receivedInputs.add(inputVector);
+		if (collectData)  receivedInput = inputVector;
 		
 		//Feed forward
 		SimpleMatrix m = feedForward(inputVector);
 		
 		if (collectData){
 			//Collect Feedforward info
-			activeStatuses.add(collectActiveStatus());
-			helpStatuses.add(collectHelpStatus());
-			predictionEntropies.add(collectPredictionEntropies());
-			entropiesThresholds.add(collectEntropyThresholds());
-			spatialBMUs.add(collectBMUs(true));
-			//temporalBMUs.add(collectBMUs(false));
-			FFOutputs.add(collectOutputs(true));
-			//temporalActivations.add(collectActivations(false));
-			spatialActivations.add(collectActivations(true));
+			activeStatuses = (collectActiveStatus());
+			helpStatuses = (collectHelpStatus());
+			predictionEntropies = (collectPredictionEntropies());
+			entropiesThresholds = (collectEntropyThresholds());
+			spatialBMUs = (collectBMUs(true));
+			temporalBMUs = (collectBMUs(false));
+			//FFOutputs = (collectOutputs(true));
+			temporalActivations = (collectActivations(false));
+			spatialActivations = (collectActivations(true));
 		}
 		
 		//Feed back
 		SimpleMatrix output = feedBackward(m);
-		if (collectData) FBOutputs.add(collectOutputs(false));
+		if (collectData) FBOutputs = (collectOutputs(false));
 		
 		//Collect feed back info
-		if (collectData) returnedOutputs.add(output);
+		if (collectData) returnedOutput = output;
 		
+		//Print data to files
+		try {
+			writeData();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return output;
+	}
+	
+	private void writeHeaders() throws IOException{
+		
+		//Write header for brain file
+		String header = "";
+		header += writeRepeatedString("Input", 1, ";");
+		header += writeRepeatedString("Output", 1, ";");
+		brainWriter.writeLine(header);
+		
+		//Write header for unit files
+		header = "";
+		header += writeRepeatedString("Prediction entropy",numUnits, ";");
+		header += writeRepeatedString("Entropy threshold", numUnits, ";");
+		
+		header += writeRepeatedString("Spatial BMU", numUnits, ";");
+		header += writeRepeatedString("Temporal BMU", numUnits, ";");
+		
+		header += writeRepeatedString("Need help", numUnits, ";");
+		header += writeRepeatedString("Was active", numUnits, ";");
+		
+		header += writeRepeatedString("Spatial activation", numUnits, ";");
+		header += writeRepeatedString("Temporal activation", numUnits, ";");
+		
+		header = header.substring(0, header.length() - 1); //Remove last semi-colon
+		
+		for (FileWriter w : unitWriters) w.writeLine(header);
+
+	}
+	
+	private void writeData() throws IOException{
+		//Print brain data
+		brainWriter.write(writeMatrixArray(receivedInput) + ";");
+		brainWriter.writeLine(writeMatrixArray(returnedOutput) + ";");
+		
+		//Print unit data
+		for (int i = 0; i < numUnits; i++){
+			FileWriter writer = unitWriters[i];
+			
+			writer.write(predictionEntropies[i] + ";");
+			writer.write(entropiesThresholds[i] + ";");
+			
+			writer.write(spatialBMUs[i] + ";");
+			writer.write(temporalBMUs[i] + ";");
+			
+			writer.write(helpStatuses[i] + ";");
+			writer.write(activeStatuses[i] + ";");
+						
+			writer.write(writeMatrixArray(spatialActivations[i]) + ";");
+			writer.write(writeMatrixArray(temporalActivations[i]) + ";");
+		}
+	}
+	
+	private String writeRepeatedString(String stringToRepeat, int numberOfTimes, String delimiter){
+		String s = "";
+		for (int i = 1; i <= numberOfTimes; i++){
+			s += stringToRepeat;
+			if (numberOfTimes > 1) s+= " " + i;
+			s+= delimiter;
+		}
+		return s;
+	}
+	
+	/**
+	 * All is pretty much taken from the Matrix.toString() metods in simpleMatrix
+	 * @param m
+	 * @return
+	 */
+	private String writeMatrixArray(SimpleMatrix m){
+		int numChar = 6;
+		int precision = 3;
+		String format = "%"+numChar+"."+precision+"f " + "  ";
+		
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(stream);
+		
+		for (double d : m.getMatrix().data){
+			ps.printf(Locale.US, format, d);
+		}
+		
+		return stream.toString();
 	}
 	
 	private double[] collectPredictionEntropies(){
@@ -185,102 +309,8 @@ public class Brain_DataCollector extends Brain {
 		return outputs;
 	}
 	
-	/**
-	 * Removes all collected data
-	 */
-	public void flushCollectedData(){
-		setupMemories();
-	}
-
-	/**
-	 * @return the receivedInputs
-	 */
-	public ArrayList<SimpleMatrix> getReceivedInputs() {
-		return receivedInputs;
-	}
-
-	/**
-	 * @return the returnedOutputs
-	 */
-	public ArrayList<SimpleMatrix> getReturnedOutputs() {
-		return returnedOutputs;
-	}
-
-	/**
-	 * @return the fFOutputs
-	 */
-	public ArrayList<SimpleMatrix[]> getFFOutputs() {
-		return FFOutputs;
-	}
-
-	/**
-	 * @return the fBOutputs
-	 */
-	public ArrayList<SimpleMatrix[]> getFBOutputs() {
-		return FBOutputs;
-	}
-
-	/**
-	 * @return the helpStatuses
-	 */
-	public ArrayList<boolean[]> getHelpStatuses() {
-		return helpStatuses;
-	}
-
-	/**
-	 * @return the activeStatuses
-	 */
-	public ArrayList<boolean[]> getActiveStatuses() {
-		return activeStatuses;
-	}
-
-	/**
-	 * @return the spatialBMUs
-	 */
-	public ArrayList<int[]> getSpatialBMUs() {
-		return spatialBMUs;
-	}
-
-	/**
-	 * @return the temporalBMUs
-	 */
-	public ArrayList<int[]> getTemporalBMUs() {
-		return temporalBMUs;
-	}
-
-	/**
-	 * @return the predictionEntropies
-	 */
-	public ArrayList<double[]> getPredictionEntropies() {
-		return predictionEntropies;
-	}
-	
-	public int getNumUnits(){
-		return numUnits;
-	}
-
-	/**
-	 * @return the temporalActivations
-	 */
-	public ArrayList<SimpleMatrix[]> getTemporalActivations() {
-		return temporalActivations;
-	}
-
-	/**
-	 * @return the spatialActivations
-	 */
-	public ArrayList<SimpleMatrix[]> getSpatialActivations() {
-		return spatialActivations;
-	}
-
-	/**
-	 * @return the entropiesThresholds
-	 */
-	public ArrayList<double[]> getEntropiesThresholds() {
-		return entropiesThresholds;
-	}
-
-	public void setCollectData(boolean collectData) {
+	public void setCollectData(boolean collectData){
 		this.collectData = collectData;
 	}
+	
 }

@@ -40,13 +40,6 @@ public class HierarchicalTextPrediction {
 		//int i = 0;	
 			setupExperiment(6);
 			totalError += runExperiment(100, true);
-			writer = new FileWriter();
-			writer.openFile(logFilepath + "_" + i, false);
-			writeInfo(writer, brain);
-			writer.closeFile();
-			//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
-			//System.out.println();
-			//brain.getUnitList().get(0).getSequencer().printTrie();
 		}
 		double error = totalError / (double) iterations;
 		System.out.printf("Error: %.3f", error );
@@ -70,6 +63,7 @@ public class HierarchicalTextPrediction {
 		}
 	}
 	
+	/*
 	public void run_Staggered(String logFilepath) throws IOException{
 
 		int i = 0;	
@@ -77,29 +71,13 @@ public class HierarchicalTextPrediction {
 		setupExperiment(1);
 		double error = runExperiment(300, true);
 		
-		writer = new FileWriter();
-		writer.openFile(logFilepath + "Staggered_Level1", false);
-		writeInfo(writer, brain);
-		writer.closeFile();
-		
 		System.out.printf("Error, staggered unit 1: %.3f", error );
 		System.out.println();
-		
-		//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
-		//System.out.println();
-		//brain.getUnitList().get(0).getSequencer().printTrie();
-		
 		
 		//Train second level unit
 		sequence = createSequenceForNextUnit();
 		setupBrain(1);
 		error = runExperiment(1, true);
-		
-		
-		writer = new FileWriter();
-		writer.openFile(logFilepath + "Staggered_Level2" , false);
-		writeInfo(writer, brain);
-		writer.closeFile();
 
 		System.out.printf("Error, staggered unit 2: %.3f", error );
 		System.out.println();
@@ -109,11 +87,6 @@ public class HierarchicalTextPrediction {
 		setupBrain(1);
 		error = runExperiment(1, true);
 		
-		
-		writer = new FileWriter();
-		writer.openFile(logFilepath + "Staggered_Level3" , false);
-		writeInfo(writer, brain);
-		writer.closeFile();
 
 		System.out.printf("Error, staggered unit 3: %.3f", error );
 
@@ -137,7 +110,7 @@ public class HierarchicalTextPrediction {
 		}
 		return newSequence;
 	}
-	
+	*/
 	private void setupExperiment(int numUnits){
 		buildSequence();
 		setupBrain(numUnits);
@@ -163,7 +136,6 @@ public class HierarchicalTextPrediction {
 		//brain.setEntropyThresholdFrozen(false);
 		//brain.setBiasBeforePrediction(true);
 		//brain.setUseBiasedInputToSequencer(true);
-		if (brainMemoryFlushBetweenTrainingAndEvaluation) brain.flushCollectedData();
 		ArrayList<Double> errors = trainer.train(brain, 0.0, calculateErrorAsDistance);
 		
 		double error = 0;
@@ -228,111 +200,6 @@ public class HierarchicalTextPrediction {
 		}
 		
 		return s;
-	}
-	
-	private void writeInfo(FileWriter writer, Brain_DataCollector brain){
-		ArrayList<SimpleMatrix> brainInputs = brain.getReceivedInputs();
-		ArrayList<SimpleMatrix> brainOutputs = brain.getReturnedOutputs();
-		ArrayList<double[]> predictionEntropies = brain.getPredictionEntropies();	
-		ArrayList<double[]> entropyThresholds = brain.getEntropiesThresholds();
-		ArrayList<int[]> spatialBMUs = brain.getSpatialBMUs();
-		ArrayList<int[]> temporalBMUs = brain.getTemporalBMUs();
-		ArrayList<boolean[]> helpStatuses = brain.getHelpStatuses();
-		ArrayList<boolean[]> activeStatuses = brain.getActiveStatuses();
-		ArrayList<SimpleMatrix[]> ffOutputs = brain.getFFOutputs();
-		
-		//Write headers
-		int numUnits = brain.getNumUnits();
-		String header = "";
-		header += writeRepeatedString("Input", 1, ";");
-		header += writeRepeatedString("Output", 1, ";");
-		header += writeRepeatedString("Prediction entropy",numUnits, ";");
-		header += writeRepeatedString("Entropy threshold", numUnits, ";");
-		header += writeRepeatedString("Spatial BMU", numUnits, ";");
-		//header += writeRepeatedString("Temporal BMU", numUnits, ";");
-		header += writeRepeatedString("Need help", numUnits, ";");
-		header += writeRepeatedString("Was active", numUnits, ";");
-		header += writeRepeatedString("FF Output", numUnits, ";");
-		header = header.substring(0, header.length() - 1); //Remove last semi-colon
-		try {
-			writer.writeLine(header);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//Write lines
-		for (int k = 0; k < predictionEntropies.size(); k++){
-			String line = "";
-			line += writeMatrixArray(brainInputs.get(k)) + ";"; 
-			line += writeMatrixArray(brainOutputs.get(k)) + ";";
-			for (double d : predictionEntropies.get(k)){
-				line += d + ";";
-	 		}
-			for (double d : entropyThresholds.get(k)){
-				line += d + ";";
-	 		}
-			for (int i : spatialBMUs.get(k)){
-				line += i + ";";
-			}
-			/*
-			for (int i : temporalBMUs.get(k)){
-				line += i + ";";
-			}
-			*/
-			for (boolean b : helpStatuses.get(k)){
-				int i = b ? 1 : 0;
-				line += i + ";";
-			}
-			for (boolean b : activeStatuses.get(k)){
-				int i = b ? 1 : 0;
-				line += i + ";";
-			}
-			
-			for (SimpleMatrix m : ffOutputs.get(k)){
-				line += writeMatrixArray(m) + ";"; 
-			}
-			
-			
-			
-			line = line.substring(0, line.length() - 1); //Remove last semi-colon
-			try {
-				writer.writeLine(line);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	private String writeRepeatedString(String stringToRepeat, int numberOfTimes, String delimiter){
-		String s = "";
-		for (int i = 1; i <= numberOfTimes; i++){
-			s += stringToRepeat;
-			if (numberOfTimes > 1) s+= " " + i;
-			s+= delimiter;
-		}
-		return s;
-	}
-	
-	/**
-	 * All is pretty much taken from the Matrix.toString() metods in simpleMatrix
-	 * @param m
-	 * @return
-	 */
-	private String writeMatrixArray(SimpleMatrix m){
-		int numChar = 6;
-		int precision = 3;
-		String format = "%"+numChar+"."+precision+"f " + "  ";
-		
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		PrintStream ps = new PrintStream(stream);
-		
-		for (double d : m.getMatrix().data){
-			ps.printf(Locale.US, format, d);
-		}
-		
-		return stream.toString();
 	}
 	
 

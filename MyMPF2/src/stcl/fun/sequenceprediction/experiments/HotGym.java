@@ -83,8 +83,7 @@ public class HotGym {
 		int markovOrder = 2;
 		
 		if (writeOutputsToFile){
-			brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, folderPath);
-			brain.openFiles(false);
+			brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, folderPath, false);
 		} else {
 			brain = new Brain_DataCollector(1, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
 		}

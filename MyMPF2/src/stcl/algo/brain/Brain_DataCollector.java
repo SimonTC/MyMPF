@@ -56,12 +56,12 @@ public class Brain_DataCollector extends Brain {
 	
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
 			int spatialMapSize, int temporalMapSize, int markovOrder) {
-		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, "");
+		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, "", false);
 		collectData = false;
 	}
 
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
-			int spatialMapSize, int temporalMapSize, int markovOrder, String parentFolder) {
+			int spatialMapSize, int temporalMapSize, int markovOrder, String parentFolder, boolean append) {
 		super(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize,
 				markovOrder);
 		
@@ -70,7 +70,8 @@ public class Brain_DataCollector extends Brain {
 		if (!parentFolder.isEmpty()){
 			collectData = true;
 			try {
-				setupFiles(parentFolder, numUnits);
+				setupWriters(parentFolder, numUnits);
+				openFiles(append);
 				writeHeaders();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -79,7 +80,7 @@ public class Brain_DataCollector extends Brain {
 		}		
 	}
 	
-	private void setupFiles(String parentFolder, int numUnits){
+	private void setupWriters(String parentFolder, int numUnits){
 		brainWriter = new FileWriter(parentFolder + "/brain.csv");
 		unitWriters = new FileWriter[numUnits];
 		for (int i = 0; i < numUnits; i++){
@@ -142,11 +143,13 @@ public class Brain_DataCollector extends Brain {
 		if (collectData) returnedOutput = output;
 		
 		//Print data to files
-		try {
-			writeData();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (collectData){
+			try {
+				writeData();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return output;
 	}
@@ -187,7 +190,6 @@ public class Brain_DataCollector extends Brain {
 		//Print unit data
 		for (int i = 0; i < numUnits; i++){
 			FileWriter writer = unitWriters[i];
-			
 			writer.write(predictionEntropies[i] + ";");
 			writer.write(entropiesThresholds[i] + ";");
 			
@@ -199,6 +201,8 @@ public class Brain_DataCollector extends Brain {
 						
 			writer.write(writeMatrixArray(spatialActivations[i]) + ";");
 			writer.write(writeMatrixArray(temporalActivations[i]) + ";");
+			
+			writer.writeLine("");
 		}
 	}
 	

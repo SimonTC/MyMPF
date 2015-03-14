@@ -123,11 +123,9 @@ public class RockPaperScissors {
 	
 	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
+		int size = unitToFit.getTemporalMapSize();
 		
-		m.reshape(rows, cols);
+		m.reshape(size, size);
 		return m;
 	}
 	

@@ -17,10 +17,7 @@ public class Brain {
 	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
 		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
 		
-		RSOM rsom = unitlist.get(unitlist.size() - 1).getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
-		uniformDistribution = createUniformDistribution(rows, cols);
+		uniformDistribution = createUniformDistribution(temporalMapSize, temporalMapSize);
 	}
 	
 	
@@ -115,11 +112,8 @@ public class Brain {
 	
 	private SimpleMatrix resizeToFitFBPass(SimpleMatrix matrixToResize, NeoCorticalUnit unitToFit){
 		SimpleMatrix m = new SimpleMatrix(matrixToResize);
-		RSOM rsom = unitToFit.getTemporalPooler().getRSOM();
-		int rows = rsom.getHeight();
-		int cols = rsom.getWidth();
-		
-		m.reshape(rows, cols);
+		int size = unitToFit.getTemporalMapSize();
+		m.reshape(size, size);
 		return m;
 	}
 	

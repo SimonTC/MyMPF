@@ -300,4 +300,12 @@ public class NewSequencer {
 	public void setLearning(boolean learning) {
 		this.learning = learning;
 	}
+
+
+	/**
+	 * @return the sequenceProbabilities
+	 */
+	public SimpleMatrix getSequenceProbabilities() {
+		return sequenceProbabilities;
+	}
 }

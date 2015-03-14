@@ -20,7 +20,7 @@ public class Connection {
 	 * Signals sent through the connection are biased by the bias unit used
 	 */
 	public Connection(NeoCorticalUnit in, NeoCorticalUnit out, Random rand, double biasInfluence, double maxReward, double alpha) {
-		int inputMatrixSize = in.getTemporalPooler().getMapSize();
+		int inputMatrixSize = in.getTemporalMapSize();
 		this.bias = new BiasUnit(inputMatrixSize, biasInfluence, rand);
 		this.correlator = new RewardCorrelator(inputMatrixSize);
 		this.rewardFunction = new RewardFunction(maxReward, alpha);

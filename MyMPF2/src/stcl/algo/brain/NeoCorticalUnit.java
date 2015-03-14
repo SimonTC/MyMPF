@@ -16,7 +16,6 @@ import dk.stcl.core.basic.containers.SomNode;
 public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
-	private TemporalPooler temporalPooler;
 	private Predictor_VOMM predictor;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
@@ -57,7 +56,6 @@ public class NeoCorticalUnit{
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
-		temporalPooler = new TemporalPooler(rand, spatialMapSize * spatialMapSize, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay); //TODO: Move all parameters out
 		sequencer = new NewSequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
 		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
@@ -202,7 +200,6 @@ public class NeoCorticalUnit{
 	}
 	
 	public void flush(){
-		temporalPooler.flushTemporalMemory();
 		biasMatrix.set(1);
 		predictor.flush();
 		sequencer.reset();
@@ -210,17 +207,12 @@ public class NeoCorticalUnit{
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
-		temporalPooler.setLearning(learning);
 		predictor.setLearning(learning);
 		sequencer.setLearning(learning);
 	}
 
 	public SpatialPooler getSpatialPooler() {
 		return spatialPooler;
-	}
-
-	public TemporalPooler getTemporalPooler() {
-		return temporalPooler;
 	}
 
 	public SimpleMatrix getFFOutput() {
@@ -233,10 +225,9 @@ public class NeoCorticalUnit{
 	
 	public void sensitize(int iteration){
 		spatialPooler.sensitize(iteration);
-		temporalPooler.sensitize(iteration);
 	}
 	
-	public SomNode findTemporalBMU(){
+	public int findTemporalBMUID(){
 		int maxID = -1;
 		double maxValue = Double.NEGATIVE_INFINITY;
 		
@@ -248,8 +239,7 @@ public class NeoCorticalUnit{
 			}
 		}
 		
-		SomNode bmu = temporalPooler.getRSOM().getNode(maxID);
-		return bmu;
+		return maxID;
 	}
 	
 	public Predictor getPredictor(){
@@ -298,6 +288,13 @@ public class NeoCorticalUnit{
 
 	public void setUseBiasedInputInSequencer(boolean useBiasedInputInSequencer) {
 		this.useBiasedInputInSequencer = useBiasedInputInSequencer;
+	}
+
+	/**
+	 * @return the temporalMapSize
+	 */
+	public int getTemporalMapSize() {
+		return temporalMapSize;
 	}
 	
 

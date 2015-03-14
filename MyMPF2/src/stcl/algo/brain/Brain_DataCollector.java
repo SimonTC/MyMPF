@@ -255,7 +255,7 @@ public class Brain_DataCollector extends Brain {
 			if (spatial) {
 				bmus[i] = unitlist.get(i).getSOM().getBMU().getId();
 			} else {
-				bmus[i] = unitlist.get(i).getTemporalPooler().getRSOM().getBMU().getId();
+				bmus[i] = unitlist.get(i).findTemporalBMUID();
 			}
 		}
 		return bmus;
@@ -288,7 +288,7 @@ public class Brain_DataCollector extends Brain {
 			if (spatial){
 				m = new SimpleMatrix(unitlist.get(i).getSpatialPooler().getActivationMatrix());
 			} else {
-				m = new SimpleMatrix(unitlist.get(i).getTemporalPooler().getActivationMatrix());
+				m = new SimpleMatrix(unitlist.get(i).getSequencer().getSequenceProbabilities());
 			}
 			activations[i] = m;
 		}

@@ -20,7 +20,7 @@ public class RockPaperScissors_WithBrainSimplified {
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithBrainSimplified runner = new RockPaperScissors_WithBrainSimplified();
-		String folder = "D:/Users/Simon/Documents/Experiments/RPS";
+		String folder = "C:/Users/Simon/Documents/Experiments/RPS";
 		runner.run(folder);
 	}
 	
@@ -30,7 +30,13 @@ public class RockPaperScissors_WithBrainSimplified {
 	
 	public void run(String dataFolder){
 		setup(ITERATIONS, dataFolder);
-		runExperiment(ITERATIONS);
+		//Train
+		runExperiment(ITERATIONS, 0.05);
+		
+		//Evaluate
+		brain.flush();
+		brain.openFiles(true);
+		runExperiment(ITERATIONS, 0.0);
 	}
 	
 	private void setup(int maxIterations, String dataFolder){
@@ -44,7 +50,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		
 	}
 	
-	private void runExperiment(int maxIterations){
+	private void runExperiment(int maxIterations, double exploreChance){
 		int curInput = 0;
 		double externalReward = 0;
 		
@@ -91,12 +97,18 @@ public class RockPaperScissors_WithBrainSimplified {
 			
 			//Extract action to perform at t+2
 			actionAfterNext = output.extractMatrix(0, 1, 3, output.END);
-			
-			//Set max value of action to 1. The rest to zero
-			int max = maxID(actionAfterNext);
-			if (max != -1){
+			if (rand.nextDouble() < exploreChance){
+				//Do exploration by choosing random action
 				actionAfterNext.set(0);
-				actionAfterNext.set(max, 1);
+				actionAfterNext.set(rand.nextInt(actionAfterNext.getNumElements()), 1);
+				
+			} else {
+				//Set max value of action to 1. The rest to zero
+				int max = maxID(actionAfterNext);
+				if (max != -1){
+					actionAfterNext.set(0);
+					actionAfterNext.set(max, 1);
+				}
 			}
 		
 			System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);

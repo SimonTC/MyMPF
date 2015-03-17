@@ -121,7 +121,7 @@ public class Brain_DataCollector extends Brain {
 		if (collectData)  receivedInput = inputVector;
 		
 		//Feed forward
-		SimpleMatrix m = feedForward(inputVector);
+		SimpleMatrix m = feedForward(inputVector, externalReward);
 		
 		if (collectData){
 			//Collect Feedforward info

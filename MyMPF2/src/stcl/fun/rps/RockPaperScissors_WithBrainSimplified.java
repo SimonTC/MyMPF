@@ -30,11 +30,15 @@ public class RockPaperScissors_WithBrainSimplified {
 	
 	public void run(String dataFolder){
 		setup(ITERATIONS, dataFolder);
+		
+		//Show
+		
 		//Train
-		runExperiment(ITERATIONS, 0.0);
+		runExperiment(ITERATIONS, 0.5);
 		
 		//Evaluate
 		brain.flush();
+		brain.setLearning(false);
 		brain.openFiles(true);
 		runExperiment(ITERATIONS, 0.0);
 		

@@ -35,11 +35,11 @@ public class BiasUnit {
 		
 		double[] sData = s.getMatrix().data;
 		
-		double massValue = 1 / (s.numCols() * s.numRows());
+		double massValue = (double) 1 / (s.getNumElements());
 		for (int i = 0; i < sData.length; i++){
 			double delta = sData[i] * biasInfluence + massValue;
 			double min = Math.min(1, delta);
-			double max = Math.max(1, min);
+			double max = Math.max(0, min);
 			bias.set(i, max);
 		}
 		

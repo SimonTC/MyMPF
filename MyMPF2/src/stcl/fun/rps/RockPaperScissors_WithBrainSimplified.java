@@ -31,12 +31,16 @@ public class RockPaperScissors_WithBrainSimplified {
 	public void run(String dataFolder){
 		setup(ITERATIONS, dataFolder);
 		//Train
-		runExperiment(ITERATIONS, 0.05);
+		runExperiment(ITERATIONS, 0.0);
 		
 		//Evaluate
 		brain.flush();
 		brain.openFiles(true);
 		runExperiment(ITERATIONS, 0.0);
+		
+		brain.getConnectionList().get(0).getCorrelationMatrix().print();
+		
+		
 	}
 	
 	private void setup(int maxIterations, String dataFolder){
@@ -54,7 +58,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		int curInput = 0;
 		double externalReward = 0;
 		
-		double[][] tmp = {{0,0,0}};
+		double[][] tmp = {{1,0,0}};
 		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
 		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
 		SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)

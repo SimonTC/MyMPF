@@ -49,5 +49,9 @@ public class Connection {
 		
 		return biasedMatrix;
 	}
+	
+	public SimpleMatrix getCorrelationMatrix(){
+		return correlationMatrix;
+	}
 
 }

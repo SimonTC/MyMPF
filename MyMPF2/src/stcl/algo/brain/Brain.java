@@ -157,5 +157,9 @@ public class Brain {
 		for (NeoCorticalUnit nu : unitlist) nu.setUseBiasedInputInSequencer(flag);
 	}
 	
+	public ArrayList<Connection> getConnectionList(){
+		return connectionList;
+	}
+	
 
 }

@@ -74,7 +74,7 @@ public class NewSequencer {
 	/**
 	 * 
 	 * @param inputMatrix matrix containing the probabilities of each of the sequences being the ones that start at time t + 1
-	 * @return
+	 * @return probabilities of the next input given the probabilities of starting the different sequences
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Returns the probabilities of the next input given the probabilities of starting the different sequences

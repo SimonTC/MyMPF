@@ -45,7 +45,13 @@ public class NewSequencer {
 		elementsInMemory = 0;
 	}
 	
-	
+	/**
+	 * 
+	 * @param probabilityVector
+	 * @param spatialBMUID
+	 * @param startNewSequence
+	 * @return Probability matrix containing the probabilities of having just exited each of the known sequences
+	 */
 	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
 		//Add input if we are still within the maximum length of a sequence
 		if (currentSequence.size() < markovOrder) {

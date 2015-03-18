@@ -45,7 +45,7 @@ public class SpatialPooler {
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		this.inputLength = inputLength;
 		this.mapSize = mapSize;		
-		curNoiseMagnitude = 0; //TODO: Be aware of noise magnitude
+		curNoiseMagnitude = 0.0; //TODO: Be aware of noise magnitude
 	}
 
 	

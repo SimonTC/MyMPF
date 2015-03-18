@@ -1,20 +1,29 @@
 package stcl.algo.brain.reinforcementlearning.trie;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import stcl.algo.brain.reinforcementlearning.Transition;
 
-public class TrieNode<Transition>{
-	private Transition symbol;
+
+public class TrieNode{
+	private int stateID;
 	private int count; //Number of times a sequence ending with this node is observed in the data
-	private HashMap<Transition, TrieNode<Transition>> children;
+	private ArrayList<HashMap<Integer, TrieNode>> actionChilds; //Map of states you can end up in by doing actions from this state
 	private double probability; //Using when predicting symbols
 	private int sequenceID;
+	private int numActions;
 	
-	public TrieNode(Transition symbol) {
+	public TrieNode(int stateID, int numActions) {
 		this.count = 0;
-		this.symbol = symbol;
-		children = new HashMap<Transition, TrieNode<Transition>>();
+		this.stateID = stateID;
+		this.numActions = numActions;
+		actionChilds = new ArrayList<HashMap<Integer,TrieNode>>();
+		//Set all children of actions to null
+		for (int i = 0; i < numActions; i++){
+			actionChilds.add(null);
+		}
 		sequenceID = -2;
 	}
 	
@@ -22,17 +31,22 @@ public class TrieNode<Transition>{
 	 * Adds an occurrence of this sequence to the node.
 	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
 	 * If no child-node corresponds to the next symbol, a new child is created.
-	 * @param symbolSequence the sequence of symbols coming after this node
+	 * @param transitionSequence the sequence of symbols coming after this node
 	 */
-	public LinkedList<TrieNode<Transition>> addSequence(LinkedList<Transition> symbolSequence, LinkedList<TrieNode<Transition>> nodeSequence){
-		if (!symbolSequence.isEmpty()){
-			Transition childSymbol = symbolSequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
-			if (correctChild == null){
-				correctChild = addNewChild(childSymbol);
+	public LinkedList<TrieNode> addSequence(LinkedList<Transition> transitionSequence, LinkedList<TrieNode> nodeSequence){
+		if (!transitionSequence.isEmpty()){
+			Transition transition = transitionSequence.removeFirst();
+			int action = transition.getAction();
+			int nextState = transition.getNextState();
+			
+			HashMap<Integer,TrieNode> possibleChildren = actionChilds.get(action);
+			if (possibleChildren == null) possibleChildren = new HashMap<Integer, TrieNode>();
+			TrieNode nextStateNode = possibleChildren.get(nextState);
+			if (nextStateNode == null){
+				nextStateNode = addNewChild(action, nextState);
 			} 
-			nodeSequence.addFirst(correctChild);
-			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence);
+			nodeSequence.addFirst(nextStateNode);
+			nodeSequence = nextStateNode.addSequence(transitionSequence, nodeSequence);
 		} else {
 			count++;
 		}
@@ -47,8 +61,14 @@ public class TrieNode<Transition>{
 	public void updateCount(LinkedList<Transition> sequence){
 		count++;
 		if (!sequence.isEmpty()){
-			Transition childSymbol = sequence.poll();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Transition transition = sequence.removeFirst();
+			int action = transition.getAction();
+			int nextState = transition.getNextState();
+			
+			HashMap<Integer,TrieNode> possibleChildren = actionChilds.get(action);
+			if (possibleChildren == null) return;
+			
+			TrieNode correctChild = possibleChildren.get(nextState);
 			if (correctChild == null) return;
 			correctChild.updateCount(sequence);
 		}
@@ -64,10 +84,16 @@ public class TrieNode<Transition>{
 	public boolean removeSequence(LinkedList<Transition> sequence){
 		count--;
 		if(!sequence.isEmpty()){
-			Transition childSymbol = sequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Transition transition = sequence.removeFirst();
+			int action = transition.getAction();
+			int nextState = transition.getNextState();
+			
+			HashMap<Integer,TrieNode> possibleChildren = actionChilds.get(action);
+			TrieNode correctChild = possibleChildren.get(nextState);
+
 			boolean childIsEmpty = !correctChild.removeSequence(sequence);				
-			if (childIsEmpty) children.remove(childSymbol);
+			if (childIsEmpty) possibleChildren.remove(nextState);
+			if (possibleChildren.isEmpty()) actionChilds.set(action, null);
 		}
 		
 		return count > 0;			
@@ -82,8 +108,14 @@ public class TrieNode<Transition>{
 	 */
 	public int findSequenceCount(LinkedList<Transition> sequence){
 		if(!sequence.isEmpty()){
-			Transition childSymbol = sequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Transition transition = sequence.removeFirst();
+			int action = transition.getAction();
+			int nextState = transition.getNextState();
+			
+			HashMap<Integer,TrieNode> possibleChildren = actionChilds.get(action);
+			if (possibleChildren == null) return 0;
+			TrieNode correctChild = possibleChildren.get(nextState);
+
 			if (correctChild == null) return 0;
 			return correctChild.findSequenceCount(sequence);
 		} else {
@@ -97,8 +129,11 @@ public class TrieNode<Transition>{
 	 */
 	public void incrementSequenceCount(LinkedList<Transition> sequence){
 		if(!sequence.isEmpty()){
-			Transition childSymbol = sequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Transition transition = sequence.removeFirst();
+			int action = transition.getAction();
+			int nextState = transition.getNextState();			
+			HashMap<Integer,TrieNode> possibleChildren = actionChilds.get(action);
+			TrieNode correctChild = possibleChildren.get(nextState);
 			correctChild.incrementSequenceCount(sequence);
 		} else {
 			count++;
@@ -113,9 +148,9 @@ public class TrieNode<Transition>{
 	 * @param symbolOfChild
 	 * @return
 	 */
-	private TrieNode<Transition> addNewChild(Transition symbolOfChild){
-		TrieNode<Transition> child = new TrieNode<Transition>(symbolOfChild);
-		children.put(symbolOfChild, child);
+	private TrieNode addNewChild(int actionToGetToChildState, int childStateID){
+		TrieNode child = new TrieNode(childStateID, numActions);
+		actionChilds.get(actionToGetToChildState).put(childStateID, child);
 		return child;
 	}
 
@@ -132,9 +167,12 @@ public class TrieNode<Transition>{
 	 * The escape chance is calculated as (number of sequences visiting child nodes) / (Number of sequences visiting this node)
 	 * @return
 	 */
-	public double calculateEscapeChance(){
+	public double calculateEscapeChance(int action){
 		int childrenCount = 0;
-		for (TrieNode<?> n : children.values()){
+		//TODO: I think calculating escape like this is probably wrong.
+		HashMap<Integer, TrieNode> childrenFromThisAction = actionChilds.get(action);
+		
+		for (TrieNode n : childrenFromThisAction.values()){
 			childrenCount += n.getCount();
 		}		
 		double escapeChance = childrenCount / (double)count;
@@ -147,20 +185,20 @@ public class TrieNode<Transition>{
 	 * @param sequence
 	 * @return null if the sequence is unknown. Otherwise it returns the hashmap of children including the probabilities that they will be the next ones to be active.
 	 */
-	public HashMap<Transition, TrieNode<Transition>> findChildrenOfLastNode(LinkedList<Transition> sequence){
+	public HashMap<Integer, TrieNode> findChildrenOfLastNode(LinkedList<Integer> sequence){
 		if(!sequence.isEmpty()){
 			//Send question further down
-			Transition childSymbol = sequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Integer childSymbol = sequence.removeFirst();
+			TrieNode<Integer> correctChild = actionChilds.get(childSymbol);
 			if (correctChild == null) return null;
 			return correctChild.findChildrenOfLastNode(sequence);
 		} else {
 			//Calculate probabilities
-			for (TrieNode<Transition> n : children.values()){
+			for (TrieNode<Integer> n : actionChilds.values()){
 				double probability = n.getCount() / (double) count;
 				n.setProbability(probability);				
 			}
-			return children;				
+			return actionChilds;				
 		}
 	}
 	
@@ -170,17 +208,17 @@ public class TrieNode<Transition>{
 	 * @param nodeSequence
 	 * @return
 	 */
-	public LinkedList<TrieNode<Transition>> findNodeSequence(LinkedList<Transition> symbolSequence, LinkedList<TrieNode<Transition>> nodeSequence){
+	public LinkedList<TrieNode<Integer>> findNodeSequence(LinkedList<Integer> symbolSequence, LinkedList<TrieNode<Integer>> nodeSequence){
 		if(!symbolSequence.isEmpty()){
 			//Send question further down
-			Transition childSymbol = symbolSequence.removeFirst();
-			TrieNode<Transition> correctChild = children.get(childSymbol);
+			Integer childSymbol = symbolSequence.removeFirst();
+			TrieNode<Integer> correctChild = actionChilds.get(childSymbol);
 			if (correctChild == null) return null;
 			nodeSequence.addFirst(correctChild);;
 			return correctChild.findNodeSequence(symbolSequence, nodeSequence);
 		} else {
 			//Calculate probabilities
-			for (TrieNode<Transition> n : children.values()){
+			for (TrieNode<Integer> n : actionChilds.values()){
 				double probability = n.getCount() / (double) count;
 				n.setProbability(probability);				
 			}
@@ -188,7 +226,7 @@ public class TrieNode<Transition>{
 		}
 	}
 	
-	public Transition getSymbol(){
+	public Integer getSymbol(){
 		return symbol;
 	}
 	
@@ -210,11 +248,11 @@ public class TrieNode<Transition>{
 		}			
 		
 		String sequenceToReturn = "";
-		if (children.isEmpty()){
+		if (actionChilds.isEmpty()){
 			return sequenceSoFar + " " + count + "   ";
 		}
 		
-		for (TrieNode<Transition> n : children.values()){
+		for (TrieNode<Integer> n : actionChilds.values()){
 			String returnedSequence = n.writeSequence(sequenceSoFar, maxSequenceLength);
 			sequenceToReturn+=returnedSequence;
 		}

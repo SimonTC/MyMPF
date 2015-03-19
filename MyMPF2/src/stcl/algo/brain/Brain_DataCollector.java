@@ -54,16 +54,23 @@ public class Brain_DataCollector extends Brain {
 	private FileWriter brainWriter;
 	private FileWriter[] unitWriters;
 	
+	
+	
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
 			int spatialMapSize, int temporalMapSize, int markovOrder) {
 		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, "", false);
 		collectData = false;
 	}
-
+	
 	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
 			int spatialMapSize, int temporalMapSize, int markovOrder, String parentFolder, boolean append) {
+		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, parentFolder, append, false);
+	}
+
+	public Brain_DataCollector(int numUnits, Random rand, int ffInputLength,
+			int spatialMapSize, int temporalMapSize, int markovOrder, String parentFolder, boolean append, boolean firstIsSpatial) {
 		super(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize,
-				markovOrder);
+				markovOrder, firstIsSpatial);
 		
 		this.numUnits = numUnits;
 		collectData = false;

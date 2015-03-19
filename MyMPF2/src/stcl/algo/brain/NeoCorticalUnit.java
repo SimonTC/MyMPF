@@ -8,6 +8,7 @@ import stcl.algo.poolers.NewSequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
+import stcl.algo.predictors.Decider;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
@@ -16,7 +17,8 @@ import dk.stcl.core.basic.containers.SomNode;
 public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
-	private Predictor_VOMM predictor;
+	//private Predictor_VOMM predictor;
+	private Decider decider;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	
@@ -68,7 +70,8 @@ public class NeoCorticalUnit{
 		} else {
 			this.temporalMapSize = spatialMapSize;
 		}
-		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
+		decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 0.3, 1, 0.3, spatialMapSize);
+		//predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(this.temporalMapSize, this.temporalMapSize);
@@ -86,6 +89,10 @@ public class NeoCorticalUnit{
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
+		return this.feedForward(inputVector, 0);
+	}
+	
+	public SimpleMatrix feedForward(SimpleMatrix inputVector, double reward){
 		//Test input
 		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
@@ -100,10 +107,11 @@ public class NeoCorticalUnit{
 		
 		//Predict next spatialFFOutputMatrix
 		if (useMarkovPrediction){
+			decider.giveExternalReward(reward);
 			if (biasBeforePredicting) {
-				predictionMatrix = predictor.predict(biasedOutput);
+				predictionMatrix = decider.predict(biasedOutput);
 			} else {
-				predictionMatrix = predictor.predict(spatialFFOutputMatrix);
+				predictionMatrix = decider.predict(spatialFFOutputMatrix);
 			}
 		} 		
 		
@@ -221,13 +229,13 @@ public class NeoCorticalUnit{
 	
 	public void flush(){
 		biasMatrix.set(1);
-		predictor.flush();
+		decider.flush();
 		if (sequencer != null) sequencer.reset();
 	}
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
-		predictor.setLearning(learning);
+		decider.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}
 
@@ -262,16 +270,17 @@ public class NeoCorticalUnit{
 		return maxID;
 	}
 	
+	/*
 	public Predictor getPredictor(){
 		return predictor;
 	}
-
+*/
 	public SOM getSOM() {
 		return spatialPooler.getSOM();
 	}
 
 	public void printPredictionModel() {
-		predictor.printModel();
+		decider.printModel();
 		
 	}
 

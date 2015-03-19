@@ -22,6 +22,7 @@ public class Predictor_VOMM implements Predictor{
 	private int predictedNextSymbol;
 	private SimpleMatrix probabilityMatrix;
 	private Random rand;
+	protected boolean learning;
 
 	public Predictor_VOMM(int markovOrder, double learningRate, Random rand) {
 		vomm = new VOMM<Integer>(markovOrder, learningRate);
@@ -147,6 +148,7 @@ public class Predictor_VOMM implements Predictor{
 
 	@Override
 	public void setLearning(boolean learning) {
+		this.learning = learning;
 		vomm.setLearning(learning);
 		
 	}

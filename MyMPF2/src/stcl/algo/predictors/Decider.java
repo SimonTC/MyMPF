@@ -33,8 +33,10 @@ public class Decider extends Predictor_VOMM {
 		SimpleMatrix prediction = super.predict(inputMatrix);
 		
 		//Do reward correlation
-		double internalReward = rewardFunction.calculateReward(externalReward);
-		correlationMatrix = correlator.correlateReward(inputMatrix, internalReward, 0.1);
+		if (learning){
+			double internalReward = rewardFunction.calculateReward(externalReward);
+			correlationMatrix = correlator.correlateReward(inputMatrix, internalReward, 0.1);
+		}
 		
 		//Bias prediction toward a better choice
 		SimpleMatrix decision = bias.biasFBSpatialOutput(prediction, correlationMatrix, 0);

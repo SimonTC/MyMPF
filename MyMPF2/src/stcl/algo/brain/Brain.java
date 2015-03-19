@@ -15,14 +15,19 @@ public class Brain {
 	private SimpleMatrix uniformDistribution;
 	
 	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
-		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder);
+		this(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, false);
+	}
+	
+	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, boolean firstIsSpatial) {
+		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, firstIsSpatial);
 		
 		uniformDistribution = createUniformDistribution(temporalMapSize, temporalMapSize);
 	}
 	
 	
 	
-	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder){
+	
+	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, boolean firstIsSpatial){
 		unitlist = new ArrayList<NeoCorticalUnit>();
 		connectionList = new ArrayList<Connection>();
 		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder); //First one is special

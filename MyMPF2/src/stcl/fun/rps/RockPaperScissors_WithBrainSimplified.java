@@ -65,7 +65,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
 		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
-		SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
+		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = new SimpleMatrix(tmp);
 		int predictedLabel = 0;
@@ -73,8 +73,8 @@ public class RockPaperScissors_WithBrainSimplified {
 		for (int i = 0; i < maxIterations; i++){
 			//Update action chain
 			actionNow = actionNext;
-			actionNext = actionAfterNext;
-			actionAfterNext = null;
+			actionNext = null;// actionAfterNext;
+			//actionAfterNext = null;
 			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
@@ -95,7 +95,7 @@ public class RockPaperScissors_WithBrainSimplified {
 			}
 			
 			//Combine input with the action that will be performed at time t+1
-			SimpleMatrix combinedInput = input.combine(0, input.END, actionNext);
+			SimpleMatrix combinedInput = input.combine(0, input.END, actionNow);
 			
 			//Give combined input to brain and collect output
 			SimpleMatrix output = brain.step(combinedInput, externalReward);
@@ -104,18 +104,18 @@ public class RockPaperScissors_WithBrainSimplified {
 			prediction = output.extractMatrix(0, 1, 0, 3);
 			
 			//Extract action to perform at t+2
-			actionAfterNext = output.extractMatrix(0, 1, 3, output.END);
+			actionNext = output.extractMatrix(0, 1, 3, output.END);
 			if (rand.nextDouble() < exploreChance){
 				//Do exploration by choosing random action
-				actionAfterNext.set(0);
-				actionAfterNext.set(rand.nextInt(actionAfterNext.getNumElements()), 1);
+				actionNext.set(0);
+				actionNext.set(rand.nextInt(actionNext.getNumElements()), 1);
 				
 			} else {
 				//Set max value of action to 1. The rest to zero
-				int max = maxID(actionAfterNext);
+				int max = maxID(actionNext);
 				if (max != -1){
-					actionAfterNext.set(0);
-					actionAfterNext.set(max, 1);
+					actionNext.set(0);
+					actionNext.set(max, 1);
 				}
 			}
 		

@@ -27,8 +27,8 @@ public class HotGym {
 	
 	SimpleMatrix uniformDistribution;
 	
-	boolean sin = false;
-	boolean writeOutputsToFile = true;
+	boolean sin = true;
+	boolean writeOutputsToFile = false;
 	
 	public static void main(String[] args){
 		HotGym runner = new HotGym();
@@ -38,7 +38,7 @@ public class HotGym {
 	
 	public void start(){
 		//Load data
-		String folderPath = "D:/Users/Simon/Documents/Experiments/Hotgym";
+		String folderPath = "c:/Users/Simon/Documents/Experiments/Hotgym";
 		String dataFilePath = folderPath + "/data_normalized_3000.csv";
 		String resultFolder = folderPath + "/results";
 		//String dataFilePath = "c:/Users/Simon/Documents/Experiments/OMXC20/OMXC20_Normalized.csv";

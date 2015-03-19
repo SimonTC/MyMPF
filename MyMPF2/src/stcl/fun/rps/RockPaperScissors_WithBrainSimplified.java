@@ -211,8 +211,8 @@ public class RockPaperScissors_WithBrainSimplified {
 		
 		scissors = new SimpleMatrix(scissorsData);
 		
-		SimpleMatrix[] tmp = {rock, paper, scissors};
-		int[] lbl = {0,1,2};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
+		int[] lbl = {0,1,1,2};
 		labelSequence = lbl;
 		sequence = tmp;			
 	}

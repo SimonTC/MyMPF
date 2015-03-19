@@ -11,7 +11,6 @@ import stcl.algo.util.Normalizer;
 public class Brain {
 	
 	protected ArrayList<NeoCorticalUnit> unitlist;
-	protected ArrayList<Connection> connectionList;
 	private SimpleMatrix uniformDistribution;
 	
 	public Brain(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder) {
@@ -22,20 +21,14 @@ public class Brain {
 		createUnitList(numUnits, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, firstIsSpatial);
 		
 		uniformDistribution = createUniformDistribution(temporalMapSize, temporalMapSize);
-	}
-	
-	
-	
+	}	
 	
 	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, boolean firstIsSpatial){
 		unitlist = new ArrayList<NeoCorticalUnit>();
-		connectionList = new ArrayList<Connection>();
 		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder, firstIsSpatial); //First one is special
 		unitlist.add(nu);
 		for (int i = 0; i < numUnits - 1; i++){
 			NeoCorticalUnit in = nu;
-			Connection conn = new Connection(in, nu, rand, 0.3, 1, 0.3); //TODO: Base on parameters
-			connectionList.add(conn);
 			nu = new NeoCorticalUnit(rand, in.getTemporalMapSize() * in.getTemporalMapSize(), spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
 			unitlist.add(nu);
 		}	
@@ -84,11 +77,6 @@ public class Brain {
 			if (cont) {
 				//Save ffinput
 				ffInput = inputToNextLayer;
-
-				//Update the connector
-				if (i < connectionList.size()){
-					connectionList.get(i).feedForward(ffInput, externalReward, 0.1);
-				}
 			} else {
 				ffInput = null;
 			}
@@ -106,9 +94,6 @@ public class Brain {
 			NeoCorticalUnit nu = unitlist.get(j);
 			SimpleMatrix m = resizeToFitFBPass(fbInput, nu);
 			SimpleMatrix inputToUnit = m;
-			if ( j < connectionList.size()){
-				inputToUnit = connectionList.get(j).feedBack(m, 0);
-			}
 			fbInput = nu.feedBackward(inputToUnit);
 		}
 		
@@ -161,10 +146,7 @@ public class Brain {
 	public void setUseBiasedInputToSequencer(boolean flag) {
 		for (NeoCorticalUnit nu : unitlist) nu.setUseBiasedInputInSequencer(flag);
 	}
-	
-	public ArrayList<Connection> getConnectionList(){
-		return connectionList;
-	}
+
 	
 
 }

@@ -36,7 +36,7 @@ public class Brain {
 			NeoCorticalUnit in = nu;
 			Connection conn = new Connection(in, nu, rand, 0.3, 1, 0.3); //TODO: Base on parameters
 			connectionList.add(conn);
-			nu = new NeoCorticalUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
+			nu = new NeoCorticalUnit(rand, in.getTemporalMapSize() * in.getTemporalMapSize(), spatialMapSize, temporalMapSize, 0.1, true, markovOrder);
 			unitlist.add(nu);
 		}	
 	}

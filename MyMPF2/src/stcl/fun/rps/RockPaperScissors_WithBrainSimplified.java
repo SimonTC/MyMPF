@@ -54,7 +54,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		int spatialMapSize = 3;
 		int temporalMapSize = 2;
 		int markovOrder = 2;
-		brain = new Brain_DataCollector(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false);
+		brain = new Brain_DataCollector(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false, true);
 		
 	}
 	

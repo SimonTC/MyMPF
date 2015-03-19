@@ -16,7 +16,7 @@ public class RockPaperScissors_WithBrainSimplified {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	
-	private final int ITERATIONS = 5000;
+	private final int ITERATIONS = 1000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithBrainSimplified runner = new RockPaperScissors_WithBrainSimplified();
@@ -34,7 +34,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		//Show
 		
 		//Train
-		runExperiment(ITERATIONS, 0.1);
+		runExperiment(ITERATIONS, 0.5);
 		
 		//Evaluate
 		brain.flush();
@@ -51,8 +51,8 @@ public class RockPaperScissors_WithBrainSimplified {
 		createInputs();
 		createRewardMatrix();
 		int ffInputLength = rock.numCols() * rock.numRows() * 2; //Multiplying by two to make room for both input and action
-		int spatialMapSize = 4;
-		int temporalMapSize = 3;
+		int spatialMapSize = 3;
+		int temporalMapSize = 2;
 		int markovOrder = 2;
 		brain = new Brain_DataCollector(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false);
 		

@@ -97,7 +97,7 @@ public class NeoCorticalUnit{
 		
 		predictionEntropy = calculateEntropy(predictionMatrix);
 		
-		if (predictionEntropy >= entropyThreshold) needHelp = true;
+		if (predictionEntropy > entropyThreshold) needHelp = true;
 		if (!entropyThresholdFrozen){
 			entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		}

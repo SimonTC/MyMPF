@@ -222,13 +222,13 @@ public class NeoCorticalUnit{
 	public void flush(){
 		biasMatrix.set(1);
 		predictor.flush();
-		sequencer.reset();
+		if (sequencer != null) sequencer.reset();
 	}
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
 		predictor.setLearning(learning);
-		sequencer.setLearning(learning);
+		if (sequencer != null) sequencer.setLearning(learning);
 	}
 
 	public SpatialPooler getSpatialPooler() {

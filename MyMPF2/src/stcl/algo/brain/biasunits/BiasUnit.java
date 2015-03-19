@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.util.Normalizer;
+
 /**
  * This Bias unit is placed betwen neocortical units to bias the values in the feedback pass towards values that might give better rewards
  * @author Simon
@@ -50,7 +52,7 @@ public class BiasUnit {
 		output = addNoise(output, noiseMagnitude);
 		
 		//Normalize
-		output = normalize(output);
+		output = Normalizer.normalize(output);
 		
 		return output;
 	}

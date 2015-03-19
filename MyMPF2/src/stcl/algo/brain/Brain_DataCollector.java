@@ -138,14 +138,14 @@ public class Brain_DataCollector extends Brain {
 			entropiesThresholds = (collectEntropyThresholds());
 			spatialBMUs = (collectBMUs(true));
 			temporalBMUs = (collectBMUs(false));
-			//FFOutputs = (collectOutputs(true));
-			temporalActivations = (collectActivations(false));
+			FFOutputs = (collectUnitOutputs(true));
+			//temporalActivations = (collectActivations(false));
 			spatialActivations = (collectActivations(true));
 		}
 		
 		//Feed back
 		SimpleMatrix output = feedBackward(m);
-		if (collectData) FBOutputs = (collectOutputs(false));
+		if (collectData) FBOutputs = (collectUnitOutputs(false));
 		
 		//Collect feed back info
 		if (collectData) returnedOutput = output;
@@ -182,7 +182,7 @@ public class Brain_DataCollector extends Brain {
 		header += writeRepeatedString("Was active", 1, ";");
 		
 		header += writeRepeatedString("Spatial activation", 1, ";");
-		header += writeRepeatedString("Temporal activation", 1, ";");
+		header += writeRepeatedString("FF Output", 1, ";");
 		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		
@@ -208,7 +208,7 @@ public class Brain_DataCollector extends Brain {
 			writer.write(activeStatuses[i] + ";");
 						
 			writer.write(writeMatrixArray(spatialActivations[i]) + ";");
-			writer.write(writeMatrixArray(temporalActivations[i]) + ";");
+			writer.write(writeMatrixArray(FFOutputs[i]) + ";");
 			
 			writer.writeLine("");
 		}
@@ -307,7 +307,7 @@ public class Brain_DataCollector extends Brain {
 		return activations;
 	}
 	
-	private SimpleMatrix[] collectOutputs(boolean feedForward){
+	private SimpleMatrix[] collectUnitOutputs(boolean feedForward){
 		SimpleMatrix[] outputs = new SimpleMatrix[numUnits];
 		for (int i = 0; i < numUnits; i++){
 			SimpleMatrix m;

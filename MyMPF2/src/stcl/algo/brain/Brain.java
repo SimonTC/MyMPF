@@ -30,7 +30,7 @@ public class Brain {
 	private void createUnitList(int numUnits, Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, boolean firstIsSpatial){
 		unitlist = new ArrayList<NeoCorticalUnit>();
 		connectionList = new ArrayList<Connection>();
-		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder); //First one is special
+		NeoCorticalUnit nu = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, 0.1, true, markovOrder, firstIsSpatial); //First one is special
 		unitlist.add(nu);
 		for (int i = 0; i < numUnits - 1; i++){
 			NeoCorticalUnit in = nu;

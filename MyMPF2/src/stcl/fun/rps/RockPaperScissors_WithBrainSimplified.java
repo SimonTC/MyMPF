@@ -34,7 +34,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		//Show
 		
 		//Train
-		runExperiment(ITERATIONS, 0.5);
+		runExperiment(ITERATIONS, 1);
 		
 		//Evaluate
 		brain.flush();
@@ -42,7 +42,10 @@ public class RockPaperScissors_WithBrainSimplified {
 		brain.openFiles(true);
 		runExperiment(ITERATIONS, 0.0);
 		
+		System.out.println();
 		brain.getConnectionList().get(0).getCorrelationMatrix().print();
+		System.out.println();
+		brain.getConnectionList().get(1).getCorrelationMatrix().print();
 		
 		
 	}
@@ -54,7 +57,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		int spatialMapSize = 3;
 		int temporalMapSize = 2;
 		int markovOrder = 2;
-		brain = new Brain_DataCollector(2, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false, true);
+		brain = new Brain_DataCollector(3, rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, dataFolder, false, true);
 		
 	}
 	
@@ -128,7 +131,8 @@ public class RockPaperScissors_WithBrainSimplified {
 			
 		}
 		brain.closeFiles();
-		//printInformation();
+		System.out.println();
+		printInformation();
 	}
 	
 	private int maxID(SimpleMatrix m){
@@ -151,16 +155,16 @@ public class RockPaperScissors_WithBrainSimplified {
 	}
 	
 	private void printInformation(){
-		System.out.println("Sequences observed by unit 1:");
-		brain.getUnitList().get(0).getSequencer().printTrie();
+		//System.out.println("Sequences observed by unit 1:");
+		//brain.getUnitList().get(0).getSequencer().printTrie();
 		
 		
 		System.out.println();
 		System.out.println("Spatial groups in unit 1");
 		brain.getUnitList().get(0).getSpatialPooler().printModelWeigths();
 		System.out.println();
-		System.out.println("Temporal groups in unit 1");
-		brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+		//System.out.println("Temporal groups in unit 1");
+		//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
 		System.out.println();
 		System.out.println("Prediction model, unit 1");
 		brain.getUnitList().get(0).printPredictionModel();

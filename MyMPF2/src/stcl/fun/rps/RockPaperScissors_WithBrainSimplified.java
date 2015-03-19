@@ -42,11 +42,6 @@ public class RockPaperScissors_WithBrainSimplified {
 		brain.openFiles(true);
 		runExperiment(ITERATIONS, 0.0);
 		
-		System.out.println();
-		brain.getConnectionList().get(0).getCorrelationMatrix().print();
-		System.out.println();
-		brain.getConnectionList().get(1).getCorrelationMatrix().print();
-		
 		
 	}
 	

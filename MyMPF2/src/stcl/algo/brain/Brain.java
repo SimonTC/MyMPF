@@ -71,7 +71,7 @@ public class Brain {
 		do {
 			NeoCorticalUnit nu = unitlist.get(i);
 			SimpleMatrix m = resizeToFitFFPass(ffInput, nu);
-			SimpleMatrix inputToNextLayer = nu.feedForward(m);
+			SimpleMatrix inputToNextLayer = nu.feedForward(m, externalReward);
 			//System.out.println( i + " Entropy " + nu.getEntropy() + " Threshold: " + nu.getEntropyThreshold());
 			cont = nu.needHelp();
 			if (cont) {

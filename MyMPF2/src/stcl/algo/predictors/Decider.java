@@ -23,6 +23,7 @@ public class Decider extends Predictor_VOMM {
 		this.correlator = new RewardCorrelator(inputMatrixSize);
 		this.rewardFunction = new RewardFunction(maxReward, alpha);
 		externalReward = 0;
+		learning = true;
 	}
 	
 	@Override

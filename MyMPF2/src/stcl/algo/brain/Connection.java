@@ -35,7 +35,7 @@ public class Connection {
 	public SimpleMatrix feedForward(SimpleMatrix ffOutputFromUnit1, double externalReward, double curLearningRate){
 		//Do reward correlation
 		double internalReward = rewardFunction.calculateReward(externalReward);
-		correlationMatrix = correlator.correlateReward(ffOutputBefore, internalReward, curLearningRate);
+		correlationMatrix = correlator.correlateReward(ffOutputFromUnit1, internalReward, curLearningRate);
 		
 		ffOutputBefore = ffOutputFromUnit1;
 		

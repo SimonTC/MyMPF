@@ -15,7 +15,6 @@ public class RockPaperScissors_WithBrain {
 	private SimpleMatrix[] sequence;
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
-	private int inputLength, actionLength;
 	
 	private final int ITERATIONS = 20000;
 	
@@ -49,9 +48,7 @@ public class RockPaperScissors_WithBrain {
 	private void setup(int maxIterations, String dataFolder){
 		createInputs();
 		createRewardMatrix();
-		inputLength = rock.getNumElements();
-		actionLength = rock.getNumElements();
-		int ffInputLength = inputLength + actionLength;
+		int ffInputLength = rock.numCols() * rock.numRows() + 3; //Adding three to make room for actions
 		int spatialMapSize = 3;
 		int temporalMapSize = 3;
 		int markovOrder = 2;
@@ -62,8 +59,10 @@ public class RockPaperScissors_WithBrain {
 	private void runExperiment(int maxIterations, double exploreChance, boolean printError){
 		int curInput = 0;
 		double externalReward = 0;
-		SimpleMatrix actionNow = new SimpleMatrix(rock); //m(t)
-		SimpleMatrix actionNext = new SimpleMatrix(rock); //m(t+1)
+		
+		double[][] tmp = {{1,0,0}};
+		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
+		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
@@ -85,23 +84,9 @@ public class RockPaperScissors_WithBrain {
 			//Calculate reward			
 			if ( i > 3){ //To get out of wrong actions
 				int actionID = -1;
-				double minDiff = Double.POSITIVE_INFINITY;
-				double diff_rock = actionNow.minus(rock).normF();
-				double diff_paper = actionNow.minus(paper).normF();
-				double diff_scissors = actionNow.minus(scissors).normF();
-				
-				if (diff_rock < minDiff){
-					actionID = 0;
-					minDiff = diff_rock;					
-				}
-				if (diff_paper < minDiff){
-					actionID = 1;
-					minDiff = diff_paper;					
-				}
-				if (diff_scissors < minDiff){
-					actionID = 2;
-					minDiff = diff_scissors;					
-				}
+				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+				if (actionNow.get(1) > 0.1 ) actionID = 1;
+				if (actionNow.get(2) > 0.1 ) actionID = 2;
 				
 				externalReward = reward(labelSequence[curInput], actionID);
 			}
@@ -114,43 +99,21 @@ public class RockPaperScissors_WithBrain {
 			SimpleMatrix output = brain.step(combinedInput, externalReward);
 			
 			//Extract prediction and reshape to matrix
-			prediction = output.extractMatrix(0, 1, 0, output.numCols() - actionLength);
+			prediction = output.extractMatrix(0, 1, 0, output.numCols() - 3);
 			prediction.reshape(5, 5);
-			
 			//Extract action to perform at t+1
-			actionNext = output.extractMatrix(0, 1, output.numCols() - actionLength, output.numCols());
-			actionNext.reshape(5, 5);
+			actionNext = output.extractMatrix(0, 1, output.numCols() - 3, output.numCols());
 			if (rand.nextDouble() < exploreChance){
 				//Do exploration by choosing random action
-				int nextAction = rand.nextInt(3);
-				switch(nextAction){
-				case 0: actionNext = new SimpleMatrix(rock); break;
-				case 1: actionNext = new SimpleMatrix(paper); break;
-				case 2: actionNext = new SimpleMatrix(scissors); break;
-				}				
-			} else {
-				int actionID = -1;
-				double minDiff = Double.POSITIVE_INFINITY;
-				double diff_rock = actionNow.minus(rock).normF();
-				double diff_paper = actionNow.minus(paper).normF();
-				double diff_scissors = actionNow.minus(scissors).normF();
+				actionNext.set(0);
+				actionNext.set(rand.nextInt(actionNext.getNumElements()), 1);
 				
-				if (diff_rock < minDiff){
-					actionID = 0;
-					minDiff = diff_rock;					
-				}
-				if (diff_paper < minDiff){
-					actionID = 1;
-					minDiff = diff_paper;					
-				}
-				if (diff_scissors < minDiff){
-					actionID = 2;
-					minDiff = diff_scissors;					
-				}
-				switch(actionID){
-				case 0: actionNext = new SimpleMatrix(rock); break;
-				case 1: actionNext = new SimpleMatrix(paper); break;
-				case 2: actionNext = new SimpleMatrix(scissors); break;
+			} else {
+				//Set max value of action to 1. The rest to zero
+				int max = maxID(actionNext);
+				if (max != -1){
+					actionNext.set(0);
+					actionNext.set(max, 1);
 				}
 			}
 		

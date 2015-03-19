@@ -34,7 +34,7 @@ public class RockPaperScissors_WithBrainSimplified {
 		//Show
 		
 		//Train
-		runExperiment(ITERATIONS, 1);
+		runExperiment(ITERATIONS, 0.5);
 		
 		//Evaluate
 		brain.flush();

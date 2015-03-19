@@ -40,6 +40,7 @@ public class Decider extends Predictor_VOMM {
 		
 		//Bias prediction toward a better choice
 		SimpleMatrix decision = bias.biasFBSpatialOutput(prediction, correlationMatrix, 0);
+		probabilityMatrix = decision;
 		return decision;		
 	}
 	

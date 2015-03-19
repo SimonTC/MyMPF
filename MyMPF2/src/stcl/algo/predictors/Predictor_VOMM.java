@@ -20,7 +20,7 @@ public class Predictor_VOMM implements Predictor{
 	private int markovOrder;
 	private LinkedList<Double> inputProbabilities;
 	private int predictedNextSymbol;
-	private SimpleMatrix probabilityMatrix;
+	protected SimpleMatrix probabilityMatrix;
 	private Random rand;
 	protected boolean learning;
 

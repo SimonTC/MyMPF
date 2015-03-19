@@ -218,7 +218,7 @@ public class VOMM<T> {
 	}
 	
 	/**
-	 * Return the map of probabilities for the seen symbols
+	 * Return a map containing all known symbols together with the probabilities of seeing the symbols at next timestep
 	 * @return
 	 */
 	public HashMap<T, Double> getCurrentProbabilityDistribution(){

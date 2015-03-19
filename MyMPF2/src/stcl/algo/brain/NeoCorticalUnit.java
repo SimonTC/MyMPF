@@ -70,7 +70,7 @@ public class NeoCorticalUnit{
 		} else {
 			this.temporalMapSize = spatialMapSize;
 		}
-		decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 0.3, 1, 0.3, spatialMapSize);
+		decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 1, 1, 0.3, spatialMapSize);
 		//predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);

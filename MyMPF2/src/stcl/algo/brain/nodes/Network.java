@@ -23,7 +23,7 @@ public class Network {
 	}
 	
 	public void addUnitNode(UnitNode node, int layer){
-		while (layer < unitLayers.size()) unitLayers.add(new ArrayList<UnitNode>());
+		while (unitLayers.size() <= layer) unitLayers.add(new ArrayList<UnitNode>());
 		unitLayers.get(layer).add(node);
 		unitNodes.add(node);
 	}
@@ -41,7 +41,7 @@ public class Network {
 		}
 		
 		//Feed back
-		for (int layerID = unitLayers.size(); layerID >= 0; layerID--){
+		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);
 			for (UnitNode n : layer){
 				n.feedback();

@@ -81,6 +81,9 @@ public class NeoCorticalUnit{
 		ffInputVectorSize = ffInputLength;
 		this.usePrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
+		predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+		predictionMatrix.set(1);
+		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
 		needHelp = false;
 		entropyThreshold = 0;

@@ -6,6 +6,7 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.util.Normalizer;
 
 public class UnitNode extends Node {
 	
@@ -63,9 +64,17 @@ public class UnitNode extends Node {
 
 	@Override
 	public void feedback() {
-		SimpleMatrix inputVector = parent.getFeedbackOutputForChild(id);
-		SimpleMatrix inputMatrix = new SimpleMatrix(inputVector);
-		inputMatrix.reshape(temporalMapSize, temporalMapSize);
+		SimpleMatrix inputMatrix = null;
+		if (parent != null){
+			SimpleMatrix inputVector = parent.getFeedbackOutputForChild(id);
+			inputMatrix = new SimpleMatrix(inputVector);
+			inputMatrix.reshape(temporalMapSize, temporalMapSize);
+		} else {
+			inputMatrix = new SimpleMatrix(temporalMapSize, temporalMapSize);
+			inputMatrix.set(1);
+			inputMatrix = Normalizer.normalize(inputMatrix);
+		}
+		
 		feedbackOutput = unit.feedBackward(inputMatrix);
 		needHelp = unit.needHelp();
 	}

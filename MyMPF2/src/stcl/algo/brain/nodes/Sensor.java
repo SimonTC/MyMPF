@@ -12,6 +12,8 @@ public class Sensor extends Node {
 	public Sensor(int id, int inputLength, Node parent) {
 		super(id, parent);
 		feedforwardInputLength = inputLength;
+		feedforwardOutputVectorLength = inputLength;
+		needHelp = true;
 	}
 
 	@Override

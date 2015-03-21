@@ -28,6 +28,7 @@ public class UnitNode extends Node {
 	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal){
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal);
 		this.temporalMapSize = temporalMapSize;
+		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
 	}
 
 	@Override
@@ -56,7 +57,8 @@ public class UnitNode extends Node {
 		SimpleMatrix combinedInput = new SimpleMatrix(1, feedforwardInputLength);
 		int currentStartCol = 0;
 		for (Node n : children){
-			combinedInput.insertIntoThis(0, currentStartCol, n.getFeedforwardOutput());
+			SimpleMatrix feedforwardOutput = n.getFeedforwardOutput();
+			combinedInput.insertIntoThis(0, currentStartCol, feedforwardOutput);
 			currentStartCol += n.getFeedforwardOutputVectorLength();
 		}
 		return combinedInput;

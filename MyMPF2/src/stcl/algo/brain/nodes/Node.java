@@ -77,7 +77,8 @@ public abstract class Node {
 			if (n.getID() == childID) break;
 			startPosition += n.getFeedforwardOutputVectorLength();
 		}
-		SimpleMatrix outputForChild = feedbackOutput.extractMatrix(0, 1, startPosition, child.feedforwardOutputVectorLength);
+		int vectorLength = child.getFeedforwardOutputVectorLength();
+		SimpleMatrix outputForChild = feedbackOutput.extractMatrix(0, 1, startPosition, startPosition + vectorLength);
 		return outputForChild;
 	}
 	

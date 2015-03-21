@@ -62,37 +62,39 @@ public class RockPaperScissors_WithNodes {
 		UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, topNode);
-		topNode.addChild(combiner);
+		UnitNode combiner = new UnitNode(1, topNode);		
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, combiner);
-		combiner.addChild(inputPooler);
+		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
 		//Create node that pools actions
-		UnitNode actionPooler = new UnitNode(3, combiner);
-		combiner.addChild(actionPooler);
+		UnitNode actionPooler = new UnitNode(3, combiner);		
 		
 		//Create the input sensor
-		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);
-		inputPooler.addChild(inputSensor);
+		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
 		
 		//Create action sensor
-		Sensor actionSensor = new Sensor(5, 3, combiner);
-		actionPooler.addChild(actionSensor);
+		Sensor actionSensor = new Sensor(5, 3, actionPooler);		
 		
 		//Initialize unit nodes
-		inputPooler.initializeUnit(rand, inputSensor.getFeedforwardOutputVectorLength(), 2, temporalMapSize, 0.1, true, markovOrder, true);
-		actionPooler.initializeUnit(rand, actionSensor.getFeedforwardOutputVectorLength(), 2, temporalMapSize, 0.1, true, markovOrder, true);
+		inputPooler.initializeUnit(rand, inputSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, true);
+		actionPooler.initializeUnit(rand, actionSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, true);
 		combiner.initializeUnit(rand, 8, 3, temporalMapSize, 0.1, true, markovOrder, false);
 		topNode.initializeUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder, false);
 		
-		//Add nodes to brain
+		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
+		actionPooler.addChild(actionSensor);
+		inputPooler.addChild(inputSensor);
+		combiner.addChild(actionPooler);
+		combiner.addChild(inputPooler);
+		topNode.addChild(combiner);
 		
+		//Add nodes to brain
 		brain = new Network();
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
+		brain.addUnitNode(actionPooler, 0);
 		brain.addUnitNode(combiner, 1);
 		brain.addUnitNode(topNode, 2);
 	}

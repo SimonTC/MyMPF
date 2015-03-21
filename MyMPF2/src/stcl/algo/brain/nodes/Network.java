@@ -34,6 +34,8 @@ public class Network {
 	
 	public void step(double reward){
 		//Feed forward
+		for (Sensor s : sensorLayer) s.feedforward();
+		
 		for (ArrayList<UnitNode> layer : unitLayers){
 			for (UnitNode n : layer){
 				n.feedforward(reward);
@@ -47,6 +49,8 @@ public class Network {
 				n.feedback();
 			}			
 		}
+		
+		for (Sensor s : sensorLayer) s.feedback();
 	}
 	
 	

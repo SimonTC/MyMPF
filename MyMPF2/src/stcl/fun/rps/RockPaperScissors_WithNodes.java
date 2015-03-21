@@ -77,8 +77,8 @@ public class RockPaperScissors_WithNodes {
 		Sensor actionSensor = new Sensor(5, 3, actionPooler);		
 		
 		//Initialize unit nodes
-		inputPooler.initializeUnit(rand, inputSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, true);
-		actionPooler.initializeUnit(rand, actionSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, true);
+		inputPooler.initializeUnit(rand, inputSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, false);
+		actionPooler.initializeUnit(rand, actionSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, false);
 		combiner.initializeUnit(rand, 8, 3, temporalMapSize, 0.1, true, markovOrder, false);
 		topNode.initializeUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder, false);
 		

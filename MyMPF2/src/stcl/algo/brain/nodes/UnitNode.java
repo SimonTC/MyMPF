@@ -69,5 +69,9 @@ public class UnitNode extends Node {
 		feedbackOutput = unit.feedBackward(inputMatrix);
 		needHelp = unit.needHelp();
 	}
+	
+	public NeoCorticalUnit getUnit(){
+		return unit;
+	}
 
 }

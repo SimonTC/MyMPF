@@ -5,23 +5,23 @@ import org.ejml.simple.SimpleMatrix;
 public class Sensor extends Node {
 	private SimpleMatrix input;
 	
-	public Sensor(int id) {
-		super(id);
+	public Sensor(int id, int inputLength) {
+		this(id, inputLength, null);
 	}
 
-	public Sensor(int id, Node parent) {
+	public Sensor(int id, int inputLength, Node parent) {
 		super(id, parent);
+		feedforwardInputLength = inputLength;
 	}
 
 	@Override
-	public void feedforward() {
+	public void feedforward(double reward) {
 		this.feedforwardOutput = input;
 	}
 
 	@Override
 	public void feedback() {
 		feedbackOutput = parent.getFeedbackOutputForChild(this.id);
-
 	}
 	
 	public void setInput(double input){

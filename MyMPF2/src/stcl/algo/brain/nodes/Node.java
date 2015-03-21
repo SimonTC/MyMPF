@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 public abstract class Node {
 	protected int id;
 	protected int feedforwardOutputVectorLength; //Has to be set by classes implementing Node
+	protected int feedforwardInputLength;
 	protected Node parent;
 	protected ArrayList<Node> children;
 	protected SimpleMatrix feedforwardOutput;
@@ -39,6 +40,7 @@ public abstract class Node {
 	
 	public void addChild(Node child){
 		children.add(child);
+		feedforwardInputLength += child.getFeedforwardOutputVectorLength();
 	}
 	
 	public ArrayList<Node> getChildren(){
@@ -87,7 +89,11 @@ public abstract class Node {
 		return needHelp;
 	}
 	
-	public abstract void feedforward();
+	public void feedforward(){
+		this.feedforward(0);
+	}
+	
+	public abstract void feedforward(double reward);
 	
 	public abstract void feedback();
 

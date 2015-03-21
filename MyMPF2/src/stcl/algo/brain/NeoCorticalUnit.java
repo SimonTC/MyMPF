@@ -34,7 +34,7 @@ public class NeoCorticalUnit{
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
 	
-	private boolean useMarkovPrediction;
+	private boolean usePrediction;
 	private boolean active;
 
 	private boolean entropyThresholdFrozen;
@@ -48,6 +48,7 @@ public class NeoCorticalUnit{
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
 		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, false);
 	}
+
 	/**
 	 * 
 	 * @param rand
@@ -57,6 +58,7 @@ public class NeoCorticalUnit{
 	 * @param initialPredictionLearningRate
 	 * @param useMarkovPrediction
 	 * @param markovOrder
+	 * @param noTemporal
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal) {
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
@@ -77,7 +79,7 @@ public class NeoCorticalUnit{
 		ffOutput = new SimpleMatrix(this.temporalMapSize, this.temporalMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
-		this.useMarkovPrediction = useMarkovPrediction;
+		this.usePrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		
 		needHelp = false;
@@ -106,7 +108,7 @@ public class NeoCorticalUnit{
 		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
 		
 		//Predict next spatialFFOutputMatrix
-		if (useMarkovPrediction){
+		if (usePrediction){
 			decider.giveExternalReward(reward);
 			if (biasBeforePredicting) {
 				predictionMatrix = decider.predict(biasedOutput);
@@ -324,6 +326,10 @@ public class NeoCorticalUnit{
 	 */
 	public int getTemporalMapSize() {
 		return temporalMapSize;
+	}
+	
+	public void setUsePrediction(boolean usePrediction){
+		this.usePrediction = usePrediction;
 	}
 	
 

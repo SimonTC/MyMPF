@@ -21,6 +21,7 @@ public class NeoCorticalUnit{
 	private Decider decider;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
+	private SimpleMatrix ffInput;
 	
 	private SimpleMatrix ffOutput;
 	private SimpleMatrix fbOutput;
@@ -103,6 +104,8 @@ public class NeoCorticalUnit{
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
 		active = true;
+		
+		ffInput = inputVector;
 		
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
@@ -333,6 +336,10 @@ public class NeoCorticalUnit{
 	
 	public void setUsePrediction(boolean usePrediction){
 		this.usePrediction = usePrediction;
+	}
+	
+	public SimpleMatrix getFFInput(){
+		return ffInput;
 	}
 	
 

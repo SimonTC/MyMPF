@@ -21,8 +21,8 @@ import stcl.algo.util.FileWriter;
  */
 public class Network_DataCollector extends Network {
 	//Inputs and outputs to the brain
-	private SimpleMatrix receivedInput;
-	private SimpleMatrix returnedOutput;
+	//private SimpleMatrix receivedInput;
+	//private SimpleMatrix returnedOutput;
 	
 	//Inputs to and outputs from the units
 	private SimpleMatrix[] FFOutputs;
@@ -53,7 +53,6 @@ public class Network_DataCollector extends Network {
 	private boolean collectData;
 	private int numUnits;
 
-	private FileWriter brainWriter;
 	private FileWriter[] unitWriters;
 	
 	public void initializeWriters(String parentFolder, boolean append){
@@ -69,7 +68,6 @@ public class Network_DataCollector extends Network {
 	}
 	
 	private void setupWriters(String parentFolder){
-		brainWriter = new FileWriter(parentFolder + "/brain.csv");
 		ArrayList<UnitNode> unitNodes = super.getUnitNodes();
 		numUnits = unitNodes.size();
 		unitWriters = new FileWriter[numUnits];
@@ -83,7 +81,6 @@ public class Network_DataCollector extends Network {
 	
 	public void openFiles(boolean append){
 		try {
-			brainWriter.openFile(append);
 			for (FileWriter f : unitWriters){
 				f.openFile(append);
 			}
@@ -95,7 +92,6 @@ public class Network_DataCollector extends Network {
 	
 	public void closeFiles(){
 		try {
-			brainWriter.closeFile();
 			for (FileWriter f : unitWriters){
 				f.closeFile();
 			}
@@ -115,6 +111,7 @@ public class Network_DataCollector extends Network {
 		
 		if (collectData){
 			//Collect Feedforward info
+			FFInputs = collectUnitInputs();
 			activeStatuses = (collectActiveStatus());
 			helpStatuses = (collectHelpStatus());
 			predictionEntropies = (collectPredictionEntropies());
@@ -144,15 +141,12 @@ public class Network_DataCollector extends Network {
 	}
 	
 	private void writeHeaders() throws IOException{
-		
-		//Write header for brain file
-		String header = "";
-		header += writeRepeatedString("Input", 1, ";");
-		header += writeRepeatedString("Output", 1, ";");
-		brainWriter.writeLine(header);
-		
+
 		//Write header for unit files
-		header = "";
+		String header = "";
+		
+		header += writeRepeatedString("Feedforward input",1, ";");
+		
 		header += writeRepeatedString("Prediction entropy",1, ";");
 		header += writeRepeatedString("Entropy threshold", 1, ";");
 		
@@ -173,12 +167,14 @@ public class Network_DataCollector extends Network {
 	
 	private void writeData() throws IOException{
 		//Print brain data
-		brainWriter.write(writeMatrixArray(receivedInput) + ";");
-		brainWriter.writeLine(writeMatrixArray(returnedOutput) + ";");
+	//	brainWriter.write(writeMatrixArray(receivedInput) + ";");
+		//brainWriter.writeLine(writeMatrixArray(returnedOutput) + ";");
 		
 		//Print unit data
 		for (int i = 0; i < numUnits; i++){
 			FileWriter writer = unitWriters[i];
+			writer.write(writeMatrixArray(FFInputs[i]) + ";");
+			
 			writer.write(predictionEntropies[i] + ";");
 			writer.write(entropiesThresholds[i] + ";");
 			
@@ -298,6 +294,15 @@ public class Network_DataCollector extends Network {
 			} else {
 				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFBOutput());
 			}
+			outputs[i] = m;
+		}
+		return outputs;
+	}
+	
+	private SimpleMatrix[] collectUnitInputs(){
+		SimpleMatrix[] outputs = new SimpleMatrix[numUnits];
+		for (int i = 0; i < numUnits; i++){
+			SimpleMatrix m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFFInput());
 			outputs[i] = m;
 		}
 		return outputs;

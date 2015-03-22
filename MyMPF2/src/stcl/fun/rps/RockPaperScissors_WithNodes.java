@@ -21,11 +21,11 @@ public class RockPaperScissors_WithNodes {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	
-	private final int ITERATIONS = 20000;
+	private final int ITERATIONS = 1000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithNodes runner = new RockPaperScissors_WithNodes();
-		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
+		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	

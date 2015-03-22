@@ -25,6 +25,17 @@ public class UnitNode extends Node {
 		super(id, parent, children);
 	}
 	
+	/**
+	 * 
+	 * @param rand
+	 * @param ffInputLength
+	 * @param spatialMapSize
+	 * @param temporalMapSize
+	 * @param initialPredictionLearningRate
+	 * @param useMarkovPrediction
+	 * @param markovOrder
+	 * @param noTemporal
+	 */
 	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal){
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal);
 		this.temporalMapSize = temporalMapSize;

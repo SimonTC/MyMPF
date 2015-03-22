@@ -52,11 +52,8 @@ public class RockPaperScissors_WithNodes {
 	private void setup(int maxIterations, String dataFolder){
 		createInputs();
 		createRewardMatrix();
-		int ffInputLength = rock.numCols() * rock.numRows();
-		int spatialMapSize = 3;
-		int temporalMapSize = 3;
-		int markovOrder = 2;
 		
+		int ffInputLength = rock.numCols() * rock.numRows();		
 		
 		//Create nodes
 		//Create top node
@@ -78,10 +75,37 @@ public class RockPaperScissors_WithNodes {
 		Sensor actionSensor = new Sensor(5, 3, actionPooler);		
 		
 		//Initialize unit nodes
-		inputPooler.initializeUnit(rand, inputSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, false);
-		actionPooler.initializeUnit(rand, actionSensor.getFeedforwardOutputVectorLength(), 2, 2, 0.1, true, markovOrder, false);
-		combiner.initializeUnit(rand, 8, 3, temporalMapSize, 0.1, true, markovOrder, false);
-		topNode.initializeUnit(rand, temporalMapSize * temporalMapSize, spatialMapSize, temporalMapSize, 0.1, true, markovOrder, false);
+			//Input pooler
+			int spatialMapSize_input = 3;
+			int temporalMapSize_input = 2;
+			int markovOrder_input = 2;
+			boolean useTemporalPooler_input = true;
+			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input);
+			
+			//Action pooler
+			int ffInputLength_action = actionSensor.getFeedforwardOutputVectorLength();
+			int spatialMapSize_action = 2;
+			int temporalMapSize_action = 2;
+			int markovOrder_action = 2;
+			boolean useTemporalPooler_action = true;
+			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
+		
+			//Combiner
+			int ffInputLength_combiner = actionPooler.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
+			int spatialMapSize_combiner = 5;
+			int temporalMapSize_combiner = 3;
+			int markovOrder_combiner = 2;
+			boolean useTemporalPooler_combiner = true;
+			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner);
+		
+			//top node
+			int ffInputLength_top = combiner.getFeedforwardOutputVectorLength();
+			int spatialMapSize_top = 5;
+			int temporalMapSize_top = 3;
+			int markovOrder_top = 2;
+			boolean useTemporalPooler_top = true;
+			topNode.initializeUnit(rand, ffInputLength_top, spatialMapSize_top, temporalMapSize_top, 0.1, true, markovOrder_top, !useTemporalPooler_top);
+
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionPooler.addChild(actionSensor);

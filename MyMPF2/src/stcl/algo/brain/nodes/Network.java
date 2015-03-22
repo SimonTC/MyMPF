@@ -33,7 +33,12 @@ public class Network {
 	}
 	
 	public void step(double reward){
-		//Feed forward
+		feedForward(reward);
+		
+		feedback();
+	}
+	
+	protected void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
 		
 		for (ArrayList<UnitNode> layer : unitLayers){
@@ -41,15 +46,15 @@ public class Network {
 				n.feedforward(reward);
 			}
 		}
-		
-		//Feed back
+	}
+	
+	protected void feedback(){
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);
 			for (UnitNode n : layer){
 				n.feedback();
 			}			
-		}
-		
+		}		
 		for (Sensor s : sensorLayer) s.feedback();
 	}
 	
@@ -72,6 +77,14 @@ public class Network {
 	
 	public void setUseBiasedInputToSequencer(boolean flag) {
 		for (UnitNode n : unitNodes) n.getUnit().setUseBiasedInputInSequencer(flag);
+	}
+	
+	public int getNumUnitNodes(){
+		return unitNodes.size();
+	}
+	
+	public ArrayList<UnitNode> getUnitNodes(){
+		return unitNodes;
 	}
 
 }

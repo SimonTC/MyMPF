@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
+import stcl.algo.brain.Network_DataCollector;
 import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
@@ -14,7 +15,7 @@ import stcl.algo.brain.nodes.UnitNode;
 public class RockPaperScissors_WithNodes {
 
 	private Random rand = new Random(1234);
-	private Network brain;
+	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
 	private int[] labelSequence;
@@ -24,7 +25,7 @@ public class RockPaperScissors_WithNodes {
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithNodes runner = new RockPaperScissors_WithNodes();
-		String folder = "C:/Users/Simon/Documents/Experiments/RPS";
+		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	
@@ -90,13 +91,14 @@ public class RockPaperScissors_WithNodes {
 		topNode.addChild(combiner);
 		
 		//Add nodes to brain
-		brain = new Network();
+		brain = new Network_DataCollector();
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
 		brain.addUnitNode(actionPooler, 0);
 		brain.addUnitNode(combiner, 1);
 		brain.addUnitNode(topNode, 2);
+		brain.initializeWriters(dataFolder, false);
 	}
 	
 	private void runExperiment(int maxIterations, double exploreChance, boolean printError){

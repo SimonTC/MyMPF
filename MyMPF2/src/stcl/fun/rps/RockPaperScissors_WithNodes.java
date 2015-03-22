@@ -78,7 +78,7 @@ public class RockPaperScissors_WithNodes {
 			//Input pooler
 			int spatialMapSize_input = 3;
 			int temporalMapSize_input = 2;
-			int markovOrder_input = 2;
+			int markovOrder_input = 3;
 			boolean useTemporalPooler_input = true;
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input);
 			

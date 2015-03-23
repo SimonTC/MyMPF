@@ -7,6 +7,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
+import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.Network_DataCollector;
 import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
@@ -204,7 +205,7 @@ public class RockPaperScissors_WithNodes {
 			
 		}
 		System.out.println();
-		//printInformation();
+		printInformation();
 	}
 	
 	private int maxID(SimpleMatrix m){
@@ -226,18 +227,27 @@ public class RockPaperScissors_WithNodes {
 				return maxID;
 	}
 	
-	/*
+	
 	private void printInformation(){
+		
+		for (UnitNode n : brain.getUnitNodes()){
+			NeoCorticalUnit unit = n.getUnit();
+			int id = n.getID();
+			System.out.println("Spatial groups in unit " + id);
+			unit.getSpatialPooler().printModelWeigths();
+			System.out.println();
+		}
+		
 		//System.out.println("Sequences observed by unit 1:");
 		//brain.getUnitList().get(0).getSequencer().printTrie();
 		
-		
+		/*
 		System.out.println();
 		System.out.println("Spatial groups in unit 1");
-		brain.getUnitList().get(0).getSpatialPooler().printModelWeigths();
+		brain.getUnitNodes().get(0).getUnit().getSpatialPooler().printModelWeigths();
 		System.out.println();
-		//System.out.println("Temporal groups in unit 1");
-		//brain.getUnitList().get(0).getSequencer().printSequenceMemory();
+		System.out.println("Temporal groups in unit 1");
+		brain.getUnitList().get(0).getSequencer().printSequenceMemory();
 		System.out.println();
 		System.out.println("Prediction model, unit 1");
 		brain.getUnitList().get(0).printPredictionModel();
@@ -251,8 +261,9 @@ public class RockPaperScissors_WithNodes {
 		brain.getUnitList().get(1).getSequencer().printSequenceMemory();
 		System.out.println("Prediction model, unit 2");
 		brain.getUnitList().get(1).printPredictionModel();
+		*/
 	}
-	*/
+	
 	/**
 	 * 
 	 * @param opponentSymbol Symbol played by opponent

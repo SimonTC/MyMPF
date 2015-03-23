@@ -22,6 +22,7 @@ public class NeoCorticalUnit{
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	private SimpleMatrix ffInput;
+	private SimpleMatrix fbInput;
 	
 	private SimpleMatrix ffOutput;
 	private SimpleMatrix fbOutput;
@@ -31,6 +32,7 @@ public class NeoCorticalUnit{
 	private int temporalMapSize;
 	
 	private boolean needHelp;
+	private boolean neededHelpThisTurn; //Used in reporting
 	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
@@ -145,7 +147,7 @@ public class NeoCorticalUnit{
 			
 			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
 		} 
-		
+		neededHelpThisTurn = needHelp;
 		return ffOutput;
 	}
 	
@@ -161,6 +163,8 @@ public class NeoCorticalUnit{
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
 
+		fbInput = inputMatrix;
+		
 		if (needHelp){
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
@@ -295,6 +299,11 @@ public class NeoCorticalUnit{
 	public boolean needHelp() {
 		return needHelp;
 	}
+	
+	public void setNeedHelp(boolean needHelp){
+		this.needHelp = needHelp;
+		neededHelpThisTurn = needHelp;
+	}
 
 	public double getEntropy() {
 		return predictionEntropy;
@@ -340,6 +349,10 @@ public class NeoCorticalUnit{
 	
 	public SimpleMatrix getFFInput(){
 		return ffInput;
+	}
+	
+	public SimpleMatrix getFBInput(){
+		return fbInput;
 	}
 	
 

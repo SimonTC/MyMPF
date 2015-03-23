@@ -114,7 +114,7 @@ public class Network_DataCollector extends Network {
 		
 		if (collectData){
 			//Collect Feedforward info
-			FFInputs = collectUnitInputs();
+			FFInputs = collectUnitInputs(true);
 			activeStatuses = (collectActiveStatus());
 			helpStatuses = (collectHelpStatus());
 			predictionEntropies = (collectPredictionEntropies());
@@ -131,6 +131,7 @@ public class Network_DataCollector extends Network {
 		
 		//Collect feed back info
 		if (collectData){
+			FBInputs = collectUnitInputs(false);
 			FBOutputs = (collectUnitOutputs(false));
 		}
 		
@@ -164,6 +165,7 @@ public class Network_DataCollector extends Network {
 		header += writeRepeatedString("Spatial activation", 1, ";");
 		header += writeRepeatedString("FF Output", 1, ";");
 		
+		header += writeRepeatedString("FB Input", 1, ";");
 		header += writeRepeatedString("FB Output", 1, ";");
 		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
@@ -194,6 +196,7 @@ public class Network_DataCollector extends Network {
 			writer.write(writeMatrixArray(spatialActivations[i]) + ";");
 			writer.write(writeMatrixArray(FFOutputs[i]) + ";");
 			
+			writer.write(writeMatrixArray(FBInputs[i]) + ";");
 			writer.write(writeMatrixArray(FBOutputs[i]) + ";");
 			
 			writer.writeLine("");
@@ -314,10 +317,15 @@ public class Network_DataCollector extends Network {
 		return outputs;
 	}
 	
-	private SimpleMatrix[] collectUnitInputs(){
+	private SimpleMatrix[] collectUnitInputs(boolean feedforward){
 		SimpleMatrix[] outputs = new SimpleMatrix[numUnits];
 		for (int i = 0; i < numUnits; i++){
-			SimpleMatrix m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFFInput());
+			SimpleMatrix m;
+			if (feedforward){
+				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFFInput());
+			} else {
+				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFBInput());
+			}
 			outputs[i] = m;
 		}
 		return outputs;

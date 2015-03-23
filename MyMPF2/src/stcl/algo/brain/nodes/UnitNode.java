@@ -106,5 +106,11 @@ public class UnitNode extends Node {
 	public NeoCorticalUnit getUnit(){
 		return unit;
 	}
+	
+	@Override
+	public void setNeedHelp(boolean needHelp){
+		super.setNeedHelp(needHelp);
+		unit.setNeedHelp(needHelp);
+	}
 
 }

@@ -198,6 +198,9 @@ public class RockPaperScissors_LearningByWatching {
 		int predictedLabel = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
+			if (i == 9996){
+				System.out.println();
+			}
 			//Update action chain
 			actionNow = actionNext;
 			actionNext = null;// actionAfterNext;

@@ -115,26 +115,30 @@ public class NeoCorticalUnit{
 		//Bias output
 		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
 		
-		//Predict next spatialFFOutputMatrix
-		if (usePrediction){
-			decider.giveExternalReward(reward);
-			if (biasBeforePredicting) {
-				predictionMatrix = decider.predict(biasedOutput);
-			} else {
-				predictionMatrix = decider.predict(spatialFFOutputMatrix);
-			}
-		} 		
-		
-		predictionEntropy = calculateEntropy(predictionMatrix);
-		
-		if (predictionEntropy > entropyThreshold) needHelp = true;
-		if (!entropyThresholdFrozen){
-			entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
-		}
-		
 		ffOutput = biasedOutput;
+		needHelp = true;
 		
 		if (!noTemporal) {
+			//Predict next spatialFFOutputMatrix
+			if (usePrediction){
+				decider.giveExternalReward(reward);
+				if (biasBeforePredicting) {
+					predictionMatrix = decider.predict(biasedOutput);
+				} else {
+					predictionMatrix = decider.predict(spatialFFOutputMatrix);
+				}
+			} 		
+			
+			predictionEntropy = calculateEntropy(predictionMatrix);
+			
+			needHelp =  (predictionEntropy > entropyThreshold);
+			if (!entropyThresholdFrozen){
+				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+			}
+			
+			ffOutput = biasedOutput;
+		
+		
 			//Transform spatial output matrix to vector
 			double[] spatialFFOutputDataVector;
 			if (useBiasedInputInSequencer){
@@ -221,6 +225,12 @@ public class NeoCorticalUnit{
 		return decay;
  	}
 	
+	/**
+	 * Bias the matrixToBias by element multiplying it with the biasMatrix
+	 * @param matrixToBias
+	 * @param biasMatrix
+	 * @return
+	 */
 	private SimpleMatrix biasMatrix(SimpleMatrix matrixToBias, SimpleMatrix biasMatrix){
 		SimpleMatrix biasedMatrix = matrixToBias.elementMult(biasMatrix);
 		biasedMatrix = Normalizer.normalize(biasedMatrix);

@@ -13,7 +13,7 @@ import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 
-public class RockPaperScissors_LearningByWatching {
+public class CopyOfRockPaperScissors_LearningByWatching {
 
 	private Random rand = new Random();
 	private Network_DataCollector brain;
@@ -23,16 +23,13 @@ public class RockPaperScissors_LearningByWatching {
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
 	
-	private int learningIterations = 2000;
-	private int trainingIterations = 5000;
-	
 	public static void main(String[] args) {
-		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();
+		CopyOfRockPaperScissors_LearningByWatching runner = new CopyOfRockPaperScissors_LearningByWatching();
 		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	
-	public RockPaperScissors_LearningByWatching() {
+	public CopyOfRockPaperScissors_LearningByWatching() {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -40,14 +37,12 @@ public class RockPaperScissors_LearningByWatching {
 		setup(dataFolder);
 		
 		//Show
-		brain.closeFiles();
-		runLearning(learningIterations);
 		
 		//Train
 		//brain.setBiasBeforePrediction(true);
-		//brain.setUseBiasedInputToSequencer(true);
-		brain.openFiles(true);
-		runExperiment(trainingIterations, true);
+		brain.setUseBiasedInputToSequencer(true);
+
+		runExperiment(1000, true);
 		brain.closeFiles();
 		
 	}
@@ -128,62 +123,9 @@ public class RockPaperScissors_LearningByWatching {
 		brain.initializeWriters(dataFolder, false);
 	}
 	
-	private void runLearning(int iterations){
-		int[][] positiveExamples = {{0,1},{1,2},{2,0}};
-		int[][] negativeExamples = {{1,0},{2,1},{0,2}};
-		int[][] neutralExamples = {{0,0},{1,1},{2,2}};
+	private void runExperiment(int episodeLength, boolean printError){
+		int numEpisodes = sequence.length + 1;
 		
-		double externalReward = 0;
-		SimpleMatrix prediction = blank;
-		
-		double[][] tmp = {{1,0,0}};
-		SimpleMatrix actionNow = new SimpleMatrix(tmp);
-		
-		for (int i = 0; i < iterations; i++){
-			//Decide which kind of example to show
-			int exampleType = rand.nextInt(3);
-			
-			//Decide specific example
-			int[] example = null;
-			switch(exampleType){
-			case 0: example = positiveExamples[rand.nextInt(3)]; break;
-			case 1: example = negativeExamples[rand.nextInt(3)]; break;
-			case 2: example = neutralExamples[rand.nextInt(3)]; break;
-			}
-			
-			//Get input and corresponding action			
-			SimpleMatrix input = new SimpleMatrix(sequence[example[0]]);
-			actionNow.set(0);
-			actionNow.set(example[1], 1);
-			
-			//Calculate reward			
-			if ( i > 3){ //To get out of wrong actions
-				int actionID = -1;
-				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionNow.get(1) > 0.1 ) actionID = 1;
-				if (actionNow.get(2) > 0.1 ) actionID = 2;
-				
-				externalReward = reward(labelSequence[example[0]], actionID);
-			}
-			
-			//Give inputs to brain
-			ArrayList<Sensor> sensors = brain.getSensors();
-			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionNow);
-			
-			//Do one step
-			brain.step(externalReward);
-			
-			//Collect output
-			sensors = brain.getSensors();
-			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
-			prediction.reshape(5, 5);
-
-		}
-	}
-	
-	private void runExperiment(int maxIterations, boolean printError){
 		int curInput = 0;
 		double externalReward = 0;
 		
@@ -195,64 +137,78 @@ public class RockPaperScissors_LearningByWatching {
 		SimpleMatrix prediction = blank;
 		int predictedLabel = 0;
 		
-		for (int i = 0; i < maxIterations; i++){
-			//Update action chain
-			actionNow = actionNext;
-			actionNext = null;// actionAfterNext;
-			//actionAfterNext = null;
-			
-			//Get input			
-			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
-			
-			//Calculate prediction error
-			SimpleMatrix diff = input.minus(prediction);
-			double predictionError = diff.normF();
-			
-			//Calculate reward			
-			if ( i > 3){ //To get out of wrong actions
-				int actionID = -1;
-				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionNow.get(1) > 0.1 ) actionID = 1;
-				if (actionNow.get(2) > 0.1 ) actionID = 2;
+		for (int episode = 0; episode < numEpisodes; episode++){
+			for (int i = 0; i < episodeLength; i++){
+				//Update action chain
+				actionNow = actionNext;
+				actionNext = null;// actionAfterNext;
+				//actionAfterNext = null;
 				
-				externalReward = reward(labelSequence[curInput], actionID);
-			}
-			
-			//Give inputs to brain
-			ArrayList<Sensor> sensors = brain.getSensors();
-			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionNow);
-			
-			//Do one step
-			brain.step(externalReward);
-			
-			//Collect output
-			sensors = brain.getSensors();
-			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
-			prediction.reshape(5, 5);
-			actionNext = sensors.get(1).getFeedbackOutput();
-
-			//Decide what to do with the action
-				//Set max value of action to 1. The rest to zero
-				int max = maxID(actionNext);
-				if (max != -1){
-					actionNext.set(0);
-					actionNext.set(max, 1);
+				//Get input			
+				SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
+				
+				//Calculate prediction error
+				SimpleMatrix diff = input.minus(prediction);
+				double predictionError = diff.normF();
+				
+				//Calculate reward			
+				if ( i > 3){ //To get out of wrong actions
+					int actionID = -1;
+					if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+					if (actionNow.get(1) > 0.1 ) actionID = 1;
+					if (actionNow.get(2) > 0.1 ) actionID = 2;
+					
+					externalReward = reward(labelSequence[curInput], actionID);
 				}
-		
-			if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+				
+				//Give inputs to brain
+				ArrayList<Sensor> sensors = brain.getSensors();
+				SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
+				sensors.get(0).setInput(inputVector);
+				sensors.get(1).setInput(actionNow);
+				
+				//Do one step
+				brain.step(externalReward);
+				
+				//Collect output
+				sensors = brain.getSensors();
+				prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
+				prediction.reshape(5, 5);
+				actionNext = sensors.get(1).getFeedbackOutput();
+
+				if (curInput < episode){
+					//Brain chooses next action
+					int max = maxID(actionNext);
+					if (max != -1){
+						actionNext.set(0);
+						actionNext.set(max, 1);
+					}
+				} else {
+					//We show it the next action
+					int nextID = -1;
+					if (curInput == lblCounter.length - 1){
+						nextID = lblCounter[0];
+					} else {
+						nextID = lblCounter[curInput + 1];
+					}
+					actionNext.set(0);
+					actionNext.set(nextID, 1);
+				}
+				
 			
-			curInput++;
-			if (curInput >= sequence.length){
-				curInput = 0;
+				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+				
+				curInput++;
+				if (curInput >= sequence.length){
+					curInput = 0;
+				}
+
 			}
-			
 		}
 		System.out.println();
 		printInformation();
+		
 	}
-
 	
 	private int maxID(SimpleMatrix m){
 		//Transform bias matrix into vector
@@ -373,9 +329,9 @@ public class RockPaperScissors_LearningByWatching {
 		};
 		
 		blank = new SimpleMatrix(blankData);
-		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
-		int[] lbl = {0,1,1,2};
-		int[] lbl_counter = {1,2,2,0};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors, paper, rock, rock, paper, scissors};
+		int[] lbl = {0,1,1,2,1,0,1,1,2};
+		int[] lbl_counter = {1,2,2,0,2,1,2,2,0};
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

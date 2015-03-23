@@ -84,6 +84,7 @@ public class Network_DataCollector extends Network {
 		try {
 			for (FileWriter f : unitWriters){
 				f.openFile(append);
+				collectData = true;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -100,6 +101,7 @@ public class Network_DataCollector extends Network {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
+		collectData = false;
 	}
 	
 	
@@ -128,7 +130,9 @@ public class Network_DataCollector extends Network {
 		this.feedback();
 		
 		//Collect feed back info
-		if (collectData) FBOutputs = (collectUnitOutputs(false));
+		if (collectData){
+			FBOutputs = (collectUnitOutputs(false));
+		}
 		
 		//Print data to files
 		if (collectData){
@@ -160,6 +164,8 @@ public class Network_DataCollector extends Network {
 		header += writeRepeatedString("Spatial activation", 1, ";");
 		header += writeRepeatedString("FF Output", 1, ";");
 		
+		header += writeRepeatedString("FB Output", 1, ";");
+		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		
 		for (FileWriter w : unitWriters) w.writeLine(header);
@@ -187,6 +193,8 @@ public class Network_DataCollector extends Network {
 						
 			writer.write(writeMatrixArray(spatialActivations[i]) + ";");
 			writer.write(writeMatrixArray(FFOutputs[i]) + ";");
+			
+			writer.write(writeMatrixArray(FBOutputs[i]) + ";");
 			
 			writer.writeLine("");
 		}

@@ -21,11 +21,11 @@ public class RockPaperScissors_WithNodes {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	
-	private final int ITERATIONS = 1000;
+	private final int ITERATIONS = 5000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_WithNodes runner = new RockPaperScissors_WithNodes();
-		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
+		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	
@@ -39,12 +39,17 @@ public class RockPaperScissors_WithNodes {
 		//Show
 		
 		//Train
+		//brain.setBiasBeforePrediction(true);
+		brain.setUseBiasedInputToSequencer(true);
+		brain.closeFiles();
 		runExperiment(ITERATIONS, 0.5, false);
 		
 		//Evaluate
+		brain.openFiles(true);
 		brain.flush();
 		brain.setLearning(false);
 		runExperiment(1000, 0.0, true);
+		brain.closeFiles();
 		
 		
 	}

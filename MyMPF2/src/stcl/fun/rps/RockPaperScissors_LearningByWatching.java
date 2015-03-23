@@ -23,8 +23,8 @@ public class RockPaperScissors_LearningByWatching {
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
 	
-	private int learningIterations = 2000;
-	private int trainingIterations = 5000;
+	private int learningIterations = 1000;
+	private int trainingIterations = 10000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();

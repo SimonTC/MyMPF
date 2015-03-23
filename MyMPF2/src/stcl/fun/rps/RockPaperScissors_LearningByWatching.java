@@ -12,6 +12,7 @@ import stcl.algo.brain.Network_DataCollector;
 import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
+import stcl.algo.poolers.NewSequencer;
 
 public class RockPaperScissors_LearningByWatching {
 
@@ -92,7 +93,7 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_action = 2;
 			int temporalMapSize_action = 2;
 			int markovOrder_action = 2;
-			boolean useTemporalPooler_action = true;
+			boolean useTemporalPooler_action = false;
 			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
 		
 			//Combiner
@@ -288,7 +289,8 @@ public class RockPaperScissors_LearningByWatching {
 			unit.getSpatialPooler().printModelWeigths();
 			System.out.println();
 			System.out.println("Temporal groups in unit " + id);
-			unit.getSequencer().printSequenceMemory();
+			NewSequencer sequencer = unit.getSequencer();
+			if (sequencer != null) sequencer.printSequenceMemory();
 			System.out.println();
 			System.out.println("Prediction model, unit " + id);
 			unit.printPredictionModel();

@@ -45,6 +45,7 @@ public class UnitNode extends Node {
 	@Override
 	public void feedforward(double reward) {
 		if (childrenNeedHelp()){ 
+			forceHelpOnChildren();
 			SimpleMatrix inputVector = collectInput();
 			SimpleMatrix outputMatrix = unit.feedForward(inputVector);
 			feedforwardOutput = new SimpleMatrix(outputMatrix);
@@ -58,6 +59,16 @@ public class UnitNode extends Node {
 			if (n.needHelp()) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Loop through all children and force them to need help.
+	 * Use to make sure that action nodes doesn't go on in a loop where they always predict the same without influence from above
+	 */
+	private void forceHelpOnChildren(){
+		for (Node n : children){
+			n.setNeedHelp(true);
+		}
 	}
 	
 	/**

@@ -90,6 +90,10 @@ public abstract class Node {
 		return needHelp;
 	}
 	
+	public void setNeedHelp(boolean needHelp){
+		this.needHelp = needHelp;
+	}
+	
 	public void feedforward(){
 		this.feedforward(0);
 	}

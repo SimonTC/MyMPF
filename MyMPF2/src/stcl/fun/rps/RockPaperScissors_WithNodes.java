@@ -236,6 +236,12 @@ public class RockPaperScissors_WithNodes {
 			System.out.println("Spatial groups in unit " + id);
 			unit.getSpatialPooler().printModelWeigths();
 			System.out.println();
+			System.out.println("Temporal groups in unit " + id);
+			unit.getSequencer().printSequenceMemory();
+			System.out.println();
+			System.out.println("Prediction model, unit " + id);
+			unit.printPredictionModel();
+			System.out.println();
 		}
 		
 		//System.out.println("Sequences observed by unit 1:");

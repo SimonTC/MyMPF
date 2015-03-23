@@ -79,6 +79,10 @@ public class Network {
 		for (UnitNode n : unitNodes) n.getUnit().setUseBiasedInputInSequencer(flag);
 	}
 	
+	public void setUsePrediction(boolean flag) {
+		for (UnitNode n : unitNodes) n.getUnit().setUsePrediction(flag);
+	}
+	
 	public int getNumUnitNodes(){
 		return unitNodes.size();
 	}

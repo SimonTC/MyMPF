@@ -15,7 +15,7 @@ import stcl.algo.brain.nodes.UnitNode;
 
 public class RockPaperScissors_LearningByWatching {
 
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
@@ -41,12 +41,14 @@ public class RockPaperScissors_LearningByWatching {
 		
 		//Show
 		brain.closeFiles();
+		brain.setUsePrediction(false);
 		runLearning(learningIterations);
 		
 		//Train
 		//brain.setBiasBeforePrediction(true);
 		//brain.setUseBiasedInputToSequencer(true);
 		brain.openFiles(true);
+		brain.setUsePrediction(true);
 		runExperiment(trainingIterations, true);
 		brain.closeFiles();
 		

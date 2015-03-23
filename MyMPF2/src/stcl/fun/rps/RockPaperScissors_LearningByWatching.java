@@ -15,15 +15,13 @@ import stcl.algo.brain.nodes.UnitNode;
 
 public class RockPaperScissors_LearningByWatching {
 
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
-	
-	private final int ITERATIONS = 5000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();

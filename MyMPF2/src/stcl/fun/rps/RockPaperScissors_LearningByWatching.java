@@ -295,6 +295,9 @@ public class RockPaperScissors_LearningByWatching {
 			System.out.println("Prediction model, unit " + id);
 			unit.printPredictionModel();
 			System.out.println();
+			System.out.println("Correaltion matrix, unit " + id);
+			unit.printCorrelationMatrix();
+			System.out.println();
 		}
 		
 		//System.out.println("Sequences observed by unit 1:");

@@ -365,5 +365,11 @@ public class NeoCorticalUnit{
 		return fbInput;
 	}
 	
+	public void printCorrelationMatrix(){
+		if (decider != null){
+			decider.printCorrelationMatrix();
+		}
+	}
+	
 
 }

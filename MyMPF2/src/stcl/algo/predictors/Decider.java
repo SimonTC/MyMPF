@@ -48,5 +48,9 @@ public class Decider extends Predictor_VOMM {
 	public void giveExternalReward(double reward){
 		this.externalReward = reward;
 	}
+	
+	public void printCorrelationMatrix(){
+		correlationMatrix.print();
+	}
 
 }

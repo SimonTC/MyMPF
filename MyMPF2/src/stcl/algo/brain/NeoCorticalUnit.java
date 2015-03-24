@@ -12,6 +12,7 @@ import stcl.algo.predictors.Decider;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
+import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
 public class NeoCorticalUnit{
@@ -150,7 +151,9 @@ public class NeoCorticalUnit{
 			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 			
 			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
-		} 
+		} else {
+			//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
+		}
 		neededHelpThisTurn = needHelp;
 		return ffOutput;
 	}

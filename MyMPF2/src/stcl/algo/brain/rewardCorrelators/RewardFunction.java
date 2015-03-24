@@ -23,7 +23,7 @@ public class RewardFunction {
 
 	
 	public double calculateReward(double externalReward){
-		
+		/*
 		externalRewardNow = externalReward;
 		
 		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
@@ -34,7 +34,7 @@ public class RewardFunction {
 		externalRewardBefore = externalRewardNow;
 		
 		return internalReward;
-		
-		//return externalReward;
+		*/
+		return externalReward;
 	}
 }

@@ -24,8 +24,8 @@ public class RockPaperScissors_LearningByWatching {
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
 	
-	private int learningIterations = 1000;
-	private int trainingIterations = 1000;
+	private int learningIterations = 5000;
+	private int trainingIterations = 10000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();
@@ -42,7 +42,7 @@ public class RockPaperScissors_LearningByWatching {
 		
 		//Show
 		brain.closeFiles();
-		brain.setUsePrediction(false);
+		//brain.setUsePrediction(false);
 		runLearning(learningIterations);
 		printInformation();
 		
@@ -85,9 +85,9 @@ public class RockPaperScissors_LearningByWatching {
 		//Initialize unit nodes
 			//Input pooler
 			int spatialMapSize_input = 3;
-			int temporalMapSize_input = 2;
-			int markovOrder_input = 3;
-			boolean useTemporalPooler_input = true;
+			int temporalMapSize_input = 3;
+			int markovOrder_input = 2;
+			boolean useTemporalPooler_input = false;
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input);
 			
 			//Action pooler
@@ -95,14 +95,14 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_action = 2;
 			int temporalMapSize_action = 2;
 			int markovOrder_action = 2;
-			boolean useTemporalPooler_action = true;
+			boolean useTemporalPooler_action = false;
 			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
 		
 			//Combiner
 			int ffInputLength_combiner = actionPooler.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
-			int spatialMapSize_combiner = 5;
+			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
-			int markovOrder_combiner = 2;
+			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;
 			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner);
 		
@@ -156,20 +156,15 @@ public class RockPaperScissors_LearningByWatching {
 			case 2: example = neutralExamples[rand.nextInt(3)]; break;
 			}
 			
-			//Get input and corresponding action			
-			SimpleMatrix input = new SimpleMatrix(sequence[example[0]]);
+			//Get input and corresponding action	
+			int inputID = example[0];
+			SimpleMatrix input = new SimpleMatrix(sequence[inputID]);
+			int actionID = example[1];
 			actionNow.set(0);
-			actionNow.set(example[1], 1);
+			actionNow.set(actionID, 1);
 			
 			//Calculate reward			
-			if ( i > 3){ //To get out of wrong actions
-				int actionID = -1;
-				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionNow.get(1) > 0.1 ) actionID = 1;
-				if (actionNow.get(2) > 0.1 ) actionID = 2;
-				
-				externalReward = reward(labelSequence[example[0]], actionID);
-			}
+			externalReward = reward(inputID, actionID);
 			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
@@ -201,9 +196,7 @@ public class RockPaperScissors_LearningByWatching {
 		int predictedLabel = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
-			if (i == 9996){
-				System.out.println();
-			}
+			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			//Update action chain
 			actionNow = actionNext;
 			actionNext = null;// actionAfterNext;
@@ -249,7 +242,9 @@ public class RockPaperScissors_LearningByWatching {
 					actionNext.set(max, 1);
 				}
 		
-			if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+			if (i > maxIterations - 100){
+				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+			}
 			
 			curInput++;
 			if (curInput >= sequence.length){

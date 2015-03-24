@@ -47,7 +47,7 @@ public class UnitNode extends Node {
 		if (childrenNeedHelp()){ 
 			forceHelpOnChildren();
 			SimpleMatrix inputVector = collectInput();
-			SimpleMatrix outputMatrix = unit.feedForward(inputVector);
+			SimpleMatrix outputMatrix = unit.feedForward(inputVector, reward);
 			feedforwardOutput = new SimpleMatrix(outputMatrix);
 			feedforwardOutput.reshape(1, outputMatrix.getNumElements());
 			this.needHelp = unit.needHelp();

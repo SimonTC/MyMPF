@@ -152,7 +152,7 @@ public class NeoCorticalUnit{
 			
 			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
 		} else {
-			//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
+			ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		}
 		neededHelpThisTurn = needHelp;
 		return ffOutput;

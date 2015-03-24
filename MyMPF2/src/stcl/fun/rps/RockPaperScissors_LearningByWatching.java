@@ -26,7 +26,7 @@ public class RockPaperScissors_LearningByWatching {
 	private int[] lblCounter;
 	private ExplorationNode actionPooler;
 	
-	private int learningIterations = 5000;
+	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
 	
 	public static void main(String[] args) {
@@ -89,7 +89,7 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_input = 3;
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
-			boolean useTemporalPooler_input = true;
+			boolean useTemporalPooler_input = false;
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input);
 			
 			//Action pooler
@@ -97,13 +97,13 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_action = 2;
 			int temporalMapSize_action = 2;
 			int markovOrder_action = 2;
-			boolean useTemporalPooler_action = true;
+			boolean useTemporalPooler_action = false;
 			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
-			actionPooler.setExplorationChance(0.05);
+			actionPooler.setExplorationChance(0.00);
 		
 			//Combiner
 			int ffInputLength_combiner = actionPooler.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
-			int spatialMapSize_combiner = 4;
+			int spatialMapSize_combiner = 5;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;

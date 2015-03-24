@@ -114,7 +114,8 @@ public class NeoCorticalUnit{
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Bias output
-		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
+		//SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
+		SimpleMatrix biasedOutput = biasTowardsPrediction(spatialFFOutputMatrix, biasMatrix, 0.5);
 		
 		ffOutput = biasedOutput;
 		needHelp = true;
@@ -236,6 +237,12 @@ public class NeoCorticalUnit{
 	 */
 	private SimpleMatrix biasMatrix(SimpleMatrix matrixToBias, SimpleMatrix biasMatrix){
 		SimpleMatrix biasedMatrix = matrixToBias.elementMult(biasMatrix);
+		biasedMatrix = Normalizer.normalize(biasedMatrix);
+		return biasedMatrix;
+	}
+	
+	private SimpleMatrix biasTowardsPrediction(SimpleMatrix matrixToBias, SimpleMatrix predictionMatrix, double predictionInfluence){
+		SimpleMatrix biasedMatrix = matrixToBias.plus(predictionInfluence, predictionMatrix);
 		biasedMatrix = Normalizer.normalize(biasedMatrix);
 		return biasedMatrix;
 	}

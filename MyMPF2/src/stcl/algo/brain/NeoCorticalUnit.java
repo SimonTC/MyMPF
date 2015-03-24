@@ -40,6 +40,8 @@ public class NeoCorticalUnit{
 	
 	private boolean usePrediction;
 	private boolean active;
+	
+	private Random rand;
 
 	private boolean entropyThresholdFrozen;
 	private boolean biasBeforePredicting;
@@ -68,6 +70,8 @@ public class NeoCorticalUnit{
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
+		
+		this.rand = rand;
 		
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		if (!noTemporal) {
@@ -151,11 +155,19 @@ public class NeoCorticalUnit{
 			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 			
+			//Orthogonalize input to temoral pooler
+			//temporalFFInputVector = Orthogonalizer.orthogonalize(temporalFFInputVector);
+			//temporalFFInputVector = Normalizer.normalize(temporalFFInputVector);
+			
 			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
 		} else {
-			ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
+			//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		}
 		neededHelpThisTurn = needHelp;
+		
+		//ffOutput = addNoise(ffOutput, 0.1);
+		//ffOutput = Normalizer.normalize(ffOutput);
+		
 		return ffOutput;
 	}
 	
@@ -212,10 +224,32 @@ public class NeoCorticalUnit{
 		
 		fbOutput = spatialPoolerFBOutputVector;
 		
+		//fbOutput = addNoise(fbOutput, 0.1);
+		//fbOutput = Normalizer.normalize(fbOutput);
+		
 		needHelp = false;
 		active = false;
 		
 		return fbOutput;
+	}
+	
+	/**
+	 * Adds noise to the given matrix and returns the matrix.
+	 * The matrix is altered in this method.
+	 * @param m
+	 * @param noiseMagnitude
+	 * @return
+	 */
+	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
+		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
+		m = m.plus(noise);
+		for (int i = 0; i < m.getNumElements(); i++){
+			double d = m.get(i);
+			d = d + (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
+			if (d < 0) d = 0;
+			m.set(i, d);
+		}
+		return m;
 	}
 	
 	/**

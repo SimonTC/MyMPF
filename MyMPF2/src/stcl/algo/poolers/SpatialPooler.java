@@ -85,7 +85,7 @@ public class SpatialPooler {
 		//Choose random model from som by roulette selection based on the input
 		//SimpleMatrix model = chooseRandom(feedBackwardInputMatrix, som);
 		SimpleMatrix model = chooseMax(feedBackwardInputMatrix, som);
-		
+		model = Normalizer.normalize(model);
 		return model;		
 	}
 	
@@ -161,6 +161,12 @@ public class SpatialPooler {
 	protected SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
 		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
 		m = m.plus(noise);
+		for (int i = 0; i < m.getNumElements(); i++){
+			double d = m.get(i);
+			d = d + (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
+			if (d < 0) d = 0;
+			m.set(i, d);
+		}
 		return m;
 	}
 	

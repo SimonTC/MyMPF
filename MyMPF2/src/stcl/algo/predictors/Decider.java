@@ -43,7 +43,7 @@ public class Decider extends Predictor_VOMM {
 		//Do reward correlation
 		if (learning){
 			double internalReward = rewardFunction.calculateReward(externalReward);
-			correlationMatrix = correlator.correlateReward(inputMatrix, internalReward, 0.1);
+			correlationMatrix = correlator.correlateReward(inputMatrix, internalReward, 1);
 		}
 		
 		SimpleMatrix decision = null;

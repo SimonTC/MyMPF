@@ -50,7 +50,7 @@ public class Decider extends Predictor_VOMM {
 	}
 	
 	public void printCorrelationMatrix(){
-		correlationMatrix.print();
+		if (correlationMatrix != null) correlationMatrix.print();
 	}
 
 }

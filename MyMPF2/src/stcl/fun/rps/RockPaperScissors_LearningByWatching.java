@@ -25,7 +25,7 @@ public class RockPaperScissors_LearningByWatching {
 	private int[] lblCounter;
 	
 	private int learningIterations = 1000;
-	private int trainingIterations = 10000;
+	private int trainingIterations = 1000;
 	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();
@@ -44,6 +44,7 @@ public class RockPaperScissors_LearningByWatching {
 		brain.closeFiles();
 		brain.setUsePrediction(false);
 		runLearning(learningIterations);
+		printInformation();
 		
 		//Train
 		//brain.setBiasBeforePrediction(true);
@@ -52,6 +53,7 @@ public class RockPaperScissors_LearningByWatching {
 		brain.setUsePrediction(true);
 		runExperiment(trainingIterations, true);
 		brain.closeFiles();
+		printInformation();
 		
 	}
 	
@@ -93,7 +95,7 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_action = 2;
 			int temporalMapSize_action = 2;
 			int markovOrder_action = 2;
-			boolean useTemporalPooler_action = false;
+			boolean useTemporalPooler_action = true;
 			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
 		
 			//Combiner
@@ -256,7 +258,6 @@ public class RockPaperScissors_LearningByWatching {
 			
 		}
 		System.out.println();
-		printInformation();
 	}
 
 	
@@ -295,7 +296,7 @@ public class RockPaperScissors_LearningByWatching {
 			System.out.println("Prediction model, unit " + id);
 			unit.printPredictionModel();
 			System.out.println();
-			System.out.println("Correaltion matrix, unit " + id);
+			System.out.println("Correlation matrix, unit " + id);
 			unit.printCorrelationMatrix();
 			System.out.println();
 		}

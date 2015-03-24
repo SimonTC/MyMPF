@@ -16,6 +16,7 @@ public class Decider extends Predictor_VOMM {
 	private RewardFunction rewardFunction;
 	private double externalReward;
 	private Random rand;
+	private double explorationChance;
 
 	public Decider(int markovOrder, double learningRate, Random rand, double biasInfluence, double maxReward, double alpha, int inputMatrixSize) {
 		super(markovOrder, learningRate, rand);
@@ -25,6 +26,7 @@ public class Decider extends Predictor_VOMM {
 		this.rewardFunction = new RewardFunction(maxReward, alpha);
 		externalReward = 0;
 		learning = true;
+		explorationChance = 0;
 	}
 	
 	@Override
@@ -32,7 +34,7 @@ public class Decider extends Predictor_VOMM {
 	 * Biases the prediction towards a state that leads to a higher reward (exploitation) or a random state (exploration)
 	 */
 	public SimpleMatrix predict(SimpleMatrix inputMatrix) {
-		return this.predict(inputMatrix, 0);	
+		return this.predict(inputMatrix, explorationChance);	
 	}
 	
 	public SimpleMatrix predict(SimpleMatrix inputMatrix, double explorationChance){
@@ -64,6 +66,10 @@ public class Decider extends Predictor_VOMM {
 	
 	public void printCorrelationMatrix(){
 		if (correlationMatrix != null) correlationMatrix.print();
+	}
+	
+	public void setExplorationChance(double explorationChance){
+		this.explorationChance = explorationChance;
 	}
 	
 	

@@ -9,6 +9,7 @@ import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.Network_DataCollector;
+import stcl.algo.brain.nodes.ExplorationNode;
 import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
@@ -74,7 +75,7 @@ public class RockPaperScissors_LearningByWatching {
 		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
 		//Create node that pools actions
-		UnitNode actionPooler = new UnitNode(3, combiner);		
+		ExplorationNode actionPooler = new ExplorationNode(3, combiner);		
 		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
@@ -97,6 +98,7 @@ public class RockPaperScissors_LearningByWatching {
 			int markovOrder_action = 2;
 			boolean useTemporalPooler_action = false;
 			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
+			actionPooler.setExplorationChance(0.05);
 		
 			//Combiner
 			int ffInputLength_combiner = actionPooler.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();

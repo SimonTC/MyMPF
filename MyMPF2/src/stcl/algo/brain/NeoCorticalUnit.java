@@ -374,5 +374,9 @@ public class NeoCorticalUnit{
 		}
 	}
 	
+	public Decider getDecider(){
+		return decider;
+	}
+	
 
 }

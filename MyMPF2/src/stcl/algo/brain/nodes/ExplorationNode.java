@@ -3,7 +3,12 @@ package stcl.algo.brain.nodes;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.ejml.simple.SimpleMatrix;
+
+import stcl.algo.util.Normalizer;
+
 public class ExplorationNode extends UnitNode {
+	private double explorationChance = 0;
 
 	public ExplorationNode(int id) {
 		super(id);
@@ -18,7 +23,17 @@ public class ExplorationNode extends UnitNode {
 	}
 	
 	public void setExplorationChance(double explorationChance){
-		this.getUnit().getDecider().setExplorationChance(explorationChance);
+		this.explorationChance = explorationChance;
+	}
+	
+	@Override
+	public void feedback() {
+		super.feedback();		
+		if (rand.nextDouble() < explorationChance){
+			SimpleMatrix fbOutput = super.getFeedbackOutput();
+			fbOutput.set(0);
+			fbOutput.set(rand.nextInt(fbOutput.getNumElements()), 1);
+		}
 	}
 
 }

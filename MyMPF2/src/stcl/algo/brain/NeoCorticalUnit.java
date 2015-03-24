@@ -314,8 +314,8 @@ public class NeoCorticalUnit{
 	}
 	
 	public void setNeedHelp(boolean needHelp){
-		this.needHelp = needHelp;
-		neededHelpThisTurn = needHelp;
+		//this.needHelp = needHelp;
+		//neededHelpThisTurn = needHelp;
 	}
 
 	public double getEntropy() {

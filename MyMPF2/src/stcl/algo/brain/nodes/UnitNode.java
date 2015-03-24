@@ -12,6 +12,7 @@ public class UnitNode extends Node {
 	
 	private NeoCorticalUnit unit;
 	private int temporalMapSize;
+	protected Random rand;
 
 	public UnitNode(int id) {
 		super(id);
@@ -40,6 +41,7 @@ public class UnitNode extends Node {
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal);
 		this.temporalMapSize = unit.getTemporalMapSize();
 		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
+		this.rand = rand;
 	}
 
 	@Override

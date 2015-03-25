@@ -11,6 +11,7 @@ public class TrieNode<T>{
 	private double probability; //Using when predicting symbols
 	private int sequenceID;
 	private TrieNode<T> parent;
+	private double reward;
 	
 	public TrieNode(T symbol, TrieNode<T> parent) {
 		this.count = 0;
@@ -18,6 +19,7 @@ public class TrieNode<T>{
 		children = new HashMap<T, TrieNode<T>>();
 		sequenceID = -2;
 		this.parent = parent;
+		reward = 0;
 	}
 	
 	/**
@@ -25,8 +27,10 @@ public class TrieNode<T>{
 	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
 	 * If no child-node corresponds to the next symbol, a new child is created.
 	 * @param symbolSequence the sequence of symbols coming after this node
+	 * @param nodeSequence the the symbol sequence converted to a node sequence. Is returned in reverse order of the symbol sequence
+	 * @param rreward reward given for this sequence. Is added to last node in sequence
 	 */
-	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
+	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence, double reward){
 		if (!symbolSequence.isEmpty()){
 			T childSymbol = symbolSequence.removeFirst();
 			TrieNode<T> correctChild = children.get(childSymbol);
@@ -37,9 +41,19 @@ public class TrieNode<T>{
 			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence);
 		} else {
 			count++;
+			this.reward += reward;
 		}
-		return nodeSequence;
-		
+		return nodeSequence;		
+	}
+	
+	/**
+	 * Adds an occurrence of this sequence to the node.
+	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
+	 * If no child-node corresponds to the next symbol, a new child is created.
+	 * @param symbolSequence the sequence of symbols coming after this node
+	 */
+	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
+		return this.addSequence(symbolSequence, nodeSequence, 0);
 	}
 	
 	/**

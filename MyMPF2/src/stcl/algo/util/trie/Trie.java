@@ -14,14 +14,25 @@ public class Trie<T> {
 	/**
 	 * Add the given sequence to the Trie
 	 * @param sequence
+	 * @param reward the reward given t this sequence. Added to the last node in the sequence
 	 * @return a list of trieNodes corresponding to the symbol sequence. 
 	 * The first node in the returned list corresponds to the last symbol in the input sequence
 	 */
-	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence){
+	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence, double reward){
 		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();
 		LinkedList<T> copy = copySequence(sequence);
 		nodeSequence = root.addSequence(copy, nodeSequence);
 		return nodeSequence;
+	}
+	
+	/**
+	 * Add the given sequence to the Trie
+	 * @param sequence
+	 * @return a list of trieNodes corresponding to the symbol sequence. 
+	 * The first node in the returned list corresponds to the last symbol in the input sequence
+	 */
+	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence){
+		return this.add(sequence,0);
 	}
 	
 	/**

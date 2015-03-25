@@ -50,11 +50,12 @@ public class Network {
 	protected void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
 
-		actionNode.feedforward(reward);
+		actionNode.feedforward(reward, -1);
+		int actionPerformed = actionNode.getCurrentAction();
 		
 		for (ArrayList<UnitNode> layer : unitLayers){
 			for (UnitNode n : layer){
-				n.feedforward(reward);
+				n.feedforward(reward, actionPerformed);
 			}
 		}
 	}

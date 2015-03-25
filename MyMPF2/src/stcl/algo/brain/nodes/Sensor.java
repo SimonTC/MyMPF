@@ -17,7 +17,7 @@ public class Sensor extends Node {
 	}
 
 	@Override
-	public void feedforward(double reward) {
+	public void feedforward(double reward, int actionPerformed) {
 		this.feedforwardOutput = input;
 	}
 

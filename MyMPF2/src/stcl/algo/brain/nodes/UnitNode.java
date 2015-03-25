@@ -46,11 +46,11 @@ public class UnitNode extends Node {
 	}
 
 	@Override
-	public void feedforward(double reward) {
+	public void feedforward(double reward, int actionPerformed) {
 		if (childrenNeedHelp()){ 
 			forceHelpOnChildren();
 			SimpleMatrix inputVector = collectInput();
-			SimpleMatrix outputMatrix = unit.feedForward(inputVector, reward);
+			SimpleMatrix outputMatrix = unit.feedForward(inputVector, reward, actionPerformed);
 			feedforwardOutput = new SimpleMatrix(outputMatrix);
 			feedforwardOutput.reshape(1, outputMatrix.getNumElements());
 			this.needHelp = unit.needHelp();

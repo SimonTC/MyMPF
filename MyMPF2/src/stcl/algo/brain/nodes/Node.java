@@ -95,10 +95,10 @@ public abstract class Node {
 	}
 	
 	public void feedforward(){
-		this.feedforward(0);
+		this.feedforward(0, -1);
 	}
 	
-	public abstract void feedforward(double reward);
+	public abstract void feedforward(double reward, int actionPerformed);
 	
 	public abstract void feedback();
 

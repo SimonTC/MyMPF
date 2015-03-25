@@ -21,7 +21,7 @@ public class ActionNode extends Node {
 	private SimpleMatrix votes;
 	private SimpleMatrix nextAction;
 
-	public ActionNode(int id, int initialExplorationChance, Sensor actionSensor) {
+	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id);
 		voters = new ArrayList<UnitNode>();
 		influenceVector = new ArrayList<Double>();
@@ -86,8 +86,8 @@ public class ActionNode extends Node {
 		influenceVector.add(1.0);
 	}
 	
-	public int getCurrentAction(){
-		return currentAction;
+	public int getNextActionID(){
+		return nextActionID;
 	}
 	
 	public SimpleMatrix getNextAction(){

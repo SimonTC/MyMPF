@@ -8,7 +8,6 @@ import stcl.algo.poolers.NewSequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.predictors.ActionDecider;
 import stcl.algo.predictors.Decider;
 import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
@@ -16,14 +15,13 @@ import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
-public class NeoCorticalUnit{
+public class CopyOfNeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
 	//private Predictor_VOMM predictor;
 	//private Decider decider;
-	private ActionDecider decider;
 	private SimpleMatrix biasMatrix;
-	private SimpleMatrix nextActionVotes;
+	private SimpleMatrix predictionMatrix;
 	private SimpleMatrix ffInput;
 	private SimpleMatrix fbInput;
 	
@@ -36,7 +34,7 @@ public class NeoCorticalUnit{
 	
 	private boolean needHelp;
 	private boolean neededHelpThisTurn; //Used in reporting
-	private double decisionEntropy;
+	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
 	
@@ -52,11 +50,9 @@ public class NeoCorticalUnit{
 	private NewSequencer sequencer;
 	private boolean noTemporal;
 	
-	private int wantedNextAction;
 	
-	
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
-		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, false, 1); //TODO: Not good with actionMatrix size. Has to be changed in future
+	public CopyOfNeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
+		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, false);
 	}
 
 	/**
@@ -70,7 +66,7 @@ public class NeoCorticalUnit{
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal, int actionMatrixSize) {
+	public CopyOfNeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal) {
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
@@ -84,8 +80,7 @@ public class NeoCorticalUnit{
 		} else {
 			this.temporalMapSize = spatialMapSize;
 		}
-		decider = new ActionDecider(markovOrder, 0.1, rand, actionMatrixSize);
-		//decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 1, 1, 0.3, spatialMapSize);
+		decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 1, 1, 0.3, spatialMapSize);
 		//predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
@@ -94,9 +89,9 @@ public class NeoCorticalUnit{
 		ffInputVectorSize = ffInputLength;
 		this.usePrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
-		nextActionVotes = new SimpleMatrix(spatialMapSize, spatialMapSize);
-		nextActionVotes.set(1);
-		nextActionVotes = Normalizer.normalize(nextActionVotes);
+		predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+		predictionMatrix.set(1);
+		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
 		needHelp = false;
 		entropyThreshold = 0;
@@ -104,7 +99,6 @@ public class NeoCorticalUnit{
 		biasBeforePredicting = false;
 		useBiasedInputInSequencer = false;
 		this.noTemporal = noTemporal;
-		wantedNextAction = -1;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -131,20 +125,21 @@ public class NeoCorticalUnit{
 		needHelp = true;
 		
 		if (!noTemporal) {
-			//Decide what action we want to do to get out of the current state
+			//Predict next spatialFFOutputMatrix
 			if (usePrediction){
+				decider.giveExternalReward(reward);
 				if (biasBeforePredicting) {
-					nextActionVotes = decider.chooseNextAction(biasedOutput);
+					predictionMatrix = decider.predict(biasedOutput);
 				} else {
-					nextActionVotes = decider.chooseNextAction(spatialFFOutputMatrix);
+					predictionMatrix = decider.predict(spatialFFOutputMatrix);
 				}
 			} 		
 			
-			decisionEntropy = calculateEntropy(nextActionVotes);
+			predictionEntropy = calculateEntropy(predictionMatrix);
 			
-			needHelp =  (decisionEntropy > entropyThreshold);
+			needHelp =  (predictionEntropy > entropyThreshold);
 			if (!entropyThresholdFrozen){
-				entropyThreshold = entropyDiscountingFactor * decisionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 			}
 			
 			ffOutput = biasedOutput;
@@ -183,7 +178,7 @@ public class NeoCorticalUnit{
 	 * @param correlationMatrix
 	 * @return
 	 */
-	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix, int chosenAction){
+	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
 		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
@@ -209,10 +204,15 @@ public class NeoCorticalUnit{
 			} else {
 				biasMatrix = inputMatrix;
 			}
+			
+			//biasMatrix = biasMatrix.plus(1, predictionMatrix);
+			biasMatrix = biasMatrix.elementMult(predictionMatrix);
+			
+			
 			biasMatrix = normalize(biasMatrix);			
 			
 		} else {
-			biasMatrix = decider.predictNextState(chosenAction);
+			biasMatrix = predictionMatrix;
 		}
 		
 		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
@@ -367,7 +367,7 @@ public class NeoCorticalUnit{
 	}
 
 	public double getEntropy() {
-		return decisionEntropy;
+		return predictionEntropy;
 	}
 	
 	public double getEntropyThreshold() {
@@ -416,12 +416,18 @@ public class NeoCorticalUnit{
 		return fbInput;
 	}
 	
-	public ActionDecider getDecider(){
+	public void printCorrelationMatrix(){
+		if (decider != null){
+			decider.printCorrelationMatrix();
+		}
+	}
+	
+	public Decider getDecider(){
 		return decider;
 	}
 	
 	public int getActionVote(){
-		return decider.getNextWantedAction();
+		
 	}
 	
 

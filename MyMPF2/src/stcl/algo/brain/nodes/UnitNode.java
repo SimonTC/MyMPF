@@ -13,6 +13,7 @@ public class UnitNode extends Node {
 	private NeoCorticalUnit unit;
 	private int temporalMapSize;
 	protected Random rand;
+	private int chosenAction;
 
 	public UnitNode(int id) {
 		super(id);
@@ -37,8 +38,8 @@ public class UnitNode extends Node {
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal);
+	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal, int actionMapSize){
+		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal, actionMapSize);
 		this.temporalMapSize = unit.getTemporalMapSize();
 		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
 		this.rand = rand;
@@ -101,7 +102,7 @@ public class UnitNode extends Node {
 			inputMatrix = Normalizer.normalize(inputMatrix);
 		}
 		
-		feedbackOutput = unit.feedBackward(inputMatrix);
+		feedbackOutput = unit.feedBackward(inputMatrix, chosenAction);
 		needHelp = unit.needHelp();
 	}
 	
@@ -113,6 +114,10 @@ public class UnitNode extends Node {
 	public void setNeedHelp(boolean needHelp){
 		super.setNeedHelp(needHelp);
 		unit.setNeedHelp(needHelp);
+	}
+	
+	public void setChosenAction(int chosenAction){
+		this.chosenAction = chosenAction;
 	}
 
 

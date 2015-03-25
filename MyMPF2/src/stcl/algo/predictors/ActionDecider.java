@@ -25,6 +25,7 @@ public class ActionDecider{
 	private SimpleMatrix probabilityMatrix;
 	private Random rand;
 	private HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState;
+	private int wantedNextAction;
 
 	public ActionDecider(int markovOrder, double learningRate, Random rand, int actionMatrixSize) {
 		int markovWithActions = markovOrder * 2; //Tree should be double as deep as markov order to account for actions
@@ -34,6 +35,7 @@ public class ActionDecider{
 		predictedNextSymbol = -1;
 		this.rand = rand;
 		actionMatrix = new SimpleMatrix(actionMatrixSize, actionMatrixSize);
+		wantedNextAction = -1;
 	}
 
 	/**
@@ -46,7 +48,7 @@ public class ActionDecider{
 			probabilityMatrix = new SimpleMatrix(currentState.numRows(), currentState.numCols()); //Reset the matrix of probabilities of seeing states next turn
 			
 			//Find the id of that symbol which we are most probably observing now
-			int mostProbableStateID = findMostProbableInput(currentState);	
+			int mostProbableStateID = findMaxElement(currentState);	
 			
 			///Add probability that the most probable symbol is indeed the symbol we are observing
 			stateProbabilities.addLast(currentState.get(mostProbableStateID));
@@ -68,6 +70,8 @@ public class ActionDecider{
 				actionMatrix.set(n.getSymbol(), n.getReward());
 			}
 			actionMatrix = Normalizer.normalize(actionMatrix);
+			
+			wantedNextAction = findMaxElement(actionMatrix);
 			
 			return actionMatrix;
 			
@@ -121,7 +125,7 @@ public class ActionDecider{
 	 * @param probabilityMatrix
 	 * @return
 	 */
-	private int findMostProbableInput(SimpleMatrix probabilityMatrix){
+	private int findMaxElement(SimpleMatrix probabilityMatrix){
 		double max = Double.NEGATIVE_INFINITY;
 		int maxID = -1;
 		for (int i = 0; i < probabilityMatrix.getNumElements(); i++){
@@ -163,6 +167,10 @@ public class ActionDecider{
 	public void setLEarningRate(double learningRate) {
 		vomm.setLearningRate(learningRate);
 		
+	}
+	
+	public int getNextWantedAction(){
+		return wantedNextAction;
 	}
 	
 

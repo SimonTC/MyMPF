@@ -24,7 +24,7 @@ public class RockPaperScissors_LearningByWatching {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
-	private ActionNode actionPooler;
+	private ActionNode actionNode;
 	
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
@@ -75,14 +75,16 @@ public class RockPaperScissors_LearningByWatching {
 		//Create node that pools input
 		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
-		//Create node that pools actions
-		actionPooler = new ActionNode(3, combiner);		
-		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
 		
 		//Create action sensor
-		Sensor actionSensor = new Sensor(5, 3, actionPooler);		
+		Sensor actionSensor = new Sensor(5, 3, actionNode);	
+		
+		//Create action node
+		actionNode = new ActionNode(3, 0.05, actionSensor);
+		int actionMapSize = 2;
+		actionNode.initialize(rand, 3, actionMapSize, 0.1);
 		
 		//Initialize unit nodes
 			//Input pooler
@@ -90,24 +92,15 @@ public class RockPaperScissors_LearningByWatching {
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
 			boolean useTemporalPooler_input = false;
-			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input);
-			
-			//Action pooler
-			int ffInputLength_action = actionSensor.getFeedforwardOutputVectorLength();
-			int spatialMapSize_action = 2;
-			int temporalMapSize_action = 2;
-			int markovOrder_action = 2;
-			boolean useTemporalPooler_action = false;
-			actionPooler.initializeUnit(rand, ffInputLength_action, spatialMapSize_action, temporalMapSize_action, 0.1, true, markovOrder_action, !useTemporalPooler_action);
-			actionPooler.setExplorationChance(0.00);
+			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, actionMapSize);
 		
 			//Combiner
-			int ffInputLength_combiner = actionPooler.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
+			int ffInputLength_combiner = actionNode.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 5;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;
-			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner);
+			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner, actionMapSize);
 		
 			//top node
 			int ffInputLength_top = combiner.getFeedforwardOutputVectorLength();
@@ -115,13 +108,12 @@ public class RockPaperScissors_LearningByWatching {
 			int temporalMapSize_top = 3;
 			int markovOrder_top = 2;
 			boolean useTemporalPooler_top = true;
-			topNode.initializeUnit(rand, ffInputLength_top, spatialMapSize_top, temporalMapSize_top, 0.1, true, markovOrder_top, !useTemporalPooler_top);
+			topNode.initializeUnit(rand, ffInputLength_top, spatialMapSize_top, temporalMapSize_top, 0.1, true, markovOrder_top, !useTemporalPooler_top, actionMapSize);
 
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
-		actionPooler.addChild(actionSensor);
+		actionNode.addChild(actionSensor);
 		inputPooler.addChild(inputSensor);
-		combiner.addChild(actionPooler);
 		combiner.addChild(inputPooler);
 		topNode.addChild(combiner);
 		
@@ -130,9 +122,9 @@ public class RockPaperScissors_LearningByWatching {
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
-		brain.addUnitNode(actionPooler, 0);
 		brain.addUnitNode(combiner, 1);
 		brain.addUnitNode(topNode, 2);
+		brain.setActionNode(actionNode);
 		brain.initializeWriters(dataFolder, false);
 	}
 	
@@ -202,7 +194,7 @@ public class RockPaperScissors_LearningByWatching {
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
 			if (i > maxIterations - 1000){
-				actionPooler.setExplorationChance(0);
+				actionNode.setExplorationChance(0);
 			}
 			
 			//Update action chain
@@ -298,9 +290,6 @@ public class RockPaperScissors_LearningByWatching {
 			System.out.println();
 			System.out.println("Prediction model, unit " + id);
 			unit.printPredictionModel();
-			System.out.println();
-			System.out.println("Correlation matrix, unit " + id);
-			unit.printCorrelationMatrix();
 			System.out.println();
 		}
 		

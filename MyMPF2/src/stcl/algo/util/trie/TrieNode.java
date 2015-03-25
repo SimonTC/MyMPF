@@ -39,11 +39,27 @@ public class TrieNode<T>{
 			} 
 			nodeSequence.addFirst(correctChild);
 			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence);
+			this.reward = calculateReward();
 		} else {
 			count++;
 			this.reward += reward;
 		}
 		return nodeSequence;		
+	}
+	
+	/**
+	 * Calculates the reward of a node with children.The reward is equal to the average of the reward of the children
+	 * @return
+	 */
+	private double calculateReward(){
+		double totalReward = 0;
+		for (TrieNode<T> child : children.values()){
+			totalReward += child.getReward();
+		}
+		
+		if (totalReward == 0) return 0;
+		double avgReward = totalReward / (double)children.size();
+		return avgReward;
 	}
 	
 	/**
@@ -83,7 +99,10 @@ public class TrieNode<T>{
 			T childSymbol = sequence.removeFirst();
 			TrieNode<T> correctChild = children.get(childSymbol);
 			boolean childIsEmpty = !correctChild.removeSequence(sequence);				
-			if (childIsEmpty) children.remove(childSymbol);
+			if (childIsEmpty){
+				children.remove(childSymbol);
+			}
+			this.reward = calculateReward();
 		}
 		
 		return count > 0;			
@@ -258,6 +277,10 @@ public class TrieNode<T>{
 	 */
 	public void setSequenceID(int sequenceID) {
 		this.sequenceID = sequenceID;
+	}
+	
+	public double getReward(){
+		return this.reward;
 	}
 	
 	public TrieNode<T> getParent(){

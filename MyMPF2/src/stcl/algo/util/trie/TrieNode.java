@@ -10,12 +10,14 @@ public class TrieNode<T>{
 	private HashMap<T, TrieNode<T>> children;
 	private double probability; //Using when predicting symbols
 	private int sequenceID;
+	private TrieNode<T> parent;
 	
-	public TrieNode(T symbol) {
+	public TrieNode(T symbol, TrieNode<T> parent) {
 		this.count = 0;
 		this.symbol = symbol;
 		children = new HashMap<T, TrieNode<T>>();
 		sequenceID = -2;
+		this.parent = parent;
 	}
 	
 	/**
@@ -114,7 +116,7 @@ public class TrieNode<T>{
 	 * @return
 	 */
 	private TrieNode<T> addNewChild(T symbolOfChild){
-		TrieNode<T> child = new TrieNode<T>(symbolOfChild);
+		TrieNode<T> child = new TrieNode<T>(symbolOfChild, this);
 		children.put(symbolOfChild, child);
 		return child;
 	}
@@ -242,5 +244,9 @@ public class TrieNode<T>{
 	 */
 	public void setSequenceID(int sequenceID) {
 		this.sequenceID = sequenceID;
+	}
+	
+	public TrieNode<T> getParent(){
+		return parent;
 	}
 }

@@ -8,7 +8,7 @@ public class Trie<T> {
 	private TrieNode<T> root;
 	
 	public Trie() {
-		root = new TrieNode<T>(null);
+		root = new TrieNode<T>(null, null);
 	}
 	
 	/**

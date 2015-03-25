@@ -26,6 +26,7 @@ public class ActionNode extends Node {
 		voters = new ArrayList<UnitNode>();
 		influenceVector = new ArrayList<Double>();
 		explorationChance = initialExplorationChance;
+		this.actionSensor = actionSensor;
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){

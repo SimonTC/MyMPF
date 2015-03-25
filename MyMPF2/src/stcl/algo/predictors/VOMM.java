@@ -185,7 +185,7 @@ public class VOMM<T> {
 	 * Updates the current node sequence if learning.
 	 * @param symbol
 	 */
-	public void addSymbol(T symbol){		
+	public void addSymbol(T symbol, double reward){		
 		currentSymbol = symbol;
 		memory.addLast(symbol);			
 		if (memory.size() > trieDepth) memory.removeFirst();
@@ -196,11 +196,15 @@ public class VOMM<T> {
 			for (int j = 1; j <= memory.size(); j++){
 				T c = memory.get(memory.size() - j);
 				context.addFirst(c);
-				currentNodeSequence = trie.add(context);
+				currentNodeSequence = trie.add(context, reward); //TODO: Should the reward be added all the time?
 			}
 		} else {
 			currentNodeSequence = trie.findNodeSequence(memory);
 		}
+	}
+	
+	public void addSymbol(T symbol){
+		this.addSymbol(symbol, 0);
 	}
 	
 	/**

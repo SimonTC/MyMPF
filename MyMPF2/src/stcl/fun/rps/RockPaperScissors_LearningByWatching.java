@@ -92,12 +92,12 @@ public class RockPaperScissors_LearningByWatching {
 			int spatialMapSize_input = 3;
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
-			boolean useTemporalPooler_input = false;
+			boolean useTemporalPooler_input = true;
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, actionMapSize);
 		
 			//Combiner
 			int ffInputLength_combiner = actionNode.getFeedforwardOutputVectorLength() + inputPooler.getFeedforwardOutputVectorLength();
-			int spatialMapSize_combiner = 5;
+			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;

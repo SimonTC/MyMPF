@@ -21,7 +21,7 @@ public class Trie<T> {
 	public LinkedList<TrieNode<T>> add(LinkedList<T> sequence, double reward){
 		LinkedList<TrieNode<T>> nodeSequence = new LinkedList<TrieNode<T>>();
 		LinkedList<T> copy = copySequence(sequence);
-		nodeSequence = root.addSequence(copy, nodeSequence);
+		nodeSequence = root.addSequence(copy, nodeSequence, reward);
 		return nodeSequence;
 	}
 	

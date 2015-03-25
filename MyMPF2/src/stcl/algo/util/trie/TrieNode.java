@@ -40,7 +40,7 @@ public class TrieNode<T>{
 				correctChild = addNewChild(childSymbol);
 			} 
 			nodeSequence.addFirst(correctChild);
-			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence);
+			nodeSequence = correctChild.addSequence(symbolSequence, nodeSequence, reward);
 			this.reward = calculateReward();
 		} else {
 			count++;

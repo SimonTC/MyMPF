@@ -134,10 +134,10 @@ public class NeoCorticalUnit{
 			//Decide what action we want to do to get out of the current state
 			if (usePrediction){
 				if (biasBeforePredicting) {
-					nextActionVotes = actionDecider.chooseNextAction(biasedOutput);
+					nextActionVotes = actionDecider.chooseNextAction(biasedOutput, reward);
 					prediction = predictor.predict(biasedOutput);
 				} else {
-					nextActionVotes = actionDecider.chooseNextAction(spatialFFOutputMatrix);
+					nextActionVotes = actionDecider.chooseNextAction(spatialFFOutputMatrix, reward);
 					prediction = predictor.predict(spatialFFOutputMatrix);
 				}
 				predictionEntropy = calculateEntropy(prediction);
@@ -306,6 +306,7 @@ public class NeoCorticalUnit{
 	public void flush(){
 		biasMatrix.set(1);
 		actionDecider.flush();
+		predictor.flush();
 		if (sequencer != null) sequencer.reset();
 	}
 	

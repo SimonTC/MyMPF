@@ -30,6 +30,7 @@ public class ActionDecider{
 	public ActionDecider(int markovOrder, double learningRate, Random rand, int actionMatrixSize) {
 		int markovWithActions = markovOrder * 2; //Tree should be double as deep as markov order to account for actions
 		vomm = new VOMM<Integer>(markovWithActions, learningRate);
+		flush();
 		stateProbabilities = new LinkedList<Double>();
 		this.markovOrder = markovOrder;
 		predictedNextSymbol = -1;
@@ -44,18 +45,18 @@ public class ActionDecider{
 	 * @param actionToGetHere
 	 * @return
 	 */
-	public SimpleMatrix chooseNextAction(SimpleMatrix currentState) {	
+	public SimpleMatrix chooseNextAction(SimpleMatrix currentState, double reward) {	
 			probabilityMatrix = new SimpleMatrix(currentState.numRows(), currentState.numCols()); //Reset the matrix of probabilities of seeing states next turn
 			
 			//Find the id of that symbol which we are most probably observing now
 			int mostProbableStateID = findMaxElement(currentState);	
 			
-			///Add probability that the most probable symbol is indeed the symbol we are observing
+			//Add probability that the most probable symbol is indeed the symbol we are observing
 			stateProbabilities.addLast(currentState.get(mostProbableStateID));
 			if (stateProbabilities.size() > markovOrder) stateProbabilities.removeFirst();
 			
 			//Add action and state to the tree
-			vomm.addSymbol(mostProbableStateID);
+			vomm.addSymbol(mostProbableStateID, reward);
 			
 			//Collect the currently observed node sequence
 			LinkedList<TrieNode<Integer>> currentSequence =  vomm.getCurrentNodeSequence();
@@ -144,6 +145,9 @@ public class ActionDecider{
 
 	public void flush() {
 		vomm.flushMemory();		
+		stateProbabilities = new LinkedList<Double>();
+		//Add starting action 
+		vomm.addSymbol(-1);
 	}
 
 	public SimpleMatrix getActionMatrix() {

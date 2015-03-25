@@ -69,6 +69,9 @@ public class ActionDecider{
 			for (TrieNode<Integer> n : actionsFromCurrentState.values()){
 				actionMatrix.set(n.getSymbol(), n.getReward());
 			}
+			
+			if (actionMatrix.elementSum() == 0) actionMatrix.set(1);
+			
 			actionMatrix = Normalizer.normalize(actionMatrix);
 			
 			wantedNextAction = findMaxElement(actionMatrix);

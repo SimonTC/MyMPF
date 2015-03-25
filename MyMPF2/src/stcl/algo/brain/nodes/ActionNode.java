@@ -43,13 +43,12 @@ public class ActionNode extends Node {
 	public void feedback() {
 		
 		if (rand.nextDouble() < explorationChance){
-			nextActionID = rand.nextInt(votes.getNumElements());
-			//TODO: Implement better exploration policy
+			nextActionID = doExploration();
 		} else {
 			//Collect action votes
 			int mostPopularAction = -1;
 			double highestVote = Double.NEGATIVE_INFINITY;
-			for (int i = 0;i < voters.size(); i++){
+			for (int i = 0; i < voters.size(); i++){
 				UnitNode n = voters.get(i);
 				NeoCorticalUnit unit = n.getUnit();
 				if (unit.active() && !unit.needHelp()){
@@ -63,12 +62,23 @@ public class ActionNode extends Node {
 						mostPopularAction = vote;
 					}
 				}				
-			}			
-			nextActionID = mostPopularAction;
+			}
+			if (mostPopularAction < 0){
+				nextActionID = doExploration(); //Might happen if all nodes needs help
+			} else {
+				nextActionID = mostPopularAction;
+			}
 		}		
 		
 		nextAction = pooler.getSOM().getNode(nextActionID).getVector();
+		feedbackOutput = nextAction;
 		
+	}
+	
+	private int doExploration(){
+		//TODO: Implement better exploration policy
+		int nextAction = rand.nextInt(votes.getNumElements());
+		return nextAction;
 	}
 
 	@Override

@@ -85,6 +85,7 @@ public class RockPaperScissors_LearningByWatching {
 		actionNode = new ActionNode(3, 0.05, actionSensor);
 		int actionMapSize = 2;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1);
+		actionSensor.setParent(actionNode);
 		
 		//Initialize unit nodes
 			//Input pooler

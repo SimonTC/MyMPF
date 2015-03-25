@@ -12,6 +12,7 @@ public class TrieNode<T>{
 	private int sequenceID;
 	private TrieNode<T> parent;
 	private double reward;
+	private double rewardDecay;
 	
 	public TrieNode(T symbol, TrieNode<T> parent) {
 		this.count = 0;
@@ -20,6 +21,7 @@ public class TrieNode<T>{
 		sequenceID = -2;
 		this.parent = parent;
 		reward = 0;
+		rewardDecay = 0.2; //TODO: SHould be a parameter
 	}
 	
 	/**
@@ -42,9 +44,20 @@ public class TrieNode<T>{
 			this.reward = calculateReward();
 		} else {
 			count++;
-			this.reward += reward;
+			double oldReward = this.reward;
+			this.reward = oldReward * (1-rewardDecay) + reward;
 		}
 		return nodeSequence;		
+	}
+	
+	/**
+	 * Adds an occurrence of this sequence to the node.
+	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
+	 * If no child-node corresponds to the next symbol, a new child is created.
+	 * @param symbolSequence the sequence of symbols coming after this node
+	 */
+	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
+		return this.addSequence(symbolSequence, nodeSequence, 0);
 	}
 	
 	/**
@@ -60,16 +73,6 @@ public class TrieNode<T>{
 		if (totalReward == 0) return 0;
 		double avgReward = totalReward / (double)children.size();
 		return avgReward;
-	}
-	
-	/**
-	 * Adds an occurrence of this sequence to the node.
-	 * If the sequence doesn't end in this node, the remaining sequence is added to the child node corresponding to the next symbol in the sequence.
-	 * If no child-node corresponds to the next symbol, a new child is created.
-	 * @param symbolSequence the sequence of symbols coming after this node
-	 */
-	public LinkedList<TrieNode<T>> addSequence(LinkedList<T> symbolSequence, LinkedList<TrieNode<T>> nodeSequence){
-		return this.addSequence(symbolSequence, nodeSequence, 0);
 	}
 	
 	/**

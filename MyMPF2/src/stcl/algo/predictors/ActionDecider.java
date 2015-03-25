@@ -116,24 +116,6 @@ public class ActionDecider{
 		return d;
 	}
 	
-	private int findInputByRoulette(SimpleMatrix probabilityMatrix){
-		double v = rand.nextDouble();
-		double sum = 0;
-		boolean found = false;
-		int id = -1;
-		int i = 0;
-		do{
-			double d = probabilityMatrix.get(i);
-			sum += d;
-			if (sum >= v){
-				found = true;
-				id = 1;
-			}
-			i++;
-		} while (!found && i < probabilityMatrix.getNumElements());
-		return id;
-	}
-	
 	/**
 	 * Finds the id of the element with the highest value
 	 * @param probabilityMatrix

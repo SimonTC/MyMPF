@@ -419,5 +419,9 @@ public class NeoCorticalUnit{
 		return decider;
 	}
 	
+	public int getActionVote(){
+		
+	}
+	
 
 }

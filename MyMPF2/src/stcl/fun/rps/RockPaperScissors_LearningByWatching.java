@@ -9,7 +9,7 @@ import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.brain.Network_DataCollector;
-import stcl.algo.brain.nodes.ExplorationNode;
+import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
@@ -24,7 +24,7 @@ public class RockPaperScissors_LearningByWatching {
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
-	private ExplorationNode actionPooler;
+	private ActionNode actionPooler;
 	
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
@@ -76,7 +76,7 @@ public class RockPaperScissors_LearningByWatching {
 		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
 		//Create node that pools actions
-		actionPooler = new ExplorationNode(3, combiner);		
+		actionPooler = new ActionNode(3, combiner);		
 		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		

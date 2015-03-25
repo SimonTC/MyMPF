@@ -146,18 +146,6 @@ public class NeoCorticalUnit{
 			needHelp = sequencer.needHelp();
 			
 			wantedNextAction = sequencer.getWantedAction();
-			
-			//Decide what action we want to do to get out of the current state
-			if (usePrediction){
-				if (biasBeforePredicting) {
-					nextActionVotes = actionDecider.chooseNextAction(biasedOutput, reward);
-					prediction = predictor.predict(biasedOutput);
-				} else {
-					nextActionVotes = actionDecider.chooseNextAction(spatialFFOutputMatrix, reward);
-					prediction = predictor.predict(spatialFFOutputMatrix);
-				}
-				predictionEntropy = calculateEntropy(prediction);
-			} 		
 		} else {
 			//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
 		}

@@ -31,7 +31,7 @@ public class RockPaperScissors_LearningByWatching {
 	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();
-		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
+		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	

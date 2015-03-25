@@ -75,13 +75,15 @@ public class NewSequencer {
 		
 		//Decide what action to vote for next
 		LinkedList<TrieNode<Integer>> nodesequence = trie.findNodeSequence(currentSequence);
-		TrieNode<Integer> currentStateNode = nodesequence.peekFirst();
-		HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
-		
-		//Create weight matrix for the different possible actions
 		actionMatrix.set(0);
-		for (TrieNode<Integer> n : actionsFromCurrentState.values()){
-			actionMatrix.set(n.getSymbol(), n.getReward());
+		if (nodesequence != null){
+			TrieNode<Integer> currentStateNode = nodesequence.peekFirst();
+			HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
+			
+			//Create weight matrix for the different possible actions
+			for (TrieNode<Integer> n : actionsFromCurrentState.values()){
+				actionMatrix.set(n.getSymbol(), n.getReward());
+			}
 		}
 		
 		if (actionMatrix.elementSum() == 0) actionMatrix.set(1);
@@ -107,8 +109,6 @@ public class NewSequencer {
 		//If the chance of being in a sequence is less than 10% we set it to zero
 		//This should make the output a bit more clean
 		removeLowChanceSequences();
-		
-		if (needHelp) reset();
 		
 		return sequenceProbabilities;
 	}
@@ -145,25 +145,31 @@ public class NewSequencer {
 					symbolProbabilities.set(symbolID, newValue);				
 				}				
 			}
+			reset();
 		} else {
+			symbolProbabilities.set(1);
 			LinkedList<TrieNode<Integer>> nodesequence = trie.findNodeSequence(currentSequence);
-			TrieNode<Integer> currentStateNode = nodesequence.peekFirst();
-			HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
-			TrieNode<Integer> action = actionsFromCurrentState.get(chosenAction);
-
-			if (action == null){
-				symbolProbabilities.set(1);
-			} else {
-				HashMap<Integer, TrieNode<Integer>> possibleNextStates = action.getChildren();
-				int totalCount = action.getCount();
-				
-				for (TrieNode<Integer> state : possibleNextStates.values()){
-					int count = state.getCount();
-					double probability = (double) count / totalCount;
-					int id = state.getSymbol();
-					symbolProbabilities.set(id, probability);
+			if (nodesequence != null){	
+				TrieNode<Integer> currentStateNode = nodesequence.peekFirst();	
+				if (currentStateNode != null){	
+					HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
+					TrieNode<Integer> action = actionsFromCurrentState.get(chosenAction);
+		
+					if (action == null){
+						symbolProbabilities.set(1);
+					} else {
+						HashMap<Integer, TrieNode<Integer>> possibleNextStates = action.getChildren();
+						int totalCount = action.getCount();
+						
+						for (TrieNode<Integer> state : possibleNextStates.values()){
+							int count = state.getCount();
+							double probability = (double) count / totalCount;
+							int id = state.getSymbol();
+							symbolProbabilities.set(id, probability);
+						}
+					}	
 				}
-			}		
+			}
 		}
 		
 		symbolProbabilities = Normalizer.normalize(symbolProbabilities);

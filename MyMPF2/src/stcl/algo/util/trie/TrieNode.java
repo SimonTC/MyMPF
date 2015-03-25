@@ -289,4 +289,8 @@ public class TrieNode<T>{
 	public TrieNode<T> getParent(){
 		return parent;
 	}
+	
+	public HashMap<T, TrieNode<T>> getChildren(){
+		return children;
+	}
 }

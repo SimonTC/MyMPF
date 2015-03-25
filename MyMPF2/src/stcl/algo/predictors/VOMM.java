@@ -252,6 +252,11 @@ public class VOMM<T> {
 		return memory;
 	}
 	
+	/**
+	 * Returns the current active node sequence.
+	 * This first node in the list corresponds to the last node in the sequence
+	 * @return
+	 */
 	public LinkedList<TrieNode<T>> getCurrentNodeSequence(){
 		return currentNodeSequence;
 	}

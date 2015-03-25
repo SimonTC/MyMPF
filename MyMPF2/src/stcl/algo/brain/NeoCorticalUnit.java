@@ -19,9 +19,9 @@ import dk.stcl.core.basic.containers.SomNode;
 public class NeoCorticalUnit{
 	
 	private SpatialPooler spatialPooler;
-	//private Predictor_VOMM predictor;
+	private Predictor_VOMM predictor;
 	//private Decider decider;
-	private ActionDecider decider;
+	private ActionDecider actionDecider;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix nextActionVotes;
 	private SimpleMatrix ffInput;
@@ -36,7 +36,7 @@ public class NeoCorticalUnit{
 	
 	private boolean needHelp;
 	private boolean neededHelpThisTurn; //Used in reporting
-	private double decisionEntropy;
+	private double predictionEntropy;
 	private double entropyThreshold; //The exponential moving average of the prediction entropy
 	private double entropyDiscountingFactor;
 	
@@ -84,9 +84,9 @@ public class NeoCorticalUnit{
 		} else {
 			this.temporalMapSize = spatialMapSize;
 		}
-		decider = new ActionDecider(markovOrder, 0.1, rand, actionMatrixSize);
+		actionDecider = new ActionDecider(markovOrder, 0.1, rand, actionMatrixSize);
 		//decider = new Decider(markovOrder, initialPredictionLearningRate, rand, 1, 1, 0.3, spatialMapSize);
-		//predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
+		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(this.temporalMapSize, this.temporalMapSize);
@@ -129,22 +129,25 @@ public class NeoCorticalUnit{
 		
 		ffOutput = biasedOutput;
 		needHelp = true;
-		
+		SimpleMatrix prediction;
 		if (!noTemporal) {
 			//Decide what action we want to do to get out of the current state
 			if (usePrediction){
 				if (biasBeforePredicting) {
-					nextActionVotes = decider.chooseNextAction(biasedOutput);
+					nextActionVotes = actionDecider.chooseNextAction(biasedOutput);
+					prediction = predictor.predict(biasedOutput);
 				} else {
-					nextActionVotes = decider.chooseNextAction(spatialFFOutputMatrix);
+					nextActionVotes = actionDecider.chooseNextAction(spatialFFOutputMatrix);
+					prediction = predictor.predict(spatialFFOutputMatrix);
 				}
+				predictionEntropy = calculateEntropy(prediction);
 			} 		
 			
-			decisionEntropy = calculateEntropy(nextActionVotes);
 			
-			needHelp =  (decisionEntropy > entropyThreshold);
+			
+			needHelp =  (predictionEntropy > entropyThreshold);
 			if (!entropyThresholdFrozen){
-				entropyThreshold = entropyDiscountingFactor * decisionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 			}
 			
 			ffOutput = biasedOutput;
@@ -212,7 +215,7 @@ public class NeoCorticalUnit{
 			biasMatrix = normalize(biasMatrix);			
 			
 		} else {
-			biasMatrix = decider.predictNextState(chosenAction);
+			biasMatrix = actionDecider.predictNextState(chosenAction);
 		}
 		
 		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
@@ -302,13 +305,13 @@ public class NeoCorticalUnit{
 	
 	public void flush(){
 		biasMatrix.set(1);
-		decider.flush();
+		actionDecider.flush();
 		if (sequencer != null) sequencer.reset();
 	}
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
-		decider.setLearning(learning);
+		actionDecider.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}
 
@@ -353,7 +356,7 @@ public class NeoCorticalUnit{
 	}
 
 	public void printPredictionModel() {
-		decider.printModel();
+		actionDecider.printModel();
 		
 	}
 
@@ -367,7 +370,7 @@ public class NeoCorticalUnit{
 	}
 
 	public double getEntropy() {
-		return decisionEntropy;
+		return predictionEntropy;
 	}
 	
 	public double getEntropyThreshold() {
@@ -417,11 +420,11 @@ public class NeoCorticalUnit{
 	}
 	
 	public ActionDecider getDecider(){
-		return decider;
+		return actionDecider;
 	}
 	
 	public int getActionVote(){
-		return decider.getNextWantedAction();
+		return actionDecider.getNextWantedAction();
 	}
 	
 

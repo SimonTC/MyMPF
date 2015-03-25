@@ -21,7 +21,7 @@ public class TrieNode<T>{
 		sequenceID = -2;
 		this.parent = parent;
 		reward = 0;
-		rewardDecay = 0.2; //TODO: SHould be a parameter
+		rewardDecay = 0.2; //TODO: Should be a parameter
 	}
 	
 	/**

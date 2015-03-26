@@ -83,7 +83,7 @@ public class RockPaperScissors_LearningByWatching {
 		Sensor actionSensor = new Sensor(5, 3, null);
 
 		//Create action node
-		actionNode = new ActionNode(3, 0.00, actionSensor);
+		actionNode = new ActionNode(3, 0.05, actionSensor);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1);
@@ -197,7 +197,7 @@ public class RockPaperScissors_LearningByWatching {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
-			if (i == 9000){
+			if (i == 9985){
 				System.out.println();
 			}
 			
@@ -246,6 +246,7 @@ public class RockPaperScissors_LearningByWatching {
 				}
 				
 			if (i > maxIterations - 100){
+				actionNode.setExplorationChance(0);
 				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			}
 			

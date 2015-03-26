@@ -195,6 +195,10 @@ public class RockPaperScissors_LearningByWatching {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
+			if (i == 9000){
+				System.out.println();
+			}
+			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			

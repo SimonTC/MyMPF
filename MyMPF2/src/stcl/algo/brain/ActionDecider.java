@@ -3,6 +3,7 @@ package stcl.algo.brain;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
+import stcl.algo.util.Orthogonalizer;
 
 public class ActionDecider {
 	
@@ -44,10 +45,14 @@ public class ActionDecider {
 		return bestAction;
 	}
 	
-	private void correlateActionAndReward(int actionToGetHere, double reward){
+	private void correlateActionAndReward(int actionPerformed, double reward){
 		//Correlate state we were in before with the action done and reward received
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
-		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionToGetHere);
+		
+		//TEsting how orthogonalization works with it
+		SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(stateProbabilitiesBefore);
+		
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, tmp.getMatrix().data);
+		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformed);
 		
 		//Decay old rewards
 		correlationVector = correlationVector.scale(1-decayFactor);
@@ -55,7 +60,7 @@ public class ActionDecider {
 		//Add new rewards
 		correlationVector = correlationVector.plus(reward, stateVector);
 		
-		correlationMatrix.insertIntoThis(actionToGetHere, 0, correlationVector);
+		correlationMatrix.insertIntoThis(actionPerformed, 0, correlationVector);
 		
 		//Normalize columns of correlationMatrix
 		//correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);

@@ -126,7 +126,7 @@ public class NeoCorticalUnit{
 		ffOutput = biasedOutput;
 		needHelp = true;
 		
-		chosenAction = decider.decideNextAction(spatialPooler.getSOM().getBMU().getId(), actionPerformed, reward);
+		chosenAction = decider.decideNextAction(spatialFFOutputMatrix, actionPerformed, reward);
 		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix

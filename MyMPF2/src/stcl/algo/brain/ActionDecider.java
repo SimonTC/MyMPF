@@ -8,7 +8,7 @@ import stcl.algo.util.Orthogonalizer;
 public class ActionDecider {
 	
 	private SimpleMatrix correlationMatrix;
-	private int stateBefore;
+	private SimpleMatrix stateProbabilitiesBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
 	private double decayFactor;
@@ -18,23 +18,25 @@ public class ActionDecider {
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
 		this.decayFactor = 0.1;//decayFactor;
-		stateBefore = -1;
 	}
 	
-	public int decideNextAction(int currentStateID, int actionToGetHere, double reward){
-		if (stateBefore != -1){
+	public int decideNextAction(SimpleMatrix currentStateProbabilities, int actionToGetHere, double reward){
+		if (stateProbabilitiesBefore != null){
 			correlateActionAndReward(actionToGetHere, reward);
 		}
-		int actionToDo = chooseBestAction(currentStateID);
-		stateBefore = currentStateID;
+		int actionToDo = chooseBestAction(currentStateProbabilities);
+		stateProbabilitiesBefore = currentStateProbabilities;
 		return actionToDo;		
 	}
 	
-	private int chooseBestAction(int currentStateID){
+	private int chooseBestAction(SimpleMatrix currentStateProbabilities){
 		int bestAction = -1;
 		double highestReward = Double.NEGATIVE_INFINITY;
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, currentStateProbabilities.getMatrix().data);
 		for (int action = 0; action < numPossibleActions; action++){
-			double reward = correlationMatrix.get(action, currentStateID);
+			SimpleMatrix correlationVector = correlationMatrix.extractVector(true, action);
+			SimpleMatrix rewardVector = correlationVector.elementMult(stateVector);
+			double reward = rewardVector.elementSum();
 			if (reward > highestReward){
 				highestReward = reward;
 				bestAction = action;
@@ -44,25 +46,18 @@ public class ActionDecider {
 	}
 	
 	private void correlateActionAndReward(int actionPerformed, double reward){
-		//Decay values in correlation matrix
-		correlationMatrix = correlationMatrix.scale(1-decayFactor);
-		double oldValue = correlationMatrix.get(actionPerformed, stateBefore);
-		double newValue = oldValue + reward;
-		correlationMatrix.set(actionPerformed, stateBefore, newValue);
-		
-		/*
+		//Correlate state we were in before with the action done and reward received
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
 		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformed);
 		
 		//Decay old rewards
 		correlationVector = correlationVector.scale(1-decayFactor);
 		
 		//Add new rewards
-		double oldValue = correlationVector.get(stateBefore);
-		double newValue = oldValue + reward;
-		correlationVector.set(newValue);
+		correlationVector = correlationVector.plus(reward, stateVector);
 		
 		correlationMatrix.insertIntoThis(actionPerformed, 0, correlationVector);
-		*/
+		
 		//Normalize columns of correlationMatrix
 		//correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);
 	}

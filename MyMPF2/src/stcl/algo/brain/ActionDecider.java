@@ -47,11 +47,7 @@ public class ActionDecider {
 	
 	private void correlateActionAndReward(int actionPerformed, double reward){
 		//Correlate state we were in before with the action done and reward received
-		
-		//TEsting how orthogonalization works with it
-		SimpleMatrix tmp = Orthogonalizer.aggressiveOrthogonalization(stateProbabilitiesBefore);
-		
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, tmp.getMatrix().data);
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
 		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformed);
 		
 		//Decay old rewards

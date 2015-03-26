@@ -126,14 +126,14 @@ public class NeoCorticalUnit{
 		ffOutput = biasedOutput;
 		needHelp = true;
 		
+		chosenAction = decider.decideNextAction(spatialFFOutputMatrix, actionPerformed, reward);
+		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix
 			if (usePrediction){
 				if (biasBeforePredicting) {
-					chosenAction = decider.decideNextAction(biasedOutput, actionPerformed, reward);
 					predictionMatrix = predictor.predict(biasedOutput);
 				} else {
-					chosenAction = decider.decideNextAction(spatialFFOutputMatrix, actionPerformed, reward);
 					predictionMatrix = predictor.predict(spatialFFOutputMatrix);
 				}
 			} 		

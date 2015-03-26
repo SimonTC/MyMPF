@@ -68,13 +68,13 @@ public class RockPaperScissors_LearningByWatching {
 		
 		//Create nodes
 		//Create top node
-		UnitNode topNode = new UnitNode(0);
+		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, topNode);		
+		//UnitNode combiner = new UnitNode(1, topNode);		
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, combiner);		
+		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
@@ -83,7 +83,7 @@ public class RockPaperScissors_LearningByWatching {
 		Sensor actionSensor = new Sensor(5, 3, null);
 
 		//Create action node
-		actionNode = new ActionNode(3, 0.05, actionSensor);
+		actionNode = new ActionNode(3, 0.00, actionSensor);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1);
@@ -98,6 +98,7 @@ public class RockPaperScissors_LearningByWatching {
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
 		
 			//Combiner
+			/*
 			int ffInputLength_combiner = inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
@@ -112,21 +113,21 @@ public class RockPaperScissors_LearningByWatching {
 			int markovOrder_top = 2;
 			boolean useTemporalPooler_top = true;
 			topNode.initializeUnit(rand, ffInputLength_top, spatialMapSize_top, temporalMapSize_top, 0.1, true, markovOrder_top, !useTemporalPooler_top, numActions);
-
+			*/
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
 		inputPooler.addChild(inputSensor);
-		combiner.addChild(inputPooler);
-		topNode.addChild(combiner);
+		//combiner.addChild(inputPooler);
+		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
 		brain = new Network_DataCollector();
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
-		brain.addUnitNode(combiner, 1);
-		brain.addUnitNode(topNode, 2);
+		//brain.addUnitNode(combiner, 1);
+		//brain.addUnitNode(topNode, 2);
 		brain.setActionNode(actionNode);
 		brain.initializeWriters(dataFolder, false);
 	}
@@ -187,6 +188,7 @@ public class RockPaperScissors_LearningByWatching {
 		
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
+		SimpleMatrix actionPerformed = null;
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
@@ -199,6 +201,9 @@ public class RockPaperScissors_LearningByWatching {
 				System.out.println();
 			}
 			
+			actionPerformed = actionNow;
+			actionNow = null;
+			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			
@@ -210,7 +215,7 @@ public class RockPaperScissors_LearningByWatching {
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionNow);
+			sensors.get(1).setInput(actionPerformed);
 			
 			//Do one step
 			brain.step(externalReward);

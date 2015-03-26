@@ -59,7 +59,7 @@ public class ActionDecider {
 		correlationMatrix.insertIntoThis(actionPerformed, 0, correlationVector);
 		
 		//Normalize columns of correlationMatrix
-		//correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);
+		correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);
 	}
 	
 	public void printCorrelationMatrix(){

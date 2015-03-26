@@ -51,6 +51,8 @@ public class Network_DataCollector extends Network {
 	private double[] predictionEntropies;
 	private double[] entropiesThresholds;
 	
+	private int[] actionVotes;
+	
 	//Misc
 	private boolean collectData;
 	private int numUnits;
@@ -130,6 +132,7 @@ public class Network_DataCollector extends Network {
 			FFOutputs = (collectUnitOutputs(true));
 			temporalActivations = (collectActivations(false));
 			spatialActivations = (collectActivations(true));
+			actionVotes = collectActionVotes();
 		}
 		
 		//Feed back
@@ -182,6 +185,8 @@ public class Network_DataCollector extends Network {
 		header += writeRepeatedString("FB Input", 1, ";");
 		header += writeRepeatedString("FB Output", 1, ";");
 		
+		header +=writeRepeatedString("Action vote", 1, ";");
+		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		
 		for (FileWriter w : unitWriters) w.writeLine(header);
@@ -215,6 +220,8 @@ public class Network_DataCollector extends Network {
 			
 			writer.write(writeMatrixArray(FBInputs[i]) + ";");
 			writer.write(writeMatrixArray(FBOutputs[i]) + ";");
+			
+			writer.write(actionVotes[i] + ";");
 			
 			writer.writeLine("");
 		}
@@ -316,6 +323,16 @@ public class Network_DataCollector extends Network {
 		}
 		
 		return status;
+	}
+	
+	private int[] collectActionVotes(){
+		int[] votes = new int[numUnits];
+		for (int i = 0; i < numUnits; i++){
+			int vote = super.getUnitNodes().get(i).getActionVote();
+			votes[i] = vote;
+		}
+		
+		return votes;
 	}
 	
 	private SimpleMatrix[] collectActivations(boolean spatial){

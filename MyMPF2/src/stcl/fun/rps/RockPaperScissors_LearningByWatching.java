@@ -187,7 +187,6 @@ public class RockPaperScissors_LearningByWatching {
 		
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
-		SimpleMatrix actionNext = new SimpleMatrix(tmp); //m(t+1)
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
@@ -196,18 +195,12 @@ public class RockPaperScissors_LearningByWatching {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
-			//Update action chain
-			actionNow = actionNext;
-			actionNext = null;// actionAfterNext;
-			//actionAfterNext = null;
-			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			
 			//Calculate prediction error
 			SimpleMatrix diff = input.minus(prediction);
-			double predictionError = diff.normF();
-			
+			double predictionError = diff.normF();			
 			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
@@ -223,22 +216,22 @@ public class RockPaperScissors_LearningByWatching {
 			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
-			actionNext = sensors.get(1).getFeedbackOutput();
+			actionNow = sensors.get(1).getFeedbackOutput();
 
 			//Decide what to do with the action
 				//Set max value of action to 1. The rest to zero
-				int max = maxID(actionNext);
+				int max = maxID(actionNow);
 				if (max != -1){
-					actionNext.set(0);
-					actionNext.set(max, 1);
+					actionNow.set(0);
+					actionNow.set(max, 1);
 				}
 				
 				//Calculate reward			
 				if ( i > 3){ //To get out of wrong actions
 					int actionID = -1;
-					if (actionNext.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-					if (actionNext.get(1) > 0.1 ) actionID = 1;
-					if (actionNext.get(2) > 0.1 ) actionID = 2;
+					if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+					if (actionNow.get(1) > 0.1 ) actionID = 1;
+					if (actionNow.get(2) > 0.1 ) actionID = 2;
 					int inputID = labelSequence[curInput];
 					externalReward = reward(inputID, actionID);
 				}

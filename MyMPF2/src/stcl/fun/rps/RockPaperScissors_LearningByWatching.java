@@ -44,8 +44,8 @@ public class RockPaperScissors_LearningByWatching {
 		//Show
 		brain.closeFiles();
 		//brain.setUsePrediction(false);
-		runLearning(learningIterations);
-		printInformation();
+		//runLearning(learningIterations);
+		//printInformation();
 		
 		//Train
 		//brain.setBiasBeforePrediction(true);
@@ -375,9 +375,9 @@ public class RockPaperScissors_LearningByWatching {
 		};
 		
 		blank = new SimpleMatrix(blankData);
-		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
-		int[] lbl = {0,1,1,2};
-		int[] lbl_counter = {1,2,2,0};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors, rock, paper, scissors, scissors, rock};
+		int[] lbl = {0,1,1,2,0,1,2,2,0};
+		int[] lbl_counter = {1,2,2,0,1,2,0,0,1};
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

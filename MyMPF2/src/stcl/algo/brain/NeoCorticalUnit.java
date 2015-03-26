@@ -117,8 +117,8 @@ public class NeoCorticalUnit{
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Bias output
-		//SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
-		SimpleMatrix biasedOutput = biasTowardsPrediction(spatialFFOutputMatrix, biasMatrix, 0.5);
+		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
+		//SimpleMatrix biasedOutput = biasTowardsPrediction(spatialFFOutputMatrix, biasMatrix, 0.5);
 		
 		ffOutput = biasedOutput;
 		needHelp = true;

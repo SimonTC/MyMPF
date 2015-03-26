@@ -17,21 +17,25 @@ public class ActionNode extends Node {
 	private int currentAction;
 	private int nextActionID;
 	private Random rand;
+	private ArrayList<Integer>givenVotes;
 	private ArrayList<Double> influenceVector;
-	private SimpleMatrix votes;
+	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
+	private double rewardInfluence;
 
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id);
 		voters = new ArrayList<UnitNode>();
 		influenceVector = new ArrayList<Double>();
+		givenVotes = new ArrayList<Integer>();
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
+		this.rewardInfluence = 0.2; //TODO: Make a parameter
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){
 		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, 0.1, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
-		votes = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
+		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
 	}
 	
@@ -51,14 +55,15 @@ public class ActionNode extends Node {
 			for (int i = 0; i < voters.size(); i++){
 				UnitNode n = voters.get(i);
 				NeoCorticalUnit unit = n.getUnit();
-				
+				givenVotes.set(i, -1);
 				boolean mayVote = unit.active();// && !unit.needHelp();
 				if (mayVote){
 					int vote = unit.getNextAction();
-					double influence = influenceVector.get(i);
-					double currentVoteValue = votes.get(vote);
-					double newValue = currentVoteValue + influence;
-					votes.set(newValue);
+					givenVotes.set(i, vote);
+					double voteInfluence = influenceVector.get(i);
+					double currentVoteValue = votesForActions.get(vote);
+					double newValue = currentVoteValue + voteInfluence;
+					votesForActions.set(newValue);
 					if (newValue > highestVote){
 						highestVote = newValue;
 						mostPopularAction = vote;
@@ -79,7 +84,7 @@ public class ActionNode extends Node {
 	
 	private int doExploration(){
 		//TODO: Implement better exploration policy
-		int nextAction = rand.nextInt(votes.getNumElements());
+		int nextAction = rand.nextInt(votesForActions.getNumElements());
 		return nextAction;
 	}
 
@@ -88,8 +93,23 @@ public class ActionNode extends Node {
 		pooler.feedForward(actionSensor.getFeedforwardOutput());
 		currentAction = pooler.getSOM().getBMU().getId();
 		
+		
 		//TODO: Implement weighting of votes
 		//Update weights of voters
+		//If you voted for the action that was performed your influenced is changed based on how good the outcome was
+		for (int voter = 0; voter < voters.size(); voter++){
+			int vote = givenVotes.get(voter);
+			if (vote != -1){
+				//Voter did vote in last election
+				if (vote == actionPerformed){
+					double oldInfluence = influenceVector.get(voter);
+					double newInfluence = oldInfluence + reward * rewardInfluence;
+					if (newInfluence < 0) newInfluence = 0;
+					influenceVector.set(voter, newInfluence);
+				}
+			}
+		}
+		
 			//Good votes --> higher influence of future votes
 			//Bad votes --> lower influence of future votes
 	}
@@ -97,6 +117,7 @@ public class ActionNode extends Node {
 	public void addVoter(UnitNode voter){
 		voters.add(voter);
 		influenceVector.add(1.0);
+		givenVotes.add(-1);
 	}
 	
 	public int getNextActionID(){

@@ -71,13 +71,13 @@ public class RockPaperScissors_LearningByWatching {
 		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		//UnitNode combiner = new UnitNode(1, null);		
+		//UnitNode combiner = new UnitNode(1, topNode);		
 		
 		//Create node that pools input
 		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
-		Sensor inputSensor = new Sensor(4, ffInputLength, inputPooler);		
+		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
 		
 		//Create action sensor
 		Sensor actionSensor = new Sensor(5, 3, null);
@@ -196,6 +196,10 @@ public class RockPaperScissors_LearningByWatching {
 		
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
+			
+			if (i == 9985){
+				System.out.println();
+			}
 			
 			actionPerformed = actionNow;
 			actionNow = null;
@@ -382,9 +386,9 @@ public class RockPaperScissors_LearningByWatching {
 		};
 		
 		blank = new SimpleMatrix(blankData);
-		SimpleMatrix[] tmp = {rock, paper, paper, scissors, paper,paper, rock};
-		int[] lbl = {0,1,1,2,1,1,2};
-		int[] lbl_counter = {1,2,2,0,2,2,0};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
+		int[] lbl = {0,1,1,2};
+		int[] lbl_counter = {1,2,2,0};
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

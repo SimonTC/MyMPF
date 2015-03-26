@@ -209,16 +209,6 @@ public class RockPaperScissors_LearningByWatching {
 			double predictionError = diff.normF();
 			
 			
-			//Calculate reward			
-			if ( i > 3){ //To get out of wrong actions
-				int actionID = -1;
-				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionNow.get(1) > 0.1 ) actionID = 1;
-				if (actionNow.get(2) > 0.1 ) actionID = 2;
-				
-				externalReward = reward(labelSequence[curInput], actionID);
-			}
-			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
@@ -242,7 +232,17 @@ public class RockPaperScissors_LearningByWatching {
 					actionNext.set(0);
 					actionNext.set(max, 1);
 				}
-		
+				
+				//Calculate reward			
+				if ( i > 3){ //To get out of wrong actions
+					int actionID = -1;
+					if (actionNext.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+					if (actionNext.get(1) > 0.1 ) actionID = 1;
+					if (actionNext.get(2) > 0.1 ) actionID = 2;
+					int inputID = labelSequence[curInput];
+					externalReward = reward(inputID, actionID);
+				}
+				
 			if (i > maxIterations - 100){
 				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			}

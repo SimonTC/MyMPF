@@ -77,7 +77,7 @@ public class RockPaperScissors_LearningByWatching {
 		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
-		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
+		Sensor inputSensor = new Sensor(4, ffInputLength, inputPooler);		
 		
 		//Create action sensor
 		Sensor actionSensor = new Sensor(5, 3, null);

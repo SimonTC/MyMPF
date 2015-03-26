@@ -32,7 +32,7 @@ public class ActionNode extends Node {
 		givenVotes = new TreeMap<Integer, Integer>();
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
-		this.rewardInfluence = 0.1; //TODO: Make a parameter
+		this.rewardInfluence = 0.01; //TODO: Make a parameter
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){

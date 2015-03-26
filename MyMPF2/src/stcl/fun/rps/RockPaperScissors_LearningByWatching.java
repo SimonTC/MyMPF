@@ -197,10 +197,6 @@ public class RockPaperScissors_LearningByWatching {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
-			if (i == 9997){
-				System.out.println();
-			}
-			
 			actionPerformed = actionNow;
 			actionNow = null;
 			
@@ -390,15 +386,16 @@ public class RockPaperScissors_LearningByWatching {
 		
 		blank = new SimpleMatrix(blankData);
 		
+		/*
 		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
 		int[] lbl = {0,1,1,2};
 		int[] lbl_counter = {1,2,2,0};
+		*/
 		
-		/*
 		SimpleMatrix[] tmp = {rock, paper, paper, scissors, paper, paper, scissors, rock};
 		int[] lbl = {0,1,1,2,1,1,2,0};
 		int[] lbl_counter = {1,2,2,0,2,2,0,1};
-		*/
+		
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

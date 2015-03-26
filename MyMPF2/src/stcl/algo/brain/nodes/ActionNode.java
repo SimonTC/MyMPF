@@ -51,7 +51,7 @@ public class ActionNode extends Node {
 			for (int i = 0; i < voters.size(); i++){
 				UnitNode n = voters.get(i);
 				NeoCorticalUnit unit = n.getUnit();
-				if (unit.active() && !unit.needHelp()){
+				if (unit.active() ){
 					int vote = unit.getNextAction();
 					double influence = influenceVector.get(i);
 					double currentVoteValue = votes.get(vote);

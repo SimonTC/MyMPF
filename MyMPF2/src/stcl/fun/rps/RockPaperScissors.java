@@ -15,7 +15,7 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;

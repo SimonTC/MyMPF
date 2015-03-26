@@ -71,10 +71,10 @@ public class RockPaperScissors_LearningByWatching {
 		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, null);		
+		//UnitNode combiner = new UnitNode(1, null);		
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, combiner);		
+		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
@@ -98,14 +98,14 @@ public class RockPaperScissors_LearningByWatching {
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
 		
 			//Combiner
-			
+			/*
 			int ffInputLength_combiner = inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;
 			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner, numActions);
-		/*
+		
 			//top node
 			int ffInputLength_top = combiner.getFeedforwardOutputVectorLength();
 			int spatialMapSize_top = 5;
@@ -118,7 +118,7 @@ public class RockPaperScissors_LearningByWatching {
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
 		inputPooler.addChild(inputSensor);
-		combiner.addChild(inputPooler);
+		//combiner.addChild(inputPooler);
 		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
@@ -126,7 +126,7 @@ public class RockPaperScissors_LearningByWatching {
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
-		brain.addUnitNode(combiner, 1);
+		//brain.addUnitNode(combiner, 1);
 		//brain.addUnitNode(topNode, 2);
 		brain.setActionNode(actionNode);
 		brain.initializeWriters(dataFolder, false);
@@ -196,10 +196,6 @@ public class RockPaperScissors_LearningByWatching {
 		
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
-			
-			if (i == 9985){
-				System.out.println();
-			}
 			
 			actionPerformed = actionNow;
 			actionNow = null;

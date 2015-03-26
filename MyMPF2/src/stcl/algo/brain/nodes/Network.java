@@ -51,10 +51,9 @@ public class Network {
 	
 	protected void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
-		
 		int actionPerformed = 0;
 		if (actionNode != null) {
-			actionNode.feedforward(reward, 0);		
+			actionNode.feedforward(reward, -1);		
 		 	actionPerformed = actionNode.getCurrentAction();
 		}
 		

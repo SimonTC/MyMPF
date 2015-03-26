@@ -32,7 +32,7 @@ public class ActionNode extends Node {
 		givenVotes = new TreeMap<Integer, Integer>();
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
-		this.rewardInfluence = 0.2; //TODO: Make a parameter
+		this.rewardInfluence = 0.1; //TODO: Make a parameter
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){
@@ -54,6 +54,7 @@ public class ActionNode extends Node {
 			//Collect action votes
 			int mostPopularAction = -1;
 			double highestVote = Double.NEGATIVE_INFINITY;
+			votesForActions.set(0);
 			for (int i = 0; i < voters.size(); i++){
 				UnitNode n = voters.get(i);
 				int voterID = n.getID();
@@ -66,7 +67,7 @@ public class ActionNode extends Node {
 					double voteInfluence = voterInfluence.get(voterID);
 					double currentVoteValue = votesForActions.get(vote);
 					double newValue = currentVoteValue + voteInfluence;
-					votesForActions.set(newValue);
+					votesForActions.set(vote, newValue);
 					if (newValue > highestVote){
 						highestVote = newValue;
 						mostPopularAction = vote;
@@ -81,8 +82,7 @@ public class ActionNode extends Node {
 		}		
 		
 		nextAction = pooler.getSOM().getNode(nextActionID).getVector();
-		feedbackOutput = nextAction;
-		
+		feedbackOutput = nextAction;		
 	}
 	
 	private int doExploration(){
@@ -105,10 +105,11 @@ public class ActionNode extends Node {
 			int vote = givenVotes.get(voterID);
 			if (vote != -1){
 				//Voter did vote in last election
-				if (vote == actionPerformed){
+				if (vote == currentAction){
 					double oldInfluence = voterInfluence.get(voterID);
 					double newInfluence = oldInfluence + reward * rewardInfluence;
 					if (newInfluence < 0) newInfluence = 0;
+					if (newInfluence > 1) newInfluence = 1;
 					voterInfluence.put(voterID, newInfluence);
 				}
 			}
@@ -136,6 +137,10 @@ public class ActionNode extends Node {
 	
 	public void printSomModels(){
 		pooler.printModelWeigths();
+	}
+	
+	public void printVoterInfluence(){
+		System.out.println(voterInfluence.toString());
 	}
 
 }

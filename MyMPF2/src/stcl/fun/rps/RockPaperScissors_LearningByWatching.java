@@ -28,6 +28,8 @@ public class RockPaperScissors_LearningByWatching {
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
 	
+	ActionNode actionNode;
+	
 	public static void main(String[] args) {
 		RockPaperScissors_LearningByWatching runner = new RockPaperScissors_LearningByWatching();
 		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
@@ -81,7 +83,7 @@ public class RockPaperScissors_LearningByWatching {
 		Sensor actionSensor = new Sensor(5, 3, null);
 
 		//Create action node
-		ActionNode actionNode = new ActionNode(3, 0.05, actionSensor);
+		actionNode = new ActionNode(3, 0.05, actionSensor);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1);
@@ -295,6 +297,9 @@ public class RockPaperScissors_LearningByWatching {
 			System.out.println();
 		}
 		
+		System.out.println("Spatial model in the action node");
+		actionNode.printSomModels();
+		
 		//System.out.println("Sequences observed by unit 1:");
 		//brain.getUnitList().get(0).getSequencer().printTrie();
 		
@@ -378,9 +383,9 @@ public class RockPaperScissors_LearningByWatching {
 		};
 		
 		blank = new SimpleMatrix(blankData);
-		SimpleMatrix[] tmp = {rock, paper, paper, scissors, rock, paper};
-		int[] lbl = {0,1,1,2,0,1};
-		int[] lbl_counter = {1,2,2,0,1,2};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors};
+		int[] lbl = {0,1,1,2};
+		int[] lbl_counter = {1,2,2,0};
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

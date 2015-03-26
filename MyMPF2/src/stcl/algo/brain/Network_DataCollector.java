@@ -11,6 +11,7 @@ import java.util.Random;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.nodes.Network;
+import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 import stcl.algo.poolers.NewSequencer;
 import stcl.algo.util.FileWriter;
@@ -22,8 +23,8 @@ import stcl.algo.util.FileWriter;
  */
 public class Network_DataCollector extends Network {
 	//Inputs and outputs to the brain
-	//private SimpleMatrix receivedInput;
-	//private SimpleMatrix returnedOutput;
+	private SimpleMatrix receivedInput[];
+	private SimpleMatrix returnedOutput[];
 	
 	//Inputs to and outputs from the units
 	private SimpleMatrix[] FFOutputs;
@@ -55,6 +56,7 @@ public class Network_DataCollector extends Network {
 	private int numUnits;
 
 	private FileWriter[] unitWriters;
+	private FileWriter brainWriter;
 	
 	public void initializeWriters(String parentFolder, boolean append){
 		collectData = true;
@@ -73,6 +75,7 @@ public class Network_DataCollector extends Network {
 		numUnits = unitNodes.size();
 		unitWriters = new FileWriter[numUnits];
 		int i = 0;
+		brainWriter = new FileWriter(parentFolder + "/network");
 		for (UnitNode n : unitNodes){
 			FileWriter f = new FileWriter(parentFolder + "/node_" + n.getID());
 			unitWriters[i] = f;
@@ -82,10 +85,11 @@ public class Network_DataCollector extends Network {
 	
 	public void openFiles(boolean append){
 		try {
+			brainWriter.openFile(append);
 			for (FileWriter f : unitWriters){
 				f.openFile(append);
-				collectData = true;
 			}
+			collectData = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -94,6 +98,7 @@ public class Network_DataCollector extends Network {
 	
 	public void closeFiles(){
 		try {
+			brainWriter.closeFile();
 			for (FileWriter f : unitWriters){
 				f.closeFile();
 			}
@@ -114,6 +119,7 @@ public class Network_DataCollector extends Network {
 		
 		if (collectData){
 			//Collect Feedforward info
+			receivedInput = collectNetworkInput();
 			FFInputs = collectUnitInputs(true);
 			activeStatuses = (collectActiveStatus());
 			helpStatuses = (collectHelpStatus());
@@ -131,6 +137,7 @@ public class Network_DataCollector extends Network {
 		
 		//Collect feed back info
 		if (collectData){
+			returnedOutput = collectNetworkOutput();
 			FBInputs = collectUnitInputs(false);
 			FBOutputs = (collectUnitOutputs(false));
 		}
@@ -148,8 +155,15 @@ public class Network_DataCollector extends Network {
 	
 	private void writeHeaders() throws IOException{
 
-		//Write header for unit files
+		//Write ehader for network file
 		String header = "";
+		header += "Received input;";
+		header += "Returned output;";
+		header = header.substring(0, header.length() - 1); //Remove last semi-colon
+		brainWriter.writeLine(header);
+		
+		//Write header for unit files
+		header = "";
 		
 		header += writeRepeatedString("Feedforward input",1, ";");
 		
@@ -176,8 +190,11 @@ public class Network_DataCollector extends Network {
 	
 	private void writeData() throws IOException{
 		//Print brain data
-	//	brainWriter.write(writeMatrixArray(receivedInput) + ";");
-		//brainWriter.writeLine(writeMatrixArray(returnedOutput) + ";");
+		for (SimpleMatrix m : receivedInput) brainWriter.write(writeMatrixArray(m));
+		brainWriter.write(";");
+		for (SimpleMatrix m : returnedOutput) brainWriter.write(writeMatrixArray(m));
+		brainWriter.writeLine("");
+		
 		
 		//Print unit data
 		for (int i = 0; i < numUnits; i++){
@@ -231,6 +248,24 @@ public class Network_DataCollector extends Network {
 		}
 		
 		return stream.toString();
+	}
+	
+	private SimpleMatrix[] collectNetworkInput(){
+		ArrayList<Sensor> sensors = super.getSensors();
+		SimpleMatrix[] inputs = new SimpleMatrix[sensors.size()];
+		for (int i = 0; i < sensors.size(); i++){
+			inputs[i] = sensors.get(i).getFeedforwardOutput();
+		}
+		return inputs;
+	}
+	
+	private SimpleMatrix[] collectNetworkOutput(){
+		ArrayList<Sensor> sensors = super.getSensors();
+		SimpleMatrix[] inputs = new SimpleMatrix[sensors.size()];
+		for (int i = 0; i < sensors.size(); i++){
+			inputs[i] = sensors.get(i).getFeedbackOutput();
+		}
+		return inputs;
 	}
 	
 	private double[] collectPredictionEntropies(){

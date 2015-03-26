@@ -50,10 +50,10 @@ public class ActionDecider {
 		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionToGetHere);
 		
 		//Decay old rewards
-		correlationVector.scale(1-decayFactor);
+		correlationVector = correlationVector.scale(1-decayFactor);
 		
 		//Add new rewards
-		correlationVector.plus(reward, stateVector);
+		correlationVector = correlationVector.plus(reward, stateVector);
 		
 		correlationMatrix.insertIntoThis(actionToGetHere, 0, correlationVector);
 		

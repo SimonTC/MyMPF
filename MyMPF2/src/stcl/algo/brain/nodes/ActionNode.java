@@ -108,5 +108,9 @@ public class ActionNode extends Node {
 	public int getCurrentAction(){
 		return currentAction;
 	}
+	
+	public void printSomModels(){
+		pooler.printModelWeigths();
+	}
 
 }

@@ -14,7 +14,7 @@ import stcl.algo.util.Normalizer;
  *
  * @param <T>
  */
-public class Predictor_VOMM implements Predictor{
+public class Predictor_VOMM{
 	
 	private VOMM<Integer> vomm;
 	private int markovOrder;
@@ -33,7 +33,6 @@ public class Predictor_VOMM implements Predictor{
 		
 	}
 
-	@Override
 	/**
 	 * Returns a probability matrix over all possible symbols.
 	 * Contains the probability of seeing a symbol given the current context.
@@ -124,12 +123,10 @@ public class Predictor_VOMM implements Predictor{
 		
 	}
 
-	@Override
 	public void flush() {
 		vomm.flushMemory();		
 	}
 
-	@Override
 	public SimpleMatrix getConditionalPredictionMatrix() {
 		return probabilityMatrix;
 	}
@@ -146,14 +143,12 @@ public class Predictor_VOMM implements Predictor{
 		vomm.printTrie();
 	}
 
-	@Override
 	public void setLearning(boolean learning) {
 		this.learning = learning;
 		vomm.setLearning(learning);
 		
 	}
 
-	@Override
 	public void setLEarningRate(double learningRate) {
 		vomm.setLearningRate(learningRate);
 		

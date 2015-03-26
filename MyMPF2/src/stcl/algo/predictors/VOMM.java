@@ -6,8 +6,8 @@ import java.util.LinkedList;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.util.trie.Trie;
-import stcl.algo.util.trie.TrieNode;
+import stcl.algo.predictors.trie.Trie;
+import stcl.algo.predictors.trie.TrieNode;
 
 /**
  * VOMM is an implementation of the Adaptive Model Averaged PPM algorithm

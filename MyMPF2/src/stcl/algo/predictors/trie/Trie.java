@@ -1,4 +1,4 @@
-package stcl.algo.util.trie;
+package stcl.algo.predictors.trie;
 
 import java.util.HashMap;
 import java.util.LinkedList;

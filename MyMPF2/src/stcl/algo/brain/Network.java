@@ -1,10 +1,12 @@
-package stcl.algo.brain.nodes;
+package stcl.algo.brain;
 
 import java.util.ArrayList;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.nodes.ActionNode;
+import stcl.algo.brain.nodes.Sensor;
+import stcl.algo.brain.nodes.UnitNode;
 
 
 public class Network {

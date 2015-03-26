@@ -8,8 +8,8 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.Brain;
 import stcl.algo.brain.Brain_DataCollector;
 import stcl.algo.brain.NeoCorticalUnit;
+import stcl.algo.brain.Network;
 import stcl.algo.brain.Network_DataCollector;
-import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 

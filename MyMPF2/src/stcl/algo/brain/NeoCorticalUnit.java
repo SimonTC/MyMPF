@@ -4,11 +4,9 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.poolers.NewSequencer;
+import stcl.algo.poolers.Sequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
-import stcl.algo.poolers.TemporalPooler;
-import stcl.algo.predictors.Predictor;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
@@ -46,7 +44,7 @@ public class NeoCorticalUnit{
 	private boolean biasBeforePredicting;
 	private boolean useBiasedInputInSequencer;
 	
-	private NewSequencer sequencer;
+	private Sequencer sequencer;
 	private boolean noTemporal;
 	
 	private int chosenAction;
@@ -76,7 +74,7 @@ public class NeoCorticalUnit{
 		
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		if (!noTemporal) {
-			sequencer = new NewSequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
+			sequencer = new Sequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
 			this.temporalMapSize = temporalMapSize;
 		} else {
 			this.temporalMapSize = spatialMapSize;
@@ -384,7 +382,7 @@ public class NeoCorticalUnit{
 		return active;
 	}
 	
-	public NewSequencer getSequencer(){
+	public Sequencer getSequencer(){
 		return sequencer;
 	}
 

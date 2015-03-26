@@ -10,10 +10,9 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.nodes.Network;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
-import stcl.algo.poolers.NewSequencer;
+import stcl.algo.poolers.Sequencer;
 import stcl.algo.util.FileWriter;
 
 /**
@@ -342,7 +341,7 @@ public class Network_DataCollector extends Network {
 			if (spatial){
 				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getSpatialPooler().getActivationMatrix());
 			} else {
-				NewSequencer sequencer = super.getUnitNodes().get(i).getUnit().getSequencer();
+				Sequencer sequencer = super.getUnitNodes().get(i).getUnit().getSequencer();
 				if (sequencer != null){
 					m = new SimpleMatrix(sequencer.getSequenceProbabilities());
 				} else {

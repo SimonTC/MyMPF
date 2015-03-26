@@ -6,11 +6,11 @@ import java.util.LinkedList;
 
 import org.ejml.simple.SimpleMatrix;
 
+import stcl.algo.predictors.trie.Trie;
+import stcl.algo.predictors.trie.TrieNode;
 import stcl.algo.util.Normalizer;
-import stcl.algo.util.trie.Trie;
-import stcl.algo.util.trie.TrieNode;
 
-public class NewSequencer {
+public class Sequencer {
 	private Trie<Integer> trie;
 	private int markovOrder;
 	private LinkedList<Integer> currentSequence;
@@ -29,7 +29,7 @@ public class NewSequencer {
 	private boolean learning;
 	
 	
-	public NewSequencer(int markovOrder, int temporalGroupMapSize, int inputLength) {
+	public Sequencer(int markovOrder, int temporalGroupMapSize, int inputLength) {
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
 		currentMinFrequency = Integer.MAX_VALUE;

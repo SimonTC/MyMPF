@@ -16,7 +16,7 @@ public class ActionDecider {
 		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = decayFactor;
+		this.decayFactor = 0.1;//decayFactor;
 	}
 	
 	public int decideNextAction(SimpleMatrix currentStateProbabilities, int actionToGetHere, double reward){

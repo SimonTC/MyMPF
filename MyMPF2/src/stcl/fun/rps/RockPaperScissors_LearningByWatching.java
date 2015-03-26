@@ -44,15 +44,17 @@ public class RockPaperScissors_LearningByWatching {
 		setup(dataFolder);
 		
 		//Show
+		/*
 		brain.closeFiles();
-		//brain.setUsePrediction(false);
-		//runLearning(learningIterations);
+		brain.setUsePrediction(false);
+		runLearning(learningIterations);
 		//printInformation();
-		
+		*/
 		//Train
 		//brain.setBiasBeforePrediction(true);
 		//brain.setUseBiasedInputToSequencer(true);
 		brain.openFiles(true);
+		//actionNode.setExplorationChance(0);
 		brain.setUsePrediction(true);
 		runExperiment(trainingIterations, true);
 		brain.closeFiles();
@@ -169,7 +171,7 @@ public class RockPaperScissors_LearningByWatching {
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			sensors.get(0).setInput(inputVector);
-			//sensors.get(1).setInput(actionNow);
+			sensors.get(1).setInput(actionNow);
 			
 			//Do one step
 			brain.step(externalReward);
@@ -340,8 +342,13 @@ public class RockPaperScissors_LearningByWatching {
 	}
 	
 	protected SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
-		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-		m = m.plus(noise);
+		
+		for (int i = 0; i < m.getNumElements(); i++){
+			double d = m.get(i);
+			double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
+			d += noise;
+			m.set(i, d);
+		}
 		return m;
 	}
 

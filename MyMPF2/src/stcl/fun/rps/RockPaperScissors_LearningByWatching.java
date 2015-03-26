@@ -197,10 +197,6 @@ public class RockPaperScissors_LearningByWatching {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
-			if (i == 9985){
-				System.out.println();
-			}
-			
 			actionPerformed = actionNow;
 			actionNow = null;
 			

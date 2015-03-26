@@ -126,8 +126,8 @@ public class NeoCorticalUnit{
 		ffOutput = biasedOutput;
 		needHelp = true;
 		
-		SimpleMatrix inputToDecider = Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
-		inputToDecider = Normalizer.normalize(inputToDecider);
+		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
+		//inputToDecider = Normalizer.normalize(inputToDecider);
 		chosenAction = decider.decideNextAction(inputToDecider, actionPerformed, reward);
 		
 		if (!noTemporal) {

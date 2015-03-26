@@ -4,7 +4,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
 
-public class Decider {
+public class ActionDecider {
 	
 	private SimpleMatrix correlationMatrix;
 	private SimpleMatrix stateProbabilitiesBefore;
@@ -12,7 +12,7 @@ public class Decider {
 	private int numPossibleActions;
 	private double decayFactor;
 	
-	public Decider(int numPossibleActions, int numPossibleStates, double decayFactor) {
+	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor) {
 		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
@@ -20,7 +20,9 @@ public class Decider {
 	}
 	
 	public int decideNextAction(SimpleMatrix currentStateProbabilities, int actionToGetHere, double reward){
-		correlateActionAndReward(actionToGetHere, reward);
+		if (stateProbabilitiesBefore != null){
+			correlateActionAndReward(actionToGetHere, reward);
+		}
 		int actionToDo = chooseBestAction(currentStateProbabilities);
 		stateProbabilitiesBefore = currentStateProbabilities;
 		return actionToDo;		
@@ -57,7 +59,10 @@ public class Decider {
 		
 		//Normalize columns of correlationMatrix
 		correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);
-
+	}
+	
+	public void printCorrelationMatrix(){
+		correlationMatrix.print();
 	}
 
 }

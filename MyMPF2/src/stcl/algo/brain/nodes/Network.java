@@ -11,6 +11,7 @@ public class Network {
 	private ArrayList<Sensor> sensorLayer;
 	private ArrayList<ArrayList<UnitNode>> unitLayers;
 	private ArrayList<UnitNode> unitNodes;
+	private ActionNode actionNode;
 	
 	public Network() {
 		sensorLayer = new ArrayList<Sensor>();
@@ -26,6 +27,16 @@ public class Network {
 		while (unitLayers.size() <= layer) unitLayers.add(new ArrayList<UnitNode>());
 		unitLayers.get(layer).add(node);
 		unitNodes.add(node);
+		if (actionNode != null){
+			actionNode.addVoter(node);
+		}
+	}
+	
+	public void setActionNode(ActionNode node){
+		this.actionNode = node;
+		for (UnitNode n : unitNodes){
+			actionNode.addVoter(n);
+		}
 	}
 	
 	public ArrayList<Sensor> getSensors(){
@@ -41,9 +52,15 @@ public class Network {
 	protected void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
 		
+		int actionPerformed = 0;
+		if (actionNode != null) {
+			actionNode.feedforward(reward, 0);		
+		 	actionPerformed = actionNode.getCurrentAction();
+		}
+		
 		for (ArrayList<UnitNode> layer : unitLayers){
 			for (UnitNode n : layer){
-				n.feedforward();
+				n.feedforward(reward, actionPerformed);
 			}
 		}
 	}
@@ -51,6 +68,7 @@ public class Network {
 	protected void feedback(){
 		
 		//Decide on what action to do
+		if (actionNode != null) actionNode.feedback();
 		
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);

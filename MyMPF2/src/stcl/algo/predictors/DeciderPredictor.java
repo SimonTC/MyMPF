@@ -8,7 +8,7 @@ import stcl.algo.brain.biasunits.BiasUnit;
 import stcl.algo.brain.rewardCorrelators.RewardCorrelator;
 import stcl.algo.brain.rewardCorrelators.RewardFunction;
 
-public class Decider extends Predictor_VOMM {
+public class DeciderPredictor extends Predictor_VOMM {
 	
 	private BiasUnit bias;
 	private RewardCorrelator correlator;
@@ -18,7 +18,7 @@ public class Decider extends Predictor_VOMM {
 	private Random rand;
 	private double explorationChance;
 
-	public Decider(int markovOrder, double learningRate, Random rand, double biasInfluence, double maxReward, double alpha, int inputMatrixSize) {
+	public DeciderPredictor(int markovOrder, double learningRate, Random rand, double biasInfluence, double maxReward, double alpha, int inputMatrixSize) {
 		super(markovOrder, learningRate, rand);
 		this.rand = rand;
 		this.bias = new BiasUnit(inputMatrixSize, biasInfluence, rand);

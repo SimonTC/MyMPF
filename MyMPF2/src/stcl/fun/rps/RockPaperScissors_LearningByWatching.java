@@ -375,9 +375,9 @@ public class RockPaperScissors_LearningByWatching {
 		};
 		
 		blank = new SimpleMatrix(blankData);
-		SimpleMatrix[] tmp = {rock, paper, paper, scissors, rock, paper, scissors, scissors, rock};
-		int[] lbl = {0,1,1,2,0,1,2,2,0};
-		int[] lbl_counter = {1,2,2,0,1,2,0,0,1};
+		SimpleMatrix[] tmp = {rock, paper, paper, scissors, rock, paper};
+		int[] lbl = {0,1,1,2,0,1};
+		int[] lbl_counter = {1,2,2,0,1,2};
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
 		sequence = tmp;			

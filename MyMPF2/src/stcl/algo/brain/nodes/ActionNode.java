@@ -1,7 +1,9 @@
 package stcl.algo.brain.nodes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.TreeMap;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -17,8 +19,8 @@ public class ActionNode extends Node {
 	private int currentAction;
 	private int nextActionID;
 	private Random rand;
-	private ArrayList<Integer>givenVotes;
-	private ArrayList<Double> influenceVector;
+	private TreeMap<Integer, Integer> givenVotes;
+	private TreeMap<Integer, Double> voterInfluence;
 	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
 	private double rewardInfluence;
@@ -26,8 +28,8 @@ public class ActionNode extends Node {
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id);
 		voters = new ArrayList<UnitNode>();
-		influenceVector = new ArrayList<Double>();
-		givenVotes = new ArrayList<Integer>();
+		voterInfluence = new TreeMap<Integer, Double>();
+		givenVotes = new TreeMap<Integer, Integer>();
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
 		this.rewardInfluence = 0.2; //TODO: Make a parameter
@@ -54,13 +56,14 @@ public class ActionNode extends Node {
 			double highestVote = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < voters.size(); i++){
 				UnitNode n = voters.get(i);
+				int voterID = n.getID();
 				NeoCorticalUnit unit = n.getUnit();
-				givenVotes.set(i, -1);
+				givenVotes.put(voterID, -1);
 				boolean mayVote = unit.active();// && !unit.needHelp();
 				if (mayVote){
 					int vote = unit.getNextAction();
-					givenVotes.set(i, vote);
-					double voteInfluence = influenceVector.get(i);
+					givenVotes.put(n.getID(), vote);
+					double voteInfluence = voterInfluence.get(voterID);
 					double currentVoteValue = votesForActions.get(vote);
 					double newValue = currentVoteValue + voteInfluence;
 					votesForActions.set(newValue);
@@ -97,27 +100,26 @@ public class ActionNode extends Node {
 		//TODO: Implement weighting of votes
 		//Update weights of voters
 		//If you voted for the action that was performed your influenced is changed based on how good the outcome was
-		for (int voter = 0; voter < voters.size(); voter++){
-			int vote = givenVotes.get(voter);
+		for (UnitNode voter : voters){
+			int voterID = voter.getID();
+			int vote = givenVotes.get(voterID);
 			if (vote != -1){
 				//Voter did vote in last election
 				if (vote == actionPerformed){
-					double oldInfluence = influenceVector.get(voter);
+					double oldInfluence = voterInfluence.get(voterID);
 					double newInfluence = oldInfluence + reward * rewardInfluence;
 					if (newInfluence < 0) newInfluence = 0;
-					influenceVector.set(voter, newInfluence);
+					voterInfluence.put(voterID, newInfluence);
 				}
 			}
 		}
-		
-			//Good votes --> higher influence of future votes
-			//Bad votes --> lower influence of future votes
 	}
 	
 	public void addVoter(UnitNode voter){
 		voters.add(voter);
-		influenceVector.add(1.0);
-		givenVotes.add(-1);
+		int voterID = voter.getID();
+		voterInfluence.put(voterID, 1.0);
+		givenVotes.put(voterID, -1);
 	}
 	
 	public int getNextActionID(){

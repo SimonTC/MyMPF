@@ -38,8 +38,8 @@ public class UnitNode extends Node {
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal, int actionMapSize){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal, actionMapSize);
+	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal){
+		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal);
 		this.temporalMapSize = unit.getTemporalMapSize();
 		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
 		this.rand = rand;
@@ -50,7 +50,7 @@ public class UnitNode extends Node {
 		if (childrenNeedHelp()){ 
 			forceHelpOnChildren();
 			SimpleMatrix inputVector = collectInput();
-			SimpleMatrix outputMatrix = unit.feedForward(inputVector, reward, actionPerformed);
+			SimpleMatrix outputMatrix = unit.feedForward(inputVector);
 			feedforwardOutput = new SimpleMatrix(outputMatrix);
 			feedforwardOutput.reshape(1, outputMatrix.getNumElements());
 			this.needHelp = unit.needHelp();
@@ -102,7 +102,7 @@ public class UnitNode extends Node {
 			inputMatrix = Normalizer.normalize(inputMatrix);
 		}
 		
-		feedbackOutput = unit.feedBackward(inputMatrix, chosenAction);
+		feedbackOutput = unit.feedBackward(inputMatrix);
 		needHelp = unit.needHelp();
 	}
 	

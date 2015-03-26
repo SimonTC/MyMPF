@@ -1,7 +1,6 @@
 package stcl.algo.poolers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -29,14 +28,8 @@ public class NewSequencer {
 	
 	private boolean learning;
 	
-	private SimpleMatrix actionMatrix;
-	private double entropyThreshold;
-	private double entropyDiscountingFactor;
-	private int wantedNextAction;
-	private boolean needHelp;
 	
-	
-	public NewSequencer(int markovOrder, int temporalGroupMapSize, int inputLength, int actionMatrixSize, double entropyDiscountingFactor) {
+	public NewSequencer(int markovOrder, int temporalGroupMapSize, int inputLength) {
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
 		currentMinFrequency = Integer.MAX_VALUE;
@@ -50,56 +43,25 @@ public class NewSequencer {
 		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
 		for (int i = 0; i < maxNumberOfSequencesInMemory; i++) sequenceMemory.add(null);
 		elementsInMemory = 0;
-		actionMatrix = new SimpleMatrix(actionMatrixSize, actionMatrixSize);
-		entropyThreshold = 0;
-		this.entropyDiscountingFactor = entropyDiscountingFactor;
 	}
 	
 	/**
 	 * 
-	 * @param currentStateProbabilities
+	 * @param probabilityVector
 	 * @param spatialBMUID
 	 * @param startNewSequence
 	 * @return Probability matrix containing the probabilities of having just exited each of the known sequences
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix currentStateProbabilities, double reward, int actionToGetToCurrentState){
-		//Find the id of that symbol which we are most probably observing now
-		int mostProbableStateID = findMaxElement(currentStateProbabilities);	
-		
+	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
 		//Add input if we are still within the maximum length of a sequence
-		if (currentSequence.size() < markovOrder * 2) { 
-			currentSequence.addLast(actionToGetToCurrentState);
-			currentSequence.addLast(mostProbableStateID);
-			currentInputProbabilitites.addLast(currentStateProbabilities);
+		if (currentSequence.size() < markovOrder) {
+			currentSequence.addLast(spatialBMUID);
+			currentInputProbabilitites.addLast(probabilityVector);
 		}
-		
-		//Decide what action to vote for next
-		LinkedList<TrieNode<Integer>> nodesequence = trie.findNodeSequence(currentSequence);
-		actionMatrix.set(0);
-		if (nodesequence != null){
-			TrieNode<Integer> currentStateNode = nodesequence.peekFirst();
-			HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
-			
-			//Create weight matrix for the different possible actions
-			for (TrieNode<Integer> n : actionsFromCurrentState.values()){
-				actionMatrix.set(n.getSymbol(), n.getReward());
-			}
-		}
-		
-		if (actionMatrix.elementSum() == 0) actionMatrix.set(1);
-		
-		actionMatrix = Normalizer.normalize(actionMatrix);
-		
-		wantedNextAction = findMaxElement(actionMatrix);
-		
-		double decisionEntropy = calculateEntropy(actionMatrix);
-		
-		needHelp =  (decisionEntropy > entropyThreshold);
-		entropyThreshold = entropyDiscountingFactor * decisionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
 		
 		if (learning){
-			if (needHelp){
-				addFinishedSequenceToMemory(reward);
+			if (startNewSequence){
+				addFinishedSequenceToMemory();
 			}
 		}
 		
@@ -110,71 +72,37 @@ public class NewSequencer {
 		//This should make the output a bit more clean
 		removeLowChanceSequences();
 		
+		if (startNewSequence) reset();
+		
 		return sequenceProbabilities;
 	}
-	
-	private double calculateEntropy(SimpleMatrix m){
-		double sum = 0;
-		for (Double d : m.getMatrix().data){
-			if (d != 0) sum += d * Math.log(d);
-		}
-		return -sum;
-	}
-
 	
 	/**
 	 * 
 	 * @param inputMatrix matrix containing the probabilities of each of the sequences being the ones that start at time t + 1
 	 * @return probabilities of the next input given the probabilities of starting the different sequences
 	 */
-	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix, int chosenAction){
+	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
+		//Returns the probabilities of the next input given the probabilities of starting the different sequences
 		SimpleMatrix symbolProbabilities = new SimpleMatrix(1, inputLength);
-		if (needHelp){
-			//Returns the probabilities of the next input given the probabilities of starting the different sequences
-			Iterator<LinkedList<TrieNode<Integer>>> sequenceIterator = sequenceMemory.iterator();
-			while (sequenceIterator.hasNext()){
-				LinkedList<TrieNode<Integer>> sequence = sequenceIterator.next();
-				if (sequence != null){
-					TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //The sequence is inverted
-					TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); 
-					int sequenceID = lastNodeInSequence.getSequenceID();
-					int symbolID = firstNodeInSequence.getSymbol();
-					double probability = inputMatrix.get(sequenceID);
-					double oldValue = symbolProbabilities.get(symbolID);
-					double newValue = oldValue + probability;
-					symbolProbabilities.set(symbolID, newValue);				
-				}				
+		Iterator<LinkedList<TrieNode<Integer>>> sequenceIterator = sequenceMemory.iterator();
+		while (sequenceIterator.hasNext()){
+			LinkedList<TrieNode<Integer>> sequence = sequenceIterator.next();
+			if (sequence != null){
+				TrieNode<Integer> firstNodeInSequence = sequence.peekLast(); //The sequence is inverted
+				TrieNode<Integer> lastNodeInSequence = sequence.peekFirst(); 
+				int sequenceID = lastNodeInSequence.getSequenceID();
+				int symbolID = firstNodeInSequence.getSymbol();
+				double probability = inputMatrix.get(sequenceID);
+				double oldValue = symbolProbabilities.get(symbolID);
+				double newValue = oldValue + probability;
+				symbolProbabilities.set(symbolID, newValue);				
 			}
-			reset();
-		} else {
-			symbolProbabilities.set(1);
-			LinkedList<TrieNode<Integer>> nodesequence = trie.findNodeSequence(currentSequence);
-			if (nodesequence != null){	
-				TrieNode<Integer> currentStateNode = nodesequence.peekFirst();	
-				if (currentStateNode != null){	
-					HashMap<Integer, TrieNode<Integer>> actionsFromCurrentState = currentStateNode.getChildren();
-					TrieNode<Integer> action = actionsFromCurrentState.get(chosenAction);
-		
-					if (action == null){
-						symbolProbabilities.set(1);
-					} else {
-						HashMap<Integer, TrieNode<Integer>> possibleNextStates = action.getChildren();
-						int totalCount = action.getCount();
-						
-						for (TrieNode<Integer> state : possibleNextStates.values()){
-							int count = state.getCount();
-							double probability = (double) count / totalCount;
-							int id = state.getSymbol();
-							symbolProbabilities.set(id, probability);
-						}
-					}	
-				}
-			}
+			
 		}
 		
 		symbolProbabilities = Normalizer.normalize(symbolProbabilities);
 		
-		needHelp = false;
 		return symbolProbabilities;
 	}
 	
@@ -223,9 +151,9 @@ public class NewSequencer {
 	/**
 	 * Adds the sequence that has just ended to the sequence memory if there is room. Also updates sequence statistics and clean memory of rare sequences.
 	 */
-	private void addFinishedSequenceToMemory(double reward){
+	private void addFinishedSequenceToMemory(){
 		//Add the current sequence to our trie of sequences
-		LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence, reward);
+		LinkedList<TrieNode<Integer>> nodeList = trie.add(currentSequence);
 		TrieNode<Integer> lastNodeInSequence = nodeList.peekFirst(); //First node in the node list corresponds to last node in the symbol sequence
 		int count = lastNodeInSequence.getCount();
 		int id = lastNodeInSequence.getSequenceID();
@@ -378,38 +306,12 @@ public class NewSequencer {
 	public void setLearning(boolean learning) {
 		this.learning = learning;
 	}
-	
-	/**
-	 * Finds the id of the element with the highest value
-	 * @param probabilityMatrix
-	 * @return
-	 */
-	private int findMaxElement(SimpleMatrix probabilityMatrix){
-		double max = Double.NEGATIVE_INFINITY;
-		int maxID = -1;
-		for (int i = 0; i < probabilityMatrix.getNumElements(); i++){
-			double value = probabilityMatrix.get(i);
-			if (value > max){
-				maxID = i;
-				max = value;
-			}
-		}		
-		return maxID;
-		
-	}
+
 
 	/**
 	 * @return the sequenceProbabilities
 	 */
 	public SimpleMatrix getSequenceProbabilities() {
 		return sequenceProbabilities;
-	}
-	
-	public boolean needHelp(){
-		return needHelp;
-	}
-	
-	public int getWantedAction(){
-		return wantedNextAction;
 	}
 }

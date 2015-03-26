@@ -234,6 +234,7 @@ public class NeoCorticalUnit{
 		
 		needHelp = false;
 		active = false;
+		chosenAction = -1;
 		
 		return fbOutput;
 	}

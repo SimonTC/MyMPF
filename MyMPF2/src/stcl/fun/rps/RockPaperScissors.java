@@ -30,7 +30,7 @@ public class RockPaperScissors {
 	
 	public static void main(String[] args) {
 		RockPaperScissors runner = new RockPaperScissors();
-		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
+		String folder = "c:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	

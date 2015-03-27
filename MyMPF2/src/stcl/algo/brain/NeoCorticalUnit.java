@@ -105,7 +105,7 @@ public class NeoCorticalUnit{
 		return this.feedForward(inputVector, 0,0);
 	}
 	
-	public SimpleMatrix feedForward(SimpleMatrix inputVector, double reward, int actionPerformed){
+	public SimpleMatrix feedForward(SimpleMatrix inputVector, double reward, int actionToBePerformed){
 		//Test input
 		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
@@ -126,7 +126,8 @@ public class NeoCorticalUnit{
 		
 		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
 		//inputToDecider = Normalizer.normalize(inputToDecider);
-		chosenAction = decider.decideNextAction(inputToDecider, actionPerformed, reward);
+		//Use reward to update action reward correlation in action decider
+		decider.feedForward(inputToDecider, actionToBePerformed, reward);
 		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix
@@ -221,6 +222,9 @@ public class NeoCorticalUnit{
 		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
+		
+		//Decide what action to do next based on our prediction of the next state
+		chosenAction = decider.feedBack(biasedTemporalFBOutput);
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);

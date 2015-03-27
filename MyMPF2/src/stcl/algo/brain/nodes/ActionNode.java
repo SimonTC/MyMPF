@@ -92,7 +92,7 @@ public class ActionNode extends Node {
 	}
 
 	@Override
-	public void feedforward(double reward, int actionPerformed) {
+	public void feedforward(double reward, int actionToBePerformed) {
 		pooler.feedForward(actionSensor.getFeedforwardOutput());
 		currentAction = pooler.getSOM().getBMU().getId();
 		

@@ -53,20 +53,23 @@ public class Network {
 	
 	protected void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
-		int actionToBePerformed = 0;
+		int actionPerformed = 0;
 		if (actionNode != null) {
 			actionNode.feedforward(reward, -1);		
-		 	actionToBePerformed = actionNode.getCurrentAction();
+		 	actionPerformed = actionNode.getCurrentAction();
 		}
 		
 		for (ArrayList<UnitNode> layer : unitLayers){
 			for (UnitNode n : layer){
-				n.feedforward(reward, actionToBePerformed);
+				n.feedforward(reward, actionPerformed);
 			}
 		}
 	}
 	
 	protected void feedback(){
+		
+		//Decide on what action to do
+		if (actionNode != null) actionNode.feedback();
 		
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);
@@ -74,10 +77,6 @@ public class Network {
 				n.feedback();
 			}			
 		}		
-		
-		//Decide on what action to do
-		if (actionNode != null) actionNode.feedback();
-				
 		for (Sensor s : sensorLayer) s.feedback();
 	}
 	

@@ -15,7 +15,7 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
@@ -187,10 +187,8 @@ public class RockPaperScissors {
 		double externalReward = 0;
 		
 		double[][] tmp = {{1,0,0}};
-		SimpleMatrix actionPerformedToGetToThisState = new SimpleMatrix(tmp);
-		SimpleMatrix actionPerformedToGetOutOfThisState = new SimpleMatrix(tmp);
-		
-		
+		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
+		SimpleMatrix actionPerformed = null;
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
@@ -198,7 +196,10 @@ public class RockPaperScissors {
 		
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
-						
+			
+			actionPerformed = actionNow;
+			actionNow = null;
+			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			
@@ -206,21 +207,11 @@ public class RockPaperScissors {
 			SimpleMatrix diff = input.minus(prediction);
 			double predictionError = diff.normF();			
 			
-			//Calculate reward for being in current state (In this case for doing an action when in this state)
-			if ( i > 3){ //To get out of wrong actions
-				int actionID = -1;
-				if (actionPerformedToGetToThisState.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionPerformedToGetToThisState.get(1) > 0.1 ) actionID = 1;
-				if (actionPerformedToGetToThisState.get(2) > 0.1 ) actionID = 2;
-				int inputID = labelSequence[curInput];
-				externalReward = reward(inputID, actionID);
-			}
-			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionPerformedToGetOutOfThisState);
+			sensors.get(1).setInput(actionPerformed);
 			
 			//Do one step
 			brain.step(externalReward);
@@ -230,16 +221,25 @@ public class RockPaperScissors {
 			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
-			actionPerformedToGetToThisState = actionPerformedToGetOutOfThisState;
-			
-			actionPerformedToGetOutOfThisState = sensors.get(1).getFeedbackOutput();
+			actionNow = sensors.get(1).getFeedbackOutput();
 
-			//Set max value of action to 1. The rest to zero
-			int max = maxID(actionPerformedToGetOutOfThisState);
-			if (max != -1){
-				actionPerformedToGetOutOfThisState.set(0);
-				actionPerformedToGetOutOfThisState.set(max, 1);
-			}
+			//Decide what to do with the action
+				//Set max value of action to 1. The rest to zero
+				int max = maxID(actionNow);
+				if (max != -1){
+					actionNow.set(0);
+					actionNow.set(max, 1);
+				}
+				
+				//Calculate reward			
+				if ( i > 3){ //To get out of wrong actions
+					int actionID = -1;
+					if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+					if (actionNow.get(1) > 0.1 ) actionID = 1;
+					if (actionNow.get(2) > 0.1 ) actionID = 2;
+					int inputID = labelSequence[curInput];
+					externalReward = reward(inputID, actionID);
+				}
 				
 			if (i > maxIterations - 100){
 				actionNode.setExplorationChance(0);

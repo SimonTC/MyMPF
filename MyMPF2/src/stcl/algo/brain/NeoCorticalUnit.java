@@ -126,7 +126,7 @@ public class NeoCorticalUnit{
 		
 		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
 		//inputToDecider = Normalizer.normalize(inputToDecider);
-		chosenAction = decider.decideNextAction(inputToDecider, actionPerformed, reward);
+		decider.feedForward(inputToDecider, actionPerformed, reward);
 		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix
@@ -221,6 +221,8 @@ public class NeoCorticalUnit{
 		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
+		
+		chosenAction = decider.feedback(biasedTemporalFBOutput);
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);

@@ -68,15 +68,15 @@ public class Network {
 	
 	protected void feedback(){
 		
-		//Decide on what action to do
-		if (actionNode != null) actionNode.feedback();
-		
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);
 			for (UnitNode n : layer){
 				n.feedback();
 			}			
-		}		
+		}	
+		
+		//Decide on what action to do
+		if (actionNode != null) actionNode.feedback();
 		for (Sensor s : sensorLayer) s.feedback();
 	}
 	

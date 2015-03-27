@@ -232,10 +232,6 @@ public class NeoCorticalUnit{
 		//fbOutput = addNoise(fbOutput, 0.1);
 		//fbOutput = Normalizer.normalize(fbOutput);
 		
-		needHelp = false;
-		active = false;
-		chosenAction = -1;
-		
 		return fbOutput;
 	}
 	
@@ -256,6 +252,12 @@ public class NeoCorticalUnit{
 			m.set(i, d);
 		}
 		return m;
+	}
+	
+	public void resetActivity(){
+		needHelp = false;
+		active = false;
+		chosenAction = -1;
 	}
 	
 	/**

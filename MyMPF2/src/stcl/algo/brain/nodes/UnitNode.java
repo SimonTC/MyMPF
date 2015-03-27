@@ -64,6 +64,10 @@ public class UnitNode extends Node {
 		return false;
 	}
 	
+	public void resetActivityOfUnit(){
+		unit.resetActivity();
+	}
+	
 	/**
 	 * Loop through all children and force them to need help.
 	 * Use to make sure that action nodes doesn't go on in a loop where they always predict the same without influence from above

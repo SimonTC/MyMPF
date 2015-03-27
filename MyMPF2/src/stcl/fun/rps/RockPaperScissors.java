@@ -25,6 +25,7 @@ public class RockPaperScissors {
 	
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
+	private Sensor inputSensor, actionSensor;
 	
 	ActionNode actionNode;
 	
@@ -77,10 +78,10 @@ public class RockPaperScissors {
 		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
-		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
+		inputSensor = new Sensor(4, ffInputLength, inputPooler);		
 		
 		//Create action sensor
-		Sensor actionSensor = new Sensor(5, 3, null);
+		actionSensor = new Sensor(5, 3, null);
 
 		//Create action node
 		actionNode = new ActionNode(3, 0.05, actionSensor);
@@ -219,18 +220,18 @@ public class RockPaperScissors {
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionThisTimestep);
+			inputSensor.setInput(inputVector);
+			actionSensor.setInput(actionThisTimestep);
 			
 			//Do one step
 			brain.step(rewardForBeingInCurrentState);
 			
 			//Collect output
 			sensors = brain.getSensors();
-			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
+			prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
-			actionNextTimeStep = sensors.get(1).getFeedbackOutput();
+			actionNextTimeStep = actionSensor.getFeedbackOutput();
 
 			//Set max value of action to 1. The rest to zero
 			int max = maxID(actionNextTimeStep);
@@ -239,7 +240,7 @@ public class RockPaperScissors {
 				actionNextTimeStep.set(max, 1);
 			}				
 				
-			if (i > maxIterations - 100){
+			if (i > maxIterations - 101){
 				actionNode.setExplorationChance(0);
 				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			}

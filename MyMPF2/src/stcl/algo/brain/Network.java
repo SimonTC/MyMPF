@@ -78,6 +78,9 @@ public class Network {
 		//Decide on what action to do
 		if (actionNode != null) actionNode.feedback();
 		for (Sensor s : sensorLayer) s.feedback();
+		
+		for (UnitNode n : unitNodes) n.resetActivityOfUnit();
+		
 	}
 	
 	

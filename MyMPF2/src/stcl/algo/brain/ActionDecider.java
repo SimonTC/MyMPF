@@ -54,7 +54,7 @@ public class ActionDecider {
 	}
 	
 	private double calculateInternaleward(double externalReward){
-		externalRewardNow = externalReward;
+		/*externalRewardNow = externalReward;
 		
 		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
 		
@@ -64,6 +64,8 @@ public class ActionDecider {
 		externalRewardBefore = externalRewardNow;
 		
 		return internalReward;
+		*/
+		return externalReward;
 
 	}
 	

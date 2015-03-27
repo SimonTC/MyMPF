@@ -14,11 +14,20 @@ public class ActionDecider {
 	private int numPossibleActions;
 	private double decayFactor;
 	
+	private double externalRewardBefore;
+	private double externalRewardNow;
+	private double maxReward;
+	private double alpha;
+	private double internalRewardBefore;
+	
 	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor) {
 		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
 		this.decayFactor = 0.1;//decayFactor;
+		
+		this.maxReward = 1;
+		this.alpha = decayFactor;
 	}
 	
 	/**
@@ -28,7 +37,8 @@ public class ActionDecider {
 	 * @param reward
 	 */
 	public void feedForward(SimpleMatrix currentStateProbabilities, int actionPerformedNow, double reward){
-		if (stateProbabilitiesBefore != null) correlateActionAndReward(reward);
+		double internalReward = calculateInternaleward(reward);
+		if (stateProbabilitiesBefore != null) correlateActionAndReward(internalReward);
 		actionPerformedBefore = actionPerformedNow;
 		stateProbabilitiesBefore = currentStateProbabilities;
 	}
@@ -41,6 +51,20 @@ public class ActionDecider {
 	public int feedback(SimpleMatrix expectedNextStateProbabilities){
 		int action = chooseBestAction(expectedNextStateProbabilities);
 		return action;
+	}
+	
+	private double calculateInternaleward(double externalReward){
+		externalRewardNow = externalReward;
+		
+		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
+		
+		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
+		
+		internalRewardBefore = internalReward;
+		externalRewardBefore = externalRewardNow;
+		
+		return internalReward;
+
 	}
 	
 	private int chooseBestAction(SimpleMatrix stateProbabilities){

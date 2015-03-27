@@ -59,17 +59,33 @@ public class ActionDecider {
 		return bestAction;
 	}
 	
-	private void correlateActionAndReward(double reward){
+	private void correlateActionAndReward(double internalReward){
 		//Correlate state we were in before with the action done and reward received
 		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
 		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformedBefore);
 		
+		SimpleMatrix tau = stateVector.scale(0.1);
+		
+		//Multiply the tau value with the given reward
+		//This is the influence that the actions at time t-1 have on the reward (I think)
+		SimpleMatrix tmp = tau.scale(internalReward);
+		
+		//Calculate the other part of the equation
+		SimpleMatrix learnedCorrelation = new SimpleMatrix(stateVector.numRows(), stateVector.numCols());
+		learnedCorrelation.set(1);
+		learnedCorrelation = learnedCorrelation.minus(tau);
+		learnedCorrelation = learnedCorrelation.elementMult(correlationVector);
+		
+		//Calculate correlation matrix
+		correlationVector = tmp.plus(learnedCorrelation);		
+		
+		/*
 		//Decay old rewards
 		correlationVector = correlationVector.scale(1-decayFactor);
 		
 		//Add new rewards
-		correlationVector = correlationVector.plus(reward, stateVector);
-		
+		correlationVector = correlationVector.plus(internalReward, stateVector);
+		*/
 		correlationMatrix.insertIntoThis(actionPerformedBefore, 0, correlationVector);
 
 	}

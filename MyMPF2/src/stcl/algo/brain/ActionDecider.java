@@ -8,8 +8,6 @@ import stcl.algo.util.Orthogonalizer;
 public class ActionDecider {
 	
 	private SimpleMatrix correlationMatrix;
-	private SimpleMatrix stateProbabilitiesBefore;
-	private int actionDoneBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
 	private double decayFactor;
@@ -23,15 +21,11 @@ public class ActionDecider {
 	
 	/**
 	 * Correlates reward with action done before and saves the info about the action to be done now and the current state probabilities
-	 * @param actionToBeDone
+	 * @param actionPerformed
 	 * @param reward
 	 */
-	public void feedForward(SimpleMatrix currentStateProbabilities, int actionToBeDone, double reward){
-		if (stateProbabilitiesBefore != null){
-			correlateActionAndReward(reward);
-		}
-		actionDoneBefore = actionToBeDone;
-		stateProbabilitiesBefore = currentStateProbabilities;
+	public void feedForward(SimpleMatrix currentStateProbabilities, int actionPerformed, double reward){
+		correlateActionAndReward(reward, actionPerformed, currentStateProbabilities);
 	}
 	
 	/**
@@ -43,10 +37,10 @@ public class ActionDecider {
 		return actionToDo;
 	}
 	
-	private int chooseBestAction(SimpleMatrix currentStateProbabilities){
+	private int chooseBestAction(SimpleMatrix predictedNextStateProbabilities){
 		int bestAction = -1;
 		double highestReward = Double.NEGATIVE_INFINITY;
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, currentStateProbabilities.getMatrix().data);
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, predictedNextStateProbabilities.getMatrix().data);
 		for (int action = 0; action < numPossibleActions; action++){
 			SimpleMatrix correlationVector = correlationMatrix.extractVector(true, action);
 			SimpleMatrix rewardVector = correlationVector.elementMult(stateVector);
@@ -64,10 +58,10 @@ public class ActionDecider {
 	 * @param actionToBeDone
 	 * @param reward
 	 */
-	private void correlateActionAndReward(double reward){
+	private void correlateActionAndReward(double reward, int actionPerformed, SimpleMatrix currentStateProbabilities){
 		//Correlate state we were in before with the action done and reward received
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
-		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionDoneBefore);
+		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, currentStateProbabilities.getMatrix().data);
+		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformed);
 		
 		//Decay old rewards
 		correlationVector = correlationVector.scale(1-decayFactor);
@@ -75,7 +69,7 @@ public class ActionDecider {
 		//Add new rewards
 		correlationVector = correlationVector.plus(reward, stateVector);
 		
-		correlationMatrix.insertIntoThis(actionDoneBefore, 0, correlationVector);
+		correlationMatrix.insertIntoThis(actionPerformed, 0, correlationVector);
 		
 		//Normalize columns of correlationMatrix
 		correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);

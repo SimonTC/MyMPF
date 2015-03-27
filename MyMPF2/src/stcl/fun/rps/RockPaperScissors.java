@@ -184,11 +184,12 @@ public class RockPaperScissors {
 	
 	private void runExperiment(int maxIterations, boolean printError){
 		int curInput = 0;
-		double externalReward = 0;
+		double externalRewardNow = 0;
 		
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix actionPerformedToGetToThisState = new SimpleMatrix(tmp);
-		SimpleMatrix actionPerformedToGetOutOfThisState = new SimpleMatrix(tmp);
+		SimpleMatrix actionPerformedInThisState = new SimpleMatrix(tmp);
+		SimpleMatrix actionToPerformInNextState = new SimpleMatrix(tmp);
 		
 		
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
@@ -206,44 +207,46 @@ public class RockPaperScissors {
 			SimpleMatrix diff = input.minus(prediction);
 			double predictionError = diff.normF();			
 			
+			SimpleMatrix actionNow = actionToPerformInNextState;
+			
+			double externalRewardBefore = externalRewardNow;
+			
 			//Calculate reward for being in current state (In this case for doing an action when in this state)
 			if ( i > 3){ //To get out of wrong actions
 				int actionID = -1;
-				if (actionPerformedToGetToThisState.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionPerformedToGetToThisState.get(1) > 0.1 ) actionID = 1;
-				if (actionPerformedToGetToThisState.get(2) > 0.1 ) actionID = 2;
+				if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+				if (actionNow.get(1) > 0.1 ) actionID = 1;
+				if (actionNow.get(2) > 0.1 ) actionID = 2;
 				int inputID = labelSequence[curInput];
-				externalReward = reward(inputID, actionID);
+				externalRewardNow = reward(inputID, actionID);
 			}
 			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionPerformedToGetOutOfThisState);
+			sensors.get(1).setInput(actionNow);
 			
 			//Do one step
-			brain.step(externalReward);
+			brain.step(externalRewardNow);
 			
 			//Collect output
 			sensors = brain.getSensors();
 			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
-			actionPerformedToGetToThisState = actionPerformedToGetOutOfThisState;
-			
-			actionPerformedToGetOutOfThisState = sensors.get(1).getFeedbackOutput();
+			actionToPerformInNextState = sensors.get(1).getFeedbackOutput();
 
 			//Set max value of action to 1. The rest to zero
-			int max = maxID(actionPerformedToGetOutOfThisState);
+			int max = maxID(actionToPerformInNextState);
 			if (max != -1){
-				actionPerformedToGetOutOfThisState.set(0);
-				actionPerformedToGetOutOfThisState.set(max, 1);
+				actionToPerformInNextState.set(0);
+				actionToPerformInNextState.set(max, 1);
 			}
 				
 			if (i > maxIterations - 100){
 				actionNode.setExplorationChance(0);
-				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
+				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalRewardNow);
 			}
 			
 			curInput++;

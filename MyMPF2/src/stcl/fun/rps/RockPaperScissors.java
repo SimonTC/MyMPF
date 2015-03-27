@@ -71,10 +71,10 @@ public class RockPaperScissors {
 		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, null);		
+		//UnitNode combiner = new UnitNode(1, null);		
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, combiner);		
+		UnitNode inputPooler = new UnitNode(2, null);		
 		
 		//Create the input sensor
 		Sensor inputSensor= new Sensor(4, ffInputLength, inputPooler);		
@@ -98,7 +98,7 @@ public class RockPaperScissors {
 			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
 		
 			//Combiner
-			
+			/*
 			int ffInputLength_combiner = inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
@@ -118,7 +118,7 @@ public class RockPaperScissors {
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
 		inputPooler.addChild(inputSensor);
-		combiner.addChild(inputPooler);
+		//combiner.addChild(inputPooler);
 		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
@@ -126,7 +126,7 @@ public class RockPaperScissors {
 		brain.addSensor(inputSensor);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
-		brain.addUnitNode(combiner, 1);
+		//brain.addUnitNode(combiner, 1);
 		//brain.addUnitNode(topNode, 2);
 		brain.setActionNode(actionNode);
 		brain.initializeWriters(dataFolder, false);
@@ -187,8 +187,7 @@ public class RockPaperScissors {
 		double externalReward = 0;
 		
 		double[][] tmp = {{1,0,0}};
-		SimpleMatrix actionNow = new SimpleMatrix(tmp); //m(t)
-		SimpleMatrix actionPerformed = null;
+		SimpleMatrix actionNextTimeStep = new SimpleMatrix(tmp); //m(t)
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
@@ -197,49 +196,48 @@ public class RockPaperScissors {
 		for (int i = 0; i < maxIterations; i++){
 			if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
-			actionPerformed = actionNow;
-			actionNow = null;
-			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			
 			//Calculate prediction error
 			SimpleMatrix diff = input.minus(prediction);
-			double predictionError = diff.normF();			
+			double predictionError = diff.normF();	
+			
+			SimpleMatrix actionThisTimestep = actionNextTimeStep;
+			double rewardForBeingInCurrentState = externalReward;
+			
+			//Calculate reward			
+			if ( i > 3){ //To get out of wrong actions
+				int actionID = -1;
+				if (actionThisTimestep.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
+				if (actionThisTimestep.get(1) > 0.1 ) actionID = 1;
+				if (actionThisTimestep.get(2) > 0.1 ) actionID = 2;
+				int inputID = labelSequence[curInput];
+				externalReward = reward(inputID, actionID);
+			}			
 			
 			//Give inputs to brain
 			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionPerformed);
+			sensors.get(1).setInput(actionThisTimestep);
 			
 			//Do one step
-			brain.step(externalReward);
+			brain.step(rewardForBeingInCurrentState);
 			
 			//Collect output
 			sensors = brain.getSensors();
 			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
-			actionNow = sensors.get(1).getFeedbackOutput();
+			actionNextTimeStep = sensors.get(1).getFeedbackOutput();
 
-			//Decide what to do with the action
-				//Set max value of action to 1. The rest to zero
-				int max = maxID(actionNow);
-				if (max != -1){
-					actionNow.set(0);
-					actionNow.set(max, 1);
-				}
-				
-				//Calculate reward			
-				if ( i > 3){ //To get out of wrong actions
-					int actionID = -1;
-					if (actionNow.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-					if (actionNow.get(1) > 0.1 ) actionID = 1;
-					if (actionNow.get(2) > 0.1 ) actionID = 2;
-					int inputID = labelSequence[curInput];
-					externalReward = reward(inputID, actionID);
-				}
+			//Set max value of action to 1. The rest to zero
+			int max = maxID(actionNextTimeStep);
+			if (max != -1){
+				actionNextTimeStep.set(0);
+				actionNextTimeStep.set(max, 1);
+			}				
 				
 			if (i > maxIterations - 100){
 				actionNode.setExplorationChance(0);

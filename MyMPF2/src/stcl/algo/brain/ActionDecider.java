@@ -28,7 +28,7 @@ public class ActionDecider {
 	 * @param reward
 	 */
 	public void feedForward(SimpleMatrix currentStateProbabilities, int actionPerformedNow, double reward){
-		correlateActionAndReward(reward);
+		if (stateProbabilitiesBefore != null) correlateActionAndReward(reward);
 		actionPerformedBefore = actionPerformedNow;
 		stateProbabilitiesBefore = currentStateProbabilities;
 	}
@@ -71,9 +71,7 @@ public class ActionDecider {
 		correlationVector = correlationVector.plus(reward, stateVector);
 		
 		correlationMatrix.insertIntoThis(actionPerformedBefore, 0, correlationVector);
-		
-		//Normalize columns of correlationMatrix
-		correlationMatrix = Normalizer.normalizeColumns(correlationMatrix);
+
 	}
 	
 	public void printCorrelationMatrix(){

@@ -15,7 +15,7 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
@@ -30,7 +30,7 @@ public class RockPaperScissors {
 	
 	public static void main(String[] args) {
 		RockPaperScissors runner = new RockPaperScissors();
-		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
+		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
 		runner.run(folder);
 	}
 	

@@ -15,7 +15,7 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
@@ -25,14 +25,16 @@ public class RockPaperScissors {
 	
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
+	private int evaluationIterations = 1000;
 	private Sensor inputSensor, actionSensor;
 	
 	ActionNode actionNode;
 	
 	public static void main(String[] args) {
 		RockPaperScissors runner = new RockPaperScissors();
-		String folder = "C:/Users/Simon/Documents/Experiments/RPS/Network";
-		runner.run(folder);
+		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
+		//runner.run(folder);
+		runner.runMultipleExperiments(100);
 	}
 	
 	public RockPaperScissors() {
@@ -40,7 +42,7 @@ public class RockPaperScissors {
 	}
 	
 	public void run(String dataFolder){
-		setup(dataFolder);
+		setup(dataFolder, true);
 		
 		//Show
 		/*
@@ -61,7 +63,49 @@ public class RockPaperScissors {
 		
 	}
 	
-	private void setup(String dataFolder){
+	private void runMultipleExperiments(int numExperiments){
+		
+		double[] totalResults = new double[2];
+		
+		for (int exp = 1; exp <= numExperiments; exp++){
+			System.out.println("Starting experiment " + exp);
+			setup("", false);
+			
+			//Show
+			brain.setUsePrediction(false);
+			runLearning(learningIterations);
+			
+			//Train
+			brain.flush();
+			brain.setUsePrediction(true);
+			actionNode.setExplorationChance(0.05);
+			runExperiment(trainingIterations, false);
+			
+			//Evaluate
+			brain.flush();
+			actionNode.setExplorationChance(0);
+			brain.setLearning(false);
+			double[] results = runExperiment(evaluationIterations, false);
+			totalResults[0] += results[0];
+			totalResults[1] += results[1];
+			System.out.println("Results, experiment " + exp + ":");
+			System.out.println("Avg prediction error: " + results[0]);
+			System.out.println("Avg score: " + results[1]);
+			System.out.println();
+		}
+		
+		double avgPredictionError = totalResults[0] / (double) numExperiments;
+		double avgScore = totalResults[1] / (double) numExperiments;
+		
+		System.out.println("Final results:");
+		System.out.println("Avg prediction error: " + avgPredictionError);
+		System.out.println("Avg score: " + avgScore);
+		
+		
+		
+	}
+	
+	private void setup(String dataFolder, boolean collectData){
 		createInputs();
 		createRewardMatrix();
 		
@@ -130,7 +174,7 @@ public class RockPaperScissors {
 		brain.addUnitNode(combiner, 1);
 		//brain.addUnitNode(topNode, 2);
 		brain.setActionNode(actionNode);
-		brain.initializeWriters(dataFolder, false);
+		if (collectData) brain.initializeWriters(dataFolder, false);
 	}
 	
 	private void runLearning(int iterations){
@@ -163,27 +207,22 @@ public class RockPaperScissors {
 			actionNow.set(0);
 			actionNow.set(actionID, 1);
 			
+			double rewardForBeingInCurrentState = externalReward;
+			
 			//Calculate reward			
 			externalReward = reward(inputID, actionID);
 			
 			//Give inputs to brain
-			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			sensors.get(0).setInput(inputVector);
-			sensors.get(1).setInput(actionNow);
+			inputSensor.setInput(inputVector);
+			actionSensor.setInput(actionNow);
 			
 			//Do one step
-			brain.step(externalReward);
-			
-			//Collect output
-			sensors = brain.getSensors();
-			prediction = new SimpleMatrix(sensors.get(0).getFeedbackOutput());
-			prediction.reshape(5, 5);
-
+			brain.step(rewardForBeingInCurrentState);
 		}
 	}
 	
-	private void runExperiment(int maxIterations, boolean printError){
+	private double[] runExperiment(int maxIterations, boolean printError){
 		int curInput = 0;
 		double externalReward = 0;
 		
@@ -192,10 +231,12 @@ public class RockPaperScissors {
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
 		SimpleMatrix prediction = blank;
-		int predictedLabel = 0;
+		
+		double totalPredictionError = 0;
+		double totalGameScore = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
-			if (i % 500 == 0) System.out.println("Iteration: " + i);
+			//if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
 			//Get input			
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
@@ -203,6 +244,7 @@ public class RockPaperScissors {
 			//Calculate prediction error
 			SimpleMatrix diff = input.minus(prediction);
 			double predictionError = diff.normF();	
+			totalPredictionError += predictionError;
 			
 			SimpleMatrix actionThisTimestep = actionNextTimeStep;
 			double rewardForBeingInCurrentState = externalReward;
@@ -215,10 +257,11 @@ public class RockPaperScissors {
 				if (actionThisTimestep.get(2) > 0.1 ) actionID = 2;
 				int inputID = labelSequence[curInput];
 				externalReward = reward(inputID, actionID);
-			}			
+			}		
+			
+			totalGameScore += externalReward;			
 			
 			//Give inputs to brain
-			ArrayList<Sensor> sensors = brain.getSensors();
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
 			inputSensor.setInput(inputVector);
 			actionSensor.setInput(actionThisTimestep);
@@ -227,7 +270,6 @@ public class RockPaperScissors {
 			brain.step(rewardForBeingInCurrentState);
 			
 			//Collect output
-			sensors = brain.getSensors();
 			prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
@@ -240,18 +282,24 @@ public class RockPaperScissors {
 				actionNextTimeStep.set(max, 1);
 			}				
 				
-			if (i > maxIterations - 101){
+			/*
+			if (i > maxIterations - 100){
 				actionNode.setExplorationChance(0);
 				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
 			}
+			*/
 			
 			curInput++;
 			if (curInput >= sequence.length){
 				curInput = 0;
-			}
-			
+			}			
 		}
-		System.out.println();
+		
+		double avgPredictionError = totalPredictionError / (double) maxIterations;
+		double avgScore = totalGameScore / (double) maxIterations;
+		
+		double[] result = {avgPredictionError, avgScore};
+		return result;
 	}
 
 	

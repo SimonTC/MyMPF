@@ -33,6 +33,7 @@ public class Sensor extends Node {
 	}
 	
 	public void setInput(SimpleMatrix input){
+		if (input.numCols() != feedforwardInputLength || input.numRows() != 1) throw new IllegalArgumentException("The input vector has to have a length of " + feedforwardInputLength);
 		this.input = input;
 	}
 

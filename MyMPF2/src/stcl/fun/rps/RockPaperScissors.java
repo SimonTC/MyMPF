@@ -219,8 +219,8 @@ public class RockPaperScissors {
 			
 			//Give inputs to brain
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 13));
-			inputSensor2.setInput(inputVector.extractMatrix(0, 1, 13, 25));
+			inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 12));
+			inputSensor2.setInput(inputVector.extractMatrix(0, 1, 12, 25));
 			actionSensor.setInput(actionNow);
 			
 			//Do one step
@@ -279,7 +279,7 @@ public class RockPaperScissors {
 			//Collect output
 			SimpleMatrix tmp1 = inputSensor1.getFeedbackOutput();
 			SimpleMatrix tmp2 = inputSensor2.getFeedbackOutput();
-			prediction = tmp1.combine(0, 13, tmp2);
+			prediction = tmp1.combine(0, 12, tmp2);
 			//prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
 			prediction.reshape(5, 5);
 			

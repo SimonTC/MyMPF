@@ -142,5 +142,9 @@ public class ActionNode extends Node {
 	public void printVoterInfluence(){
 		System.out.println(voterInfluence.toString());
 	}
+	
+	public void printActionModels(){
+		pooler.printModelWeigths();
+	}
 
 }

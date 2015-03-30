@@ -41,6 +41,10 @@ public class Network {
 		}
 	}
 	
+	public ActionNode getActionNode(){
+		return actionNode;
+	}
+	
 	public ArrayList<Sensor> getSensors(){
 		return sensorLayer;
 	}

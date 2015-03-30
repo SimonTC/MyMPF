@@ -26,7 +26,7 @@ public class RockPaperScissors {
 	private int learningIterations = 1000;
 	private int trainingIterations = 10000;
 	private int evaluationIterations = 1000;
-	private Sensor inputSensor, actionSensor;
+	private Sensor inputSensor1, inputSensor2, actionSensor;
 	
 	ActionNode actionNode;
 	
@@ -121,8 +121,11 @@ public class RockPaperScissors {
 		//Create node that pools input
 		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
-		//Create the input sensor
-		inputSensor = new Sensor(4, ffInputLength, inputPooler);		
+		//Create the input sensor 1
+		inputSensor1 = new Sensor(4, 12, inputPooler);		
+		
+		//Create the input sensor 2
+		inputSensor2 = new Sensor(6, 13, inputPooler);	
 		
 		//Create action sensor
 		actionSensor = new Sensor(5, 3, null);
@@ -162,13 +165,15 @@ public class RockPaperScissors {
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
-		inputPooler.addChild(inputSensor);
+		inputPooler.addChild(inputSensor1);
+		inputPooler.addChild(inputSensor2);
 		combiner.addChild(inputPooler);
 		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
 		brain = new Network_DataCollector();
-		brain.addSensor(inputSensor);
+		brain.addSensor(inputSensor1);
+		brain.addSensor(inputSensor2);
 		brain.addSensor(actionSensor);
 		brain.addUnitNode(inputPooler, 0);
 		brain.addUnitNode(combiner, 1);
@@ -214,7 +219,8 @@ public class RockPaperScissors {
 			
 			//Give inputs to brain
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			inputSensor.setInput(inputVector);
+			inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 13));
+			inputSensor2.setInput(inputVector.extractMatrix(0, 1, 13, 25));
 			actionSensor.setInput(actionNow);
 			
 			//Do one step
@@ -263,14 +269,18 @@ public class RockPaperScissors {
 			
 			//Give inputs to brain
 			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			inputSensor.setInput(inputVector);
+			inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 12));
+			inputSensor2.setInput(inputVector.extractMatrix(0, 1, 12, 25));
 			actionSensor.setInput(actionThisTimestep);
 			
 			//Do one step
 			brain.step(rewardForBeingInCurrentState);
 			
 			//Collect output
-			prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
+			SimpleMatrix tmp1 = inputSensor1.getFeedbackOutput();
+			SimpleMatrix tmp2 = inputSensor2.getFeedbackOutput();
+			prediction = tmp1.combine(0, 13, tmp2);
+			//prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
 			actionNextTimeStep = actionSensor.getFeedbackOutput();

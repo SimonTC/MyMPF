@@ -118,21 +118,20 @@ public class RockPaperScissors {
 		//Create node that combines input and action
 		UnitNode combiner = new UnitNode(1, null);		
 		
-		//Create nodes that pools input
-		UnitNode inputPooler1 = new UnitNode(2, combiner);		
-		UnitNode inputPooler2 = new UnitNode(3, combiner);	
+		//Create node that pools input
+		UnitNode inputPooler = new UnitNode(2, combiner);		
 		
 		//Create the input sensor 1
-		inputSensor1 = new Sensor(5, 12, inputPooler1);		
+		inputSensor1 = new Sensor(4, 12, inputPooler);		
 		
 		//Create the input sensor 2
-		inputSensor2 = new Sensor(6, 13, inputPooler2);	
+		inputSensor2 = new Sensor(6, 13, inputPooler);	
 		
 		//Create action sensor
-		actionSensor = new Sensor(7, 3, null);
+		actionSensor = new Sensor(5, 3, null);
 
 		//Create action node
-		actionNode = new ActionNode(4, 0.05, actionSensor);
+		actionNode = new ActionNode(3, 0.05, actionSensor);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1);
@@ -144,12 +143,11 @@ public class RockPaperScissors {
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
 			boolean useTemporalPooler_input = true;
-			inputPooler1.initializeUnit(rand, inputSensor1.getFeedforwardOutputVectorLength(), spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
-			inputPooler2.initializeUnit(rand, inputSensor2.getFeedforwardOutputVectorLength(), spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
-			
+			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
+		
 			//Combiner
 			
-			int ffInputLength_combiner = inputPooler1.getFeedforwardOutputVectorLength() + inputPooler2.getFeedforwardOutputVectorLength();
+			int ffInputLength_combiner = inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
@@ -167,10 +165,9 @@ public class RockPaperScissors {
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
-		inputPooler1.addChild(inputSensor1);
-		inputPooler2.addChild(inputSensor2);
-		combiner.addChild(inputPooler1);
-		combiner.addChild(inputPooler2);
+		inputPooler.addChild(inputSensor1);
+		inputPooler.addChild(inputSensor2);
+		combiner.addChild(inputPooler);
 		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
@@ -178,8 +175,7 @@ public class RockPaperScissors {
 		brain.addSensor(inputSensor1);
 		brain.addSensor(inputSensor2);
 		brain.addSensor(actionSensor);
-		brain.addUnitNode(inputPooler1, 0);
-		brain.addUnitNode(inputPooler2, 0);
+		brain.addUnitNode(inputPooler, 0);
 		brain.addUnitNode(combiner, 1);
 		//brain.addUnitNode(topNode, 2);
 		brain.setActionNode(actionNode);

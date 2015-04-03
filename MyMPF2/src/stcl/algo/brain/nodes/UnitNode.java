@@ -44,6 +44,20 @@ public class UnitNode extends Node {
 		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
 		this.rand = rand;
 	}
+	
+	/**
+	 * Initialization method used when all children has already been added.
+	 * @param rand
+	 * @param spatialMapSize int > 0 
+	 * @param temporalMapSize int >= 0 If 0 then now temporal pooling is used
+	 * @param initialPredictionLearningRate
+	 * @param markovOrder int >= 0 if zero then no prediction is performed
+	 * @param numPossibleActions
+	 */
+	public void initializeUnit(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
+		int inputLength = feedforwardInputLength;
+		this.initializeUnit(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder > 0, markovOrder, temporalMapSize == 0, numPossibleActions);
+	}
 
 	@Override
 	public void feedforward(double reward, int actionPerformed) {

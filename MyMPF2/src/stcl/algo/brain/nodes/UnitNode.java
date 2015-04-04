@@ -45,6 +45,10 @@ public class UnitNode extends Node {
 		this.rand = rand;
 	}
 	
+	public void setID(int id){
+		this.id = id;
+	}
+	
 	/**
 	 * Initialization method used when all children has already been added.
 	 * @param rand

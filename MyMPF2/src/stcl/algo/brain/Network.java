@@ -125,13 +125,13 @@ public class Network {
 		StringBuffer buffer = new StringBuffer();
 		ArrayList<int[]> connections = new ArrayList<int[]>();
 		
-		buffer.append("Nodes/n");
+		buffer.append("Nodes\n");
 		//Write all sensors in network
 		for (Sensor s : sensorLayer){
 			buffer.append(s.getID() + " ");
 			buffer.append(0 + " "); //Type
 			buffer.append(0 + " "); //Layer
-			buffer.append("/n");
+			buffer.append("\n");
 			int[] connection = new int[2];
 			connection[0] = s.getID();
 			connection[1] = s.getParent().getID();
@@ -144,7 +144,7 @@ public class Network {
 				buffer.append(n.getID() + " ");
 				buffer.append(1+ " "); //Type
 				buffer.append(i + " "); //Layer
-				buffer.append("/n");
+				buffer.append("\n");
 				int[] connection = new int[2];
 				if (n.getParent() != null){
 					connection[0] = n.getID();
@@ -154,17 +154,17 @@ public class Network {
 			}
 		}
 		
-		buffer.append("/n");
-		buffer.append("Connections/n");
+		buffer.append("\n");
+		buffer.append("Connections\n");
 		for (int[] conn : connections){
-			buffer.append(conn[0] + " --> " + conn[1] + "/n");
+			buffer.append(conn[0] + " --> " + conn[1] + "\n");
 		}
 		
-		buffer.append("Voter influence/n");
+		buffer.append("Voter influence\n");
 		TreeMap<Integer, Double> influenceMap = actionNode.getInfluenceMap();
 		for (Integer key : influenceMap.keySet()){
 			double influence = influenceMap.get(key);
-			buffer.append(key + " : " + influence + "/n");
+			buffer.append(key + " : " + influence + "\n");
 		}
 		
 		return buffer.toString();

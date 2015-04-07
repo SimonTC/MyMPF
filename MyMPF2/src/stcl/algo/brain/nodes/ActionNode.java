@@ -20,7 +20,7 @@ public class ActionNode extends Node {
 	private int nextActionID;
 	private Random rand;
 	private TreeMap<Integer, Integer> givenVotes;
-	private TreeMap<Integer, Double> voterInfluence;
+	private TreeMap<Integer, Double> influenceMap;
 	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
 	private double rewardInfluence;
@@ -28,7 +28,7 @@ public class ActionNode extends Node {
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id);
 		voters = new ArrayList<UnitNode>();
-		voterInfluence = new TreeMap<Integer, Double>();
+		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
@@ -64,7 +64,7 @@ public class ActionNode extends Node {
 				if (mayVote){
 					int vote = unit.getNextAction();
 					givenVotes.put(n.getID(), vote);
-					double voteInfluence = voterInfluence.get(voterID);
+					double voteInfluence = influenceMap.get(voterID);
 					double currentVoteValue = votesForActions.get(vote);
 					double newValue = currentVoteValue + voteInfluence;
 					votesForActions.set(vote, newValue);
@@ -106,11 +106,11 @@ public class ActionNode extends Node {
 			if (vote != -1){
 				//Voter did vote in last election
 				if (vote == currentAction){
-					double oldInfluence = voterInfluence.get(voterID);
+					double oldInfluence = influenceMap.get(voterID);
 					double newInfluence = oldInfluence + reward * rewardInfluence;
 					if (newInfluence < 0) newInfluence = 0;
 					if (newInfluence > 1) newInfluence = 1;
-					voterInfluence.put(voterID, newInfluence);
+					influenceMap.put(voterID, newInfluence);
 				}
 			}
 		}
@@ -119,7 +119,7 @@ public class ActionNode extends Node {
 	public void addVoter(UnitNode voter){
 		voters.add(voter);
 		int voterID = voter.getID();
-		voterInfluence.put(voterID, 1.0);
+		influenceMap.put(voterID, 1.0);
 		givenVotes.put(voterID, -1);
 	}
 	
@@ -140,11 +140,15 @@ public class ActionNode extends Node {
 	}
 	
 	public void printVoterInfluence(){
-		System.out.println(voterInfluence.toString());
+		System.out.println(influenceMap.toString());
 	}
 	
 	public void printActionModels(){
 		pooler.printModelWeigths();
+	}
+	
+	public TreeMap<Integer, Double> getInfluenceMap(){
+		return influenceMap;
 	}
 
 }

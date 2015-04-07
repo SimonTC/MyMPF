@@ -1,6 +1,7 @@
 package stcl.algo.brain;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -118,6 +119,54 @@ public class Network {
 	
 	public ArrayList<UnitNode> getUnitNodes(){
 		return unitNodes;
+	}
+	
+	public String toString(){
+		StringBuffer buffer = new StringBuffer();
+		ArrayList<int[]> connections = new ArrayList<int[]>();
+		
+		buffer.append("Nodes/n");
+		//Write all sensors in network
+		for (Sensor s : sensorLayer){
+			buffer.append(s.getID() + " ");
+			buffer.append(0 + " "); //Type
+			buffer.append(0 + " "); //Layer
+			buffer.append("/n");
+			int[] connection = new int[2];
+			connection[0] = s.getID();
+			connection[1] = s.getParent().getID();
+			connections.add(connection);
+		}
+		
+		//Write all unit nodes
+		for (int i = 0; i < unitLayers.size(); i++){
+			for (UnitNode n : unitLayers.get(i)){
+				buffer.append(n.getID() + " ");
+				buffer.append(1+ " "); //Type
+				buffer.append(i + " "); //Layer
+				buffer.append("/n");
+				int[] connection = new int[2];
+				connection[0] = n.getID();
+				connection[1] = n.getParent().getID();
+				connections.add(connection);
+			}
+		}
+		
+		buffer.append("/n");
+		buffer.append("Connections/n");
+		for (int[] conn : connections){
+			buffer.append(conn[0] + " --> " + conn[1] + "/n");
+		}
+		
+		buffer.append("Voter influence/n");
+		TreeMap<Integer, Double> influenceMap = actionNode.getInfluenceMap();
+		for (Integer key : influenceMap.keySet()){
+			double influence = influenceMap.get(key);
+			buffer.append(key + " : " + influence + "/n");
+		}
+		
+		return buffer.toString();
+		
 	}
 
 }

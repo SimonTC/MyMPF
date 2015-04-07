@@ -152,7 +152,7 @@ public class UnitNode extends Node {
 	@Override
 	public String toString(){
 		String s = super.toString();
-		s += " " + unit.getSpatialPooler().getMapSize() + " " + unit.getTemporalMapSize();
+		s += " " + unit.getSpatialPooler().getMapSize() + " " + unit.getTemporalMapSize() + " " + unit.getMarkovOrder();
 		return s;
 	}
 

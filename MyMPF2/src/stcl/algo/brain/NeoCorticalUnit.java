@@ -48,6 +48,7 @@ public class NeoCorticalUnit{
 	private boolean noTemporal;
 	
 	private int chosenAction;
+	private int markovOrder;
 	
 	
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
@@ -99,6 +100,7 @@ public class NeoCorticalUnit{
 		biasBeforePredicting = false;
 		useBiasedInputInSequencer = false;
 		this.noTemporal = noTemporal;
+		this.markovOrder = markovOrder;
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -434,6 +436,10 @@ public class NeoCorticalUnit{
 	
 	public int getNextAction(){
 		return chosenAction;
+	}
+	
+	public int getMarkovOrder(){
+		return markovOrder;
 	}
 
 	

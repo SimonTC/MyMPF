@@ -148,6 +148,13 @@ public class UnitNode extends Node {
 	public int getActionVote(){
 		return unit.getNextAction();
 	}
+	
+	@Override
+	public String toString(){
+		String s = super.toString();
+		s += " " + unit.getSpatialPooler().getMapSize() + " " + unit.getTemporalMapSize();
+		return s;
+	}
 
 
 }

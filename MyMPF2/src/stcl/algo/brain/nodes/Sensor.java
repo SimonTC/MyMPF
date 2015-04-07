@@ -14,6 +14,7 @@ public class Sensor extends Node {
 		feedforwardInputLength = inputLength;
 		feedforwardOutputVectorLength = inputLength;
 		needHelp = true;
+		this.type = NodeType.SENSOR;
 	}
 
 	@Override

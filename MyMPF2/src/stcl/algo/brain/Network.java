@@ -160,6 +160,8 @@ public class Network {
 			buffer.append(conn[0] + " --> " + conn[1] + "\n");
 		}
 		
+		buffer.append("\n");
+		
 		buffer.append("Voter influence\n");
 		TreeMap<Integer, Double> influenceMap = actionNode.getInfluenceMap();
 		for (Integer key : influenceMap.keySet()){

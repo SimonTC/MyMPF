@@ -25,6 +25,7 @@ public class UnitNode extends Node {
 
 	public UnitNode(int id, Node parent, ArrayList<Node> children) {
 		super(id, parent, children);
+		this.type = NodeType.UNIT;
 	}
 	
 	/**

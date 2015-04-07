@@ -13,8 +13,10 @@ public abstract class Node {
 	protected ArrayList<Node> children;
 	protected SimpleMatrix feedforwardOutput;
 	protected SimpleMatrix feedbackOutput;
+	public enum NodeType {SENSOR, ACTION, UNIT};
 	
 	protected boolean needHelp;
+	protected NodeType type;
 	
 	public Node(int id) {
 		this(id, null);		
@@ -128,6 +130,10 @@ public abstract class Node {
 		if (id != other.id)
 			return false;
 		return true;
+	}
+	
+	public NodeType getType(){
+		return type;
 	}
 
 }

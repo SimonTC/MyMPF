@@ -33,6 +33,7 @@ public class ActionNode extends Node {
 		explorationChance = initialExplorationChance;
 		this.actionSensor = actionSensor;
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
+		this.type = NodeType.ACTION;
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){

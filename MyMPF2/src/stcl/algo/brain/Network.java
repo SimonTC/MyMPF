@@ -22,6 +22,7 @@ public class Network {
 		sensorLayer = new ArrayList<Sensor>();
 		unitLayers = new ArrayList<ArrayList<UnitNode>>();
 		unitNodes = new ArrayList<UnitNode>();
+		nodes = new ArrayList<Node>();
 	}
 	
 	public void addSensor(Sensor sensor){

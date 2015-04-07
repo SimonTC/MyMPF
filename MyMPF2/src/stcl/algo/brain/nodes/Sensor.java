@@ -5,12 +5,12 @@ import org.ejml.simple.SimpleMatrix;
 public class Sensor extends Node {
 	private SimpleMatrix input;
 	
-	public Sensor(int id, int inputLength) {
-		this(id, inputLength, null);
+	public Sensor(int id,int layer,  int inputLength) {
+		this(id, layer, inputLength, null);
 	}
 
-	public Sensor(int id, int inputLength, Node parent) {
-		super(id, parent);
+	public Sensor(int id, int layer, int inputLength, Node parent) {
+		super(id,layer,  parent);
 		feedforwardInputLength = inputLength;
 		feedforwardOutputVectorLength = inputLength;
 		needHelp = true;

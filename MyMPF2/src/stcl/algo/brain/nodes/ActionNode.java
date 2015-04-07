@@ -26,7 +26,7 @@ public class ActionNode extends Node {
 	private double rewardInfluence;
 
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
-		super(id);
+		super(id,-1);
 		voters = new ArrayList<UnitNode>();
 		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();

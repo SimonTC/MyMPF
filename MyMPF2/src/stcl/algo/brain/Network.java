@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.nodes.ActionNode;
+import stcl.algo.brain.nodes.Node;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 
@@ -15,6 +16,7 @@ public class Network {
 	private ArrayList<ArrayList<UnitNode>> unitLayers;
 	private ArrayList<UnitNode> unitNodes;
 	private ActionNode actionNode;
+	private ArrayList<Node> nodes;
 	
 	public Network() {
 		sensorLayer = new ArrayList<Sensor>();
@@ -24,6 +26,7 @@ public class Network {
 	
 	public void addSensor(Sensor sensor){
 		sensorLayer.add(sensor);
+		nodes.add(sensor);
 	}
 	
 	public void addUnitNode(UnitNode node, int layer){
@@ -33,6 +36,7 @@ public class Network {
 		if (actionNode != null){
 			actionNode.addVoter(node);
 		}
+		nodes.add(node);
 	}
 	
 	public void setActionNode(ActionNode node){
@@ -40,6 +44,7 @@ public class Network {
 		for (UnitNode n : unitNodes){
 			actionNode.addVoter(n);
 		}
+		nodes.add(actionNode);
 	}
 	
 	public ActionNode getActionNode(){
@@ -126,31 +131,14 @@ public class Network {
 		ArrayList<int[]> connections = new ArrayList<int[]>();
 		
 		buffer.append("Nodes\n");
-		//Write all sensors in network
-		for (Sensor s : sensorLayer){
-			buffer.append(s.getID() + " ");
-			buffer.append(0 + " "); //Type
-			buffer.append(0 + " "); //Layer
+		for (Node n :  nodes){
+			buffer.append(n.toString());
 			buffer.append("\n");
 			int[] connection = new int[2];
-			connection[0] = s.getID();
-			connection[1] = s.getParent().getID();
-			connections.add(connection);
-		}
-		
-		//Write all unit nodes
-		for (int i = 0; i < unitLayers.size(); i++){
-			for (UnitNode n : unitLayers.get(i)){
-				buffer.append(n.getID() + " ");
-				buffer.append(1+ " "); //Type
-				buffer.append(i + " "); //Layer
-				buffer.append("\n");
-				int[] connection = new int[2];
-				if (n.getParent() != null){
-					connection[0] = n.getID();
-					connection[1] = n.getParent().getID();
-					connections.add(connection);
-				}
+			if (n.getParent() != null){
+				connection[0] = n.getID();
+				connection[1] = n.getParent().getID();
+				connections.add(connection);
 			}
 		}
 		

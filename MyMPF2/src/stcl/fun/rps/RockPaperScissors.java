@@ -116,19 +116,19 @@ public class RockPaperScissors {
 		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, null);		
+		UnitNode combiner = new UnitNode(1, 2, null);		
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, combiner);		
+		UnitNode inputPooler = new UnitNode(2, 1, combiner);		
 		
 		//Create the input sensor 1
-		inputSensor1 = new Sensor(4, 12, inputPooler);		
+		inputSensor1 = new Sensor(4, 0,12, inputPooler);		
 		
 		//Create the input sensor 2
-		inputSensor2 = new Sensor(6, 13, inputPooler);	
+		inputSensor2 = new Sensor(6, 0,  13, inputPooler);	
 		
 		//Create action sensor
-		actionSensor = new Sensor(5, 3, null);
+		actionSensor = new Sensor(5, 0, 3, null);
 
 		//Create action node
 		actionNode = new ActionNode(3, 0.05, actionSensor);

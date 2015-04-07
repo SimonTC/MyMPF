@@ -15,21 +15,31 @@ public abstract class Node {
 	protected SimpleMatrix feedbackOutput;
 	public enum NodeType {SENSOR, ACTION, UNIT};
 	
+	private int layer;
 	protected boolean needHelp;
 	protected NodeType type;
 	
-	public Node(int id) {
-		this(id, null);		
+	public Node(int id, int layer) {
+		this(id, layer, null);		
 	}
 	
-	public Node(int id, Node parent) {
-		this(id, parent, new ArrayList<Node>());
+	public Node(int id, int layer, Node parent) {
+		this(id, layer, parent, new ArrayList<Node>());
 	}
 	
-	public Node(int id, Node parent, ArrayList<Node> children) {
+	public Node(int id, int layer,  Node parent, ArrayList<Node> children) {
 		this.id = id;
 		this.parent = parent;
 		this.children = children;
+		this.layer = layer;
+	}
+	
+	public void setLayer(int layer){
+		this.layer = layer;
+	}
+	
+	public int getLayer(){
+		return layer;
 	}
 	
 	public void setParent(Node parent){
@@ -98,6 +108,12 @@ public abstract class Node {
 	
 	public void feedforward(){
 		this.feedforward(0, -1);
+	}
+	
+	@Override
+	public String toString(){
+		String s = id + " " + type.ordinal() + " " + layer;
+		return s;
 	}
 	
 	public abstract void feedforward(double reward, int actionPerformed);

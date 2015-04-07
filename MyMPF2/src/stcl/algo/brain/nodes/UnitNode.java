@@ -9,24 +9,26 @@ import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.util.Normalizer;
 
 public class UnitNode extends Node {
-	
+
 	private NeoCorticalUnit unit;
 	private int temporalMapSize;
 	protected Random rand;
 	private int chosenAction;
 
-	public UnitNode(int id) {
-		super(id);
+	
+	public UnitNode(int id, int layer) {
+		this(id, layer, null);		
 	}
-
-	public UnitNode(int id, Node parent) {
-		super(id, parent);
+	
+	public UnitNode(int id, int layer, Node parent) {
+		this(id, layer, parent, new ArrayList<Node>());
 	}
-
-	public UnitNode(int id, Node parent, ArrayList<Node> children) {
-		super(id, parent, children);
+	
+	public UnitNode(int id, int layer,  Node parent, ArrayList<Node> children) {
+		super(id, layer, parent, children);
 		this.type = NodeType.UNIT;
 	}
+	
 	
 	/**
 	 * 

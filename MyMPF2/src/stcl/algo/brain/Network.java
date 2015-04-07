@@ -146,9 +146,11 @@ public class Network {
 				buffer.append(i + " "); //Layer
 				buffer.append("/n");
 				int[] connection = new int[2];
-				connection[0] = n.getID();
-				connection[1] = n.getParent().getID();
-				connections.add(connection);
+				if (n.getParent() != null){
+					connection[0] = n.getID();
+					connection[1] = n.getParent().getID();
+					connections.add(connection);
+				}
 			}
 		}
 		

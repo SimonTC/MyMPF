@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.util.Normalizer;
@@ -24,6 +25,7 @@ public class ActionNode extends Node {
 	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
 	private double rewardInfluence;
+	private boolean learningActions;
 
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id,-1);
@@ -34,6 +36,7 @@ public class ActionNode extends Node {
 		this.actionSensor = actionSensor;
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
+		learningActions = true;
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){
@@ -150,6 +153,26 @@ public class ActionNode extends Node {
 	
 	public TreeMap<Integer, Double> getInfluenceMap(){
 		return influenceMap;
+	}
+	
+	/**
+	 * Use this method if you want to give the network a set of specific actions it can perform without having to learn them first.
+	 * @param actions
+	 */
+	public void setPossibleActions(ArrayList<SimpleMatrix> actions){
+		if (learningActions){ //We don't want to go through this if it has already been done before
+			SomNode[] poolerNodes = pooler.getSOM().getNodes();
+			assert poolerNodes.length == actions.size() : "Number of given actions is different from the size of the action pooler map";
+			assert poolerNodes[0].getVector().getNumElements() == actions.get(0).getNumElements() : "The given actions are of different length than the vectors in the action pooler map";
+
+			for (int i = 0; i < poolerNodes.length; i++){
+				SomNode n = poolerNodes[i];
+				n.setVector(actions.get(i));
+			}
+			pooler.setLearning(false);
+			learningActions = false;
+		}
+		
 	}
 
 }

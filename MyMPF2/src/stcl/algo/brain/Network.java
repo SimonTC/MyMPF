@@ -1,12 +1,14 @@
 package stcl.algo.brain;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Node;
+import stcl.algo.brain.nodes.NodeFactory;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 
@@ -23,6 +25,57 @@ public class Network {
 		unitLayers = new ArrayList<ArrayList<UnitNode>>();
 		unitNodes = new ArrayList<UnitNode>();
 		nodes = new ArrayList<Node>();
+	}
+	
+	/**
+	 * Use this constructor to create a NEtwork based on the string created by the toString() method
+	 * @param s
+	 * @param rand
+	 */
+	public Network(String s, Random rand) {
+		sensorLayer = new ArrayList<Sensor>();
+		unitLayers = new ArrayList<ArrayList<UnitNode>>();
+		unitNodes = new ArrayList<UnitNode>();
+		nodes = new ArrayList<Node>();
+		
+		String[] lines = s.split("\n");
+		int counter = 1; //Jump first line
+		
+		//Add basic nodes nodes
+		String line =lines[counter];
+		NodeFactory factory = new NodeFactory();
+		while (!line.equalsIgnoreCase("Connections\n")){
+			Node n = factory.buildNode(line, rand);
+			switch(n.getType()){
+			case SENSOR: this.addSensor((Sensor) n); break;
+			case UNIT: this.addUnitNode((UnitNode) n, n.getLayer()); break;			
+			case ACTION: this.setActionNode((ActionNode) n); break;
+			}
+			counter++;
+			line =lines[counter];
+		}
+		
+		//Connect nodes
+		while (!line.equalsIgnoreCase("Voter influence\n")){
+			String[] arr = line.split(" --> ");
+			int childID = Integer.parseInt(arr[0]);
+			int parentID = Integer.parseInt(arr[1]);
+			Node child = null;
+			Node parent = null;
+			int nodeCounter = 0;
+			while(child == null || parent == null){
+				Node n = nodes.get(nodeCounter);
+				if (n.getID() == childID) child = n;
+				if (n.getID() == parentID) parent = n;
+				nodeCounter++;
+			}
+			
+			child.setParent(parent);
+			parent.addChild(child);
+			
+			counter++;
+			line = lines[counter];
+		}
 	}
 	
 	public void addSensor(Sensor sensor){
@@ -162,25 +215,6 @@ public class Network {
 		
 	}
 	
-	public Network(String s) {
-		sensorLayer = new ArrayList<Sensor>();
-		unitLayers = new ArrayList<ArrayList<UnitNode>>();
-		unitNodes = new ArrayList<UnitNode>();
-		nodes = new ArrayList<Node>();
-		
-		String[] lines = s.split("\n");
-		int counter = 1; //Jump first line
-		int nodeCounterStart = counter;
-		
-		//Add basic nodes nodes
-		String line ="";
-		while (!line.equalsIgnoreCase("Connections\n")){
-			String[] data = line.split(" ");
-		}
-		
-		//Connect nodes
-		
-		//Create action node with influences
-	}
+
 
 }

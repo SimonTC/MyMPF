@@ -39,7 +39,13 @@ public class Network {
 		nodes = new ArrayList<Node>();
 		
 		String[] lines = s.split("\n");
-		int counter = 1; //Jump first line
+		int counter = 0; 
+		//Go to first node
+		String tmp = "";
+		while(!tmp.equalsIgnoreCase("Nodes\n")){
+			tmp = lines[counter];
+			counter++;
+		}
 		
 		//Add basic nodes nodes
 		String line =lines[counter];

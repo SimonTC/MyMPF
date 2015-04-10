@@ -41,8 +41,8 @@ public class UnitNode extends Node {
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal, int numPossibleActions){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, noTemporal, numPossibleActions);
+	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
+		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
 		this.temporalMapSize = unit.getTemporalMapSize();
 		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
 		this.rand = rand;
@@ -63,7 +63,7 @@ public class UnitNode extends Node {
 	 */
 	public void initializeUnit(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
 		int inputLength = feedforwardInputLength;
-		this.initializeUnit(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder > 0, markovOrder, temporalMapSize == 0, numPossibleActions);
+		this.initializeUnit(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
 	}
 
 	@Override

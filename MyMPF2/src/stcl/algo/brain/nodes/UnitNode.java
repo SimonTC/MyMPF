@@ -11,7 +11,7 @@ import stcl.algo.util.Normalizer;
 public class UnitNode extends Node {
 
 	private NeoCorticalUnit unit;
-	private int temporalMapSize;
+	private int ffOutputMapSize;
 	protected Random rand;
 	private int chosenAction;
 
@@ -43,8 +43,8 @@ public class UnitNode extends Node {
 	 */
 	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
-		this.temporalMapSize = unit.getTemporalMapSize();
-		feedforwardOutputVectorLength = unit.getTemporalMapSize() * unit.getTemporalMapSize();
+		this.ffOutputMapSize = unit.getFeedForwardMapSize();
+		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
 	}
 	
@@ -120,9 +120,9 @@ public class UnitNode extends Node {
 		if (parent != null){
 			SimpleMatrix inputVector = parent.getFeedbackOutputForChild(id);
 			inputMatrix = new SimpleMatrix(inputVector);
-			inputMatrix.reshape(temporalMapSize, temporalMapSize);
+			inputMatrix.reshape(ffOutputMapSize, ffOutputMapSize);
 		} else {
-			inputMatrix = new SimpleMatrix(temporalMapSize, temporalMapSize);
+			inputMatrix = new SimpleMatrix(ffOutputMapSize, ffOutputMapSize);
 			inputMatrix.set(1);
 			inputMatrix = Normalizer.normalize(inputMatrix);
 		}

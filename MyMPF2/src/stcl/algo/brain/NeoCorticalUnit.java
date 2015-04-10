@@ -28,6 +28,7 @@ public class NeoCorticalUnit{
 	private int ffInputVectorSize;
 	private int spatialMapSize;
 	private int temporalMapSize;
+	private int ffOutputMapSize;
 	
 	private boolean needHelp;
 	private boolean neededHelpThisTurn; //Used in reporting
@@ -76,17 +77,17 @@ public class NeoCorticalUnit{
 		if (temporalMapSize == 0) noTemporal = true;
 		if (markovOrder == 0) usePrediction = false;
 		
+		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
+		
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		if (!noTemporal) {
 			sequencer = new Sequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
 			this.temporalMapSize = temporalMapSize;
 			if (usePrediction) predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
-		} else {
-			this.temporalMapSize = spatialMapSize;
-		}
+		} 
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
-		ffOutput = new SimpleMatrix(this.temporalMapSize, this.temporalMapSize);
+		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
 		this.spatialMapSize = spatialMapSize;
@@ -102,6 +103,8 @@ public class NeoCorticalUnit{
 		biasBeforePredicting = false;
 		useBiasedInputInSequencer = false;
 		this.markovOrder = markovOrder;
+		
+		
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -187,7 +190,7 @@ public class NeoCorticalUnit{
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
-		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != temporalMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + temporalMapSize + " x " + temporalMapSize + " matrix");
+		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
 
 		fbInput = inputMatrix;
 		
@@ -413,6 +416,10 @@ public class NeoCorticalUnit{
 	 */
 	public int getTemporalMapSize() {
 		return temporalMapSize;
+	}
+	
+	public int getFeedForwardMapSize(){
+		return ffOutputMapSize;
 	}
 	
 	public void setUsePrediction(boolean usePrediction){

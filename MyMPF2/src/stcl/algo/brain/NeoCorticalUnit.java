@@ -51,8 +51,8 @@ public class NeoCorticalUnit{
 	private int markovOrder;
 	
 	
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder) {
-		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, useMarkovPrediction, markovOrder, false,1);
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder) {
+		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, 1);
 	}
 
 	/**
@@ -66,27 +66,29 @@ public class NeoCorticalUnit{
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, boolean useMarkovPrediction, int markovOrder, boolean noTemporal, int numPossibleActions) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions) {
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
 		
 		this.rand = rand;
 		
+		if (temporalMapSize == 0) noTemporal = true;
+		if (markovOrder == 0) usePrediction = false;
+		
 		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		if (!noTemporal) {
 			sequencer = new Sequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
 			this.temporalMapSize = temporalMapSize;
+			if (usePrediction) predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		} else {
 			this.temporalMapSize = spatialMapSize;
 		}
-		predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(this.temporalMapSize, this.temporalMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
-		this.usePrediction = useMarkovPrediction;
 		this.spatialMapSize = spatialMapSize;
 		predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		predictionMatrix.set(1);
@@ -99,7 +101,6 @@ public class NeoCorticalUnit{
 		entropyThresholdFrozen = false;
 		biasBeforePredicting = false;
 		useBiasedInputInSequencer = false;
-		this.noTemporal = noTemporal;
 		this.markovOrder = markovOrder;
 	}
 	
@@ -312,13 +313,13 @@ public class NeoCorticalUnit{
 	
 	public void flush(){
 		biasMatrix.set(1);
-		predictor.flush();
+		if (predictor != null) predictor.flush();
 		if (sequencer != null) sequencer.reset();
 	}
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
-		predictor.setLearning(learning);
+		if (predictor != null) predictor.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}
 
@@ -363,7 +364,7 @@ public class NeoCorticalUnit{
 	}
 
 	public void printPredictionModel() {
-		predictor.printModel();
+		if (predictor != null) predictor.printModel();
 		
 	}
 

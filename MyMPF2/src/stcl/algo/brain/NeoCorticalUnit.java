@@ -190,7 +190,7 @@ public class NeoCorticalUnit{
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
 		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
-		if (inputMatrix.numCols() != temporalMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
+		if (inputMatrix.numCols() != ffOutputMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
 
 		fbInput = inputMatrix;
 		

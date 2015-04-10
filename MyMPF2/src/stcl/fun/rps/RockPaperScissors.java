@@ -143,7 +143,7 @@ public class RockPaperScissors {
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
 			boolean useTemporalPooler_input = true;
-			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, true, markovOrder_input, !useTemporalPooler_input, numActions);
+			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, markovOrder_input, numActions);
 		
 			//Combiner
 			
@@ -152,7 +152,7 @@ public class RockPaperScissors {
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;
-			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, true, markovOrder_combiner, !useTemporalPooler_combiner, numActions);
+			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, markovOrder_combiner,  numActions);
 		/*
 			//top node
 			int ffInputLength_top = combiner.getFeedforwardOutputVectorLength();

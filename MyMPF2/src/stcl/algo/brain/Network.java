@@ -161,5 +161,26 @@ public class Network {
 		return buffer.toString();
 		
 	}
+	
+	public Network(String s) {
+		sensorLayer = new ArrayList<Sensor>();
+		unitLayers = new ArrayList<ArrayList<UnitNode>>();
+		unitNodes = new ArrayList<UnitNode>();
+		nodes = new ArrayList<Node>();
+		
+		String[] lines = s.split("\n");
+		int counter = 1; //Jump first line
+		int nodeCounterStart = counter;
+		
+		//Add basic nodes nodes
+		String line ="";
+		while (!line.equalsIgnoreCase("Connections\n")){
+			String[] data = line.split(" ");
+		}
+		
+		//Connect nodes
+		
+		//Create action node with influences
+	}
 
 }

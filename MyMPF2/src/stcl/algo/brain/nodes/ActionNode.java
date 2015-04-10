@@ -26,6 +26,7 @@ public class ActionNode extends Node {
 	private SimpleMatrix nextAction;
 	private double rewardInfluence;
 	private boolean learningActions;
+	private String initializationDescription;
 
 	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
 		super(id,-1);
@@ -37,12 +38,35 @@ public class ActionNode extends Node {
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
 		learningActions = true;
+		initializationDescription = "" + initialExplorationChance;
+	}
+	
+	/**
+	 * Creates and initializes an Action node based on the given string.
+	 * The string is created by the toString() method.
+	 * Remember to set the sensor afterwards;
+	 * @param s
+	 * @param rand
+	 */
+	public ActionNode(String s, Random rand){
+		super(s);
+		voters = new ArrayList<UnitNode>();
+		influenceMap = new TreeMap<Integer, Double>();
+		givenVotes = new TreeMap<Integer, Integer>();
+		this.rewardInfluence = 0.01; //TODO: Make a parameter
+		learningActions = true;
+		String[] arr = s.split(" ");
+		int length = arr.length;
+		explorationChance = Double.parseDouble(arr[length-4]);
+		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]));
+		initializationDescription = explorationChance + " " + initializationDescription;
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){
-		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, 0.1, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
+		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
 		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
+		initializationDescription += " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate;
 	}
 	
 	public void setExplorationChance(double explorationChance){
@@ -173,6 +197,13 @@ public class ActionNode extends Node {
 			learningActions = false;
 		}
 		
+	}
+	
+	@Override
+	public String toString(){
+		String s = super.toString();
+		s += " " + initializationDescription;
+		return s;
 	}
 
 }

@@ -34,6 +34,21 @@ public abstract class Node {
 		this.layer = layer;
 	}
 	
+	/**
+	 * Create new node from string created by the toString() method
+	 * @param s
+	 */
+	public Node(String s){
+		String[] data = s.split(" ");
+		id = Integer.parseInt(data[0]);
+		int typeID = Integer.parseInt(data[1]);
+		type = NodeType.values()[typeID];
+		layer = Integer.parseInt(data[2]);
+		feedforwardInputLength = Integer.parseInt(data[3]);
+		children = new ArrayList<Node>();
+	}
+
+	
 	public void setLayer(int layer){
 		this.layer = layer;
 	}
@@ -112,7 +127,7 @@ public abstract class Node {
 	
 	@Override
 	public String toString(){
-		String s = id + " " + type.ordinal() + " " + layer;
+		String s = id + " " + type.ordinal() + " " + layer + " " + feedforwardInputLength;
 		return s;
 	}
 	

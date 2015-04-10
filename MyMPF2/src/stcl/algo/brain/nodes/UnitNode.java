@@ -14,7 +14,7 @@ public class UnitNode extends Node {
 	private int ffOutputMapSize;
 	protected Random rand;
 	private int chosenAction;
-
+	private String initializationDescription;
 	
 	public UnitNode(int id, int layer) {
 		this(id, layer, null);		
@@ -27,6 +27,20 @@ public class UnitNode extends Node {
 	public UnitNode(int id, int layer,  Node parent, ArrayList<Node> children) {
 		super(id, layer, parent, children);
 		this.type = NodeType.UNIT;
+	}
+	
+	/**
+	 * Create a new unit node based on the text string created by the toString() method.
+	 * Remember to add parent and children after this.
+	 * Node is initialized in this constructor
+	 * @param s
+	 * @param rand
+	 */
+	public UnitNode(String s, Random rand){
+		super(s);
+		String[] arr = s.split(" ");
+		int length = arr.length;
+		this.initializeUnit(rand, Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Double.parseDouble(arr[length-3]), Integer.parseInt(arr[length-2]), Integer.parseInt(arr[length-1]));
 	}
 	
 	
@@ -46,6 +60,7 @@ public class UnitNode extends Node {
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
+		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize + " " + initialPredictionLearningRate + " " + markovOrder + " " + numPossibleActions;
 	}
 	
 	public void setID(int id){
@@ -152,9 +167,9 @@ public class UnitNode extends Node {
 	@Override
 	public String toString(){
 		String s = super.toString();
-		s += " " + unit.getSpatialPooler().getMapSize() + " " + unit.getTemporalMapSize() + " " + unit.getMarkovOrder();
+		//s += " " + unit.getSpatialPooler().getMapSize() + " " + unit.getTemporalMapSize() + " " + unit.getMarkovOrder();
+		s += " " + initializationDescription;
 		return s;
 	}
-
 
 }

@@ -16,6 +16,13 @@ public class Sensor extends Node {
 		needHelp = true;
 		this.type = NodeType.SENSOR;
 	}
+	
+	public Sensor(String s){
+		super(s);
+		needHelp = true;
+		this.type = NodeType.SENSOR;
+		feedforwardOutputVectorLength = feedforwardInputLength;
+	}
 
 	@Override
 	public void feedforward(double reward, int actionPerformed) {

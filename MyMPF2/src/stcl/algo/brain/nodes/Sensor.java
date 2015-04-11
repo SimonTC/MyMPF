@@ -21,7 +21,8 @@ public class Sensor extends Node {
 		super(s);
 		needHelp = true;
 		this.type = NodeType.SENSOR;
-		if (feedforwardInputLength == 0) feedforwardInputLength = 1;
+		String[] arr = s.split(" ");
+		feedforwardInputLength = Integer.parseInt(arr[arr.length-1]);
 		feedforwardOutputVectorLength = feedforwardInputLength;
 	}
 
@@ -39,6 +40,13 @@ public class Sensor extends Node {
 		double[][] data = {{input}};
 		SimpleMatrix m = new SimpleMatrix(data);
 		this.setInput(m);
+	}
+	
+	@Override
+	public String toString(){
+		String s = super.toString();
+		s += " " + feedforwardInputLength;
+		return s;
 	}
 	
 	public void setInput(SimpleMatrix input){

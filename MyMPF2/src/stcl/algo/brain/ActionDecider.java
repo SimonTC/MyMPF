@@ -82,6 +82,7 @@ public class ActionDecider {
 				bestAction = action;
 			}
 		}
+		assert bestAction != -1 : "No best action coudl be found. There is something wrong";
 		return bestAction;
 	}
 	

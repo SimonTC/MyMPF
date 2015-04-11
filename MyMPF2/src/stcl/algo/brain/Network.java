@@ -46,47 +46,41 @@ public class Network {
 		BufferedReader reader = new BufferedReader( new FileReader (networkFileName));
 		String line = null;
 		
-		boolean lineFound = false;
 		try {
 			//Go to first node
-			while( ( line = reader.readLine() ) != null && ! lineFound) {
-				lineFound = line.equalsIgnoreCase("Nodes");
+			while( ( line = reader.readLine() ) != null) {
+				if (line.equalsIgnoreCase("Nodes")) break;
 			}
-			lineFound = false;
 			//Create nodes
 			NodeFactory factory = new NodeFactory();
-			while( ( line = reader.readLine() ) != null && ! lineFound) {
-				lineFound = line.equalsIgnoreCase("Connections");
-				if (!lineFound){
-					Node n = factory.buildNode(line, rand);
-					switch(n.getType()){
-					case SENSOR: this.addSensor((Sensor) n); break;
-					case UNIT: this.addUnitNode((UnitNode) n, n.getLayer()); break;			
-					case ACTION: this.setActionNode((ActionNode) n); break;
-					}
+			while( ( line = reader.readLine() ) != null) {
+				if (line.equalsIgnoreCase("Connections")) break;
+				Node n = factory.buildNode(line, rand);
+				switch(n.getType()){
+				case SENSOR: this.addSensor((Sensor) n); break;
+				case UNIT: this.addUnitNode((UnitNode) n, n.getLayer()); break;			
+				case ACTION: this.setActionNode((ActionNode) n); break;
+
 				}
 			}
-			lineFound = false;
 			//Connect nodes
-			while( ( line = reader.readLine() ) != null && ! lineFound) {
-				lineFound = line.equalsIgnoreCase("Voter influence");
-				if (!lineFound){
-					String[] arr = line.split(" --> ");
-					int childID = Integer.parseInt(arr[0]);
-					int parentID = Integer.parseInt(arr[1]);
-					Node child = null;
-					Node parent = null;
-					int nodeCounter = 0;
-					while(child == null || parent == null){
-						Node n = nodes.get(nodeCounter);
-						if (n.getID() == childID) child = n;
-						if (n.getID() == parentID) parent = n;
-						nodeCounter++;
-					}
-					
-					child.setParent(parent);
-					parent.addChild(child);
+			while( ( line = reader.readLine() ) != null ) {
+				if(line.equalsIgnoreCase("Voter influence")) break;
+				String[] arr = line.split(" --> ");
+				int childID = Integer.parseInt(arr[0]);
+				int parentID = Integer.parseInt(arr[1]);
+				Node child = null;
+				Node parent = null;
+				int nodeCounter = 0;
+				while(child == null || parent == null){
+					Node n = nodes.get(nodeCounter);
+					if (n.getID() == childID) child = n;
+					if (n.getID() == parentID) parent = n;
+					nodeCounter++;
 				}
+				
+				child.setParent(parent);
+				parent.addChild(child);
 			}
 			
 		} catch (IOException e) {

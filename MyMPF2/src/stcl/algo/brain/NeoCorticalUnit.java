@@ -73,7 +73,7 @@ public class NeoCorticalUnit{
 		//TODO: All parameters should be handled in parameter file
 		
 		this.rand = rand;
-		
+		usePrediction = true;
 		if (temporalMapSize == 0) noTemporal = true;
 		if (markovOrder == 0) usePrediction = false;
 		

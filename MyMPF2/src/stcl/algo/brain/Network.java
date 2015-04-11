@@ -52,7 +52,7 @@ public class Network {
 			while( ( line = reader.readLine() ) != null && ! lineFound) {
 				lineFound = line.equalsIgnoreCase("Nodes");
 			}
-			
+			lineFound = false;
 			//Create nodes
 			NodeFactory factory = new NodeFactory();
 			while( ( line = reader.readLine() ) != null && ! lineFound) {
@@ -66,7 +66,7 @@ public class Network {
 					}
 				}
 			}
-			
+			lineFound = false;
 			//Connect nodes
 			while( ( line = reader.readLine() ) != null && ! lineFound) {
 				lineFound = line.equalsIgnoreCase("Voter influence");
@@ -93,23 +93,6 @@ public class Network {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	private String readFile( String file ) throws IOException {
-	    BufferedReader reader = new BufferedReader( new FileReader (file));
-	    String         line = null;
-	   String s = "";
-	    // StringBuilder  stringBuilder = new StringBuilder();
-	    String         ls = System.getProperty("line.separator");
-
-	    while( ( line = reader.readLine() ) != null ) {
-	        s += line;
-	        s+= ls;
-	    	//stringBuilder.append( line );
-	       // stringBuilder.append( ls );
-	    }
-	    reader.close();
-	    return s;//stringBuilder.toString();
 	}
 	
 	public void addSensor(Sensor sensor){

@@ -131,10 +131,11 @@ public class RockPaperScissors {
 		actionSensor = new Sensor(5, 0, 3, null);
 
 		//Create action node
-		actionNode = new ActionNode(3, 0.05, actionSensor);
+		actionNode = new ActionNode(3);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
-		actionNode.initialize(rand, 3, actionMapSize, 0.1);
+		actionNode.initialize(rand, 3, actionMapSize, 0.1, 0.05);
+		actionNode.addChild(actionSensor);
 		actionSensor.setParent(actionNode);
 		
 		//Initialize unit nodes

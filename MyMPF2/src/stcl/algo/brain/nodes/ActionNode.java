@@ -28,17 +28,14 @@ public class ActionNode extends Node {
 	private boolean learningActions;
 	private String initializationDescription;
 
-	public ActionNode(int id, double initialExplorationChance, Sensor actionSensor) {
+	public ActionNode(int id) {
 		super(id,-1);
 		voters = new ArrayList<UnitNode>();
 		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();
-		explorationChance = initialExplorationChance;
-		this.actionSensor = actionSensor;
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
 		learningActions = true;
-		initializationDescription = "" + initialExplorationChance;
 	}
 	
 	/**
@@ -57,20 +54,25 @@ public class ActionNode extends Node {
 		learningActions = true;
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		explorationChance = Double.parseDouble(arr[length-4]);
-		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]));
-		initializationDescription = explorationChance + " " + initializationDescription;
+		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
 	}
 	
-	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate){
+	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate, double initialExplorationChance){
 		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
 		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
-		initializationDescription += " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate;
+		initializationDescription =initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate;
+		explorationChance = initialExplorationChance;
 	}
 	
 	public void setExplorationChance(double explorationChance){
 		this.explorationChance = explorationChance;
+	}
+	
+	@Override
+	public void addChild(Node child){
+		super.addChild(child);
+		this.actionSensor = (Sensor) child;
 	}
 	
 	@Override

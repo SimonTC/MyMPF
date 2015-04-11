@@ -21,7 +21,7 @@ public class Sensor extends Node {
 		super(s);
 		needHelp = true;
 		this.type = NodeType.SENSOR;
-		feedforwardInputLength = 1;
+		if (feedforwardInputLength == 0) feedforwardInputLength = 1;
 		feedforwardOutputVectorLength = feedforwardInputLength;
 	}
 

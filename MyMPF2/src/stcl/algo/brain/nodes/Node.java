@@ -44,7 +44,7 @@ public abstract class Node {
 		int typeID = Integer.parseInt(data[1]);
 		type = NodeType.values()[typeID];
 		layer = Integer.parseInt(data[2]);
-		feedforwardInputLength = Integer.parseInt(data[3]);
+		feedforwardInputLength = 0; //Don't read from file as this number is increased when children are added
 		children = new ArrayList<Node>();
 	}
 
@@ -127,7 +127,7 @@ public abstract class Node {
 	
 	@Override
 	public String toString(){
-		String s = id + " " + type.ordinal() + " " + layer + " " + feedforwardInputLength;
+		String s = id + " " + type.ordinal() + " " + layer;
 		return s;
 	}
 	

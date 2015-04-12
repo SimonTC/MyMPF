@@ -4,17 +4,16 @@ import org.ejml.simple.SimpleMatrix;
 
 public class Sensor extends Node {
 	private SimpleMatrix input;
-	
-	public Sensor(int id,int layer,  int inputLength) {
-		this(id, layer, inputLength, null);
-	}
 
-	public Sensor(int id, int layer, int inputLength, Node parent) {
-		super(id,layer,  parent);
+	public Sensor(int id, int x, int y, int z){
+		super(id, x, y, z);
+		this.type = NodeType.SENSOR;
+	}
+	
+	public void initialize(int inputLength){
 		feedforwardInputLength = inputLength;
 		feedforwardOutputVectorLength = inputLength;
 		needHelp = true;
-		this.type = NodeType.SENSOR;
 	}
 	
 	public Sensor(String s){

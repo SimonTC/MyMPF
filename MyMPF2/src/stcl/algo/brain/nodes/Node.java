@@ -15,23 +15,15 @@ public abstract class Node {
 	protected SimpleMatrix feedbackOutput;
 	public enum NodeType {SENSOR, ACTION, UNIT};
 	
-	private int layer;
+	private int z, x, y;
 	protected boolean needHelp;
 	protected NodeType type;
 	
-	public Node(int id, int layer) {
-		this(id, layer, null);		
-	}
-	
-	public Node(int id, int layer, Node parent) {
-		this(id, layer, parent, new ArrayList<Node>());
-	}
-	
-	public Node(int id, int layer,  Node parent, ArrayList<Node> children) {
+	public Node(int id, int x, int y, int z) {
 		this.id = id;
-		this.parent = parent;
-		this.children = children;
-		this.layer = layer;
+		this.z = z;
+		this.x = x;
+		this.y = y;
 	}
 	
 	/**
@@ -43,18 +35,20 @@ public abstract class Node {
 		id = Integer.parseInt(data[0]);
 		int typeID = Integer.parseInt(data[1]);
 		type = NodeType.values()[typeID];
-		layer = Integer.parseInt(data[2]);
+		x = Integer.parseInt(data[2]);
+		y = Integer.parseInt(data[3]);
+		z = Integer.parseInt(data[4]);
 		feedforwardInputLength = 0; //Don't read from file as this number is increased when children are added
 		children = new ArrayList<Node>();
 	}
-
 	
-	public void setLayer(int layer){
-		this.layer = layer;
-	}
-	
-	public int getLayer(){
-		return layer;
+	/**
+	 * Return coordinate triple containing x, y, z coordinate
+	 * @return
+	 */
+	public int[] getCoordinates(){
+		int[] coor = {x,y,z};
+		return coor;
 	}
 	
 	public void setParent(Node parent){
@@ -127,7 +121,7 @@ public abstract class Node {
 	
 	@Override
 	public String toString(){
-		String s = id + " " + type.ordinal() + " " + layer;
+		String s = id + " " + type.ordinal() + " " + x + " " + y + " " + z;
 		return s;
 	}
 	

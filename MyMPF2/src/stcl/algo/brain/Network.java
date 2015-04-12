@@ -56,12 +56,7 @@ public class Network {
 			while( ( line = reader.readLine() ) != null) {
 				if (line.equalsIgnoreCase("Connections")) break;
 				Node n = factory.buildNode(line, rand);
-				switch(n.getType()){
-				case SENSOR: this.addSensor((Sensor) n); break;
-				case UNIT: this.addUnitNode((UnitNode) n, n.getLayer()); break;			
-				case ACTION: this.setActionNode((ActionNode) n); break;
-
-				}
+				this.addNode(n);
 			}
 			//Connect nodes
 			while( ( line = reader.readLine() ) != null ) {
@@ -89,27 +84,39 @@ public class Network {
 		}
 	}
 	
-	public void addSensor(Sensor sensor){
-		sensorLayer.add(sensor);
-		nodes.add(sensor);
+	/**
+	 * Add the given node to the network.
+	 * Node will be placed according to its type
+	 * @param node
+	 */
+	public void addNode(Node node){
+		nodes.add(node);
+		switch(node.getType()){
+		case SENSOR: this.addSensor((Sensor) node); break;
+		case UNIT: this.addUnitNode((UnitNode) node); break;			
+		case ACTION: this.setActionNode((ActionNode) node); break;
+		}
 	}
 	
-	public void addUnitNode(UnitNode node, int layer){
+	private void addSensor(Sensor sensor){
+		sensorLayer.add(sensor);
+	}
+	
+	private void addUnitNode(UnitNode node){
+		int layer = node.getCoordinates()[2];
 		while (unitLayers.size() <= layer) unitLayers.add(new ArrayList<UnitNode>());
 		unitLayers.get(layer).add(node);
 		unitNodes.add(node);
 		if (actionNode != null){
 			actionNode.addVoter(node);
 		}
-		nodes.add(node);
 	}
 	
-	public void setActionNode(ActionNode node){
+	private void setActionNode(ActionNode node){
 		this.actionNode = node;
 		for (UnitNode n : unitNodes){
 			actionNode.addVoter(n);
 		}
-		nodes.add(actionNode);
 	}
 	
 	public ActionNode getActionNode(){

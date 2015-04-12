@@ -29,7 +29,7 @@ public class ActionNode extends Node {
 	private String initializationDescription;
 
 	public ActionNode(int id) {
-		super(id,-1);
+		super(id, -1, -1, -1);
 		voters = new ArrayList<UnitNode>();
 		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();

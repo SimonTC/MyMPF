@@ -116,22 +116,25 @@ public class RockPaperScissors {
 		//UnitNode topNode = new UnitNode(0);
 		
 		//Create node that combines input and action
-		UnitNode combiner = new UnitNode(1, 2, null);		
+		UnitNode combiner = new UnitNode(1, 0, 0, 2);
 		
 		//Create node that pools input
-		UnitNode inputPooler = new UnitNode(2, 1, combiner);		
+		UnitNode inputPooler = new UnitNode(2, 0,0,1);		
 		
 		//Create the input sensor 1
-		inputSensor1 = new Sensor(4, 0,12, inputPooler);		
+		inputSensor1 = new Sensor(3,0,0,0);
+		inputSensor1.initialize(12);
 		
 		//Create the input sensor 2
-		inputSensor2 = new Sensor(6, 0,  13, inputPooler);	
+		inputSensor2 = new Sensor(4,0,1,0);	
+		inputSensor2.initialize(13);
 		
 		//Create action sensor
-		actionSensor = new Sensor(5, 0, 3, null);
+		actionSensor = new Sensor(5, 0,2,0);
+		actionSensor.initialize(3);
 
 		//Create action node
-		actionNode = new ActionNode(3);
+		actionNode = new ActionNode(6);
 		int actionMapSize = 2;
 		int numActions = actionMapSize * actionMapSize;
 		actionNode.initialize(rand, 3, actionMapSize, 0.1, 0.05);
@@ -144,7 +147,7 @@ public class RockPaperScissors {
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
 			boolean useTemporalPooler_input = true;
-			inputPooler.initializeUnit(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, markovOrder_input, numActions);
+			inputPooler.initialize(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input, 0.1, markovOrder_input, numActions);
 		
 			//Combiner
 			
@@ -153,7 +156,7 @@ public class RockPaperScissors {
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
 			boolean useTemporalPooler_combiner = true;
-			combiner.initializeUnit(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, markovOrder_combiner,  numActions);
+			combiner.initialize(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner, 0.1, markovOrder_combiner,  numActions);
 		/*
 			//top node
 			int ffInputLength_top = combiner.getFeedforwardOutputVectorLength();
@@ -166,20 +169,24 @@ public class RockPaperScissors {
 		
 		//Add children - Needs to be done in reverse order of creation to make sure that input length calculation is correct
 		actionNode.addChild(actionSensor);
+		actionSensor.setParent(actionNode);
 		inputPooler.addChild(inputSensor1);
+		inputSensor1.setParent(inputPooler);
 		inputPooler.addChild(inputSensor2);
+		inputSensor2.setParent(inputPooler);
 		combiner.addChild(inputPooler);
+		inputPooler.setParent(combiner);
 		//topNode.addChild(combiner);
 		
 		//Add nodes to brain
 		brain = new Network_DataCollector();
-		brain.addSensor(inputSensor1);
-		brain.addSensor(inputSensor2);
-		brain.addSensor(actionSensor);
-		brain.addUnitNode(inputPooler, 0);
-		brain.addUnitNode(combiner, 1);
-		//brain.addUnitNode(topNode, 2);
-		brain.setActionNode(actionNode);
+		brain.addNode(inputSensor1);
+		brain.addNode(inputSensor2);
+		brain.addNode(actionSensor);
+		brain.addNode(inputPooler);
+		brain.addNode(combiner);
+		//brain.addUnitNode(topNode);
+		brain.addNode(actionNode);
 		if (collectData) brain.initializeWriters(dataFolder, false);
 	}
 	

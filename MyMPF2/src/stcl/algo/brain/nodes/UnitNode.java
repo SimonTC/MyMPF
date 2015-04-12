@@ -16,16 +16,8 @@ public class UnitNode extends Node {
 	private int chosenAction;
 	private String initializationDescription;
 	
-	public UnitNode(int id, int layer) {
-		this(id, layer, null);		
-	}
-	
-	public UnitNode(int id, int layer, Node parent) {
-		this(id, layer, parent, new ArrayList<Node>());
-	}
-	
-	public UnitNode(int id, int layer,  Node parent, ArrayList<Node> children) {
-		super(id, layer, parent, children);
+	public UnitNode(int id, int x, int y, int z) {
+		super(id, x, y, z);
 		this.type = NodeType.UNIT;
 	}
 	
@@ -40,7 +32,7 @@ public class UnitNode extends Node {
 		super(s);
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		this.initializeUnit(rand, Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Double.parseDouble(arr[length-3]), Integer.parseInt(arr[length-2]), Integer.parseInt(arr[length-1]));
+		this.initialize(rand, Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Double.parseDouble(arr[length-3]), Integer.parseInt(arr[length-2]), Integer.parseInt(arr[length-1]));
 	}
 	
 	
@@ -55,7 +47,7 @@ public class UnitNode extends Node {
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public void initializeUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
+	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
@@ -76,9 +68,9 @@ public class UnitNode extends Node {
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
 	 * @param numPossibleActions
 	 */
-	public void initializeUnit(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
+	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions){
 		int inputLength = feedforwardInputLength;
-		this.initializeUnit(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
+		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions);
 	}
 
 	@Override

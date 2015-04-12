@@ -24,6 +24,7 @@ public abstract class Node {
 		this.z = z;
 		this.x = x;
 		this.y = y;
+		children = new ArrayList<Node>();
 	}
 	
 	/**

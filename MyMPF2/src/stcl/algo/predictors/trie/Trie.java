@@ -1,10 +1,11 @@
 package stcl.algo.predictors.trie;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class Trie<T> {
-	
+public class Trie<T> implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private TrieNode<T> root;
 	
 	public Trie() {

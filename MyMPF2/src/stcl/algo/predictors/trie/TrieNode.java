@@ -1,10 +1,13 @@
 package stcl.algo.predictors.trie;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 
-public class TrieNode<T>{
+public class TrieNode<T> implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private T symbol;
 	private int count; //Number of times a sequence ending with this node is observed in the data
 	private HashMap<T, TrieNode<T>> children;

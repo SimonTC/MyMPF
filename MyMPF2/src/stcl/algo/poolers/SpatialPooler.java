@@ -1,5 +1,6 @@
 package stcl.algo.poolers;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
@@ -8,8 +9,8 @@ import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.SomBasics;
 import dk.stcl.core.basic.containers.SomNode;
 
-public class SpatialPooler {
-	
+public class SpatialPooler implements Serializable {
+	private static final long serialVersionUID = 1L;
 	//Weight matrix
 	protected SOM som;
 	

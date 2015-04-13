@@ -1,12 +1,14 @@
 package stcl.algo.brain;
 
+import java.io.Serializable;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
-public class ActionDecider {
-	
+public class ActionDecider implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private SimpleMatrix correlationMatrix;
 	private SimpleMatrix stateProbabilitiesBefore;
 	private int actionPerformedBefore;

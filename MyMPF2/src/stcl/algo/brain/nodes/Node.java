@@ -1,11 +1,13 @@
 package stcl.algo.brain.nodes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.ejml.simple.SimpleMatrix;
 
-public abstract class Node {
+public abstract class Node implements Serializable {
+	private static final long serialVersionUID = 1L;
 	protected int id;
 	protected int feedforwardOutputVectorLength; //Has to be set by classes implementing Node
 	protected int feedforwardInputLength;

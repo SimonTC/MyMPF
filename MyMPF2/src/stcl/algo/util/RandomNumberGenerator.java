@@ -1,12 +1,14 @@
 package stcl.algo.util;
 
+import java.io.Serializable;
 import java.util.Random;
 /**
  * Class extending the Random number generator with extra abilities
  * @author Simon
  *
  */
-public class RandomNumberGenerator  {
+public class RandomNumberGenerator implements Serializable {
+	private static final long serialVersionUID = 1L;
 	Random rand;
 	long seed;
 	

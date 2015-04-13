@@ -1,5 +1,6 @@
 package stcl.algo.predictors;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,7 +18,8 @@ import stcl.algo.predictors.trie.TrieNode;
  *
  */
 //TODO: Better citation
-public class VOMM<T> {
+public class VOMM<T> implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Trie<T> trie;
 	private LinkedList<T> memory;
 	private int markovOrder;

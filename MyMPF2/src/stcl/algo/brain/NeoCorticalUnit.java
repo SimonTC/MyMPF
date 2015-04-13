@@ -1,5 +1,6 @@
 package stcl.algo.brain;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
@@ -12,8 +13,8 @@ import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 
-public class NeoCorticalUnit{
-	
+public class NeoCorticalUnit implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private SpatialPooler spatialPooler;
 	private Predictor_VOMM predictor;
 	private ActionDecider decider;

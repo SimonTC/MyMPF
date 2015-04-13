@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeMap;
@@ -17,7 +18,8 @@ import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 
 
-public class Network {
+public class Network implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Sensor> sensorLayer;
 	private ArrayList<ArrayList<UnitNode>> unitLayers;
 	private ArrayList<UnitNode> unitNodes;

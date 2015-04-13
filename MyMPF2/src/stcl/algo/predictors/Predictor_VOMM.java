@@ -1,5 +1,6 @@
 package stcl.algo.predictors;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
@@ -14,8 +15,8 @@ import stcl.algo.util.Normalizer;
  *
  * @param <T>
  */
-public class Predictor_VOMM{
-	
+public class Predictor_VOMM implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private VOMM<Integer> vomm;
 	private int markovOrder;
 	private LinkedList<Double> inputProbabilities;

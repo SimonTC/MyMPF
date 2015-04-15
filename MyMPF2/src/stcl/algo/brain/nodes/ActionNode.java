@@ -13,6 +13,8 @@ import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.util.Normalizer;
 
 public class ActionNode extends Node {
+
+	private static final long serialVersionUID = 1L;
 	private double explorationChance;
 	private ArrayList<UnitNode> voters;
 	private SpatialPooler pooler;
@@ -27,6 +29,7 @@ public class ActionNode extends Node {
 	private double rewardInfluence;
 	private boolean learningActions;
 	private String initializationDescription;
+	private boolean updateVoterInfluence;
 
 	public ActionNode(int id) {
 		super(id, -1, -1, -1);
@@ -36,6 +39,7 @@ public class ActionNode extends Node {
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
 		learningActions = true;
+		updateVoterInfluence = true;
 	}
 	
 	/**
@@ -52,6 +56,7 @@ public class ActionNode extends Node {
 		givenVotes = new TreeMap<Integer, Integer>();
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		learningActions = true;
+		updateVoterInfluence = true;
 		String[] arr = s.split(" ");
 		int length = arr.length;
 		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
@@ -130,17 +135,19 @@ public class ActionNode extends Node {
 		//TODO: Implement weighting of votes
 		//Update weights of voters
 		//If you voted for the action that was performed your influenced is changed based on how good the outcome was
-		for (UnitNode voter : voters){
-			int voterID = voter.getID();
-			int vote = givenVotes.get(voterID);
-			if (vote != -1){
-				//Voter did vote in last election
-				if (vote == currentAction){
-					double oldInfluence = influenceMap.get(voterID);
-					double newInfluence = oldInfluence + reward * rewardInfluence;
-					if (newInfluence < 0) newInfluence = 0;
-					if (newInfluence > 1) newInfluence = 1;
-					influenceMap.put(voterID, newInfluence);
+		if (updateVoterInfluence){
+			for (UnitNode voter : voters){
+				int voterID = voter.getID();
+				int vote = givenVotes.get(voterID);
+				if (vote != -1){
+					//Voter did vote in last election
+					if (vote == currentAction){
+						double oldInfluence = influenceMap.get(voterID);
+						double newInfluence = oldInfluence + reward * rewardInfluence;
+						if (newInfluence < 0) newInfluence = 0;
+						if (newInfluence > 1) newInfluence = 1;
+						influenceMap.put(voterID, newInfluence);
+					}
 				}
 			}
 		}
@@ -203,6 +210,10 @@ public class ActionNode extends Node {
 			learningActions = false;
 		}
 		
+	}
+	
+	public void setUpdateVoterInfluence(boolean flag){
+		this.updateVoterInfluence = flag;
 	}
 	
 	@Override

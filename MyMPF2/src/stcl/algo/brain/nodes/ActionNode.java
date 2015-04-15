@@ -2,6 +2,7 @@ package stcl.algo.brain.nodes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.TreeMap;
 

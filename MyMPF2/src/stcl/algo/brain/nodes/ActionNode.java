@@ -181,6 +181,10 @@ public class ActionNode extends Node {
 		return influenceMap;
 	}
 	
+	public void setInfluenceMap(TreeMap<Integer, Double> influenceMap){
+		this.influenceMap = influenceMap;
+	}
+	
 	/**
 	 * Use this method if you want to give the network a set of specific actions it can perform without having to learn them first.
 	 * @param actions

@@ -84,7 +84,7 @@ public class ActionDecider implements Serializable {
 				bestAction = action;
 			}
 		}
-		assert bestAction != -1 : "No best action coudl be found. There is something wrong";
+		assert bestAction != -1 : "No best action could be found. There is something wrong";
 		return bestAction;
 	}
 	

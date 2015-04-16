@@ -50,7 +50,7 @@ public class QFunction implements Serializable{
 	
 	private double calculateQValue(SimpleMatrix currentState, SimpleMatrix actionPerformedNow){
 		SimpleMatrix featureVector = createFeatureVector(currentState, actionPerformedNow);
-		double qValue = parameterVectorCurrentEpisode.dot(featureVector.transpose());
+		double qValue = parameterVectorNextEpisode.dot(featureVector.transpose());
 		return qValue;		
 	}
 	

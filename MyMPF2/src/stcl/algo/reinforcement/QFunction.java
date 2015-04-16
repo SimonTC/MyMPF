@@ -26,8 +26,9 @@ public class QFunction implements Serializable{
 	}
 	
 	public void feedForward(SimpleMatrix currentStateVector, int actionPerformedNow, double rewardForActionBefore){
-		updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
-		
+		if(stateBefore != null){
+			updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
+		}
 		stateBefore = currentStateVector;
 		actionPerformedBefore = actionPerformedNow;
 	}

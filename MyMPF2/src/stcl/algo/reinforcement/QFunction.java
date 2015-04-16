@@ -38,6 +38,11 @@ public class QFunction implements Serializable{
 		for (int i = 0; i < parameterVectorCurrentEpisode.getNumElements(); i++){
 			parameterVectorCurrentEpisode.set(rand.nextDouble());
 		}
+		parameterVectorNextEpisode = new SimpleMatrix(parameterVectorCurrentEpisode);
+	}
+	
+	public void newEpisode(){
+		parameterVectorCurrentEpisode = new SimpleMatrix(parameterVectorNextEpisode);
 	}
 	
 	private double calculateQValue(SimpleMatrix currentState, SimpleMatrix actionPerformedNow){

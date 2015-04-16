@@ -21,7 +21,7 @@ public class QFunction implements Serializable{
 	
 	public void feedForward(SimpleMatrix currentStateVector, int actionPerformedNow, double rewardForActionBefore){
 		if(stateBefore != null){
-			updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
+			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
 		}
 		stateBefore = currentStateVector;
 		actionPerformedBefore = actionPerformedNow;
@@ -51,7 +51,7 @@ public class QFunction implements Serializable{
 		return qValue;		
 	}
 	
-	private void updateParameterVector(SimpleMatrix stateNow, SimpleMatrix actionNow, SimpleMatrix stateNext, 
+	private SimpleMatrix updateParameterVector(SimpleMatrix stateNow, SimpleMatrix actionNow, SimpleMatrix stateNext, 
 			double rewardNow, double learningRate, double decay, SimpleMatrix parameterVector){
 			double valueThisState = calculateQValue(stateNow, actionNow);
 			double maxValueNextState = calculateMaxQPossible(stateNext);
@@ -60,6 +60,7 @@ public class QFunction implements Serializable{
 			SimpleMatrix delta = featureVector.scale(learningRate);
 			delta = delta.scale(difference);
 			parameterVector = parameterVector.plus(delta);		
+			return parameterVector;
 	}
 	
 	private double calculateMaxQPossible(SimpleMatrix state){

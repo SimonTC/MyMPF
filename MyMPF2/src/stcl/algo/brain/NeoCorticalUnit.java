@@ -100,7 +100,8 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
 		//decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
-		decider = new QFunction(numPossibleActions, spatialMapSize * spatialMapSize, null, rand);
+		decider = new QFunction();
+		decider.initialize(6, spatialMapSize * spatialMapSize, rand, null); //TODO: Move action vector length to parameter
 		
 		needHelp = false;
 		entropyThreshold = 0;

@@ -15,12 +15,6 @@ public class QFunction implements Serializable{
 	private SimpleMatrix stateBefore;
 
 	
-	public QFunction(int numPossibleActions, int numPossibleStates, SimpleMatrix actionMatrix, Random rand){
-		initializeParameterVector(numPossibleActions, numPossibleStates, rand);
-		
-		this.actionMatrix = actionMatrix;
-	}
-	
 	public void setActionMatrix(SimpleMatrix actionMatrix){
 		this.actionMatrix = actionMatrix;
 	}
@@ -38,8 +32,9 @@ public class QFunction implements Serializable{
 		return action;
 	}
 	
-	public void initializeParameterVector(int numPossibleActions, int numPossibleStates, Random rand){
-		parameterVectorCurrentEpisode = new SimpleMatrix(1, numPossibleActions + numPossibleStates);
+	public void initialize(int actionVectorLength, int stateVectorLength, Random rand, SimpleMatrix actionMatrix){
+		this.actionMatrix = actionMatrix;
+		parameterVectorCurrentEpisode = new SimpleMatrix(1, actionVectorLength + stateVectorLength);
 		for (int i = 0; i < parameterVectorCurrentEpisode.getNumElements(); i++){
 			parameterVectorCurrentEpisode.set(rand.nextDouble());
 		}

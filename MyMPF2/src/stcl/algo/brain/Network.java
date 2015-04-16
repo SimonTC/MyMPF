@@ -232,8 +232,8 @@ public class Network implements Serializable{
 		
 	}
 	
-	public void newEpisode(){
-		for (UnitNode n : unitNodes) n.getUnit().newEpisode();
+	public void newEpisode(double rewardForLastEpisode){
+		for (UnitNode n : unitNodes) n.getUnit().newEpisode(rewardForLastEpisode);
 	}
 
 

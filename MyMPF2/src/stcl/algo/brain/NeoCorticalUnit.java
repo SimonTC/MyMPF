@@ -463,8 +463,8 @@ public class NeoCorticalUnit implements Serializable{
 		return markovOrder;
 	}
 
-	public void newEpisode(){
-		decider.newEpisode();
+	public void newEpisode(double rewardForLastEpisode){
+		decider.newEpisodedouble(rewardForLastEpisode);
 	}
 
 }

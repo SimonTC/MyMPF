@@ -101,7 +101,7 @@ public class NeoCorticalUnit implements Serializable{
 		
 		//decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
 		decider = new QFunction();
-		decider.initialize(6, spatialMapSize * spatialMapSize, rand, null); //TODO: Move action vector length to parameter
+		decider.initialize(6, spatialPooler.getSOM().getInputVectorLength(), rand, null); //TODO: Move action vector length to parameter
 		
 		needHelp = false;
 		entropyThreshold = 0;

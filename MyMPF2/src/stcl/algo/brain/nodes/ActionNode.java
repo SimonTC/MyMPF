@@ -209,8 +209,20 @@ public class ActionNode extends Node {
 			}
 			pooler.setLearning(false);
 			learningActions = false;
+			giveActionMatrixToVoters();
 		}
 		
+	}
+	
+	public void giveActionMatrixToVoters(){
+		SomNode[] poolerNodes = pooler.getSOM().getNodes();
+		SimpleMatrix actionMatrix = new SimpleMatrix(poolerNodes.length, poolerNodes[0].getVector().getNumElements());
+		for (int i = 0; i < poolerNodes.length; i++){
+			actionMatrix.insertIntoThis(i, 0, poolerNodes[i].getVector());
+		}
+		for (UnitNode n : voters){
+			n.setActionMatrix(actionMatrix);
+		}
 	}
 	
 	public void setUpdateVoterInfluence(boolean flag){

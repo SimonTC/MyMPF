@@ -95,4 +95,8 @@ public class QFunction implements Serializable{
 		featureVector.insertIntoThis(0, state.getNumElements(), action);
 		return featureVector;
 	}
+	
+	public SimpleMatrix getParameterVectorNextEpisode(){
+		return parameterVectorNextEpisode;
+	}
 }

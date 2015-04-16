@@ -466,5 +466,9 @@ public class NeoCorticalUnit implements Serializable{
 	public void newEpisode(double rewardForLastEpisode){
 		decider.newEpisodedouble(rewardForLastEpisode);
 	}
+	
+	public QFunction getDecider(){
+		return this.decider;
+	}
 
 }

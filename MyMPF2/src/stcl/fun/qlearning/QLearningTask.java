@@ -11,6 +11,7 @@ public class QLearningTask {
 	private QFunction qfunction;
 	private Random rand = new Random(1234);
 	private SimpleMatrix rewardMatrix, actionMatrix;
+	private int numEpisodes = 10000;
 
 	public static void main(String[] args) {
 		QLearningTask qt = new QLearningTask();
@@ -50,7 +51,7 @@ public class QLearningTask {
 	}
 	
 	public void run(){
-		int numEpisodes = 200000;
+		
 		for (int i = 0; i < numEpisodes; i++){
 			int result = runEpisode(i);
 			System.out.println("Finished episode " + i + " Result: " + result);
@@ -64,13 +65,13 @@ public class QLearningTask {
 		SimpleMatrix position = new SimpleMatrix(posData);
 		boolean goalFound = false;
 		boolean dead = false;
-		int maxSteps = 10;
+		int maxSteps = 20;
 		int step = 0;
 		int action = 4;
 		double reward = 0;
 		boolean stop = false;
 		while(!goalFound && !dead && !stop && step < maxSteps){
-			System.out.println("Position: " + position.get(0) + ", " + position.get(1));
+			//System.out.println("Position: " + position.get(0) + ", " + position.get(1));
 			qfunction.feedForward(position, action, reward);
 			SimpleMatrix actionToPerform = actionMatrix.extractVector(true, action);
 			
@@ -121,9 +122,10 @@ public class QLearningTask {
 				position.set(0, newRow);
 				position.set(1, newCol);
 				int nextAction = 0;
-				//nextAction = qfunction.feedback(position);
-				nextAction = qfunction.chooseNextAction(position, 10 + temperature);
-				//if (rand.nextDouble() < 0.2) nextAction = rand.nextInt(5);
+				nextAction = qfunction.feedback(position);
+				//nextAction = qfunction.chooseNextAction(position, 10 + temperature);
+				double threshold = 1 * Math.exp(-temperature / numEpisodes);
+				if (rand.nextDouble() < threshold) nextAction = rand.nextInt(5);
 				action = nextAction;
 				step++;
 			}

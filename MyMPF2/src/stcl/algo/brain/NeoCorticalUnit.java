@@ -9,7 +9,6 @@ import stcl.algo.poolers.Sequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.predictors.Predictor_VOMM;
-import stcl.algo.reinforcement.QFunction;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
@@ -18,9 +17,7 @@ public class NeoCorticalUnit implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private SpatialPooler spatialPooler;
 	private Predictor_VOMM predictor;
-	
-	//private ActionDecider decider;
-	private QFunction decider;
+	private ActionDecider decider;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	private SimpleMatrix ffInput;
@@ -99,8 +96,7 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		//decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
-		decider = new QFunction(numPossibleActions, spatialMapSize * spatialMapSize, null, rand);
+		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
 		
 		needHelp = false;
 		entropyThreshold = 0;
@@ -135,7 +131,7 @@ public class NeoCorticalUnit implements Serializable{
 		ffOutput = biasedOutput;
 		needHelp = true;
 		
-		SimpleMatrix inputToDecider = spatialPooler.getSOM().getBMU().getVector();//spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
+		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
 		//inputToDecider = Normalizer.normalize(inputToDecider);
 		decider.feedForward(inputToDecider, actionPerformed, reward);
 		
@@ -233,14 +229,12 @@ public class NeoCorticalUnit implements Serializable{
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		
-		//chosenAction = decider.feedback(biasedTemporalFBOutput);
+		chosenAction = decider.feedback(biasedTemporalFBOutput);
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
 		
 		fbOutput = spatialPoolerFBOutputVector;
-		
-		chosenAction = decider.feedback(fbOutput);
 		
 		//fbOutput = addNoise(fbOutput, 0.1);
 		//fbOutput = Normalizer.normalize(fbOutput);
@@ -265,10 +259,6 @@ public class NeoCorticalUnit implements Serializable{
 			m.set(i, d);
 		}
 		return m;
-	}
-	
-	public void setActionMatrix(SimpleMatrix actionMatrix){
-		decider.setActionMatrix(actionMatrix);
 	}
 	
 	public void resetActivity(){
@@ -445,11 +435,10 @@ public class NeoCorticalUnit implements Serializable{
 		return fbInput;
 	}
 	
-	/*
 	public void printCorrelationMatrix(){
 		decider.printCorrelationMatrix();
 	}
-	*/
+	
 	public Predictor_VOMM getPredictor(){
 		return predictor;
 	}

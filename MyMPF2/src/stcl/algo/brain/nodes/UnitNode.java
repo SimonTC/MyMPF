@@ -163,9 +163,5 @@ public class UnitNode extends Node {
 		s += " " + initializationDescription;
 		return s;
 	}
-	
-	public void setActionMatrix(SimpleMatrix actionMatrix){
-		unit.setActionMatrix(actionMatrix);
-	}
 
 }

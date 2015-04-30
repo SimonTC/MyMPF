@@ -23,7 +23,7 @@ public class QFunction implements Serializable{
 		if(stateBefore != null){
 			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
 		}
-		stateBefore = new SimpleMatrix(currentStateVector);
+		stateBefore = currentStateVector;
 		actionPerformedBefore = actionPerformedNow;
 	}
 	
@@ -41,10 +41,7 @@ public class QFunction implements Serializable{
 		parameterVectorNextEpisode = new SimpleMatrix(parameterVectorCurrentEpisode);
 	}
 	
-	public void newEpisodedouble (double rewardForLastEpisode){
-		SimpleMatrix tmpMatrix = new SimpleMatrix(stateBefore);
-		tmpMatrix.set(0);
-		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9, parameterVectorNextEpisode);
+	public void newEpisode(){
 		parameterVectorCurrentEpisode = new SimpleMatrix(parameterVectorNextEpisode);
 	}
 	

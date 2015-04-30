@@ -233,7 +233,7 @@ public class Network_DataCollector extends Network {
 			
 			writer.write(actionVotes[i] + ";");
 			
-			writer.write(writeMatrixArray(qParameters[i]) + ";"); 
+			writer.write(qParameters[i] + ";"); 
 			
 			writer.writeLine("");
 		}

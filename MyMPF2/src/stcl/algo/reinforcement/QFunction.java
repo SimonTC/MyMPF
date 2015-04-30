@@ -22,7 +22,7 @@ public class QFunction implements Serializable{
 	
 	public void feedForward(SimpleMatrix currentStateVector, int actionPerformedNow, double rewardForActionBefore){
 		if(stateBefore != null){
-			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9);
+			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.5, 0.9, parameterVectorNextEpisode);
 		}
 		stateBefore = new SimpleMatrix(currentStateVector);
 		actionPerformedBefore = actionPerformedNow;
@@ -38,8 +38,7 @@ public class QFunction implements Serializable{
 		SimpleMatrix temperateQVector = new SimpleMatrix(actionMatrix.numRows(),1);
 		double totalTemperateQ = 0;
 		for (int action = 0; action < actionMatrix.numRows(); action++){
-			double q = calculateQValue(StateFromWhichToChoose, actionMatrix.extractVector(true, action), parameterVectorCurrentEpisode);
-			double temperateQ = Math.pow(temperature, q);
+			double temperateQ = Math.pow(temperature, calculateQValue(StateFromWhichToChoose, actionMatrix.extractVector(true, action)));
 			temperateQVector.set(action, temperateQ);
 			totalTemperateQ += temperateQ;
 		}
@@ -65,41 +64,43 @@ public class QFunction implements Serializable{
 			parameterVectorCurrentEpisode.set(i,rand.nextDouble());
 		}
 		parameterVectorNextEpisode = new SimpleMatrix(parameterVectorCurrentEpisode);
-		parameterVectorCurrentEpisode.print();
 	}
 	
 	public void newEpisodedouble(double rewardForLastEpisode){
 		SimpleMatrix tmpMatrix = new SimpleMatrix(stateBefore);
 		tmpMatrix.set(0);
-		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9);
+		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9, parameterVectorNextEpisode);
 		parameterVectorCurrentEpisode = new SimpleMatrix(parameterVectorNextEpisode);
 		stateBefore = null;
 	}
 	
-	private double calculateQValue(SimpleMatrix currentState, SimpleMatrix actionPerformedNow, SimpleMatrix parameterVector){
+	private double calculateQValue(SimpleMatrix currentState, SimpleMatrix actionPerformedNow){
 		SimpleMatrix featureVector = createFeatureVector(currentState, actionPerformedNow);
-		double qValue = parameterVector.dot(featureVector.transpose());
+		double qValue = parameterVectorCurrentEpisode.dot(featureVector.transpose());
 		return qValue;		
 	}
 	
 	private SimpleMatrix updateParameterVector(SimpleMatrix stateNow, SimpleMatrix actionNow, SimpleMatrix stateNext, 
-			double rewardNow, double learningRate, double decay){
-			double valueThisState = calculateQValue(stateNow, actionNow, parameterVectorNextEpisode);
-			double maxValueNextState = calculateMaxQPossible(stateNext, parameterVectorCurrentEpisode);
+			double rewardNow, double learningRate, double decay, SimpleMatrix parameterVector){
+			if (rewardNow > 0.5){
+				System.out.println();
+			}
+			double valueThisState = calculateQValue(stateNow, actionNow);
+			double maxValueNextState = calculateMaxQPossible(stateNext);
 			double difference = rewardNow + decay * maxValueNextState - valueThisState;
 			SimpleMatrix featureVector = createFeatureVector(stateNow, actionNow);
 			SimpleMatrix delta = featureVector.scale(learningRate);
 			delta = delta.scale(difference);
-			parameterVectorNextEpisode = parameterVectorNextEpisode.plus(delta);	
+			parameterVector = parameterVector.plus(delta);	
 		
-			return parameterVectorNextEpisode;
+			return parameterVector;
 	}
 	
-	private double calculateMaxQPossible(SimpleMatrix state, SimpleMatrix parameterVector){
+	private double calculateMaxQPossible(SimpleMatrix state){
 		double max = Double.NEGATIVE_INFINITY;
 		for (int action = 0; action < actionMatrix.numRows(); action++){
 			SimpleMatrix actionVector = actionMatrix.extractVector(true, action);
-			max = Math.max(max, calculateQValue(state, actionVector, parameterVector));
+			max = Math.max(max, calculateQValue(state, actionVector));
 		}
 		return max;
 	}
@@ -109,7 +110,7 @@ public class QFunction implements Serializable{
 		int bestState = -1;
 		for (int action = 0; action < actionMatrix.numRows(); action++){
 			SimpleMatrix actionVector = actionMatrix.extractVector(true, action);
-			double value = calculateQValue(state, actionVector, parameterVectorCurrentEpisode);
+			double value = calculateQValue(state, actionVector);
 			if (value > max){
 				max = value;
 				bestState = action;

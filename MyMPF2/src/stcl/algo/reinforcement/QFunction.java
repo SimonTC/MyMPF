@@ -22,7 +22,7 @@ public class QFunction implements Serializable{
 	
 	public void feedForward(SimpleMatrix currentStateVector, int actionPerformedNow, double rewardForActionBefore){
 		if(stateBefore != null){
-			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
+			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode, 0.1);
 		}
 		stateBefore = new SimpleMatrix(currentStateVector);
 		actionPerformedBefore = actionPerformedNow;
@@ -69,7 +69,7 @@ public class QFunction implements Serializable{
 	public void newEpisodedouble(double rewardForLastEpisode){
 		SimpleMatrix tmpMatrix = new SimpleMatrix(stateBefore);
 		tmpMatrix.set(0);
-		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9, parameterVectorNextEpisode);
+		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9, parameterVectorNextEpisode, 0.1);
 		parameterVectorCurrentEpisode = new SimpleMatrix(parameterVectorNextEpisode);
 	}
 	
@@ -80,15 +80,18 @@ public class QFunction implements Serializable{
 	}
 	
 	private SimpleMatrix updateParameterVector(SimpleMatrix stateNow, SimpleMatrix actionNow, SimpleMatrix stateNext, 
-			double rewardNow, double learningRate, double decay, SimpleMatrix parameterVector){
+			double rewardNow, double learningRate, double decay, SimpleMatrix parameterVector, double lambda){
 			double valueThisState = calculateQValue(stateNow, actionNow);
 			double maxValueNextState = calculateMaxQPossible(stateNext);
 			double difference = rewardNow + decay * maxValueNextState - valueThisState;
 			SimpleMatrix featureVector = createFeatureVector(stateNow, actionNow);
 			SimpleMatrix delta = featureVector.scale(learningRate);
+			SimpleMatrix regularizationTerm = new SimpleMatrix(parameterVector);
+			regularizationTerm = regularizationTerm.scale(lambda / (double) regularizationTerm.getNumElements());
 			delta = delta.scale(difference);
 			parameterVector = parameterVector.plus(delta);	
-		
+			parameterVector = parameterVector.plus(regularizationTerm);
+			
 			return parameterVector;
 	}
 	

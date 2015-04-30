@@ -13,7 +13,6 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 import stcl.algo.poolers.Sequencer;
-import stcl.algo.reinforcement.QFunction;
 import stcl.algo.util.FileWriter;
 
 /**
@@ -22,9 +21,6 @@ import stcl.algo.util.FileWriter;
  *
  */
 public class Network_DataCollector extends Network {
-
-	private static final long serialVersionUID = 1L;
-	
 	//Inputs and outputs to the brain
 	private SimpleMatrix receivedInput[];
 	private SimpleMatrix returnedOutput[];
@@ -35,9 +31,6 @@ public class Network_DataCollector extends Network {
 	
 	private SimpleMatrix[] FFInputs;
 	private SimpleMatrix[] FBInputs;
-	
-	//Parameters of q-functions
-	private SimpleMatrix[] qParameters;
 	
 	//Help status of the units
 	private boolean[] helpStatuses;
@@ -149,7 +142,6 @@ public class Network_DataCollector extends Network {
 			returnedOutput = collectNetworkOutput();
 			FBInputs = collectUnitInputs(false);
 			FBOutputs = (collectUnitOutputs(false));
-			qParameters = collectqParameters();
 		}
 		
 		//Print data to files
@@ -165,11 +157,10 @@ public class Network_DataCollector extends Network {
 	
 	private void writeHeaders() throws IOException{
 
-		//Write header for network file
+		//Write ehader for network file
 		String header = "";
 		header += "Received input;";
 		header += "Returned output;";
-		header += "Voter influence;";
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		brainWriter.writeLine(header);
 		
@@ -194,8 +185,6 @@ public class Network_DataCollector extends Network {
 		header += writeRepeatedString("FB Output", 1, ";");
 		
 		header +=writeRepeatedString("Action vote", 1, ";");
-		
-		header +=writeRepeatedString("Q Parameters", 1, ";");
 		
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		
@@ -232,8 +221,6 @@ public class Network_DataCollector extends Network {
 			writer.write(writeMatrixArray(FBOutputs[i]) + ";");
 			
 			writer.write(actionVotes[i] + ";");
-			
-			writer.write(qParameters[i] + ";"); 
 			
 			writer.writeLine("");
 		}
@@ -297,7 +284,6 @@ public class Network_DataCollector extends Network {
 				
 	}
 	
-	
 	private double[] collectEntropyThresholds(){
 		double[] thresholds = new double[numUnits];
 		for (int i = 0; i < numUnits; i++){
@@ -348,15 +334,6 @@ public class Network_DataCollector extends Network {
 		return votes;
 	}
 	
-	private SimpleMatrix[] collectqParameters(){
-		SimpleMatrix[] qparameters = new SimpleMatrix[numUnits];
-		for (int i = 0; i < numUnits; i++){
-			SimpleMatrix m = super.getUnitNodes().get(i).getUnit().getDecider().getParameterVectorNextEpisode();
-			qparameters[i] = new SimpleMatrix(m);
-		}
-		return qparameters;
-	}
-
 	private SimpleMatrix[] collectActivations(boolean spatial){
 		SimpleMatrix[] activations = new SimpleMatrix[numUnits];
 		for (int i = 0; i < numUnits; i++){

@@ -39,8 +39,8 @@ public class BlockWorldTest {
 		
 		start = new State(startID, world);
 		end = new State(endID, world);
-		world.set(-0.001);
-		world.set(endID, 10);
+		world.set(0);
+		world.set(endID, 1);
 
 	}
 	

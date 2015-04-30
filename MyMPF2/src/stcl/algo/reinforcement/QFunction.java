@@ -22,7 +22,7 @@ public class QFunction implements Serializable{
 	
 	public void feedForward(SimpleMatrix currentStateVector, int actionPerformedNow, double rewardForActionBefore){
 		if(stateBefore != null){
-			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.5, 0.9, parameterVectorNextEpisode);
+			parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), currentStateVector, rewardForActionBefore, 0.1, 0.9, parameterVectorNextEpisode);
 		}
 		stateBefore = new SimpleMatrix(currentStateVector);
 		actionPerformedBefore = actionPerformedNow;
@@ -71,20 +71,16 @@ public class QFunction implements Serializable{
 		tmpMatrix.set(0);
 		parameterVectorNextEpisode = updateParameterVector(stateBefore, actionMatrix.extractVector(true, actionPerformedBefore), tmpMatrix, rewardForLastEpisode, 0.1, 0.9, parameterVectorNextEpisode);
 		parameterVectorCurrentEpisode = new SimpleMatrix(parameterVectorNextEpisode);
-		stateBefore = null;
 	}
 	
 	private double calculateQValue(SimpleMatrix currentState, SimpleMatrix actionPerformedNow){
 		SimpleMatrix featureVector = createFeatureVector(currentState, actionPerformedNow);
-		double qValue = parameterVectorCurrentEpisode.dot(featureVector.transpose());
+		double qValue = parameterVectorNextEpisode.dot(featureVector.transpose());
 		return qValue;		
 	}
 	
 	private SimpleMatrix updateParameterVector(SimpleMatrix stateNow, SimpleMatrix actionNow, SimpleMatrix stateNext, 
 			double rewardNow, double learningRate, double decay, SimpleMatrix parameterVector){
-			if (rewardNow > 0.5){
-				System.out.println();
-			}
 			double valueThisState = calculateQValue(stateNow, actionNow);
 			double maxValueNextState = calculateMaxQPossible(stateNext);
 			double difference = rewardNow + decay * maxValueNextState - valueThisState;

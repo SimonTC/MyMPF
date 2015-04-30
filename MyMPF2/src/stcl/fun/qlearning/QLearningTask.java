@@ -40,7 +40,7 @@ public class QLearningTask {
 	
 	private SimpleMatrix createRewardMatrix(){
 		double[][] data = {
-				{0,0,0,1},
+				{0,0,0,10},
 				{0,0,0,0},
 				{0,0,0,0},
 				{0,0,0,0}
@@ -64,27 +64,19 @@ public class QLearningTask {
 		SimpleMatrix position = new SimpleMatrix(posData);
 		boolean goalFound = false;
 		boolean dead = false;
-		int maxSteps = 10;
+		int maxSteps = 100;
 		int step = 0;
 		int action = 4;
 		double reward = 0;
-		boolean stop = false;
-		while(!goalFound && !dead && !stop && step < maxSteps){
-			System.out.println("Position: " + position.get(0) + ", " + position.get(1));
+		while(!goalFound && !dead && step < maxSteps){
 			qfunction.feedForward(position, action, reward);
 			SimpleMatrix actionToPerform = actionMatrix.extractVector(true, action);
 			
 			reward = rewardMatrix.get((int) position.get(0), (int) position.get(1));
-			if ((int)position.get(0) == 0 && (int)position.get(1) == 3){
-				reward = 0;
-				goalFound = true;
-			}
-			/*
 			if (reward >= 9.99 && reward <= 10.01){
 				reward = 0;
 				goalFound = true;
 			}
-			*/
 			
 			if (!goalFound){			
 				double rowChange = actionToPerform.get(0) - actionToPerform.get(1);
@@ -96,26 +88,19 @@ public class QLearningTask {
 				
 				if (newRow > 3){
 					newRow = 3;
-					//dead = true;
-					//stop = true;
+					dead = true;
 				}
 				if (newRow < 0){
 					newRow = 0;
-					//dead = true;
-					//stop = true;
-
+					dead = true;
 				}
 				if (newCol > 3){
 					newCol = 3;
-					//dead = true;
-					//stop = true;
-
+					dead = true;
 				}
 				if (newCol < 0){
 					newCol = 0;
-					//dead = true;
-					//stop = true;
-
+					dead = true;
 				}
 				
 				position.set(0, newRow);

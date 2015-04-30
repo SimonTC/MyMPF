@@ -1,6 +1,7 @@
 package stcl.algo.brain;
 
 import java.io.Serializable;
+import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -9,8 +10,9 @@ import stcl.algo.util.Orthogonalizer;
 
 public class ActionDecider implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private SimpleMatrix correlationMatrix;
-	private SimpleMatrix stateProbabilitiesBefore;
+	private SimpleMatrix qMatrix;
+	private SimpleMatrix traceMatrix;
+	private int stateBefore;
 	private int actionPerformedBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
@@ -22,11 +24,14 @@ public class ActionDecider implements Serializable {
 	private double alpha;
 	private double internalRewardBefore;
 	
-	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor) {
-		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
+	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
+		qMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
+		for (int i = 0; i < qMatrix.getNumElements(); i++) qMatrix.set(i, rand.nextDouble());
+		traceMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
 		this.decayFactor = 0.1;//decayFactor;
+		this.stateBefore = -1;
 		
 		this.maxReward = 1;
 		this.alpha = decayFactor;
@@ -38,11 +43,11 @@ public class ActionDecider implements Serializable {
 	 * @param actionPerformedNow
 	 * @param reward
 	 */
-	public void feedForward(SimpleMatrix currentStateProbabilities, int actionPerformedNow, double reward){
+	public void feedForward(int currentState, int actionPerformedNow, double reward){
 		double internalReward = calculateInternaleward(reward);
-		if (stateProbabilitiesBefore != null) correlateActionAndReward(internalReward);
+		if (stateBefore != -1) updateQMatrix(currentState, actionPerformedNow, 0.9, decayFactor, alpha, internalReward);
 		actionPerformedBefore = actionPerformedNow;
-		stateProbabilitiesBefore = currentStateProbabilities;
+		stateBefore = currentState;
 	}
 	
 	/**
@@ -56,8 +61,9 @@ public class ActionDecider implements Serializable {
 	}
 	
 	private double calculateInternaleward(double externalReward){
-		externalRewardNow = externalReward;
 		
+		externalRewardNow = externalReward;
+		/*
 		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
 		
 		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
@@ -66,8 +72,8 @@ public class ActionDecider implements Serializable {
 		externalRewardBefore = externalRewardNow;
 		
 		return internalReward;
-		
-		//return externalReward;
+		*/
+		return externalReward;
 
 	}
 	
@@ -76,8 +82,8 @@ public class ActionDecider implements Serializable {
 		double highestReward = Double.NEGATIVE_INFINITY;
 		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilities.getMatrix().data);
 		for (int action = 0; action < numPossibleActions; action++){
-			SimpleMatrix correlationVector = correlationMatrix.extractVector(true, action);
-			SimpleMatrix rewardVector = correlationVector.elementMult(stateVector);
+			SimpleMatrix qVector = qMatrix.extractVector(true, action);
+			SimpleMatrix rewardVector = qVector.elementMult(stateVector);
 			double reward = rewardVector.elementSum();
 			if (reward > highestReward){
 				highestReward = reward;
@@ -88,39 +94,37 @@ public class ActionDecider implements Serializable {
 		return bestAction;
 	}
 	
-	private void correlateActionAndReward(double internalReward){
-		//Correlate state we were in before with the action done and reward received
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
-		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformedBefore);
-		
-		SimpleMatrix tau = stateVector.scale(0.1);
-		
-		//Multiply the tau value with the given reward
-		//This is the influence that the actions at time t-1 have on the reward (I think)
-		SimpleMatrix tmp = tau.scale(internalReward);
-		
-		//Calculate the other part of the equation
-		SimpleMatrix learnedCorrelation = new SimpleMatrix(stateVector.numRows(), stateVector.numCols());
-		learnedCorrelation.set(1);
-		learnedCorrelation = learnedCorrelation.minus(tau);
-		learnedCorrelation = learnedCorrelation.elementMult(correlationVector);
-		
-		//Calculate correlation matrix
-		correlationVector = tmp.plus(learnedCorrelation);		
-		
-		/*
-		//Decay old rewards
-		correlationVector = correlationVector.scale(1-decayFactor);
-		
-		//Add new rewards
-		correlationVector = correlationVector.plus(internalReward, stateVector);
-		*/
-		correlationMatrix.insertIntoThis(actionPerformedBefore, 0, correlationVector);
+	private void updateQMatrix(int stateNow, int actionNow, double lambda, double gamma, double alpha, double reward){
+		updateTraceMatrix(stateNow, actionNow, lambda, gamma);
+		double error = calculateTDError(stateNow, actionNow, gamma, reward);
+		qMatrix = qMatrix.plus(alpha * error, traceMatrix);
 
 	}
 	
+	private double calculateTDError(int stateNow, int actionNow, double gamma, double reward){
+		double error = reward + gamma * qMatrix.get(actionNow, stateNow) - qMatrix.get(actionPerformedBefore, stateBefore);
+		return error;
+	}
+	
+	private void updateTraceMatrix(int state, int action, double lambda, double gamma){
+		//Decay all traces
+		traceMatrix = traceMatrix.scale(gamma * lambda);
+		
+		//Calculate trace for the current state-action pair
+		double newValue = 1 + traceMatrix.get(action, state);
+		
+		//Set trace to zero for actions not taken in current state
+		SimpleMatrix actionVector = traceMatrix.extractVector(false, state);
+		actionVector.set(0);
+		traceMatrix.insertIntoThis(0, state, actionVector);
+		
+		//Set trace value for current state-action pair
+		traceMatrix.set(action, state, newValue);		
+		
+	}
+	
 	public void printCorrelationMatrix(){
-		correlationMatrix.print();
+		qMatrix.print();
 	}
 
 }

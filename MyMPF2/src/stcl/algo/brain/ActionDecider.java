@@ -13,16 +13,12 @@ public class ActionDecider implements Serializable {
 	private SimpleMatrix qMatrix;
 	private SimpleMatrix traceMatrix;
 	private int stateBefore;
-	private int actionPerformedBefore;
+	private int actionBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
 	private double decayFactor;
-	
-	private double externalRewardBefore;
-	private double externalRewardNow;
-	private double maxReward;
-	private double alpha;
-	private double internalRewardBefore;
+
+	private double learningRate;
 	
 	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		qMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
@@ -33,20 +29,19 @@ public class ActionDecider implements Serializable {
 		this.decayFactor = 0.1;//decayFactor;
 		this.stateBefore = -1;
 		
-		this.maxReward = 1;
-		this.alpha = decayFactor;
+		this.learningRate = 0.99;
 	}
 	
 	/**
 	 * Correlates the given reward with the action performed at t-1	
 	 * @param currentStateProbabilities
-	 * @param actionPerformedNow
-	 * @param reward
+	 * @param actionToBePerformedNow
+	 * @param rewardForCurrentState
 	 */
-	public void feedForward(int currentState, int actionPerformedNow, double reward){
-		double internalReward = calculateInternaleward(reward);
-		if (stateBefore != -1) updateQMatrix(currentState, actionPerformedNow, 0.9, decayFactor, alpha, internalReward);
-		actionPerformedBefore = actionPerformedNow;
+	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
+		double internalReward = calculateInternaleward(rewardForCurrentState);
+		if (stateBefore != -1) updateQMatrix(currentState, actionToBePerformedNow, 0.9, decayFactor, learningRate, internalReward);
+		actionBefore = actionToBePerformedNow;
 		stateBefore = currentState;
 	}
 	
@@ -62,7 +57,7 @@ public class ActionDecider implements Serializable {
 	
 	private double calculateInternaleward(double externalReward){
 		
-		externalRewardNow = externalReward;
+		//externalRewardNow = externalReward;
 		/*
 		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
 		
@@ -96,13 +91,13 @@ public class ActionDecider implements Serializable {
 	
 	private void updateQMatrix(int stateNow, int actionNow, double lambda, double gamma, double alpha, double reward){
 		updateTraceMatrix(stateNow, actionNow, lambda, gamma);
-		double error = calculateTDError(stateNow, actionNow, gamma, reward);
+		double error = calculateTDError(stateNow, actionNow, stateBefore, actionBefore, gamma, reward);
 		qMatrix = qMatrix.plus(alpha * error, traceMatrix);
 
 	}
 	
-	private double calculateTDError(int stateNow, int actionNow, double gamma, double reward){
-		double error = reward + gamma * qMatrix.get(actionNow, stateNow) - qMatrix.get(actionPerformedBefore, stateBefore);
+	private double calculateTDError(int stateNow, int actionNow, int stateBefore, int actionBefore, double gamma, double rewardNow){
+		double error = rewardNow + gamma * qMatrix.get(actionNow, stateNow) - qMatrix.get(actionBefore, stateBefore);
 		return error;
 	}
 	
@@ -125,6 +120,14 @@ public class ActionDecider implements Serializable {
 	
 	public void printCorrelationMatrix(){
 		qMatrix.print();
+	}
+	
+	public void setLearningRate(double learningRate){
+		this.learningRate = learningRate;
+	}
+	
+	public void newEpisode(){
+		traceMatrix.set(0);
 	}
 
 }

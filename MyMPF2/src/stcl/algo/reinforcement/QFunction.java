@@ -13,7 +13,6 @@ public class QFunction implements Serializable{
 	private SimpleMatrix actionMatrix;
 	private int actionPerformedBefore;
 	private SimpleMatrix stateBefore;
-	private Random rand;
 
 	
 	public void setActionMatrix(SimpleMatrix actionMatrix){
@@ -33,31 +32,7 @@ public class QFunction implements Serializable{
 		return action;
 	}
 	
-	public int chooseNextAction(SimpleMatrix StateFromWhichToChoose, int temperature){
-		SimpleMatrix probabilityVector = new SimpleMatrix(actionMatrix.numRows(),1);
-		SimpleMatrix temperateQVector = new SimpleMatrix(actionMatrix.numRows(),1);
-		double totalTemperateQ = 0;
-		for (int action = 0; action < actionMatrix.numRows(); action++){
-			double temperateQ = Math.pow(temperature, calculateQValue(StateFromWhichToChoose, actionMatrix.extractVector(true, action)));
-			temperateQVector.set(action, temperateQ);
-			totalTemperateQ += temperateQ;
-		}
-		
-		probabilityVector = temperateQVector.divide(totalTemperateQ);
-		double threshold = rand.nextDouble();
-		boolean actionFound = false;
-		int action = -1;
-		double value = 0;
-		while(!actionFound){
-			action++;
-			value += probabilityVector.get(action);
-			if (value >= threshold) actionFound = true;
-		}
-		return action;
-	}
-	
 	public void initialize(int actionVectorLength, int stateVectorLength, Random rand, SimpleMatrix actionMatrix){
-		this.rand = rand;
 		this.actionMatrix = actionMatrix;
 		parameterVectorCurrentEpisode = new SimpleMatrix(1, actionVectorLength + stateVectorLength);
 		for (int i = 0; i < parameterVectorCurrentEpisode.getNumElements(); i++){

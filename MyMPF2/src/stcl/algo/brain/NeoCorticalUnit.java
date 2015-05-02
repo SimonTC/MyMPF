@@ -459,6 +459,10 @@ public class NeoCorticalUnit implements Serializable{
 	public int getMarkovOrder(){
 		return markovOrder;
 	}
+	
+	public void newEpisode(){
+		decider.newEpisode();
+	}
 
 	
 

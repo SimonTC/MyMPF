@@ -232,6 +232,10 @@ public class Network implements Serializable{
 		
 	}
 	
+	public void newEpisode(){
+		for (UnitNode n : unitNodes) n.newEpisode();
+	}
+	
 
 
 }

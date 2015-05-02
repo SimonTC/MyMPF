@@ -26,10 +26,10 @@ public class ActionDecider implements Serializable {
 		traceMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = 0.9;//decayFactor;
+		this.decayFactor = decayFactor;
 		this.stateBefore = -1;
 		
-		this.learningRate = 0.99;
+		this.learningRate = 0.1;
 	}
 	
 	/**
@@ -40,7 +40,7 @@ public class ActionDecider implements Serializable {
 	 */
 	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
 		double internalReward = calculateInternaleward(rewardForCurrentState);
-		if (stateBefore != -1) updateQMatrix(currentState, actionToBePerformedNow, 0.9, decayFactor, learningRate, internalReward);
+		if (stateBefore != -1) updateQMatrix(currentState, actionToBePerformedNow, decayFactor, decayFactor, learningRate, internalReward); //TODO: Lambda, gamma and alpha should be given as parameters and changed during training
 		actionBefore = actionToBePerformedNow;
 		stateBefore = currentState;
 	}

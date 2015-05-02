@@ -96,7 +96,7 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
+		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay, rand);//TODO: Change parameters. Especially decay
 		
 		needHelp = false;
 		entropyThreshold = 0;
@@ -133,7 +133,16 @@ public class NeoCorticalUnit implements Serializable{
 		
 		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
 		//inputToDecider = Normalizer.normalize(inputToDecider);
-		decider.feedForward(inputToDecider, actionPerformed, reward);
+		int maxProbableState = -1;
+		double maxProb = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < inputToDecider.getNumElements(); i++){
+			double d = inputToDecider.get(i);
+			if (d > maxProb){
+				maxProb = d;
+				maxProbableState = i;
+			}
+		}
+		decider.feedForward(maxProbableState, actionPerformed, reward);
 		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix

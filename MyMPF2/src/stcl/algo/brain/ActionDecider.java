@@ -26,7 +26,7 @@ public class ActionDecider implements Serializable {
 		traceMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = 0.1;//decayFactor;
+		this.decayFactor = 0.9;//decayFactor;
 		this.stateBefore = -1;
 		
 		this.learningRate = 0.99;
@@ -92,6 +92,7 @@ public class ActionDecider implements Serializable {
 	private void updateQMatrix(int stateNow, int actionNow, double lambda, double gamma, double alpha, double reward){
 		updateTraceMatrix(stateNow, actionNow, lambda, gamma);
 		double error = calculateTDError(stateNow, actionNow, stateBefore, actionBefore, gamma, reward);
+		qMatrix = qMatrix.scale(1-alpha);
 		qMatrix = qMatrix.plus(alpha * error, traceMatrix);
 
 	}
@@ -118,8 +119,12 @@ public class ActionDecider implements Serializable {
 		
 	}
 	
-	public void printCorrelationMatrix(){
+	public void printQMatrix(){
 		qMatrix.print();
+	}
+	
+	public void printTraceMatrix(){
+		traceMatrix.print();
 	}
 	
 	public void setLearningRate(double learningRate){

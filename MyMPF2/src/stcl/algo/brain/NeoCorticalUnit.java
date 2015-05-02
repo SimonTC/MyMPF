@@ -436,7 +436,7 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	public void printCorrelationMatrix(){
-		decider.printCorrelationMatrix();
+		decider.printQMatrix();
 	}
 	
 	public Predictor_VOMM getPredictor(){

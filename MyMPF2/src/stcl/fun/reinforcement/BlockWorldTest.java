@@ -15,7 +15,7 @@ public class BlockWorldTest {
 	private int worldSize;
 	
 	public static void main(String[] args){
-		BlockWorldTest bwt = new BlockWorldTest(5);
+		BlockWorldTest bwt = new BlockWorldTest(10);
 		bwt.run(100);
 	}
 	
@@ -50,7 +50,20 @@ public class BlockWorldTest {
 			agent.newEpisode();
 			int steps = runEpisode(i/numEpisodes);
 			System.out.println("Finished episode " + i + " in " + steps + " steps");
+			/*
+			System.out.println();
+			System.out.println("Trace matrix: ");
+			agent.printTraceMatrix();
+			System.out.println();
+			
+			System.out.println("Q matrix: ");
+			agent.printQMatrix();
+			System.out.println();
+			*/
+			
 		}
+		
+		agent.printQMatrix();
 		
 		//Evaluation
 		agent.setLearningRate(0);

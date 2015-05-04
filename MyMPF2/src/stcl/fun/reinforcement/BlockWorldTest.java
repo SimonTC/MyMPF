@@ -8,7 +8,7 @@ import stcl.algo.brain.ActionDecider;
 
 public class BlockWorldTest {
 	private enum ACTIONS {N,S,E,W};
-	private Random rand = new Random(12345);
+	private Random rand = new Random();
 	private SimpleMatrix world;
 	private State start, end;
 	private ActionDecider agent;

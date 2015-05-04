@@ -39,6 +39,8 @@ public class BlockWorldTest {
 		
 		start = new State(startID, world);
 		end = new State(endID, world);
+		System.out.println("Start: (" + start.col + "," + start.row + ")");
+		System.out.println("End: (" + end.col + "," + end.row + ")");
 		world.set(0);
 		world.set(endID, 1);
 
@@ -46,9 +48,9 @@ public class BlockWorldTest {
 	
 	public void run(int numEpisodes){
 		for (int i = 1; i <= numEpisodes; i++){
-			agent.setLearningRate((double) i / numEpisodes);
+			agent.setLearningRate(1 - (double) i / numEpisodes);
 			agent.newEpisode();
-			int steps = runEpisode(i/numEpisodes);
+			int steps = runEpisode(1 - i/numEpisodes);
 			System.out.println("Finished episode " + i + " in " + steps + " steps");
 			/*
 			System.out.println();

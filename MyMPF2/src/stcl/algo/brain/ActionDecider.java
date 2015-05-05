@@ -126,6 +126,10 @@ public class ActionDecider implements Serializable {
 		qMatrix.print();
 	}
 	
+	public SimpleMatrix getQMatrix(){
+		return qMatrix;
+	}
+	
 	public void printTraceMatrix(){
 		traceMatrix.print();
 	}

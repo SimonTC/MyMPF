@@ -29,7 +29,7 @@ public class ActionDecider implements Serializable {
 		this.numPossibleStates = numPossibleStates;
 		this.decayFactor = decayFactor;
 		this.stateBefore = -1;
-		lambda = 1;//decayFactor; //TODO:Should be parameter
+		lambda =  1;//decayFactor; //TODO:Should be parameter
 		
 		this.learningRate = 0.1;
 	}

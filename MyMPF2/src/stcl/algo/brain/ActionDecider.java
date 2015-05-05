@@ -91,11 +91,11 @@ public class ActionDecider implements Serializable {
 		return bestAction;
 	}
 	
-	private void updateQMatrix(int stateNow, int actionNow, double lambda, double gamma, double alpha, double reward){
-		updateTraceMatrix(stateNow, actionNow, lambda, gamma);
-		double error = calculateTDError(stateNow, actionNow, stateBefore, actionBefore, gamma, reward);
-		qMatrix = qMatrix.scale(1-alpha);
-		qMatrix = qMatrix.plus(alpha * error, traceMatrix);
+	private void updateQMatrix(int stateNow, int actionNow, double lambda, double decayFactor, double learningRate, double reward){
+		updateTraceMatrix(stateNow, actionNow, lambda, decayFactor);
+		double error = calculateTDError(stateNow, actionNow, stateBefore, actionBefore, decayFactor, reward);
+		qMatrix = qMatrix.scale(1-learningRate);
+		qMatrix = qMatrix.plus(learningRate * error, traceMatrix);
 
 	}
 	

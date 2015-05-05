@@ -21,9 +21,8 @@ public class Predictor_VOMM implements Serializable{
 	private int markovOrder;
 	private LinkedList<Double> inputProbabilities;
 	private int predictedNextSymbol;
-	protected SimpleMatrix probabilityMatrix;
+	private SimpleMatrix probabilityMatrix;
 	private Random rand;
-	protected boolean learning;
 
 	public Predictor_VOMM(int markovOrder, double learningRate, Random rand) {
 		vomm = new VOMM<Integer>(markovOrder, learningRate);
@@ -145,7 +144,6 @@ public class Predictor_VOMM implements Serializable{
 	}
 
 	public void setLearning(boolean learning) {
-		this.learning = learning;
 		vomm.setLearning(learning);
 		
 	}

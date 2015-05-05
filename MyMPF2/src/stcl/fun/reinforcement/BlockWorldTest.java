@@ -47,10 +47,12 @@ public class BlockWorldTest {
 	}
 	
 	public void run(int numEpisodes){
+		int minSteps = Integer.MAX_VALUE;
 		for (int i = 1; i <= numEpisodes; i++){
 			agent.setLearningRate(1 - (double) i / numEpisodes);
 			agent.newEpisode();
-			int steps = runEpisode(0.05);
+			int steps = runEpisode(1 - (double) i / numEpisodes);
+			if (steps < minSteps) minSteps = steps;
 			System.out.println("Finished episode " + i + " in " + steps + " steps");
 			/*
 			System.out.println();
@@ -72,6 +74,7 @@ public class BlockWorldTest {
 		agent.newEpisode();
 		int steps = runEpisode(0);
 		System.out.println("Finished evaluation in " + steps + " steps");
+		System.out.println("Minimum number of steps used: " + minSteps);
 	}
 	
 	private int runEpisode(double explorationChance){

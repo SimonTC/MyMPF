@@ -94,13 +94,14 @@ public class ActionDecider implements Serializable {
 	private void updateQMatrix(int stateNow, int actionNow, double lambda, double decayFactor, double learningRate, double reward){
 		updateTraceMatrix(stateNow, actionNow, lambda, decayFactor);
 		double error = calculateTDError(stateNow, actionNow, stateBefore, actionBefore, decayFactor, reward);
-		qMatrix = qMatrix.scale(1-learningRate);
+		//qMatrix = qMatrix.scale(1-learningRate); //ALready happens in the calculation of the TD-error
 		qMatrix = qMatrix.plus(learningRate * error, traceMatrix);
 
 	}
 	
 	private double calculateTDError(int stateNow, int actionNow, int stateBefore, int actionBefore, double gamma, double rewardNow){
 		double error = rewardNow + gamma * qMatrix.get(actionNow, stateNow) - qMatrix.get(actionBefore, stateBefore);
+		//double error = rewardNow + gamma * qMatrix.get(actionNow, stateNow);
 		return error;
 	}
 	

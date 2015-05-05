@@ -15,7 +15,7 @@ public class BlockWorldTest {
 	private int worldSize;
 	
 	public static void main(String[] args){
-		BlockWorldTest bwt = new BlockWorldTest(10);
+		BlockWorldTest bwt = new BlockWorldTest(4);
 		bwt.run(100);
 	}
 	
@@ -41,8 +41,8 @@ public class BlockWorldTest {
 		end = new State(endID, world);
 		System.out.println("Start: (" + start.col + "," + start.row + ")");
 		System.out.println("End: (" + end.col + "," + end.row + ")");
-		world.set(0);
-		world.set(endID, 100);
+		world.set(1);
+		world.set(endID, 10);
 
 	}
 	
@@ -53,21 +53,10 @@ public class BlockWorldTest {
 			agent.newEpisode();
 			int steps = runEpisode(1 - (double) i / numEpisodes);
 			if (steps < minSteps) minSteps = steps;
-			System.out.println("Finished episode " + i + " in " + steps + " steps");
-			/*
-			System.out.println();
-			System.out.println("Trace matrix: ");
-			agent.printTraceMatrix();
-			System.out.println();
-			
-			System.out.println("Q matrix: ");
-			agent.printQMatrix();
-			System.out.println();
-			*/
-			
+			System.out.println("Finished episode " + i + " in " + steps + " steps");			
 		}
 		
-		agent.printQMatrix();
+		//agent.printQMatrix();
 		
 		//Evaluation
 		agent.setLearningRate(0);
@@ -75,6 +64,10 @@ public class BlockWorldTest {
 		int steps = runEpisode(0);
 		System.out.println("Finished evaluation in " + steps + " steps");
 		System.out.println("Minimum number of steps used: " + minSteps);
+		
+		System.out.println("Q matrix: ");
+		agent.printQMatrix();
+		System.out.println();
 	}
 	
 	private int runEpisode(double explorationChance){

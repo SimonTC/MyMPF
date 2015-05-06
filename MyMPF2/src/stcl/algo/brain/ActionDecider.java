@@ -26,7 +26,7 @@ public class ActionDecider implements Serializable {
 		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = 0.1;//decayFactor;
+		this.decayFactor = decayFactor;
 		
 		this.maxReward = 1;
 		this.alpha = decayFactor;

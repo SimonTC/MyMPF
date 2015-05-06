@@ -20,7 +20,7 @@ public class QLearner implements Serializable {
 	
 	public QLearner(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		qMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
-		for (int i = 0; i < qMatrix.getNumElements(); i++) qMatrix.set(i, rand.nextDouble());
+		//for (int i = 0; i < qMatrix.getNumElements(); i++) qMatrix.set(i, rand.nextDouble());
 		
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
@@ -51,7 +51,7 @@ public class QLearner implements Serializable {
 	public void updateQMatrix(int stateNow, int actionNow, double decayFactor, double learningRate, double reward){
 		if (stateBefore != -1){
 			double maxQ = maxQ(stateNow);
-			double delta = learningRate * (reward +decayFactor * maxQ - getQValue(stateBefore, actionBefore));
+			double delta = learningRate * (reward + decayFactor * maxQ - getQValue(stateBefore, actionBefore));
 			delta += qMatrix.get(actionBefore, stateBefore);
 			qMatrix.set(actionBefore, stateBefore, delta);
 		}

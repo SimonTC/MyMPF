@@ -13,7 +13,7 @@ import stcl.algo.reinforcement.QLearner;
  */
 public class BlockWorldTest_SO_Qlearner {
 	private enum ACTIONS {N,S,E,W};
-	private Random rand = new Random(); //12345678
+	private Random rand = new Random(1234); //12345678
 	private SimpleMatrix world;
 	private State end;
 	private QLearner agent;
@@ -33,6 +33,8 @@ public class BlockWorldTest_SO_Qlearner {
 	
 	private void setupAgent(int worldSize){
 		agent = new QLearner(4, worldSize * worldSize, 0.9, rand);
+		visitCounter = new SimpleMatrix(agent.getQMatrix());
+		visitCounter.set(1);
 	}
 	
 	private SimpleMatrix createPolicyMap(){
@@ -67,12 +69,10 @@ public class BlockWorldTest_SO_Qlearner {
 	
 	private void setupWorld(int worldSize){
 		world = new SimpleMatrix(worldSize, worldSize);
-		visitCounter = new SimpleMatrix(world);
-		visitCounter.set(1);
 		int endID = 0; //Upper left corner
 		end = new State(endID, world);
-		world.set(1);
-		world.set(endID, 10);
+		world.set(-0.1);
+		world.set(endID, 1);
 
 	}
 	
@@ -86,28 +86,66 @@ public class BlockWorldTest_SO_Qlearner {
 	}
 	
 	public void run(int numEpisodes){
-		int minSteps = Integer.MAX_VALUE;
+		SimpleMatrix orgQ = new SimpleMatrix(agent.getQMatrix());
 		int totalSteps = 0;
 		boolean cont = true;
 		SimpleMatrix oldMap = createPolicyMap();
 		int noChange = 0;
+		double explorationChance = 0.5;
+		State state = findStartState();
+		boolean goalFound = false;
 		while(cont){
-			int steps = runEpisode(0.1);
-			totalSteps += steps;
+			if (totalSteps % 1000 == 0) System.out.println("Step " + totalSteps);
+			if (goalFound){
+				state = findStartState();
+				goalFound = false;
+			}
+
+			SimpleMatrix stateProbs = new SimpleMatrix(worldSize, worldSize);
+			stateProbs.set(state.getID(), 1);
+			int nextAction = agent.chooseBestAction(stateProbs);
+			if (rand.nextDouble() < explorationChance){
+				nextAction = rand.nextInt(ACTIONS.values().length);
+			}
+			int visits = (int) visitCounter.get(nextAction, state.id);
+			visits++;
+			visitCounter.set(nextAction, state.id, visits);
+			ACTIONS action = ACTIONS.values()[nextAction];	
+			State nextState = move(state, action);
+			
+			double learningRate = 0.1;//1.0 / (double) visits;
+			agent.setLearningRate(learningRate);
+			state = nextState;
+			//System.out.println("Moved to: (" + state.getCol() + ", " + state.getRow() + ")");
+			if(state.equals(end)){
+				goalFound = true;
+				for (int i = 0; i < 4; i++){
+					visits = (int) visitCounter.get(i, state.id);
+					visits++;
+					visitCounter.set(i, state.id, visits);
+					agent.getQMatrix().set(i, state.id, 1);
+				}
+				
+			}
+			double reward = world.get(state.id);
+			agent.updateQMatrix(state.id, nextAction, 0.9, learningRate, reward);
+			
 			SimpleMatrix map = createPolicyMap();
-			printPolicyMap(map);
+		//	printPolicyMap(map);
 			if (map.isIdentical(oldMap, 0.001)){
 				noChange++;
 			} else {
 				noChange = 0;
 			}
 			
-			System.out.println("Steps: " + totalSteps + " Episodes without changes: " + noChange);
+			//System.out.println("Steps: " + totalSteps + " Episodes without changes: " + noChange);
 			
-			if (noChange > 500){
+			if (noChange > 10000){
 				if (calculateMinVisits() > 30) cont = false;				
 			}
+			if (totalSteps > 1200000) cont = false;
 			
+			totalSteps++;
 			oldMap = map;
 		}
 		System.out.println("Finished after " + totalSteps + " steps");
@@ -119,16 +157,24 @@ public class BlockWorldTest_SO_Qlearner {
 		visitCounter.print();
 		
 		System.out.println();
-		System.out.println("Q matrix:");
+		System.out.println("Q matrix now:");
 		agent.printQMatrix();
+		
+		System.out.println();
+		System.out.println("Q matrix start:");
+		orgQ.print();
 	}
 	
 	private void printPolicyMap(SimpleMatrix policyMap){
 		String[][] map = new String[policyMap.numRows()][policyMap.numCols()];
 		for (int row = 0; row < map.length; row++){
 			for (int col = 0; col < map[row].length; col++){
-				int action = (int) policyMap.get(row, col);
-				System.out.print(ACTIONS.values()[action].name() + "  ");
+				if(row == end.row && col == end.col){
+					System.out.print("*  ");
+				} else {
+					int action = (int) policyMap.get(row, col);
+					System.out.print(ACTIONS.values()[action].name() + "  ");
+				}
 			}
 			System.out.println();
 		}
@@ -199,6 +245,10 @@ public class BlockWorldTest_SO_Qlearner {
 			col = id - row * numCols;
 			this.id = id;
 			
+		}
+		
+		public String toString(){
+			return "" + id;
 		}
 		public int getRow(){
 			return row;

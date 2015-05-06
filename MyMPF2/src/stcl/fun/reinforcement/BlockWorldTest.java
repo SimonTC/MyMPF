@@ -39,21 +39,30 @@ public class BlockWorldTest {
 		
 		start = new State(startID, world);
 		end = new State(endID, world);
-		System.out.println("Start: (" + start.col + "," + start.row + ")");
-		System.out.println("End: (" + end.col + "," + end.row + ")");
-		world.set(1);
-		world.set(endID, 10);
+		System.out.println("Start: (" + start.col + "," + start.row + ") ID: " + start.id);
+		System.out.println("End: (" + end.col + "," + end.row + ") ID: " + end.id);
+		world.set(0);
+		world.set(endID, 1);
 
 	}
 	
 	public void run(int numEpisodes){
 		int minSteps = Integer.MAX_VALUE;
 		for (int i = 1; i <= numEpisodes; i++){
-			agent.setLearningRate(1 - (double) i / numEpisodes);
+			agent.setLearningRate(0.1);
 			agent.newEpisode();
 			int steps = runEpisode(1 - (double) i / numEpisodes);
 			if (steps < minSteps) minSteps = steps;
-			System.out.println("Finished episode " + i + " in " + steps + " steps");			
+			System.out.println("Finished episode " + i + " in " + steps + " steps");	
+			/*
+			System.out.println();
+			System.out.println("Q matrix: ");
+			agent.printQMatrix();
+			System.out.println();
+			
+			System.out.println("Trace matrix:");
+			agent.printTraceMatrix();
+			*/
 		}
 		
 		//agent.printQMatrix();
@@ -68,6 +77,9 @@ public class BlockWorldTest {
 		System.out.println("Q matrix: ");
 		agent.printQMatrix();
 		System.out.println();
+		
+		System.out.println("Trace matrix:");
+		agent.printTraceMatrix();
 	}
 	
 	private int runEpisode(double explorationChance){

@@ -29,7 +29,7 @@ public class ActionDecider implements Serializable {
 		this.numPossibleStates = numPossibleStates;
 		this.decayFactor = decayFactor;
 		this.stateBefore = -1;
-		lambda = 1;//decayFactor; //TODO:Should be parameter
+		lambda = 0;// 0.9;//decayFactor; //TODO:Should be parameter
 		
 		this.learningRate = 0.1;
 	}
@@ -110,7 +110,7 @@ public class ActionDecider implements Serializable {
 		traceMatrix = traceMatrix.scale(gamma * lambda);
 		
 		//Calculate trace for the current state-action pair
-		double newValue = 1 + traceMatrix.get(action, state);
+		double newValue = 1 ;//+ traceMatrix.get(action, state);
 		
 		//Set trace to zero for actions not taken in current state
 		SimpleMatrix actionVector = traceMatrix.extractVector(false, state);

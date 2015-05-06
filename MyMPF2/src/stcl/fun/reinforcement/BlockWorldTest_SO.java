@@ -12,7 +12,7 @@ import stcl.algo.brain.ActionDecider;
  */
 public class BlockWorldTest_SO {
 	private enum ACTIONS {N,S,E,W};
-	private Random rand = new Random(12345678);
+	private Random rand = new Random(); //12345678
 	private SimpleMatrix world;
 	private State end;
 	private ActionDecider agent;
@@ -31,7 +31,7 @@ public class BlockWorldTest_SO {
 	}
 	
 	private void setupAgent(int worldSize){
-		agent = new ActionDecider(4, worldSize * worldSize, 0, rand);
+		agent = new ActionDecider(4, worldSize * worldSize, 0.9, rand);
 	}
 	
 	private SimpleMatrix createPolicyMap(){
@@ -95,6 +95,7 @@ public class BlockWorldTest_SO {
 			int steps = runEpisode(0.1);
 			totalSteps += steps;
 			SimpleMatrix map = createPolicyMap();
+			printPolicyMap(map);
 			if (map.isIdentical(oldMap, 0.001)){
 				noChange++;
 			} else {
@@ -103,7 +104,7 @@ public class BlockWorldTest_SO {
 			
 			System.out.println("Steps: " + totalSteps + " Episodes without changes: " + noChange);
 			
-			if (noChange > 100){
+			if (noChange > 500){
 				if (calculateMinVisits() > 30) cont = false;				
 			}
 			
@@ -116,6 +117,14 @@ public class BlockWorldTest_SO {
 		System.out.println();
 		System.out.println("Visit counts:");
 		visitCounter.print();
+		
+		System.out.println();
+		System.out.println("Q matrix:");
+		agent.printQMatrix();
+		
+		System.out.println();
+		System.out.println("Trace matrix:");
+		agent.printTraceMatrix();
 	}
 	
 	private void printPolicyMap(SimpleMatrix policyMap){

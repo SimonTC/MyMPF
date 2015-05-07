@@ -238,7 +238,16 @@ public class NeoCorticalUnit implements Serializable{
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		
-		chosenAction = decider.feedback(biasedTemporalFBOutput);
+		int maxProbableState = -1;
+		double maxProb = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < biasedTemporalFBOutput.getNumElements(); i++){
+			double d = biasedTemporalFBOutput.get(i);
+			if (d > maxProb){
+				maxProb = d;
+				maxProbableState = i;
+			}
+		}
+		chosenAction = decider.feedback(maxProbableState);
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);

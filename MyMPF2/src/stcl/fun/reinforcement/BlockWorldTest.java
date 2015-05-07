@@ -98,7 +98,7 @@ public class BlockWorldTest {
 			if(state.equals(end)) goalFound = true;
 			reward = world.get(state.id);
 			stateProbs.set(state.getID(), 1);
-			int nextAction = agent.feedback(stateProbs);
+			int nextAction = agent.feedback(state.getID());
 			if (rand.nextDouble() < explorationChance){
 				nextAction = rand.nextInt(ACTIONS.values().length);
 			}

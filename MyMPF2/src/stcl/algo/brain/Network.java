@@ -129,6 +129,11 @@ public class Network implements Serializable{
 		return sensorLayer;
 	}
 	
+	/**
+	 * Takes one step through the network.
+	 * Set sensors before stepping
+	 * @param reward
+	 */
 	public void step(double reward){
 		feedForward(reward);
 		

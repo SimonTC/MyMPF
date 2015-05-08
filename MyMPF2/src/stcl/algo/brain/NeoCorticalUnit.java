@@ -472,6 +472,10 @@ public class NeoCorticalUnit implements Serializable{
 	public void newEpisode(){
 		decider.newEpisode();
 	}
+	
+	public ActionDecider getDecider(){
+		return this.decider;
+	}
 
 	
 

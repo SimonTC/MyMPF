@@ -29,17 +29,19 @@ public class BlockWorldTest_Brain {
 	
 	public void run(int numEpisodes){
 		for (int i = 1; i <= numEpisodes; i++){
-			agent.setLearningRate(0.1);
+			System.out.println("Start episode " + i );
 			agent.newEpisode();
 			runEpisode(agent, 1 - (double) i / numEpisodes);
 		}
 		
+		ActionDecider decider = agent.getUnitNodes().get(0).getUnit().getDecider();
+		
 		System.out.println("Q matrix: ");
-		agent.printQMatrix();
+		decider.getQMatrix().print();
 		System.out.println();
 		
 		System.out.println("Policy map:");
-		printPolicyMap(agent);
+		printPolicyMap(decider);
 		System.out.println();
 		
 		System.out.println("Reward map:");
@@ -78,34 +80,48 @@ public class BlockWorldTest_Brain {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 0, 0.1, 3, 4);
+		node.initialize(rand, worldSize, 2, 0.1, 3, 4);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);
 		agent.addNode(node);
-		agent.addNode(actionSensor);
 		agent.addNode(inputSensor);
+		agent.addNode(actionSensor);
+		
 		
 		
 	}
 	
 	public void runEpisode(Network agent, double explorationChance){
 		agent.newEpisode();
+		agent.getActionNode().setExplorationChance(explorationChance);
 		State state = selectRandomState(true);
 		int actionID = rand.nextInt(ACTIONS.values().length);
-		agent.step(reward)
-		agent.feedForward(state.id, actionID, 0);//Reward not important for this first feed forward. Only used to save initial state and action
+		loadNetwork(agent, state, actionID);
+		agent.step(0);//Reward not important for this first feed forward. Only used to save initial state and action 
 				
 		while(!isTerminalState(state)){
-			
-			State nextState = move(state, ACTIONS.values()[actionID]);
-			double reward = world.get(nextState.row, nextState.col);
-			int nextActionID = chooseAction(nextState, explorationChance);
-			agent.feedForward(nextState.id, nextActionID, reward);
-			//agent.updateQMatrix(state.id, actionID, nextState.id, nextActionID, reward);
-			state = nextState;		
-			actionID = nextActionID;
+			state = move(state, ACTIONS.values()[actionID]);
+			double reward = world.get(state.row, state.col);
+			actionID = getAction(agent);
+			loadNetwork(agent, state, actionID);
+			agent.step(reward);
 		}
+	}
+	
+	private int getAction(Network agent){
+		SimpleMatrix actionMatrix = agent.getSensors().get(1).getFeedbackOutput();
+		int action = (int) actionMatrix.get(0);
+		return action;
+	}
+	
+	private void loadNetwork(Network agent, State state, int actionID){
+		Sensor inputSensor = agent.getSensors().get(0);
+		Sensor actionSensor = agent.getSensors().get(1);
+		double[][] inputData = {{state.getRow(), state.getCol()}};
+		SimpleMatrix input = new SimpleMatrix(inputData);
+		inputSensor.setInput(input);
+		actionSensor.setInput(actionID);
 	}
 	
 	public void printPolicyMap(ActionDecider agent){

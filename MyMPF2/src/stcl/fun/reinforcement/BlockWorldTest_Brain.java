@@ -1,5 +1,6 @@
 package stcl.fun.reinforcement;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
@@ -20,6 +21,8 @@ public class BlockWorldTest_Brain {
 	private State hole;
 	private Random rand = new Random();
 	private Network agent;
+	private SimpleMatrix visitCounter;
+	
 	
 	public static void main(String[] args){
 		BlockWorldTest_Brain bwt = new BlockWorldTest_Brain();
@@ -29,7 +32,7 @@ public class BlockWorldTest_Brain {
 	
 	public void run(int numEpisodes){
 		for (int i = 1; i <= numEpisodes; i++){
-			System.out.println("Start episode " + i );
+			//System.out.println("Start episode " + i );
 			agent.newEpisode();
 			runEpisode(agent, 1 - (double) i / numEpisodes);
 		}
@@ -50,6 +53,10 @@ public class BlockWorldTest_Brain {
 		
 		System.out.println("Model:");
 		agent.getUnitNodes().get(0).getUnit().getSpatialPooler().printModelWeigths();
+		System.out.println();
+		
+		System.out.println("State visits:");
+		visitCounter.print();
 	}
 	
 	public void setup(int worldSize){
@@ -59,6 +66,7 @@ public class BlockWorldTest_Brain {
 		world.set(goal.row, goal.col, GOAL_REWARD);
 		//world.set(hole.row, hole.col, HOLE_REWARD);
 		setupAgent(worldSize);
+		visitCounter = new SimpleMatrix(worldSize, worldSize);
 	}
 	
 	private void setupAgent(int worldSize){
@@ -91,6 +99,18 @@ public class BlockWorldTest_Brain {
 		agent.addNode(node);
 		agent.addNode(inputSensor);
 		agent.addNode(actionSensor);		
+		
+		actionNode.setPossibleActions(createPossibleActions());
+	}
+	
+	private ArrayList<SimpleMatrix> createPossibleActions(){
+		ArrayList<SimpleMatrix> actions = new ArrayList<SimpleMatrix>();
+		for (int i = 0; i < 4; i++){
+			double[][] d = {{i}};
+			SimpleMatrix m = new SimpleMatrix(d);
+			actions.add(m);
+		}
+		return actions;
 	}
 	
 	public void runEpisode(Network agent, double explorationChance){
@@ -101,7 +121,10 @@ public class BlockWorldTest_Brain {
 		loadNetwork(agent, state, actionID);
 		agent.step(0);//Reward not important for this first feed forward. Only used to save initial state and action 
 		int count = 0;
-		while(!isTerminalState(state) && count < 100){
+		while(!isTerminalState(state)){
+			double visits = visitCounter.get(state.id);
+			visits += 1;
+			visitCounter.set(state.id, visits);
 			state = move(state, ACTIONS.values()[actionID]);
 			double reward = world.get(state.row, state.col);
 			actionID = getAction(agent);
@@ -206,6 +229,13 @@ public class BlockWorldTest_Brain {
 			this.id = id;
 			
 		}
+		
+		@Override
+		public String toString(){
+			String s = "(" + row + "," + col + ")  ID: " + id;
+			return s;
+		}
+		
 		public int getRow(){
 			return row;
 		}

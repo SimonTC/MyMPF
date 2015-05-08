@@ -45,9 +45,9 @@ public class BlockWorldTest {
 	public void setup(int worldSize){
 		world = new SimpleMatrix(worldSize, worldSize);
 		goal = selectRandomState(true);
-		hole = selectRandomState(false);
+		//hole = selectRandomState(false);
 		world.set(goal.row, goal.col, GOAL_REWARD);
-		world.set(hole.row, hole.col, HOLE_REWARD);
+		//world.set(hole.row, hole.col, HOLE_REWARD);
 		agent = new ActionDecider(4, worldSize * worldSize, 0.9, rand);
 	}
 	
@@ -55,12 +55,14 @@ public class BlockWorldTest {
 		agent.newEpisode();
 		State state = selectRandomState(true);
 		int actionID = chooseAction(state, explorationChance);
+		agent.feedForward(state.id, actionID, 0);//Reward not important for this first feed forward. Only used to save initial state and action
 				
 		while(!isTerminalState(state)){
 			State nextState = move(state, ACTIONS.values()[actionID]);
 			double reward = world.get(nextState.row, nextState.col);
 			int nextActionID = chooseAction(nextState, explorationChance);
-			agent.updateQMatrix(state.id, actionID, nextState.id, nextActionID, reward);
+			agent.feedForward(nextState.id, nextActionID, reward);
+			//agent.updateQMatrix(state.id, actionID, nextState.id, nextActionID, reward);
 			state = nextState;		
 			actionID = nextActionID;
 		}

@@ -3,113 +3,38 @@ package stcl.fun.reinforcement;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
-
 import stcl.algo.brain.ActionDecider;
 
-
-public class BlockWorldTest {
-	private SimpleMatrix world;
+public class CopyOfBlockWorldTest {
 	private enum ACTIONS {N,S,E,W};
-	private final double GOAL_REWARD = 1;
-	private final double HOLE_REWARD = -1;
-	private State goal;
-	private State hole;
 	private Random rand = new Random();
+	private SimpleMatrix world;
+	private State goal;
 	private ActionDecider agent;
 	
 	public static void main(String[] args){
-		BlockWorldTest bwt = new BlockWorldTest();
-		bwt.setup(4);
+		CopyOfBlockWorldTest bwt = new CopyOfBlockWorldTest(4);
 		bwt.run(1000);
 	}
 	
-	public void run(int numEpisodes){
-		for (int i = 1; i <= numEpisodes; i++){
-			agent.setLearningRate(0.1);
-			agent.newEpisode();
-			runEpisode(agent, 1 - (double) i / numEpisodes);
-		}
-		
-		System.out.println("Q matrix: ");
-		agent.printQMatrix();
-		System.out.println();
-		
-		System.out.println("Policy map:");
-		printPolicyMap(agent);
-		System.out.println();
-		
-		System.out.println("Reward map:");
-		world.print();
+	public CopyOfBlockWorldTest(int worldSize){
+		setupWorld(worldSize);
+		setupAgent(worldSize);
 	}
 	
-	public void setup(int worldSize){
-		world = new SimpleMatrix(worldSize, worldSize);
-		goal = selectRandomState(true);
-		hole = selectRandomState(false);
-		world.set(goal.row, goal.col, GOAL_REWARD);
-		world.set(hole.row, hole.col, HOLE_REWARD);
+	private void setupAgent(int worldSize){
 		agent = new ActionDecider(4, worldSize * worldSize, 0.9, rand);
 	}
 	
-	public void runEpisode(ActionDecider agent, double explorationChance){
-		agent.newEpisode();
-		State state = selectRandomState(true);
-		int actionID = chooseAction(state, explorationChance);
+	private void setupWorld(int worldSize){
+		world = new SimpleMatrix(worldSize, worldSize);
+		int goalID = rand.nextInt(worldSize * worldSize);
 				
-		while(!isTerminalState(state)){
-			State nextState = move(state, ACTIONS.values()[actionID]);
-			double reward = world.get(nextState.row, nextState.col);
-			int nextActionID = chooseAction(nextState, explorationChance);
-			agent.updateQMatrix(state.id, actionID, nextState.id, nextActionID, reward);
-			state = nextState;		
-			actionID = nextActionID;
-		}
-	}
-	
-	private int chooseAction(State state, double explorationChance){
-		int actionID;
-		if (rand.nextDouble() < explorationChance){
-			actionID = rand.nextInt(ACTIONS.values().length);
-		} else {
-			actionID = agent.feedBack(state.id);
-		}
-		return actionID;
-	}
-	
-	public void printPolicyMap(ActionDecider agent){
-		for (int row = 0; row < world.numRows(); row++){
-			for (int col = 0; col < world.numCols(); col++){
-				State s = new State(row, col, world);
-				if (s.equals(goal)){
-					System.out.print("*  ");
-				} else if (s.equals(hole)){
-					System.out.print("/  ");
-				} else {
-					int bestAction = agent.feedBack(s.id);
-					System.out.print(ACTIONS.values()[bestAction].name() + "  ");
-				}
-			}
-			System.out.println();
-		}
-	}
+		goal = new State(goalID, world);
+		System.out.println("End: (" + goal.row + "," + goal.col + ") ID: " + goal.id);
+		world.set(0);
+		world.set(goalID, 1);
 
-	private State move(State state, ACTIONS action){
-		int rowChange = 0, colChange = 0;
-		switch(action){
-		case E: rowChange = 0; colChange = 1;  break;
-		case N: rowChange = -1; colChange = 0;  break;
-		case S: rowChange = 1; colChange = 0;  break;
-		case W: rowChange = 0; colChange = -1;  break;		
-		}
-		
-		int newRow = state.getRow() + rowChange;
-		int newCol = state.getCol() + colChange;
-		
-		if(newRow < 0 || newRow > world.numRows() - 1) newRow = state.getRow();
-		if(newCol < 0 || newCol > world.numCols() - 1) newCol = state.getCol();
-		
-		State newState = new State(newRow, newCol, world);
-		return newState;
 	}
 	
 	private State selectRandomState(boolean includeGoalState){
@@ -128,18 +53,94 @@ public class BlockWorldTest {
 		return s;
 	}
 	
+	public void run(int numEpisodes){
+		for (int i = 1; i <= numEpisodes; i++){
+			agent.setLearningRate(0.1);
+			agent.newEpisode();
+			runEpisode(1 - (double) i / numEpisodes);
+		}
+		
+		System.out.println("Q matrix: ");
+		agent.printQMatrix();
+		System.out.println();
+		
+		System.out.println("Policy map:");
+		printPolicyMap();
+		System.out.println();
+		
+		System.out.println("Reward map:");
+		world.print();
+	}
+	
+	private void printPolicyMap(){
+		for (int row = 0; row < world.numRows(); row++){
+			for (int col = 0; col < world.numCols(); col++){
+				State s = new State(row, col, world);
+				if (s.equals(goal)){
+					System.out.print("*  ");
+				} else {
+					int bestAction = agent.feedBack(s.id);
+					System.out.print(ACTIONS.values()[bestAction].name() + "  ");
+				}
+			}
+			System.out.println();
+		}
+	}
+	
+	private void runEpisode(double explorationChance){
+		agent.newEpisode();
+		State state = selectRandomState(true);
+		int actionID = chooseAction(state, explorationChance);
+		agent.feedForward(state.id, actionID, 0); //Reward is unimportant in the first update. Update only used to save start state and action
+		
+		while(!isTerminalState(state)){
+			State nextState = move(state, ACTIONS.values()[actionID]);
+			double reward = world.get(nextState.row, nextState.col);
+			if(reward > 0){
+				System.out.println();
+			}
+			int nextActionID = chooseAction(state, explorationChance);
+			
+			agent.feedForward(nextState.id, nextActionID, reward);
+			
+			state = nextState;		
+			actionID = nextActionID;
+		}
+	}
+	
+	private int chooseAction(State state, double explorationChance){
+		int actionID;
+		if (rand.nextDouble() < explorationChance){
+			actionID = rand.nextInt(ACTIONS.values().length);
+		} else {
+			actionID = agent.feedBack(state.id);
+		}
+		return actionID;
+	}
+	
 	private boolean isTerminalState(State s){
 		if (s.equals(goal)) return true;
-		if (s.equals(hole)) return true;
+
 		return false;
 	}
 	
-	public int getNumActions(){
-		return ACTIONS.values().length;
-	}
-	
-	public int getNumStates(){
-		return world.getNumElements();
+	private State move(State state, ACTIONS action){
+		int rowChange = 0, colChange = 0;
+		switch(action){
+		case E: rowChange = 0; colChange = 1;  break;
+		case N: rowChange = 1; colChange = 0;  break;
+		case S: rowChange = -1; colChange = 0;  break;
+		case W: rowChange = 0; colChange = -1;  break;		
+		}
+		
+		int newRow = state.getRow() + rowChange;
+		int newCol = state.getCol() + colChange;
+		
+		if(newRow < 0 || newRow > world.numRows() - 1) newRow = state.getRow();
+		if(newCol < 0 || newCol > world.numCols() - 1) newCol = state.getCol();
+		
+		State newState = new State(newRow, newCol, world);
+		return newState;
 	}
 	
 	private class State{
@@ -194,8 +195,8 @@ public class BlockWorldTest {
 				return false;
 			return true;
 		}
-		private BlockWorldTest getOuterType() {
-			return BlockWorldTest.this;
+		private CopyOfBlockWorldTest getOuterType() {
+			return CopyOfBlockWorldTest.this;
 		}
 		
 	}

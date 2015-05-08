@@ -13,11 +13,13 @@ public class ActionDecider implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private SARSALearner sarsa;
 	private int stateBefore, actionBefore;
+	private boolean learning;
 	
 	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		sarsa = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, 0.9);
 		stateBefore = -1;
 		actionBefore = -1;
+		learning = true;
 	}
 	
 	/**
@@ -28,7 +30,7 @@ public class ActionDecider implements Serializable {
 	 */
 	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
 		double internalReward = calculateInternaleward(rewardForCurrentState);
-		if(stateBefore != -1){
+		if(stateBefore != -1 && learning){
 			sarsa.updateQMatrix(stateBefore, actionBefore, currentState, actionToBePerformedNow, internalReward);
 		}
 		stateBefore = currentState;
@@ -36,13 +38,18 @@ public class ActionDecider implements Serializable {
 		
 	}
 	
+	public void updateQMatrix(int originState, int action, int nextState, int nextAction,
+			double reward) {
+		sarsa.updateQMatrix(originState, action, nextState, nextAction, reward);
+	}
+	
 	/**
 	 * Chooses which action to do at t+1 given the expected state of t+1
 	 * @param expectedNextStateProbabilities
 	 * @return
 	 */
-	public int feedback(int expectedNextState){
-		int action = sarsa.selectBestAction(expectedNextState);
+	public int feedBack(int originState){
+		int action = sarsa.selectBestAction(originState);
 		return action;
 	}
 	
@@ -74,7 +81,7 @@ public class ActionDecider implements Serializable {
 	}
 	
 	public void printTraceMatrix(){
-		System.out.println("Not implemented yet");//traceMatrix.print();
+		sarsa.getTraceMatrix().print();
 	}
 	
 	public void setLearningRate(double learningRate){
@@ -82,7 +89,13 @@ public class ActionDecider implements Serializable {
 	}
 	
 	public void newEpisode(){
+		stateBefore = -1;
+		actionBefore = -1;
 		sarsa.newEpisode();
+	}
+	
+	public void setLearning(boolean learning){
+		this.learning = learning;
 	}
 
 }

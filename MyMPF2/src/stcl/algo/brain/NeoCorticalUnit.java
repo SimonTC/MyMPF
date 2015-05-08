@@ -341,6 +341,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
+		decider.setLearning(learning);
 		if (predictor != null) predictor.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}

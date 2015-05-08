@@ -125,7 +125,9 @@ public class BlockWorldTest_Brain {
 			double visits = visitCounter.get(state.id);
 			visits += 1;
 			visitCounter.set(state.id, visits);
+			//Perform action and observe s'
 			state = move(state, ACTIONS.values()[actionID]);
+			//Observe reward
 			double reward = world.get(state.row, state.col);
 			actionID = getAction(agent);
 			loadNetwork(agent, state, actionID);

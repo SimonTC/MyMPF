@@ -46,6 +46,10 @@ public class BlockWorldTest_Brain {
 		
 		System.out.println("Reward map:");
 		world.print();
+		System.out.println();
+		
+		System.out.println("Model:");
+		agent.getUnitNodes().get(0).getUnit().getSpatialPooler().printModelWeigths();
 	}
 	
 	public void setup(int worldSize){
@@ -80,16 +84,13 @@ public class BlockWorldTest_Brain {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 2, 0.1, 3, 4);
+		node.initialize(rand, worldSize, 2, 0.1, 1, 4);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);
 		agent.addNode(node);
 		agent.addNode(inputSensor);
-		agent.addNode(actionSensor);
-		
-		
-		
+		agent.addNode(actionSensor);		
 	}
 	
 	public void runEpisode(Network agent, double explorationChance){
@@ -99,13 +100,14 @@ public class BlockWorldTest_Brain {
 		int actionID = rand.nextInt(ACTIONS.values().length);
 		loadNetwork(agent, state, actionID);
 		agent.step(0);//Reward not important for this first feed forward. Only used to save initial state and action 
-				
-		while(!isTerminalState(state)){
+		int count = 0;
+		while(!isTerminalState(state) && count < 100){
 			state = move(state, ACTIONS.values()[actionID]);
 			double reward = world.get(state.row, state.col);
 			actionID = getAction(agent);
 			loadNetwork(agent, state, actionID);
 			agent.step(reward);
+			count++;
 		}
 	}
 	

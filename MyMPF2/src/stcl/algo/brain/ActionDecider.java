@@ -5,9 +5,8 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.itu.stcl.agents.QLearner;
 import dk.itu.stcl.agents.SARSALearner;
-import stcl.algo.util.Normalizer;
-import stcl.algo.util.Orthogonalizer;
 
 public class ActionDecider implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -38,11 +37,12 @@ public class ActionDecider implements Serializable {
 		
 	}
 	
+	/*
 	public void updateQMatrix(int originState, int action, int nextState, int nextAction,
 			double reward) {
 		sarsa.updateQMatrix(originState, action, nextState, nextAction, reward);
 	}
-	
+	*/
 	/**
 	 * Chooses which action to do at t+1 given the expected state of t+1
 	 * @param expectedNextStateProbabilities
@@ -50,6 +50,7 @@ public class ActionDecider implements Serializable {
 	 */
 	public int feedBack(int originState){
 		int action = sarsa.selectBestAction(originState);
+		
 		return action;
 	}
 	
@@ -79,6 +80,7 @@ public class ActionDecider implements Serializable {
 	public SimpleMatrix getQMatrix(){
 		return sarsa.getQMatrix();
 	}
+	
 	
 	public void printTraceMatrix(){
 		sarsa.getTraceMatrix().print();

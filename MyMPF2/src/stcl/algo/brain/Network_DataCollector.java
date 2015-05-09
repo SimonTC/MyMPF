@@ -131,7 +131,6 @@ public class Network_DataCollector extends Network {
 			FFOutputs = (collectUnitOutputs(true));
 			temporalActivations = (collectActivations(false));
 			spatialActivations = (collectActivations(true));
-			actionVotes = collectActionVotes();
 		}
 		
 		//Feed back
@@ -142,6 +141,7 @@ public class Network_DataCollector extends Network {
 			returnedOutput = collectNetworkOutput();
 			FBInputs = collectUnitInputs(false);
 			FBOutputs = (collectUnitOutputs(false));
+			actionVotes = collectActionVotes();
 		}
 		
 		super.resetUnitActivity();

@@ -6,7 +6,6 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.ActionDecider;
 
-<<<<<<< HEAD
 public class BlockWorldTest {
 	private enum ACTIONS {N,S,E,W};
 	private Random rand = new Random();

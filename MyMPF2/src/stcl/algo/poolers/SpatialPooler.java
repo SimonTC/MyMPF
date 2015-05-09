@@ -12,23 +12,17 @@ import dk.stcl.core.basic.containers.SomNode;
 public class SpatialPooler implements Serializable {
 	private static final long serialVersionUID = 1L;
 	//Weight matrix
-	protected SOM som;
+	private SOM som;
 	
 	//Matrice used 
-	protected SimpleMatrix errorMatrix; //Squared error of the activation in the SOM
-	protected SimpleMatrix activationMatrix;
-	
-	//Variables for learning
-	protected double curLearningRate;
-	protected double curNeighborhoodRadius;
-	protected double curNoiseMagnitude;
+	private SimpleMatrix activationMatrix;
 	
 	//Variables used for testing inputs
-	protected int inputLength;
-	protected int mapSize;
+	private int inputLength;
+	private int mapSize;
 	
 	//Misc
-	protected Random rand;
+	private Random rand;
 
 	/**
 	 * Constructor used when all parameters are given
@@ -42,11 +36,9 @@ public class SpatialPooler implements Serializable {
 	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
 		this.rand = rand;
 		som = new SOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev);
-		errorMatrix = new SimpleMatrix(mapSize, mapSize);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
 		this.inputLength = inputLength;
 		this.mapSize = mapSize;		
-		curNoiseMagnitude = 0.0; //TODO: Be aware of noise magnitude
 	}
 
 	
@@ -95,7 +87,7 @@ public class SpatialPooler implements Serializable {
 	 * @param input
 	 * @return
 	 */
-	protected SimpleMatrix chooseRandom(SimpleMatrix input, SomBasics map){
+	private SimpleMatrix chooseRandom(SimpleMatrix input, SomBasics map){
 		//Transform matrix into vector
 		double[] vector = input.getMatrix().data;
 		
@@ -126,7 +118,7 @@ public class SpatialPooler implements Serializable {
 	 * @param map
 	 * @return
 	 */
-	protected SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
+	private SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
 		//Transform bias matrix into vector
 		double[] vector = input.getMatrix().data;
 		
@@ -150,25 +142,6 @@ public class SpatialPooler implements Serializable {
 		
 		return model;
 		
-	}
-	
-	/**
-	 * Adds noise to the given matrix and returns the matrix.
-	 * The matrix is altered in this method.
-	 * @param m
-	 * @param noiseMagnitude
-	 * @return
-	 */
-	protected SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
-		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-		m = m.plus(noise);
-		for (int i = 0; i < m.getNumElements(); i++){
-			double d = m.get(i);
-			d = d + (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-			if (d < 0) d = 0;
-			m.set(i, d);
-		}
-		return m;
 	}
 	
 	public SOM getSOM(){

@@ -96,7 +96,7 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay); //TODO: Change parameters. Especially decay
+		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay, rand);//TODO: Change parameters. Especially decay
 		
 		needHelp = false;
 		entropyThreshold = 0;
@@ -133,7 +133,16 @@ public class NeoCorticalUnit implements Serializable{
 		
 		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
 		//inputToDecider = Normalizer.normalize(inputToDecider);
-		decider.feedForward(inputToDecider, actionPerformed, reward);
+		int maxProbableState = -1;
+		double maxProb = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < inputToDecider.getNumElements(); i++){
+			double d = inputToDecider.get(i);
+			if (d > maxProb){
+				maxProb = d;
+				maxProbableState = i;
+			}
+		}
+		decider.feedForward(maxProbableState, actionPerformed, reward);
 		
 		if (!noTemporal) {
 			//Predict next spatialFFOutputMatrix
@@ -229,7 +238,16 @@ public class NeoCorticalUnit implements Serializable{
 		
 		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
 		
-		chosenAction = decider.feedback(biasedTemporalFBOutput);
+		int maxProbableState = -1;
+		double maxProb = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < biasedTemporalFBOutput.getNumElements(); i++){
+			double d = biasedTemporalFBOutput.get(i);
+			if (d > maxProb){
+				maxProb = d;
+				maxProbableState = i;
+			}
+		}
+		chosenAction = decider.feedBack(maxProbableState);
 		
 		//Selection of best spatial mode
 		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
@@ -323,6 +341,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
+		decider.setLearning(learning);
 		if (predictor != null) predictor.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}
@@ -436,7 +455,7 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	public void printCorrelationMatrix(){
-		decider.printCorrelationMatrix();
+		decider.printQMatrix();
 	}
 	
 	public Predictor_VOMM getPredictor(){
@@ -449,6 +468,14 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public int getMarkovOrder(){
 		return markovOrder;
+	}
+	
+	public void newEpisode(){
+		decider.newEpisode();
+	}
+	
+	public ActionDecider getDecider(){
+		return this.decider;
 	}
 
 	

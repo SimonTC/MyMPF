@@ -1,21 +1,21 @@
 package stcl.algo.brain;
 
 import java.io.Serializable;
+import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.itu.stcl.agents.SARSALearner;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 
 public class ActionDecider implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private SimpleMatrix correlationMatrix;
-	private SimpleMatrix stateProbabilitiesBefore;
-	private int actionPerformedBefore;
-	private int numPossibleStates;
-	private int numPossibleActions;
-	private double decayFactor;
+	private SARSALearner sarsa;
+	private int stateBefore, actionBefore;
+	private boolean learning;
 	
+<<<<<<< HEAD
 	private double externalRewardBefore;
 	private double externalRewardNow;
 	private double maxReward;
@@ -30,19 +30,34 @@ public class ActionDecider implements Serializable {
 		
 		this.maxReward = 1;
 		this.alpha = decayFactor;
+=======
+	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
+		sarsa = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, 0.9);
+		stateBefore = -1;
+		actionBefore = -1;
+		learning = true;
+>>>>>>> refs/remotes/origin/eligibilityTraces
 	}
 	
 	/**
 	 * Correlates the given reward with the action performed at t-1	
 	 * @param currentStateProbabilities
-	 * @param actionPerformedNow
-	 * @param reward
+	 * @param actionToBePerformedNow
+	 * @param rewardForCurrentState
 	 */
-	public void feedForward(SimpleMatrix currentStateProbabilities, int actionPerformedNow, double reward){
-		double internalReward = calculateInternaleward(reward);
-		if (stateProbabilitiesBefore != null) correlateActionAndReward(internalReward);
-		actionPerformedBefore = actionPerformedNow;
-		stateProbabilitiesBefore = currentStateProbabilities;
+	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
+		double internalReward = calculateInternaleward(rewardForCurrentState);
+		if(stateBefore != -1 && learning){
+			sarsa.updateQMatrix(stateBefore, actionBefore, currentState, actionToBePerformedNow, internalReward);
+		}
+		stateBefore = currentState;
+		actionBefore = actionToBePerformedNow;
+		
+	}
+	
+	public void updateQMatrix(int originState, int action, int nextState, int nextAction,
+			double reward) {
+		sarsa.updateQMatrix(originState, action, nextState, nextAction, reward);
 	}
 	
 	/**
@@ -50,14 +65,15 @@ public class ActionDecider implements Serializable {
 	 * @param expectedNextStateProbabilities
 	 * @return
 	 */
-	public int feedback(SimpleMatrix expectedNextStateProbabilities){
-		int action = chooseBestAction(expectedNextStateProbabilities);
+	public int feedBack(int originState){
+		int action = sarsa.selectBestAction(originState);
 		return action;
 	}
 	
 	private double calculateInternaleward(double externalReward){
-		externalRewardNow = externalReward;
 		
+		//externalRewardNow = externalReward;
+		/*
 		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
 		
 		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
@@ -66,61 +82,37 @@ public class ActionDecider implements Serializable {
 		externalRewardBefore = externalRewardNow;
 		
 		return internalReward;
-		
-		//return externalReward;
-
-	}
-	
-	private int chooseBestAction(SimpleMatrix stateProbabilities){
-		int bestAction = -1;
-		double highestReward = Double.NEGATIVE_INFINITY;
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilities.getMatrix().data);
-		for (int action = 0; action < numPossibleActions; action++){
-			SimpleMatrix correlationVector = correlationMatrix.extractVector(true, action);
-			SimpleMatrix rewardVector = correlationVector.elementMult(stateVector);
-			double reward = rewardVector.elementSum();
-			if (reward > highestReward){
-				highestReward = reward;
-				bestAction = action;
-			}
-		}
-		assert bestAction != -1 : "No best action could be found. There is something wrong";
-		return bestAction;
-	}
-	
-	private void correlateActionAndReward(double internalReward){
-		//Correlate state we were in before with the action done and reward received
-		SimpleMatrix stateVector = new SimpleMatrix(1, numPossibleStates, true, stateProbabilitiesBefore.getMatrix().data);
-		SimpleMatrix correlationVector = correlationMatrix.extractVector(true, actionPerformedBefore);
-		
-		SimpleMatrix tau = stateVector.scale(0.1);
-		
-		//Multiply the tau value with the given reward
-		//This is the influence that the actions at time t-1 have on the reward (I think)
-		SimpleMatrix tmp = tau.scale(internalReward);
-		
-		//Calculate the other part of the equation
-		SimpleMatrix learnedCorrelation = new SimpleMatrix(stateVector.numRows(), stateVector.numCols());
-		learnedCorrelation.set(1);
-		learnedCorrelation = learnedCorrelation.minus(tau);
-		learnedCorrelation = learnedCorrelation.elementMult(correlationVector);
-		
-		//Calculate correlation matrix
-		correlationVector = tmp.plus(learnedCorrelation);		
-		
-		/*
-		//Decay old rewards
-		correlationVector = correlationVector.scale(1-decayFactor);
-		
-		//Add new rewards
-		correlationVector = correlationVector.plus(internalReward, stateVector);
 		*/
-		correlationMatrix.insertIntoThis(actionPerformedBefore, 0, correlationVector);
+		return externalReward;
 
 	}
 	
-	public void printCorrelationMatrix(){
-		correlationMatrix.print();
+
+	
+	public void printQMatrix(){
+		sarsa.getQMatrix().print();
+	}
+	
+	public SimpleMatrix getQMatrix(){
+		return sarsa.getQMatrix();
+	}
+	
+	public void printTraceMatrix(){
+		sarsa.getTraceMatrix().print();
+	}
+	
+	public void setLearningRate(double learningRate){
+		sarsa.setAlpha(learningRate);
+	}
+	
+	public void newEpisode(){
+		stateBefore = -1;
+		actionBefore = -1;
+		sarsa.newEpisode();
+	}
+	
+	public void setLearning(boolean learning){
+		this.learning = learning;
 	}
 
 }

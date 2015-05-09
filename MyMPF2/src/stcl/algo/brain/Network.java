@@ -129,10 +129,17 @@ public class Network implements Serializable{
 		return sensorLayer;
 	}
 	
+	/**
+	 * Takes one step through the network.
+	 * Set sensors before stepping
+	 * @param reward
+	 */
 	public void step(double reward){
 		feedForward(reward);
 		
 		feedback();
+		
+		resetUnitActivity();
 	}
 	
 	protected void feedForward(double reward){
@@ -161,10 +168,12 @@ public class Network implements Serializable{
 		
 		//Decide on what action to do
 		if (actionNode != null) actionNode.feedback();
-		for (Sensor s : sensorLayer) s.feedback();
+		for (Sensor s : sensorLayer) s.feedback();		
 		
+	}
+	
+	protected void resetUnitActivity(){
 		for (UnitNode n : unitNodes) n.resetActivityOfUnit();
-		
 	}
 	
 	
@@ -230,6 +239,10 @@ public class Network implements Serializable{
 		
 		return buffer.toString();
 		
+	}
+	
+	public void newEpisode(){
+		for (UnitNode n : unitNodes) n.newEpisode();
 	}
 	
 

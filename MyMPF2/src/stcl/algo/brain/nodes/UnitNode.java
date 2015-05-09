@@ -163,5 +163,9 @@ public class UnitNode extends Node {
 		s += " " + initializationDescription;
 		return s;
 	}
+	
+	public void newEpisode(){
+		unit.newEpisode();
+	}
 
 }

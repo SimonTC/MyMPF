@@ -14,29 +14,12 @@ public class ActionDecider implements Serializable {
 	private SARSALearner sarsa;
 	private int stateBefore, actionBefore;
 	private boolean learning;
-	
-<<<<<<< HEAD
-	private double externalRewardBefore;
-	private double externalRewardNow;
-	private double maxReward;
-	private double alpha;
-	private double internalRewardBefore;
-	
-	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor) {
-		correlationMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
-		this.numPossibleActions = numPossibleActions;
-		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = decayFactor;
-		
-		this.maxReward = 1;
-		this.alpha = decayFactor;
-=======
+
 	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		sarsa = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, 0.9);
 		stateBefore = -1;
 		actionBefore = -1;
 		learning = true;
->>>>>>> refs/remotes/origin/eligibilityTraces
 	}
 	
 	/**

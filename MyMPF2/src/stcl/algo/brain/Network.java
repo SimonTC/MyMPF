@@ -138,6 +138,8 @@ public class Network implements Serializable{
 		feedForward(reward);
 		
 		feedback();
+		
+		resetUnitActivity();
 	}
 	
 	protected void feedForward(double reward){
@@ -166,10 +168,12 @@ public class Network implements Serializable{
 		
 		//Decide on what action to do
 		if (actionNode != null) actionNode.feedback();
-		for (Sensor s : sensorLayer) s.feedback();
+		for (Sensor s : sensorLayer) s.feedback();		
 		
+	}
+	
+	protected void resetUnitActivity(){
 		for (UnitNode n : unitNodes) n.resetActivityOfUnit();
-		
 	}
 	
 	

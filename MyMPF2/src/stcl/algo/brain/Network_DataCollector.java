@@ -144,6 +144,8 @@ public class Network_DataCollector extends Network {
 			FBOutputs = (collectUnitOutputs(false));
 		}
 		
+		super.resetUnitActivity();
+		
 		//Print data to files
 		if (collectData){
 			try {

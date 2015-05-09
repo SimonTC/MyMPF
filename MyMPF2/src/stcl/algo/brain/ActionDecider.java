@@ -15,7 +15,7 @@ public class ActionDecider implements Serializable {
 	private boolean learning;
 
 	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
-		sarsa = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, 0.9);
+		sarsa = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, true, 0.9);
 		stateBefore = -1;
 		actionBefore = -1;
 		learning = true;
@@ -37,12 +37,12 @@ public class ActionDecider implements Serializable {
 		
 	}
 	
-	/*
+	
 	public void updateQMatrix(int originState, int action, int nextState, int nextAction,
 			double reward) {
 		sarsa.updateQMatrix(originState, action, nextState, nextAction, reward);
 	}
-	*/
+	
 	/**
 	 * Chooses which action to do at t+1 given the expected state of t+1
 	 * @param expectedNextStateProbabilities

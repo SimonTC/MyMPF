@@ -37,6 +37,7 @@ public class BlockWorldTest_Brain {
 			runEpisode(agent, 1 - (double) i / numEpisodes);
 		}
 		
+		agent.setLearning(false);
 		ActionDecider decider = agent.getUnitNodes().get(0).getUnit().getDecider();
 		
 		System.out.println("Q matrix: ");

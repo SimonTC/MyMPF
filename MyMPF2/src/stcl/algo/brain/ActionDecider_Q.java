@@ -8,14 +8,14 @@ import org.ejml.simple.SimpleMatrix;
 import dk.itu.stcl.agents.QLearner;
 import dk.itu.stcl.agents.SARSALearner;
 
-public class ActionDecider implements Serializable {
+public class ActionDecider_Q implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private SARSALearner learner;
+	private QLearner learner;
 	private int stateBefore, actionBefore;
 	private boolean learning;
 
-	public ActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning) {
-		learner = new SARSALearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning, 0.9);
+	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning) {
+		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
 		stateBefore = -1;
 		actionBefore = -1;
 		learning = true;
@@ -79,11 +79,6 @@ public class ActionDecider implements Serializable {
 	
 	public SimpleMatrix getQMatrix(){
 		return learner.getQMatrix();
-	}
-	
-	
-	public void printTraceMatrix(){
-		learner.getTraceMatrix().print();
 	}
 	
 	public void setLearningRate(double learningRate){

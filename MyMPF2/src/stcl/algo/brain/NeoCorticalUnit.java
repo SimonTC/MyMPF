@@ -54,7 +54,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder) {
-		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, 1);
+		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, 1, true);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions, boolean offlineLearning) {
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		//TODO: All parameters should be handled in parameter file
@@ -96,7 +96,7 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, decay, rand);//TODO: Change parameters. Especially decay
+		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
 		
 		needHelp = false;
 		entropyThreshold = 0;

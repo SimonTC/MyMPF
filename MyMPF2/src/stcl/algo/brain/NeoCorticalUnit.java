@@ -17,7 +17,7 @@ public class NeoCorticalUnit implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private SpatialPooler spatialPooler;
 	private Predictor_VOMM predictor;
-	private ActionDecider decider;
+	private ActionDecider_Q decider;
 	private SimpleMatrix biasMatrix;
 	private SimpleMatrix predictionMatrix;
 	private SimpleMatrix ffInput;
@@ -96,7 +96,7 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		decider = new ActionDecider(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+		decider = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
 		
 		needHelp = false;
 		entropyThreshold = 0;
@@ -474,7 +474,7 @@ public class NeoCorticalUnit implements Serializable{
 		decider.newEpisode();
 	}
 	
-	public ActionDecider getDecider(){
+	public ActionDecider_Q getDecider(){
 		return this.decider;
 	}
 

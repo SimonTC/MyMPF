@@ -30,7 +30,8 @@ public class ActionDecider_Q implements Serializable {
 	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
 		double internalReward = calculateInternaleward(rewardForCurrentState);
 		if(stateBefore != -1 && learning){
-			learner.updateQMatrix(stateBefore, actionBefore, currentState, actionToBePerformedNow, internalReward);
+			learner.updateQMatrix(stateBefore, actionBefore, currentState, internalReward);
+			//learner.updateQMatrix(stateBefore, actionBefore, currentState, actionToBePerformedNow, internalReward);
 		}
 		stateBefore = currentState;
 		actionBefore = actionToBePerformedNow;

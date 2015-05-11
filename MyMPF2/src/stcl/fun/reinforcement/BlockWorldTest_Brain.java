@@ -93,7 +93,7 @@ public class BlockWorldTest_Brain {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 2, 0.1, 1, 4);
+		node.initialize(rand, worldSize, 2, 0.1, 1, 4, true);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);

@@ -48,7 +48,7 @@ public class BlockWorldTest {
 		//hole = selectRandomState(false);
 		world.set(goal.row, goal.col, GOAL_REWARD);
 		//world.set(hole.row, hole.col, HOLE_REWARD);
-		agent = new ActionDecider(4, worldSize * worldSize, 0.9, rand);
+		agent = new ActionDecider(4, worldSize * worldSize, 0.9, rand, true);
 	}
 	
 	public void runEpisode(ActionDecider agent, double explorationChance){

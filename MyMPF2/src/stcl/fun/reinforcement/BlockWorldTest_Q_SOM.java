@@ -1,19 +1,15 @@
 package stcl.fun.reinforcement;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.ActionDecider;
 import stcl.algo.brain.ActionDecider_Q;
-import stcl.algo.brain.Network;
-import stcl.algo.brain.nodes.ActionNode;
-import stcl.algo.brain.nodes.Sensor;
-import stcl.algo.brain.nodes.UnitNode;
+import stcl.algo.poolers.SpatialPooler;
 
 
-public class BlockWorldTest_Brain {
+public class BlockWorldTest_Q_SOM {
 	private SimpleMatrix world;
 	private enum ACTIONS {N,S,E,W};
 	private final double GOAL_REWARD = 1;
@@ -21,40 +17,42 @@ public class BlockWorldTest_Brain {
 	private State goal;
 	private State hole;
 	private Random rand = new Random();
-	private Network agent;
-	private SimpleMatrix visitCounter;
-	
+	private ActionDecider_Q agent;
+	private SpatialPooler pooler;
+	private boolean learnMapFirst = false;
 	
 	public static void main(String[] args){
-		BlockWorldTest_Brain bwt = new BlockWorldTest_Brain();
-		bwt.setup(4);
-		bwt.run(2000);
+		BlockWorldTest_Q_SOM bwt = new BlockWorldTest_Q_SOM();
+		bwt.setup(10);
+		bwt.run(1000);
 	}
 	
 	public void run(int numEpisodes){
-		for (int i = 1; i <= numEpisodes; i++){
-			System.out.println("Start episode " + i );
-			agent.newEpisode();
-			runEpisode(agent, 1 - (double) i / numEpisodes);
+		
+		if (learnMapFirst){
+			for (int i = 1; i <= 2000; i++){
+				learnTheMap(pooler);
+			}
 		}
 		
-		agent.setLearning(false);
-		ActionDecider_Q decider = agent.getUnitNodes().get(0).getUnit().getDecider();
+		System.out.println("Map:");
+		pooler.printModelWeigths();
+		
+		
+		for (int i = 1; i <= numEpisodes; i++){
+			agent.setLearningRate(0.1);
+			agent.newEpisode();
+			runEpisode(agent, pooler, 1 - (double) i / numEpisodes);
+			System.out.println("Finished training " + i);
+		}
 		
 		System.out.println("Q matrix: ");
-		decider.getQMatrix().print();
+		agent.printQMatrix();
 		System.out.println();
 		
 		System.out.println("Policy map:");
-		printPolicyMap(decider);
+		printPolicyMap(agent);
 		System.out.println();
-		
-		System.out.println("Model:");
-		agent.getUnitNodes().get(0).getUnit().getSpatialPooler().printModelWeigths();
-		System.out.println();
-		
-		System.out.println("State visits:");
-		visitCounter.print();
 	}
 	
 	public void setup(int worldSize){
@@ -63,95 +61,56 @@ public class BlockWorldTest_Brain {
 		//hole = selectRandomState(false);
 		world.set(goal.row, goal.col, GOAL_REWARD);
 		//world.set(hole.row, hole.col, HOLE_REWARD);
-		setupAgent(worldSize);
-		visitCounter = new SimpleMatrix(worldSize, worldSize);
+		agent = new ActionDecider_Q(4, worldSize * worldSize, 0.9, rand, true);
+		pooler = new SpatialPooler(rand, 2, worldSize, 0.1, Math.sqrt(worldSize), 0.125);
 	}
 	
-	private void setupAgent(int worldSize){
-		agent = new Network();
-		
-		//Create node
-		UnitNode node = new UnitNode(0, 0, 0, 1);
-		
-		//Create sensors
-		Sensor inputSensor = new Sensor(1, 0, 0, 0);
-		inputSensor.initialize(2);
-		Sensor actionSensor = new Sensor(2, 0, 1, 0);
-		actionSensor.initialize(1);
-		
-		//Create action node
-		ActionNode actionNode = new ActionNode(3);
-		
-		//Add children
-		node.addChild(inputSensor);
-		inputSensor.setParent(node);
-		
-		actionNode.addChild(actionSensor);
-		actionSensor.setParent(actionNode);
-		
-		//Initialize nodes
-		node.initialize(rand, worldSize, 2, 0.1, 1, 4, true);
-		actionNode.initialize(rand, 1, 2, 0.1, 1);
-		
-		agent.addNode(actionNode);
-		agent.addNode(node);
-		agent.addNode(inputSensor);
-		agent.addNode(actionSensor);		
-		
-		actionNode.setPossibleActions(createPossibleActions());
-	}
-	
-	private ArrayList<SimpleMatrix> createPossibleActions(){
-		ArrayList<SimpleMatrix> actions = new ArrayList<SimpleMatrix>();
-		for (int i = 0; i < 4; i++){
-			double[][] d = {{i}};
-			SimpleMatrix m = new SimpleMatrix(d);
-			actions.add(m);
-		}
-		return actions;
-	}
-	
-	public void runEpisode(Network agent, double explorationChance){
-		agent.newEpisode();
-		agent.getActionNode().setExplorationChance(explorationChance);
-		
-		State state = selectRandomState(true);
-		int action = 0;
-		int nextAction = 0;
-		
+	public void learnTheMap(SpatialPooler pooler){
+		State state = selectRandomState(false);
 		do{
-			//Perform a and observe s'
-			State nextState = move(state, ACTIONS.values()[action]);
-			
-			//Get reward r
-			double reward = world.get(nextState.row, nextState.col);
-			
-			//Update q with state s, action a and reward r
-			loadNetwork(agent, nextState, nextAction);
-			agent.step(reward);
-			
-			action = nextAction;
-			nextAction = getAction(agent);
+			int actionID = rand.nextInt(ACTIONS.values().length);
+			State nextState = move(state, ACTIONS.values()[actionID]);
+			double[][] stateData = {{nextState.row, nextState.col}};
+			SimpleMatrix m = new SimpleMatrix(stateData);
+			pooler.feedForward(m);
 			state = nextState;
-			int visits =  (int) visitCounter.get(state.id);
-			visitCounter.set(state.id, ++visits);
-			
-		} while (!isTerminalState(state));
+		} while(!isTerminalState(state));
 	}
 	
-	private int getAction(Network agent){
-		SimpleMatrix actionMatrix = agent.getSensors().get(1).getFeedbackOutput();
-		int action = (int) actionMatrix.get(0);
-		return action;
+	public void runEpisode(ActionDecider_Q agent, SpatialPooler pooler, double explorationChance){
+		agent.newEpisode();
+		State state = selectRandomState(false);
+		int actionID = 0;
+		int stateID = stateID(state, pooler);
+		agent.feedForward(stateID, actionID, 0);	
+
+		do{
+			State nextState = move(state, ACTIONS.values()[actionID]);
+			double reward = world.get(nextState.row, nextState.col);
+			stateID = stateID(state, pooler);
+			int nextStateID = stateID(nextState, pooler);
+			agent.updateQMatrix(stateID, actionID, nextStateID, -1, reward);
+			actionID = chooseAction(nextState, explorationChance);			
+			state = nextState;		
+		} while(!isTerminalState(state));
 	}
 	
-	private void loadNetwork(Network agent, State state, int actionID){
-		Sensor inputSensor = agent.getSensors().get(0);
-		Sensor actionSensor = agent.getSensors().get(1);
-		double[][] inputData = {{state.getRow(), state.getCol()}};
-		SimpleMatrix input = new SimpleMatrix(inputData);
-		inputSensor.setInput(input);
-		actionSensor.setInput(actionID);
+	private int stateID(State state, SpatialPooler pooler){
+		double[][] stateData = {{state.row, state.col}};
+		SimpleMatrix m = new SimpleMatrix(stateData);
+		pooler.feedForward(m);
+		int stateID = pooler.getSOM().getBMU().getId();
+		return stateID;
+	}
+	
+	private int chooseAction(State state, double explorationChance){
+		int actionID;
+		if (rand.nextDouble() < explorationChance){
+			actionID = rand.nextInt(ACTIONS.values().length);
+		} else {
+			actionID = agent.feedBack(stateID(state, pooler));
+		}
+		return actionID;
 	}
 	
 	public void printPolicyMap(ActionDecider_Q agent){
@@ -163,7 +122,7 @@ public class BlockWorldTest_Brain {
 				} else if (s.equals(hole)){
 					System.out.print("/  ");
 				} else {
-					int bestAction = agent.feedBack(s.id);
+					int bestAction = agent.feedBack(stateID(s, pooler));
 					System.out.print(ACTIONS.values()[bestAction].name() + "  ");
 				}
 			}
@@ -234,13 +193,6 @@ public class BlockWorldTest_Brain {
 			this.id = id;
 			
 		}
-		
-		@Override
-		public String toString(){
-			String s = "(" + row + "," + col + ")  ID: " + id;
-			return s;
-		}
-		
 		public int getRow(){
 			return row;
 		}
@@ -279,8 +231,8 @@ public class BlockWorldTest_Brain {
 				return false;
 			return true;
 		}
-		private BlockWorldTest_Brain getOuterType() {
-			return BlockWorldTest_Brain.this;
+		private BlockWorldTest_Q_SOM getOuterType() {
+			return BlockWorldTest_Q_SOM.this;
 		}
 		
 	}

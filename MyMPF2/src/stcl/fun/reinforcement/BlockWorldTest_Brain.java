@@ -28,14 +28,15 @@ public class BlockWorldTest_Brain {
 	public static void main(String[] args){
 		BlockWorldTest_Brain bwt = new BlockWorldTest_Brain();
 		bwt.setup(4);
-		bwt.run(2000);
+		bwt.run(1000);
 	}
 	
 	public void run(int numEpisodes){
 		for (int i = 1; i <= numEpisodes; i++){
-			System.out.println("Start episode " + i );
 			agent.newEpisode();
-			runEpisode(agent, 1 - (double) i / numEpisodes);
+			double error = runEpisode(agent, 1 - (double) i / numEpisodes);
+			
+			System.out.println("Finished episode " + i + " with prediction error " + error);
 		}
 		
 		agent.setLearning(false);
@@ -90,7 +91,7 @@ public class BlockWorldTest_Brain {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 2, 0.1, 1, 4, true);
+		node.initialize(rand, worldSize, 1, 0.1, 1, 4, true);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);
@@ -111,24 +112,35 @@ public class BlockWorldTest_Brain {
 		return actions;
 	}
 	
-	public void runEpisode(Network agent, double explorationChance){
+	public double runEpisode(Network agent, double explorationChance){
 		agent.newEpisode();
 		agent.getActionNode().setExplorationChance(explorationChance);
 		
 		State state = selectRandomState(true);
 		int action = 0;
 		int nextAction = 0;
+		State prediction = null;
+		
+		int errors = 0;
+		int count = 0;
 		
 		do{
+			count++;
 			//Perform a and observe s'
 			State nextState = move(state, ACTIONS.values()[action]);
+			
+			if (prediction != null){
+				if (!prediction.equals(nextState)) errors++;
+			}
 			
 			//Get reward r
 			double reward = world.get(nextState.row, nextState.col);
 			
 			//Update q with state s, action a and reward r
 			loadNetwork(agent, nextState, nextAction);
-			agent.step(reward);
+			agent.step(reward);			
+			
+			prediction = getPrediction(agent);
 			
 			action = nextAction;
 			nextAction = getAction(agent);
@@ -137,6 +149,9 @@ public class BlockWorldTest_Brain {
 			visitCounter.set(state.id, ++visits);
 			
 		} while (!isTerminalState(state));
+		
+		double errorRate = (double) errors / count;
+		return errorRate;
 	}
 	
 	private int getAction(Network agent){
@@ -152,6 +167,18 @@ public class BlockWorldTest_Brain {
 		SimpleMatrix input = new SimpleMatrix(inputData);
 		inputSensor.setInput(input);
 		actionSensor.setInput(actionID);
+	}
+	
+	private State getPrediction(Network agent){
+		SimpleMatrix prediction = agent.getSensors().get(0).getFeedbackOutput();
+
+		int row = (int) Math.round(prediction.get(0));
+		int col = (int) Math.round(prediction.get(1));
+		
+		State s = new State(row, col, world);
+		
+		return s;
+		
 	}
 	
 	public void printPolicyMap(ActionDecider_Q agent){

@@ -28,12 +28,12 @@ public class BlockWorldTest_Brain {
 	public static void main(String[] args){
 		BlockWorldTest_Brain bwt = new BlockWorldTest_Brain();
 		bwt.setup(4);
-		bwt.run(1000);
+		bwt.run(2000);
 	}
 	
 	public void run(int numEpisodes){
 		for (int i = 1; i <= numEpisodes; i++){
-			//System.out.println("Start episode " + i );
+			System.out.println("Start episode " + i );
 			agent.newEpisode();
 			runEpisode(agent, 1 - (double) i / numEpisodes);
 		}
@@ -120,22 +120,25 @@ public class BlockWorldTest_Brain {
 		agent.getActionNode().setExplorationChance(explorationChance);
 		
 		State state = selectRandomState(true);
-		int actionID = 0;
-		double reward = 0;
+		int action = 0;
+		int nextAction = 0;
 		
-		int count = 0;
-		while(!isTerminalState(state)){			
-			loadNetwork(agent, state, actionID);
+		do{
+			//Perform a and observe s'
+			State nextState = move(state, ACTIONS.values()[action]);
+			
+			//Get reward r
+			double reward = world.get(nextState.row, nextState.col);
+			
+			//Update q with state s, action a and reward r
+			loadNetwork(agent, nextState, nextAction);
 			agent.step(reward);
-			State nextState = move(state, ACTIONS.values()[actionID]);
-			reward = world.get(nextState.row, nextState.col);
-			actionID = getAction(agent);
+			
+			action = nextAction;
+			nextAction = getAction(agent);
 			state = nextState;
-			double visits = visitCounter.get(state.id);
-			visits += 1;
-			visitCounter.set(state.id, visits);
-			count++;			
-		}
+			
+		} while (!isTerminalState(state));
 	}
 	
 	private int getAction(Network agent){

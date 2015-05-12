@@ -38,9 +38,6 @@ public class BlockWorldTest_Q {
 		System.out.println("Policy map:");
 		printPolicyMap(agent);
 		System.out.println();
-		
-		System.out.println("Reward map:");
-		world.print();
 	}
 	
 	public void setup(int worldSize){

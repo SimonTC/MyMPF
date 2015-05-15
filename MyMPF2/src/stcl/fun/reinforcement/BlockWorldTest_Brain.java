@@ -91,7 +91,13 @@ public class BlockWorldTest_Brain {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 1, 1, 4, true);
+		int spatialMap = worldSize;
+		int temporalMap = 0;
+		int markovOrder = 0;
+		int numPossibleActions = 4;
+		boolean usePrediction = false;
+		
+		node.initialize(rand, spatialMap, temporalMap, markovOrder, numPossibleActions, usePrediction);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);

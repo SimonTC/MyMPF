@@ -58,14 +58,15 @@ public class UnitNode extends Node {
 		this.id = id;
 	}
 	
+	
+	
 	/**
 	 * Initialization method used when all children has already been added.
 	 * @param rand
 	 * @param spatialMapSize int > 0 
-	 * @param temporalMapSize int >= 0 If 0 then now temporal pooling is used
-	 * @param initialPredictionLearningRate
+	 * @param temporalMapSize int >= 0 If 0 then no temporal pooling is used
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
-	 * @param numPossibleActions
+	 * @param numPossibleActions  int >= 0 If 0 then no actions will be decided on.
 	 */
 	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction){
 		int inputLength = feedforwardInputLength;

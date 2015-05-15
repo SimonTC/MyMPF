@@ -42,10 +42,9 @@ public class UnitNode extends Node {
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
-	 * @param initialPredictionLearningRate
-	 * @param useMarkovPrediction
 	 * @param markovOrder
-	 * @param noTemporal
+	 * @param numPossibleActions
+	 * @param usePrediction
 	 */
 	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction){
 		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction);
@@ -68,7 +67,7 @@ public class UnitNode extends Node {
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
 	 * @param numPossibleActions
 	 */
-	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions, boolean usePrediction){
+	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction){
 		int inputLength = feedforwardInputLength;
 		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction);
 	}

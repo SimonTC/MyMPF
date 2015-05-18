@@ -52,6 +52,7 @@ public class NeoCorticalUnit implements Serializable{
 	private int chosenAction;
 	private int markovOrder;
 	
+	private boolean useReactionaryDecider =true;
 	
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder) {
 		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, 1, true);
@@ -96,8 +97,11 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
-		decider = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
-		
+		if (useReactionaryDecider){
+			decider = new ActionDecider_Q_Reactionary(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+		} else {
+			decider = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+		}
 		needHelp = false;
 		entropyThreshold = 0;
 		entropyThresholdFrozen = false;

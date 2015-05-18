@@ -4,15 +4,14 @@ import java.io.Serializable;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
-
 import dk.itu.stcl.agents.QLearner;
 import dk.itu.stcl.agents.SARSALearner;
 
 public class ActionDecider_Q implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private QLearner learner;
-	private int stateBefore, actionBefore;
-	private boolean learning;
+	protected QLearner learner;
+	protected int stateBefore, actionBefore;
+	protected boolean learning;
 
 	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning) {
 		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
@@ -55,7 +54,7 @@ public class ActionDecider_Q implements Serializable {
 		return action;
 	}
 	
-	private double calculateInternaleward(double externalReward){
+	protected double calculateInternaleward(double externalReward){
 		
 		//externalRewardNow = externalReward;
 		/*
@@ -94,6 +93,17 @@ public class ActionDecider_Q implements Serializable {
 	
 	public void setLearning(boolean learning){
 		this.learning = learning;
+	}
+	
+	public SimpleMatrix getPolicyMap(){
+		SimpleMatrix qMatrix = learner.getQMatrix();
+		SimpleMatrix map = new SimpleMatrix(qMatrix.numRows(), 1);
+		
+		for (int state = 0; state < qMatrix.numRows(); state++){
+			double action = learner.selectBestAction(state);
+			map.set(state,action);
+		}
+		return map;
 	}
 
 }

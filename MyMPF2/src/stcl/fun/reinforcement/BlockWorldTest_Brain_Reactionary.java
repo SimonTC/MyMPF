@@ -91,7 +91,8 @@ public class BlockWorldTest_Brain_Reactionary {
 		actionSensor.setParent(actionNode);
 		
 		//Initialize nodes
-		node.initialize(rand, worldSize, 1, 0.1, 1, 4, true);
+		
+		node.initialize(rand, worldSize, 1, 1, 4, true);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);

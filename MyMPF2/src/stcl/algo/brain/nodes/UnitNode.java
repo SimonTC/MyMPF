@@ -32,7 +32,7 @@ public class UnitNode extends Node {
 		super(s);
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		this.initialize(rand, Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Double.parseDouble(arr[length-4]), Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
+		this.initialize(rand, Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
 	}
 	
 	
@@ -42,35 +42,35 @@ public class UnitNode extends Node {
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
-	 * @param initialPredictionLearningRate
-	 * @param useMarkovPrediction
 	 * @param markovOrder
-	 * @param noTemporal
+	 * @param numPossibleActions
+	 * @param usePrediction
 	 */
-	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions, boolean offlineLearning){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions, offlineLearning);
+	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction){
+		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
-		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize + " " + initialPredictionLearningRate + " " + markovOrder + " " + numPossibleActions + " " + offlineLearning;
+		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction;
 	}
 	
 	public void setID(int id){
 		this.id = id;
 	}
 	
+	
+	
 	/**
 	 * Initialization method used when all children has already been added.
 	 * @param rand
 	 * @param spatialMapSize int > 0 
-	 * @param temporalMapSize int >= 0 If 0 then now temporal pooling is used
-	 * @param initialPredictionLearningRate
+	 * @param temporalMapSize int >= 0 If 0 then no temporal pooling is used
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
-	 * @param numPossibleActions
+	 * @param numPossibleActions  int >= 0 If 0 then no actions will be decided on.
 	 */
-	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions, boolean offlineLearning){
+	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction){
 		int inputLength = feedforwardInputLength;
-		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, numPossibleActions, offlineLearning);
+		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction);
 	}
 
 	@Override

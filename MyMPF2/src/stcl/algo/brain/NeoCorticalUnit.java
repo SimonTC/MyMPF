@@ -43,20 +43,20 @@ public class NeoCorticalUnit implements Serializable{
 	private Random rand;
 
 	private boolean entropyThresholdFrozen;
-	private boolean biasBeforePredicting;
-	private boolean useBiasedInputInSequencer;
 	
 	private Sequencer sequencer;
 	private boolean noTemporal;
 	
 	private int chosenAction;
 	private int markovOrder;
-	
+
 	private boolean useReactionaryDecider =true;
-	
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder) {
-		this(rand, ffInputLength, spatialMapSize, temporalMapSize, initialPredictionLearningRate, markovOrder, 1, true);
-	}
+
+	/**
+	 * If true the FF output from the spatial pooler will be biased by the prediction done at t-1
+	 */
+	private boolean biasSpatialFFOutput; 
+
 
 	/**
 	 * 
@@ -69,47 +69,59 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param markovOrder
 	 * @param noTemporal
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, double initialPredictionLearningRate, int markovOrder, int numPossibleActions, boolean offlineLearning) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction) {
+		
+		//Test arguments
+		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
+		if (spatialMapSize < 1) throw new IllegalArgumentException("The spatial map size has to be greater than 0");
+		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
+		if (markovOrder < 1 && temporalMapSize > 0) throw new IllegalArgumentException("Markov order has to be greater than 0 when using the temporal pooler");
+		
+		
+		//Instantiate sub-components
+		spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
+		int spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
+		
+		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, true); //TODO: Move all parameters out
+		
+		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
+		
+		if (temporalMapSize > 0) sequencer = instantiateSequencer(markovOrder, temporalMapSize, spatialOutputLength);
+		
+		//Set flags
+		this.usePrediction = usePrediction;
+		noTemporal = (temporalMapSize < 1);
+		needHelp = false;
+		entropyThresholdFrozen = false;
+		biasSpatialFFOutput = false; //TODO: Make sure this can be changed
+		
+		//Set fields
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
-		//TODO: All parameters should be handled in parameter file
-		
 		this.rand = rand;
-		usePrediction = true;
-		if (temporalMapSize == 0) noTemporal = true;
-		if (markovOrder == 0) usePrediction = false;
-		
 		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
+		entropyThreshold = 0;
+		this.markovOrder = markovOrder;
+		chosenAction = -1;
 		
-		spatialPooler = new SpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
-		if (!noTemporal) {
-			sequencer = new Sequencer(markovOrder, temporalMapSize, spatialMapSize * spatialMapSize);
-			this.temporalMapSize = temporalMapSize;
-			if (usePrediction) predictor = new Predictor_VOMM(markovOrder, initialPredictionLearningRate, rand);
-		} 
+		//Initialize matrices
 		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		biasMatrix.set(1);
 		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
 		this.spatialMapSize = spatialMapSize;
+		
 		predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
-		
-		if (useReactionaryDecider){
-			decider = new ActionDecider_Q_Reactionary(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
-		} else {
-			decider = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
-		}
+
 		needHelp = false;
 		entropyThreshold = 0;
 		entropyThresholdFrozen = false;
-		biasBeforePredicting = false;
-		useBiasedInputInSequencer = false;
+
 		this.markovOrder = markovOrder;
-		
-		
+
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -129,14 +141,133 @@ public class NeoCorticalUnit implements Serializable{
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		
 		//Bias output
-		SimpleMatrix biasedOutput = biasMatrix(spatialFFOutputMatrix, biasMatrix);
-		//SimpleMatrix biasedOutput = biasTowardsPrediction(spatialFFOutputMatrix, biasMatrix, 0.5);
+		if (biasSpatialFFOutput) spatialFFOutputMatrix = biasMatrix(spatialFFOutputMatrix, biasMatrix);
 		
-		ffOutput = biasedOutput;
 		needHelp = true;
 		
-		SimpleMatrix inputToDecider = spatialFFOutputMatrix;//Orthogonalizer.orthogonalize(spatialFFOutputMatrix);
-		//inputToDecider = Normalizer.normalize(inputToDecider);
+		if (decider != null){
+			feedDecider(spatialFFOutputMatrix, actionPerformed, reward);
+		}
+		
+		if (predictor != null){
+			predictionMatrix = predictor.predict(spatialFFOutputMatrix);			
+			predictionEntropy = calculateEntropy(predictionMatrix);			
+			needHelp =  (predictionEntropy > entropyThreshold);
+			if (!entropyThresholdFrozen){
+				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+			}
+		}
+		
+		if (sequencer != null){
+			double[] spatialFFOutputDataVector;
+			spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;	
+			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
+			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
+			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
+		} else {
+			ffOutput = spatialFFOutputMatrix;
+		}
+		
+		return ffOutput;
+	}
+	
+	/**
+	 * 
+	 * @param inputMatrix
+	 * @param correlationMatrix
+	 * @return
+	 */
+	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
+		//Test input
+		if (inputMatrix.numCols() != ffOutputMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
+
+		fbInput = inputMatrix;
+		
+		if (needHelp){
+			//Normalize
+			SimpleMatrix normalizedInput = normalize(inputMatrix);
+			
+			if (sequencer != null){
+				//Selection of best temporal model
+				SimpleMatrix sequencerFBOutput = sequencer.feedBackward(normalizedInput);
+				
+				//Normalize
+				SimpleMatrix normalizedSequencerFBOutput = normalize(sequencerFBOutput);
+				
+				//Transformation into matrix
+				normalizedSequencerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
+				
+				//Combine FB output from temporal pooler with bias and prediction (if enabled)
+				biasMatrix = normalizedSequencerFBOutput;
+			} else {
+				biasMatrix = inputMatrix;
+			}
+			
+			if (predictor != null) {
+				biasMatrix = biasMatrix.elementMult(predictionMatrix);			
+				
+				biasMatrix = normalize(biasMatrix);			
+			}
+			
+		} else {
+			biasMatrix = predictionMatrix;
+		}
+		
+		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
+		
+		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
+		
+		if (decider != null) chosenAction = chooseAction(biasedTemporalFBOutput);
+		
+		//Selection of best spatial model
+		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
+		
+		fbOutput = spatialPoolerFBOutputVector;
+		
+		return fbOutput;
+	}
+	
+	private int chooseAction(SimpleMatrix state){
+		int maxProbableState = -1;
+		double maxProb = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < state.getNumElements(); i++){
+			double d = state.get(i);
+			if (d > maxProb){
+				maxProb = d;
+				maxProbableState = i;
+			}
+		}
+		int action = decider.feedBack(maxProbableState);
+		return action;
+	}
+	
+	private SpatialPooler instantiateSpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor){
+		SpatialPooler s = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
+		return s;
+	}
+	
+	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning){
+		ActionDecider_Q a;
+		if (useReactionaryDecider){
+			a = new ActionDecider_Q_Reactionary(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+		} else {
+			a = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+		}
+
+		return a;
+	}
+	
+	private Predictor_VOMM instantiatePredictor(int markovOrder, double learningRate, Random rand){
+		Predictor_VOMM p = new Predictor_VOMM(markovOrder, learningRate, rand);
+		return p;
+	}
+	
+	private Sequencer instantiateSequencer(int markovOrder, int temporalGroupMapSize, int inputLength){
+		Sequencer s = new Sequencer(markovOrder, temporalGroupMapSize, inputLength);
+		return s;
+	}
+	
+	private void feedDecider(SimpleMatrix inputToDecider, int actionPerformed, double reward){
 		int maxProbableState = -1;
 		double maxProb = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < inputToDecider.getNumElements(); i++){
@@ -147,122 +278,8 @@ public class NeoCorticalUnit implements Serializable{
 			}
 		}
 		decider.feedForward(maxProbableState, actionPerformed, reward);
-		
-		if (!noTemporal) {
-			//Predict next spatialFFOutputMatrix
-			if (usePrediction){
-				if (biasBeforePredicting) {
-					predictionMatrix = predictor.predict(biasedOutput);
-				} else {
-					predictionMatrix = predictor.predict(spatialFFOutputMatrix);
-				}
-			} 		
-			
-			predictionEntropy = calculateEntropy(predictionMatrix);
-			
-			needHelp =  (predictionEntropy > entropyThreshold);
-			if (!entropyThresholdFrozen){
-				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
-			}
-			
-			ffOutput = biasedOutput;
-		
-		
-			//Transform spatial output matrix to vector
-			double[] spatialFFOutputDataVector;
-			if (useBiasedInputInSequencer){
-				spatialFFOutputDataVector = biasedOutput.getMatrix().data;		
-			} else {
-				spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;	
-			}
-			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
-			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-			
-			//Orthogonalize input to temoral pooler
-			//temporalFFInputVector = Orthogonalizer.orthogonalize(temporalFFInputVector);
-			//temporalFFInputVector = Normalizer.normalize(temporalFFInputVector);
-			
-			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
-		} else {
-			//ffOutput = Orthogonalizer.aggressiveOrthogonalization(ffOutput);
-		}
-		neededHelpThisTurn = needHelp;
-		
-		//ffOutput = addNoise(ffOutput, 0.1);
-		//ffOutput = Normalizer.normalize(ffOutput);
-		
-		return ffOutput;
 	}
 	
-	
-	/**
-	 * 
-	 * @param inputMatrix
-	 * @param correlationMatrix
-	 * @return
-	 */
-	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
-		//Test input
-		//if (inputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a matrix");
-		if (inputMatrix.numCols() != ffOutputMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
-
-		fbInput = inputMatrix;
-		
-		if (needHelp){
-			//Normalize
-			SimpleMatrix normalizedInput = normalize(inputMatrix);
-			
-			if (!noTemporal){
-				//Selection of best temporal model
-				SimpleMatrix temporalPoolerFBOutput = sequencer.feedBackward(normalizedInput);
-				
-				//Normalize
-				SimpleMatrix normalizedTemporalPoolerFBOutput = normalize(temporalPoolerFBOutput);
-				
-				//Transformation into matrix
-				normalizedTemporalPoolerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
-				
-				//Combine FB output from temporal pooler with bias and prediction (if enabled)
-				biasMatrix = normalizedTemporalPoolerFBOutput;
-			} else {
-				biasMatrix = inputMatrix;
-			}
-			
-			//biasMatrix = biasMatrix.plus(1, predictionMatrix);
-			biasMatrix = biasMatrix.elementMult(predictionMatrix);
-			
-			
-			biasMatrix = normalize(biasMatrix);			
-			
-		} else {
-			biasMatrix = predictionMatrix;
-		}
-		
-		//biasMatrix = biasMatrix.plus(0.1 / biasMatrix.getNumElements()); //Add small uniform mass
-		
-		SimpleMatrix biasedTemporalFBOutput = biasMatrix;
-		
-		int maxProbableState = -1;
-		double maxProb = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < biasedTemporalFBOutput.getNumElements(); i++){
-			double d = biasedTemporalFBOutput.get(i);
-			if (d > maxProb){
-				maxProb = d;
-				maxProbableState = i;
-			}
-		}
-		chosenAction = decider.feedBack(maxProbableState);
-		
-		//Selection of best spatial mode
-		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
-		
-		fbOutput = spatialPoolerFBOutputVector;
-		
-		//fbOutput = addNoise(fbOutput, 0.1);
-		//fbOutput = Normalizer.normalize(fbOutput);
-		
-		return fbOutput;
-	}
 	
 	/**
 	 * Adds noise to the given matrix and returns the matrix.
@@ -425,21 +442,6 @@ public class NeoCorticalUnit implements Serializable{
 	 */
 	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
 		this.entropyThresholdFrozen = entropyThresholdFrozen;
-	}
-	
-	public void setBiasBeforePrediction(boolean flag){
-		biasBeforePredicting = flag;
-	}
-
-	public void setUseBiasedInputInSequencer(boolean useBiasedInputInSequencer) {
-		this.useBiasedInputInSequencer = useBiasedInputInSequencer;
-	}
-
-	/**
-	 * @return the temporalMapSize
-	 */
-	public int getTemporalMapSize() {
-		return temporalMapSize;
 	}
 	
 	public int getFeedForwardMapSize(){

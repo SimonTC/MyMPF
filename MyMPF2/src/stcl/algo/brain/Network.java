@@ -189,14 +189,6 @@ public class Network implements Serializable{
 		for (UnitNode n : unitNodes) n.getUnit().setEntropyThresholdFrozen(entropyThresholdFrozen);
 	}
 	
-	public void setBiasBeforePrediction(boolean biasBeforePrediction) {
-		for (UnitNode n : unitNodes) n.getUnit().setBiasBeforePrediction(biasBeforePrediction);
-	}
-	
-	public void setUseBiasedInputToSequencer(boolean flag) {
-		for (UnitNode n : unitNodes) n.getUnit().setUseBiasedInputInSequencer(flag);
-	}
-	
 	public void setUsePrediction(boolean flag) {
 		for (UnitNode n : unitNodes) n.getUnit().setUsePrediction(flag);
 	}

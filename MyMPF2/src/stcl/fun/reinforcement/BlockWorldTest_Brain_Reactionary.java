@@ -20,7 +20,7 @@ public class BlockWorldTest_Brain_Reactionary {
 	private final double HOLE_REWARD = -1;
 	private State goal;
 	private State hole;
-	private Random rand = new Random(1234);
+	private Random rand = new Random();
 	private Network agent;
 	private SimpleMatrix visitCounter;
 	
@@ -47,7 +47,7 @@ public class BlockWorldTest_Brain_Reactionary {
 		System.out.println();
 		
 		System.out.println("Policy map:");
-		printPolicyMap(decider);
+		printPolicyMap(agent);
 		System.out.println();
 		
 		System.out.println("Model:");
@@ -92,7 +92,7 @@ public class BlockWorldTest_Brain_Reactionary {
 		
 		//Initialize nodes
 		
-		node.initialize(rand, worldSize, 1, 1, 4, true);
+		node.initialize(rand, worldSize, 1, 1, 4, false);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);
@@ -176,26 +176,28 @@ public class BlockWorldTest_Brain_Reactionary {
 		
 	}
 	
-	public void printPolicyMap(ActionDecider_Q agent){
-		SimpleMatrix policyMap = agent.getPolicyMap();
-		
+	public void printPolicyMap(Network agent){
+		agent.setLearning(false);
+		agent.getActionNode().setExplorationChance(0);
+				
 		for (int row = 0; row < world.numRows(); row++){
 			for (int col = 0; col < world.numCols(); col++){
+				agent.newEpisode(); //Make sure old state action pairs doesn't have an influence
 				State s = new State(row, col, world);
 				if (s.equals(goal)){
 					System.out.print("*  ");
 				} else if (s.equals(hole)){
 					System.out.print("/  ");
 				} else {
-					double action = policyMap.get(s.getID());
-					int actionToPrint = (int) Math.round(action);
-					System.out.print(ACTIONS.values()[actionToPrint].name() + "  ");
+					loadNetwork(agent, s, -1);
+					agent.step(0);	
+					int action = getAction(agent);
+					System.out.print(ACTIONS.values()[action].name() + "  ");
 				}
 			}
 			System.out.println();
 		}
 	}
-
 	private State move(State state, ACTIONS action){
 		int rowChange = 0, colChange = 0;
 		switch(action){

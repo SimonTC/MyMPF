@@ -47,7 +47,7 @@ public class BlockWorldTest_Brain {
 		System.out.println();
 		
 		System.out.println("Policy map:");
-		printPolicyMap(decider);
+		printPolicyMap(agent);
 		System.out.println();
 		
 		System.out.println("Model:");
@@ -187,17 +187,23 @@ public class BlockWorldTest_Brain {
 		
 	}
 	
-	public void printPolicyMap(ActionDecider_Q agent){
+	public void printPolicyMap(Network agent){
+		agent.setLearning(false);
+		agent.getActionNode().setExplorationChance(0);
+				
 		for (int row = 0; row < world.numRows(); row++){
 			for (int col = 0; col < world.numCols(); col++){
+				agent.newEpisode(); //Make sure old state action pairs doesn't have an influence
 				State s = new State(row, col, world);
 				if (s.equals(goal)){
 					System.out.print("*  ");
 				} else if (s.equals(hole)){
 					System.out.print("/  ");
 				} else {
-					int bestAction = agent.feedBack(s.id);
-					System.out.print(ACTIONS.values()[bestAction].name() + "  ");
+					loadNetwork(agent, s, -1);
+					agent.step(0);	
+					int action = getAction(agent);
+					System.out.print(ACTIONS.values()[action].name() + "  ");
 				}
 			}
 			System.out.println();

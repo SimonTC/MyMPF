@@ -249,9 +249,9 @@ public class NeoCorticalUnit implements Serializable{
 	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning){
 		ActionDecider_Q a;
 		if (useReactionaryDecider){
-			a = new ActionDecider_Q_Reactionary(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);//TODO: Change parameters. Especially decay
 		} else {
-			a = new ActionDecider_Q(numPossibleActions, spatialMapSize * spatialMapSize, 0.9, rand, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);//TODO: Change parameters. Especially decay
 		}
 
 		return a;
@@ -362,7 +362,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public void setLearning(boolean learning){
 		spatialPooler.setLearning(learning);
-		decider.setLearning(learning);
+		if (decider != null) decider.setLearning(learning);
 		if (predictor != null) predictor.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
 	}

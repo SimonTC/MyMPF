@@ -113,7 +113,6 @@ public class BlockWorldTest_Brain_Reactionary {
 	}
 	
 	public int runEpisode(Network agent, double explorationChance){
-		agent.newEpisode();
 		agent.getActionNode().setExplorationChance(explorationChance);
 		
 		State state = selectRandomState(true);

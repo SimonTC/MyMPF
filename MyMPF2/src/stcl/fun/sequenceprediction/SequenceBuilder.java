@@ -8,7 +8,7 @@ public class SequenceBuilder {
 	private Stack<SequenceLevel> levels;
 	private Random rand;
 	private int[] finalSequence;
-	
+	private SequenceLevel topLevel;
 	/**
 	 * Creates blocks of length minBlockLength >= length <= maxBlockLength
 	 * @param rand
@@ -56,9 +56,13 @@ public class SequenceBuilder {
 			levels.push(lastLevel);
 		}
 		
-		SequenceLevel topLevel = new SequenceLevel(1, 1, 1, lastLevel, rand);
+		topLevel = new SequenceLevel(1, 1, 1, lastLevel, rand);
 		levels.push(topLevel);
 		return levels;
+	}
+	
+	public SequenceLevel getTopLevel(){
+		return topLevel;
 	}
 	
 	

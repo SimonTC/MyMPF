@@ -7,13 +7,25 @@ import java.util.Random;
 public class SequenceLevel{
 	private int[][] blocks;
 	private SequenceLevel child;
-	private Random rand;
 	
 	public SequenceLevel(int alphabetSize, int minBlockLength, int maxBlockLength, SequenceLevel child, Random rand) {
-		this.rand = rand;
 		this.child = child;
-		blocks = createLevelBlocks(alphabetSize, minBlockLength, maxBlockLength);
-		
+		blocks = createLevelBlocks(alphabetSize, minBlockLength, maxBlockLength, rand);		
+	}
+	
+	/**
+	 * Createsa deep copy of the given level
+	 * @param original
+	 */
+	public SequenceLevel(SequenceLevel original){
+		int[][] originalBlocks = original.getBlocks();
+		blocks = copyLevelBlocks(originalBlocks);
+		SequenceLevel originalChild = original.getChild();
+		if (originalChild == null){
+			this.child = originalChild;
+		} else {
+			this.child = new SequenceLevel(original.getChild());
+		}
 	}
 	
 	public int[] unpackBlock(int blockID){
@@ -41,7 +53,7 @@ public class SequenceLevel{
 	}
 	
 	
-	public int[][] createLevelBlocks(int alphabetSize, int minBlockLength, int maxBlockLength){
+	private int[][] createLevelBlocks(int alphabetSize, int minBlockLength, int maxBlockLength, Random rand){
 		int numBlocks = alphabetSize;
 		int[][] blocks = new int[numBlocks][];
 		
@@ -50,6 +62,22 @@ public class SequenceLevel{
 			int[] block = new int[blockLength];
 			for (int i = 0; i < blockLength; i++){
 				block[i] = rand.nextInt(alphabetSize);
+			}
+			blocks[blockID] = block;
+		}
+		
+		return blocks;		
+	}
+	
+	private int[][] copyLevelBlocks(int[][] originalBlocks){
+		int numBlocks = originalBlocks.length;
+		int[][] blocks = new int[numBlocks][];
+		
+		for (int blockID = 0; blockID < numBlocks; blockID++){
+			int blockLength = originalBlocks[blockID].length;
+			int[] block = new int[blockLength];
+			for (int i = 0; i < blockLength; i++){
+				block[i] = originalBlocks[blockID][i];
 			}
 			blocks[blockID] = block;
 		}

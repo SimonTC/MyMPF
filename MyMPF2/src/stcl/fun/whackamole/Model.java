@@ -9,7 +9,7 @@ import stcl.fun.sequenceprediction.SequenceBuilder;
 import stcl.fun.sequenceprediction.SequenceLevel;
 
 public class Model {
-	private int[] moleSequence, holySequence;
+	private int[] moleSequence, moleTypeSequence;
 	private SequenceBuilder builder;
 	private int currentStep;
 	private int runningScore, maxPossibleScore;
@@ -25,7 +25,7 @@ public class Model {
 		int score = 0;
 		if (!gameOver){
 			int correctField = moleSequence[currentStep];
-			boolean shouldHit = holySequence[currentStep] == 0; //If it is not a holy mole, you should hit it
+			boolean shouldHit = moleTypeSequence[currentStep] == 0; //If it is not a holy mole, you should hit it
 			if (shouldHit) maxPossibleScore++;
 			
 			if (activeField != correctField) {
@@ -40,6 +40,14 @@ public class Model {
 		}
 		gameOver = (currentStep >= moleSequence.length);
 		return score;
+	}
+	
+	public int nextState(){
+		if (!gameOver){
+			return moleSequence[currentStep];
+		} else {
+			return -1;
+		}
 	}
 	
 	public boolean isGameOver(){
@@ -63,7 +71,7 @@ public class Model {
 	
 	public void initialize(int worldSize, int numLevels, int minBlockLength, int maxBlockLength, double holyChance, Random rand){
 		moleSequence = buildMoleSequence(rand, (int)Math.pow(worldSize, 2), numLevels, minBlockLength, maxBlockLength);
-		holySequence = buildHolySequence(builder, holyChance, rand);
+		moleTypeSequence = buildMoleTypeSequence(builder, holyChance, rand);
 	}
 	
 	private int[] buildMoleSequence(Random rand, int alphabetSize, int numLevels, int minBlockLength, int maxBlockLength){
@@ -72,9 +80,9 @@ public class Model {
 		return moleSequence;
 	}
 	
-	private int[] buildHolySequence(SequenceBuilder builder, double holyChance, Random rand){
-		SequenceLevel holyTop = new SequenceLevel(builder.getTopLevel());
-		SequenceLevel parent = holyTop.getChild();
+	private int[] buildMoleTypeSequence(SequenceBuilder builder, double holyChance, Random rand){
+		SequenceLevel top = new SequenceLevel(builder.getTopLevel());
+		SequenceLevel parent = top.getChild();
 		SequenceLevel child = parent.getChild();
 		
 		do{
@@ -82,19 +90,19 @@ public class Model {
 			child = parent.getChild();			
 		} while (child != null);
 		
-		int[][] holyBlocks = parent.getBlocks();
-		int numBlocks = holyBlocks.length;
+		int[][] moleTypeBlocks = parent.getBlocks();
+		int numBlocks = moleTypeBlocks.length;
 		
 		for (int blockID = 0; blockID < numBlocks; blockID++){
-			int blockLength = holyBlocks[blockID].length;
+			int blockLength = moleTypeBlocks[blockID].length;
 			int[] block = new int[blockLength];
 			for (int i = 0; i < blockLength; i++){
 				block[i] = (rand.nextDouble() < holyChance)? 1 : 0;				
 			}
-			holyBlocks[blockID] = block;
+			moleTypeBlocks[blockID] = block;
 		}
 		
-		int[] holySequence = holyTop.unpackBlock(0);
-		return holySequence;
+		int[] moleTypeSequence = top.unpackBlock(0);
+		return moleTypeSequence;
 	}
 }

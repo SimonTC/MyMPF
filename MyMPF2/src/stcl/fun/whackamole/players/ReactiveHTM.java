@@ -3,6 +3,8 @@ package stcl.fun.whackamole.players;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Network_DataCollector;
@@ -14,28 +16,48 @@ import stcl.fun.whackamole.Model;
 public class ReactiveHTM extends Player {
 	
 	private Network_DataCollector brain;
-	private SimpleMatrix currentState;
+	private SimpleMatrix currentState, predictedState;
+	private int actionPerformedBefore;
+	private int score;
 	
 	public ReactiveHTM(int numStates, Random rand){
 		brain = setupNetwork(numStates, rand);
 	}
 
 	@Override
-	public int[] action() {
+	public void step() {
 		brain.getSensors().get(0).setInput(currentState);
+		brain.getSensors().get(1).setInput(actionPerformedBefore);
+		brain.step(score);
+		SimpleMatrix actionOutput = brain.getSensors().get(1).getFeedbackOutput();
+		actionPerformedBefore = (int) Math.round(actionOutput.get(0));
+		predictedState = brain.getSensors().get(0).getFeedbackOutput();
 		
+	}
+	
+	private int getMaxID(SimpleMatrix m){
+		int maxID = -1;
+		double maxValue = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < m.getNumElements(); i++){
+			double d = m.get(i);
+			if (d > maxValue){
+				maxValue = d;
+				maxID = i;
+			}
+		}
+		return maxID;
 	}
 
 	@Override
 	public void giveScore(int score) {
-		
+		this.score = score;
 
 	}
 
 	@Override
 	public void giveInfo(Model model) {
-		// TODO Auto-generated method stub
-
+		currentState = new SimpleMatrix(model.nextState());
+		currentState.reshape(1, currentState.getNumElements());
 	}
 	
 	private Network_DataCollector setupNetwork(int inputLenght, Random rand){
@@ -70,7 +92,7 @@ public class ReactiveHTM extends Player {
 		brain.addNode(inputSensor);
 		brain.addNode(actionSensor);		
 		
-		actionNode.setPossibleActions(createPossibleActions());
+		//actionNode.setPossibleActions(createPossibleActions());
 		
 		return brain;
 	}
@@ -83,6 +105,27 @@ public class ReactiveHTM extends Player {
 			actions.add(m);
 		}
 		return actions;
+	}
+
+	@Override
+	public int getAction() {
+		return actionPerformedBefore;
+	}
+
+	@Override
+	public SimpleMatrix getPrediction() {
+		return predictedState;
+	}
+
+	@Override
+	public void endRound() {
+		brain.newEpisode();
+		
+	}
+
+	@Override
+	public Network_DataCollector getBrain() {
+		return brain;
 	}
 	
 	

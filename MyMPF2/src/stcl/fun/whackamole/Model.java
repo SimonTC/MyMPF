@@ -10,10 +10,13 @@ import stcl.fun.sequenceprediction.SequenceLevel;
 
 public class Model {
 	private int[] moleSequence, moleTypeSequence;
+	private SimpleMatrix[] possibleInputs;
 	private SequenceBuilder builder;
 	private int currentStep;
 	private int runningScore, maxPossibleScore;
 	private boolean gameOver;
+	private int correctField;
+	private int correctAction;
 	
 	/**
 	 * 
@@ -24,17 +27,12 @@ public class Model {
 	public int step(int activeField, boolean hit){
 		int score = 0;
 		if (!gameOver){
-			int correctField = moleSequence[currentStep];
-			boolean shouldHit = moleTypeSequence[currentStep] == 0; //If it is not a holy mole, you should hit it
+			correctField = moleSequence[currentStep];
+			correctAction = moleTypeSequence[currentStep];
+			boolean shouldHit = correctAction == 0; //If it is not a holy mole, you should hit it
 			if (shouldHit) maxPossibleScore++;
-			
-			if (activeField != correctField) {
-				score = 0;
-			} else if (shouldHit == hit){
-				score = 1;
-			} else {
-				score = -1;	
-			}
+						
+			score = calculateScore(activeField, hit, shouldHit);
 			runningScore += score;
 			currentStep++;
 		}
@@ -42,12 +40,38 @@ public class Model {
 		return score;
 	}
 	
-	public int nextState(){
+	private int calculateScore(int activeField, boolean hit, boolean shouldHit){
+		if (activeField != correctField) return 0;
+		if (hit && shouldHit) return 1;
+		if (hit && !shouldHit) return -1;
+		return 0;
+		
+		
+	}
+	
+	public SimpleMatrix nextState(){
 		if (!gameOver){
-			return moleSequence[currentStep];
+			int inputID = moleSequence[currentStep];
+			return possibleInputs[inputID];
 		} else {
-			return -1;
+			return null;
 		}
+	}
+	
+	public int nextStateID(){
+		return moleSequence[currentStep];
+	}
+	
+	public SimpleMatrix lastState(){
+		return possibleInputs[correctField];
+	}
+	
+	public int lastCorrectAction(){
+		return correctAction;
+	}
+	
+	public int nextCorrectAction(){
+		return moleTypeSequence[currentStep];
 	}
 	
 	public boolean isGameOver(){
@@ -71,7 +95,19 @@ public class Model {
 	
 	public void initialize(int worldSize, int numLevels, int minBlockLength, int maxBlockLength, double holyChance, Random rand){
 		moleSequence = buildMoleSequence(rand, (int)Math.pow(worldSize, 2), numLevels, minBlockLength, maxBlockLength);
+		possibleInputs = createPossibleInputs(worldSize);
 		moleTypeSequence = buildMoleTypeSequence(builder, holyChance, rand);
+	}
+	
+	private SimpleMatrix[] createPossibleInputs(int mapSize){
+		SimpleMatrix[] inputs = new SimpleMatrix[(int)Math.pow(mapSize, 2)];
+		for (int i = 0; i < inputs.length; i++){
+			SimpleMatrix m = new SimpleMatrix(mapSize, mapSize);
+			m.set(i,1);
+			inputs[i] = m;
+		}
+		
+		return inputs;
 	}
 	
 	private int[] buildMoleSequence(Random rand, int alphabetSize, int numLevels, int minBlockLength, int maxBlockLength){

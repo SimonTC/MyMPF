@@ -41,10 +41,12 @@ public class Model {
 	}
 	
 	private int calculateScore(int activeField, boolean hit, boolean shouldHit){
-		if (activeField != correctField) return 0;
-		if (hit && shouldHit) return 1;
+		if (activeField != correctField) return -1;
 		if (hit && !shouldHit) return -1;
-		return 0;
+		if (!hit && shouldHit) return -1;
+		if (hit && shouldHit) return 1;
+		
+		return 0; //Should never end here
 		
 		
 	}

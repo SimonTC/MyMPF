@@ -35,7 +35,7 @@ public class Controller {
 	public void setup(){
 		model = new Model();
 		int worldSize = 2;
-		model.initialize(worldSize, 3, 2, 5, 0, rand);
+		model.initialize(worldSize, 3, 2, 5, 0.1, rand);
 		player = new ReactiveHTM((int) Math.pow(worldSize, 2), rand);
 		player.getBrain().getActionNode().setExplorationChance(0);
 	}

@@ -50,8 +50,6 @@ public class NeoCorticalUnit implements Serializable{
 	private int chosenAction;
 	private int markovOrder;
 
-	private boolean useReactionaryDecider =true;
-
 	/**
 	 * If true the FF output from the spatial pooler will be biased by the prediction done at t-1
 	 */
@@ -64,12 +62,12 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
-	 * @param initialPredictionLearningRate
-	 * @param useMarkovPrediction
 	 * @param markovOrder
-	 * @param noTemporal
+	 * @param numPossibleActions
+	 * @param usePrediction
+	 * @param reactionary
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary) {
 		
 		//Test arguments
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
@@ -82,7 +80,7 @@ public class NeoCorticalUnit implements Serializable{
 		spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		int spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
 		
-		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, true); //TODO: Move all parameters out
+		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, true, reactionary); //TODO: Move all parameters out
 		
 		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
 		
@@ -246,7 +244,7 @@ public class NeoCorticalUnit implements Serializable{
 		return s;
 	}
 	
-	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning){
+	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning, boolean useReactionaryDecider){
 		ActionDecider_Q a;
 		if (useReactionaryDecider){
 			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);//TODO: Change parameters. Especially decay

@@ -97,7 +97,7 @@ public class BlockWorldTest_Brain {
 		int numPossibleActions = 4;
 		boolean usePrediction = false;
 		
-		node.initialize(rand, spatialMap, temporalMap, markovOrder, numPossibleActions, usePrediction);
+		node.initialize(rand, spatialMap, temporalMap, markovOrder, numPossibleActions, usePrediction, false);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);

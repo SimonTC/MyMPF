@@ -84,7 +84,7 @@ public class ReactiveHTM extends Player {
 		
 		//Initialize nodes
 		
-		node.initialize(rand, (int) Math.sqrt(inputLenght), 1, 1, 4, false);
+		node.initialize(rand, (int) Math.sqrt(inputLenght), 1, 1, 4, false, true);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		brain.addNode(actionNode);

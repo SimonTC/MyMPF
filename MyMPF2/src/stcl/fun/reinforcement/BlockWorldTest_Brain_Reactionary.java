@@ -92,7 +92,7 @@ public class BlockWorldTest_Brain_Reactionary {
 		
 		//Initialize nodes
 		
-		node.initialize(rand, worldSize, 1, 1, 4, false);
+		node.initialize(rand, worldSize, 1, 1, 4, false, true);
 		actionNode.initialize(rand, 1, 2, 0.1, 1);
 		
 		agent.addNode(actionNode);

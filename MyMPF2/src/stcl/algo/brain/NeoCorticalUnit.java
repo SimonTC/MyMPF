@@ -56,7 +56,10 @@ public class NeoCorticalUnit implements Serializable{
 	private boolean biasSpatialFFOutput; 
 	
 	private boolean offlineLearning = false;
-
+	
+	private boolean useBiasedInputInPredictor;
+	private boolean useBiasedInputInSequencer;
+	private boolean useBiasedInputInDecider;
 
 	/**
 	 * 
@@ -94,6 +97,8 @@ public class NeoCorticalUnit implements Serializable{
 		needHelp = false;
 		entropyThresholdFrozen = false;
 		biasSpatialFFOutput = false; //TODO: Make sure this can be changed
+		useBiasedInputInPredictor = false;
+		useBiasedInputInSequencer = false;
 		
 		//Set fields
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
@@ -133,18 +138,18 @@ public class NeoCorticalUnit implements Serializable{
 		
 		//Spatial classification
 		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
-		
-		//Bias output
-		if (biasSpatialFFOutput) spatialFFOutputMatrix = biasMatrix(spatialFFOutputMatrix, biasMatrix);
+		SimpleMatrix biasedSpatialFFOutputMatrix = biasMatrix(spatialFFOutputMatrix, biasMatrix);
 		
 		needHelp = true;
 		
 		if (decider != null){
-			feedDecider(spatialFFOutputMatrix, actionPerformed, reward);
+			SimpleMatrix inputToDecider = useBiasedInputInDecider ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
+			feedDecider(inputToDecider, actionPerformed, reward);
 		}
 		
 		if (predictor != null){
-			predictionMatrix = predictor.predict(spatialFFOutputMatrix);			
+			SimpleMatrix inputToPredictor = useBiasedInputInPredictor ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
+			predictionMatrix = predictor.predict(inputToPredictor);			
 			predictionEntropy = calculateEntropy(predictionMatrix);			
 			needHelp =  (predictionEntropy > entropyThreshold);
 			if (!entropyThresholdFrozen){
@@ -153,13 +158,14 @@ public class NeoCorticalUnit implements Serializable{
 		}
 		
 		if (sequencer != null){
+			SimpleMatrix inputToSequencer = useBiasedInputInSequencer ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 			double[] spatialFFOutputDataVector;
-			spatialFFOutputDataVector = spatialFFOutputMatrix.getMatrix().data;	
+			spatialFFOutputDataVector = inputToSequencer.getMatrix().data;	
 			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
 			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
 		} else {
-			ffOutput = spatialFFOutputMatrix;
+			ffOutput = biasSpatialFFOutput ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 		}
 		
 		return ffOutput;
@@ -312,7 +318,8 @@ public class NeoCorticalUnit implements Serializable{
  	}
 	
 	/**
-	 * Bias the matrixToBias by element multiplying it with the biasMatrix
+	 * Bias the matrixToBias by element multiplying it with the biasMatrix.
+	 * No changes are made to the original matrix.
 	 * @param matrixToBias
 	 * @param biasMatrix
 	 * @return

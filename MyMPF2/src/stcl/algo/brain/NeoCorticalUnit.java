@@ -114,12 +114,6 @@ public class NeoCorticalUnit implements Serializable{
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 
-		needHelp = false;
-		entropyThreshold = 0;
-		entropyThresholdFrozen = false;
-
-		this.markovOrder = markovOrder;
-
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){

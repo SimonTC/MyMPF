@@ -148,12 +148,14 @@ public class NeoCorticalUnit implements Serializable{
 		}
 		
 		if (predictor != null){
-			SimpleMatrix inputToPredictor = useBiasedInputInPredictor ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
-			predictionMatrix = predictor.predict(inputToPredictor);			
-			predictionEntropy = calculateEntropy(predictionMatrix);			
-			needHelp =  (predictionEntropy > entropyThreshold);
-			if (!entropyThresholdFrozen){
-				entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+			if (usePrediction){
+				SimpleMatrix inputToPredictor = useBiasedInputInPredictor ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
+				predictionMatrix = predictor.predict(inputToPredictor);			
+				predictionEntropy = calculateEntropy(predictionMatrix);			
+				needHelp =  (predictionEntropy > entropyThreshold);
+				if (!entropyThresholdFrozen){
+					entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
+				}
 			}
 		}
 		

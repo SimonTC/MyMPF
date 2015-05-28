@@ -32,7 +32,7 @@ public class UnitNode extends Node {
 		super(s);
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		this.initialize(rand, Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Integer.parseInt(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
+		this.initialize(rand, Integer.parseInt(arr[length-8]), Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Boolean.parseBoolean(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
 	}
 	
 	
@@ -46,12 +46,12 @@ public class UnitNode extends Node {
 	 * @param numPossibleActions
 	 * @param usePrediction
 	 */
-	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary);
+	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
+		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
-		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary;
+		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
 	}
 	
 	public void setID(int id){
@@ -68,9 +68,9 @@ public class UnitNode extends Node {
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
 	 * @param numPossibleActions  int >= 0 If 0 then no actions will be decided on.
 	 */
-	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary){
+	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		int inputLength = feedforwardInputLength;
-		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary);
+		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 	}
 
 	@Override

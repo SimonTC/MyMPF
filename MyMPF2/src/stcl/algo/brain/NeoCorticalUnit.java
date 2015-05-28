@@ -55,8 +55,6 @@ public class NeoCorticalUnit implements Serializable{
 	 */
 	private boolean biasSpatialFFOutput; 
 	
-	private boolean offlineLearning = false;
-	
 	private boolean useBiasedInputInPredictor;
 	private boolean useBiasedInputInSequencer;
 	private boolean useBiasedInputInDecider;
@@ -71,8 +69,9 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param numPossibleActions
 	 * @param usePrediction
 	 * @param reactionary
+	 * @param offlineLearning
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary) {
+	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning) {
 		
 		//Test arguments
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");

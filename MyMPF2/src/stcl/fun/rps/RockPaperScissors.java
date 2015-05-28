@@ -15,7 +15,7 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
@@ -146,7 +146,6 @@ public class RockPaperScissors {
 			int spatialMapSize_input = 3;
 			int temporalMapSize_input = 3;
 			int markovOrder_input = 2;
-			boolean useTemporalPooler_input = true;
 			inputPooler.initialize(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input,  markovOrder_input, numActions, true, false);
 		
 			//Combiner
@@ -155,7 +154,6 @@ public class RockPaperScissors {
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
 			int markovOrder_combiner = 3;
-			boolean useTemporalPooler_combiner = true;
 			combiner.initialize(rand, ffInputLength_combiner, spatialMapSize_combiner, temporalMapSize_combiner,  markovOrder_combiner,  numActions, true, false);
 		/*
 			//top node

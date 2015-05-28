@@ -54,6 +54,8 @@ public class NeoCorticalUnit implements Serializable{
 	 * If true the FF output from the spatial pooler will be biased by the prediction done at t-1
 	 */
 	private boolean biasSpatialFFOutput; 
+	
+	private boolean offlineLearning = false;
 
 
 	/**
@@ -80,7 +82,7 @@ public class NeoCorticalUnit implements Serializable{
 		spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 		int spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
 		
-		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, true, reactionary); //TODO: Move all parameters out
+		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, offlineLearning, reactionary); //TODO: Move all parameters out
 		
 		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
 		

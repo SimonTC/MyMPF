@@ -74,12 +74,14 @@ public class RockPaperScissors {
 			//Show
 			brain.setUsePrediction(false);
 			runLearning(learningIterations);
+			brain.newEpisode();
 			
 			//Train
 			brain.flush();
 			brain.setUsePrediction(true);
 			actionNode.setExplorationChance(0.05);
 			runExperiment(trainingIterations, false);
+			brain.newEpisode();
 			
 			//Evaluate
 			brain.flush();

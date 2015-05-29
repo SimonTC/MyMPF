@@ -1,5 +1,6 @@
 package stcl.fun.rps;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,10 +16,11 @@ import stcl.algo.poolers.Sequencer;
 
 public class RockPaperScissors {
 
-	private Random rand = new Random();
+	private Random rand = new Random(1234);
 	private Network_DataCollector brain;
 	private SimpleMatrix rock, paper, scissors, blank;
 	private SimpleMatrix[] sequence;
+	private SimpleMatrix[] possibleInputs;
 	private int[] labelSequence;
 	private SimpleMatrix rewardMatrix;
 	private int[] lblCounter;
@@ -34,7 +36,8 @@ public class RockPaperScissors {
 		RockPaperScissors runner = new RockPaperScissors();
 		String folder = "D:/Users/Simon/Documents/Experiments/RPS/Network";
 		//runner.run(folder);
-		runner.runMultipleExperiments(100);
+		//runner.runMultipleExperiments(100);
+		runner.runMultipleExperiments(100, folder, false);
 	}
 	
 	public RockPaperScissors() {
@@ -63,13 +66,21 @@ public class RockPaperScissors {
 		
 	}
 	
-	private void runMultipleExperiments(int numExperiments){
+	private void runMultipleExperiments(int numExperiments, String dataFolder, boolean collectData){
 		
 		double[] totalResults = new double[2];
 		
 		for (int exp = 1; exp <= numExperiments; exp++){
 			System.out.println("Starting experiment " + exp);
-			setup("", false);
+			String folder = "";
+			if (collectData){
+				folder = dataFolder + "/Exp_" + exp;
+				File f = new File(folder);
+				f.mkdirs();
+			}
+			setup(folder, collectData);
+			
+			//if (collectData) brain.openFiles(true);
 			
 			//Show
 			brain.setUsePrediction(false);
@@ -94,6 +105,8 @@ public class RockPaperScissors {
 			System.out.println("Avg prediction error: " + results[0]);
 			System.out.println("Avg score: " + results[1]);
 			System.out.println();
+			
+			if (collectData) brain.closeFiles();
 		}
 		
 		double avgPredictionError = totalResults[0] / (double) numExperiments;
@@ -215,7 +228,7 @@ public class RockPaperScissors {
 			
 			//Get input and corresponding action	
 			int inputID = example[0];
-			SimpleMatrix input = new SimpleMatrix(sequence[inputID]);
+			SimpleMatrix input = new SimpleMatrix(possibleInputs[inputID]);
 			int actionID = example[1];
 			actionNow.set(0);
 			actionNow.set(actionID, 1);
@@ -463,12 +476,14 @@ public class RockPaperScissors {
 		*/
 		
 		SimpleMatrix[] tmp = {rock, paper, paper, scissors, paper, paper, scissors, rock};
+		SimpleMatrix[] tmp2 = {rock, paper, scissors};
 		int[] lbl = {0,1,1,2,1,1,2,0};
 		int[] lbl_counter = {1,2,2,0,2,2,0,1};
 		
 		lblCounter = lbl_counter;
 		labelSequence = lbl;
-		sequence = tmp;			
+		sequence = tmp;		
+		possibleInputs = tmp2;
 	}
 	
 	private void createRewardMatrix(){

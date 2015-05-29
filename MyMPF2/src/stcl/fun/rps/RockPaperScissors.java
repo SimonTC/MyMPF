@@ -269,9 +269,11 @@ public class RockPaperScissors {
 			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
 			
 			//Calculate prediction error
-			SimpleMatrix diff = input.minus(prediction);
-			double predictionError = diff.normF();	
-			totalPredictionError += predictionError;
+			if (i > 0){ //Don't check for error on the first. It will always be wrong
+				SimpleMatrix diff = input.minus(prediction);
+				double predictionError = diff.normF();	
+				if (predictionError > 0.1) totalPredictionError += 1; //TODO: Maybe change threshold of error
+			}
 			
 			SimpleMatrix actionThisTimestep = actionNextTimeStep;
 			double rewardForBeingInCurrentState = externalReward;

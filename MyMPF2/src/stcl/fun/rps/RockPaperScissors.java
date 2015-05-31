@@ -253,6 +253,7 @@ public class RockPaperScissors {
 		double externalReward = 0;
 		
 		double[][] tmp = {{1,0,0}};
+		SimpleMatrix input = new SimpleMatrix(blank);
 		SimpleMatrix actionNextTimeStep = new SimpleMatrix(tmp); //m(t)
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
@@ -262,10 +263,9 @@ public class RockPaperScissors {
 		double totalGameScore = 0;
 		
 		for (int i = 0; i < maxIterations; i++){
-			//if (i % 500 == 0) System.out.println("Iteration: " + i);
 			
 			//Get input			
-			SimpleMatrix input = new SimpleMatrix(sequence[curInput]);
+			input = new SimpleMatrix(sequence[curInput]);
 			
 			//Calculate prediction error
 			if (i > 0){ //Don't check for error on the first. It will always be wrong
@@ -294,20 +294,15 @@ public class RockPaperScissors {
 			
 			totalGameScore += externalReward;			
 			
-			//Give inputs to brain
-			SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-			inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 12));
-			inputSensor2.setInput(inputVector.extractMatrix(0, 1, 12, 25));
-			actionSensor.setInput(actionThisTimestep);
 			
-			//Do one step
-			brain.step(rewardForBeingInCurrentState);
+			//Give input and step
+			step(input, actionThisTimestep, rewardForBeingInCurrentState);
+			
 			
 			//Collect output
 			SimpleMatrix tmp1 = inputSensor1.getFeedbackOutput();
 			SimpleMatrix tmp2 = inputSensor2.getFeedbackOutput();
 			prediction = tmp1.combine(0, 12, tmp2);
-			//prediction = new SimpleMatrix(inputSensor.getFeedbackOutput());
 			prediction.reshape(5, 5);
 			
 			actionNextTimeStep = actionSensor.getFeedbackOutput();
@@ -319,13 +314,6 @@ public class RockPaperScissors {
 				actionNextTimeStep.set(max, 1);
 			}				
 				
-			/*
-			if (i > maxIterations - 100){
-				actionNode.setExplorationChance(0);
-				if (printError) System.out.println(i + " Error: " + predictionError + " Reward: " + externalReward);
-			}
-			*/
-			
 			curInput++;
 			if (curInput >= sequence.length){
 				curInput = 0;
@@ -337,6 +325,15 @@ public class RockPaperScissors {
 		
 		double[] result = {avgPredictionError, avgScore};
 		return result;
+	}
+	
+	private void step(SimpleMatrix input, SimpleMatrix action, double reward){
+		SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
+		inputSensor1.setInput(inputVector.extractMatrix(0, 1, 0, 12));
+		inputSensor2.setInput(inputVector.extractMatrix(0, 1, 12, 25));
+		actionSensor.setInput(action);
+		
+		brain.step(reward);
 	}
 
 	

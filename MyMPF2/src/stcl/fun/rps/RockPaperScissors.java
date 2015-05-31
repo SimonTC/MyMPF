@@ -45,7 +45,7 @@ public class RockPaperScissors {
 	}
 	
 	public void run(String dataFolder){
-		setup(dataFolder, true);
+		setup(dataFolder, true, rand);
 		
 		//Show
 		/*
@@ -67,9 +67,7 @@ public class RockPaperScissors {
 	}
 	
 	private void runMultipleExperiments(int numExperiments, String dataFolder, boolean collectData){
-		
-		
-		
+
 		double[] totalResults = new double[2];
 		
 		for (int exp = 1; exp <= numExperiments; exp++){
@@ -80,13 +78,14 @@ public class RockPaperScissors {
 				File f = new File(folder);
 				f.mkdirs();
 			}
-			setup(folder, collectData);
+			
+			setup(folder, collectData, new Random(5234)); //Make sure the same brain is created each time
 			
 			//if (collectData) brain.openFiles(true);
 			
 			//Show
 			brain.setUsePrediction(false);
-			runLearning(learningIterations);
+			runLearning(learningIterations, new Random()); //Make sure the learning is always the same
 			brain.newEpisode();
 			
 			//Train
@@ -122,7 +121,7 @@ public class RockPaperScissors {
 		
 	}
 	
-	private void setup(String dataFolder, boolean collectData){
+	private void setup(String dataFolder, boolean collectData, Random rand){
 		createInputs();
 		createRewardMatrix();
 		
@@ -165,8 +164,7 @@ public class RockPaperScissors {
 			int markovOrder_input = 2;
 			inputPooler.initialize(rand, ffInputLength, spatialMapSize_input, temporalMapSize_input,  markovOrder_input, numActions, true, false, false);
 		
-			//Combiner
-			
+			//Combiner			
 			int ffInputLength_combiner = inputPooler.getFeedforwardOutputVectorLength();
 			int spatialMapSize_combiner = 4;
 			int temporalMapSize_combiner = 3;
@@ -202,9 +200,10 @@ public class RockPaperScissors {
 		brain.addNode(topNode);
 		brain.addNode(actionNode);
 		if (collectData) brain.initializeWriters(dataFolder, false);
+
 	}
 	
-	private void runLearning(int iterations){
+	private void runLearning(int iterations, Random rand){
 		int[][] positiveExamples = {{0,1},{1,2},{2,0}};
 		int[][] negativeExamples = {{1,0},{2,1},{0,2}};
 		int[][] neutralExamples = {{0,0},{1,1},{2,2}};

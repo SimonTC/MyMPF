@@ -255,10 +255,13 @@ public class RockPaperScissors {
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix input = new SimpleMatrix(blank);
 		step(input, new SimpleMatrix(tmp), 0);
-		SimpleMatrix actionNextTimeStep = new SimpleMatrix(tmp); //m(t)
-		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
-
-		SimpleMatrix prediction = blank;
+		
+		SimpleMatrix[] output = collectOutput();
+		
+		SimpleMatrix prediction = output[0];
+		
+		SimpleMatrix actionNextTimeStep = output[1];
+		
 		
 		double totalPredictionError = 0;
 		double totalGameScore = 0;
@@ -279,7 +282,7 @@ public class RockPaperScissors {
 			double rewardForBeingInCurrentState = externalReward;
 			
 			//Calculate reward			
-			if ( i > 0){ //First action is always wrong
+			if ( i >= 0){ //First action is always wrong
 				externalReward = calculateReward(actionThisTimestep, curInput);
 			}		
 			
@@ -291,7 +294,7 @@ public class RockPaperScissors {
 			
 			
 			//Collect output
-			SimpleMatrix[] output = collectOutput();
+			output = collectOutput();
 			
 			prediction = output[0];
 			

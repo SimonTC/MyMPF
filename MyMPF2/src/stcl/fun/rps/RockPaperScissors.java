@@ -280,17 +280,7 @@ public class RockPaperScissors {
 			
 			//Calculate reward			
 			if ( i > 0){ //First action is always wrong
-				int actionID = -1;
-				double maxValue = Double.NEGATIVE_INFINITY;
-				for (int j = 0; j < actionThisTimestep.getNumElements(); j++){
-					double d = actionThisTimestep.get(j);
-					if (d > maxValue){
-						maxValue = d;
-						actionID = j;
-					}
-				}
-				int inputID = labelSequence[curInput];
-				externalReward = reward(inputID, actionID);
+				externalReward = calculateReward(actionThisTimestep, curInput);
 			}		
 			
 			totalGameScore += externalReward;			
@@ -324,6 +314,21 @@ public class RockPaperScissors {
 		double avgScore = totalGameScore / (double) maxIterations;
 		
 		double[] result = {avgPredictionError, avgScore};
+		return result;
+	}
+	
+	private double calculateReward(SimpleMatrix action, int inputLabel){
+		int actionID = -1;
+		double maxValue = Double.NEGATIVE_INFINITY;
+		for (int j = 0; j < action.getNumElements(); j++){
+			double d = action.get(j);
+			if (d > maxValue){
+				maxValue = d;
+				actionID = j;
+			}
+		}
+		int inputID = labelSequence[inputLabel];
+		double result = reward(inputID, actionID);
 		return result;
 	}
 	

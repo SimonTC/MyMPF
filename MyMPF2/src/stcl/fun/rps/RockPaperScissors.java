@@ -68,6 +68,8 @@ public class RockPaperScissors {
 	
 	private void runMultipleExperiments(int numExperiments, String dataFolder, boolean collectData){
 		
+		
+		
 		double[] totalResults = new double[2];
 		
 		for (int exp = 1; exp <= numExperiments; exp++){

@@ -278,11 +278,16 @@ public class RockPaperScissors {
 			double rewardForBeingInCurrentState = externalReward;
 			
 			//Calculate reward			
-			if ( i > 3){ //To get out of wrong actions
+			if ( i > 0){ //First action is always wrong
 				int actionID = -1;
-				if (actionThisTimestep.get(0) > 0.1) actionID = 0; //Using > 0.1 to get around doubles not always being == 0
-				if (actionThisTimestep.get(1) > 0.1 ) actionID = 1;
-				if (actionThisTimestep.get(2) > 0.1 ) actionID = 2;
+				double maxValue = Double.NEGATIVE_INFINITY;
+				for (int j = 0; j < actionThisTimestep.getNumElements(); j++){
+					double d = actionThisTimestep.get(j);
+					if (d > maxValue){
+						maxValue = d;
+						actionID = j;
+					}
+				}
 				int inputID = labelSequence[curInput];
 				externalReward = reward(inputID, actionID);
 			}		

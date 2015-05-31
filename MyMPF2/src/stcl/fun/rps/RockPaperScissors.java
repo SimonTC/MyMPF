@@ -254,6 +254,7 @@ public class RockPaperScissors {
 		
 		double[][] tmp = {{1,0,0}};
 		SimpleMatrix input = new SimpleMatrix(blank);
+		step(input, new SimpleMatrix(tmp), 0);
 		SimpleMatrix actionNextTimeStep = new SimpleMatrix(tmp); //m(t)
 		//SimpleMatrix actionAfterNext = new SimpleMatrix(tmp); //m(t+2)
 
@@ -300,12 +301,11 @@ public class RockPaperScissors {
 			
 			
 			//Collect output
-			SimpleMatrix tmp1 = inputSensor1.getFeedbackOutput();
-			SimpleMatrix tmp2 = inputSensor2.getFeedbackOutput();
-			prediction = tmp1.combine(0, 12, tmp2);
-			prediction.reshape(5, 5);
+			SimpleMatrix[] output = collectOutput();
 			
-			actionNextTimeStep = actionSensor.getFeedbackOutput();
+			prediction = output[0];
+			
+			actionNextTimeStep = output[1];
 
 			//Set max value of action to 1. The rest to zero
 			int max = maxID(actionNextTimeStep);
@@ -324,6 +324,17 @@ public class RockPaperScissors {
 		double avgScore = totalGameScore / (double) maxIterations;
 		
 		double[] result = {avgPredictionError, avgScore};
+		return result;
+	}
+	
+	private SimpleMatrix[] collectOutput(){
+		SimpleMatrix tmp1 = inputSensor1.getFeedbackOutput();
+		SimpleMatrix tmp2 = inputSensor2.getFeedbackOutput();
+		SimpleMatrix prediction = tmp1.combine(0, 12, tmp2);
+		prediction.reshape(5, 5);
+		
+		SimpleMatrix actionNextTimeStep = actionSensor.getFeedbackOutput();
+		SimpleMatrix[] result = {prediction, actionNextTimeStep};
 		return result;
 	}
 	

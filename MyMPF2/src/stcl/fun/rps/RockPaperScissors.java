@@ -79,13 +79,14 @@ public class RockPaperScissors {
 				f.mkdirs();
 			}
 			
-			setup(folder, collectData, new Random(5234)); //Make sure the same brain is created each time
+			setup(folder, collectData, rand); //Make sure the same brain is created each time
 			
 			//if (collectData) brain.openFiles(true);
 			
 			//Show
+			
 			brain.setUsePrediction(false);
-			runLearning(learningIterations, new Random()); //Make sure the learning is always the same
+			runLearning(learningIterations,rand); //Make sure the learning is always the same
 			brain.newEpisode();
 			
 			//Train

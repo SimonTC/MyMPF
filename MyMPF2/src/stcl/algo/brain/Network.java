@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeMap;
@@ -40,12 +41,32 @@ public class Network implements Serializable{
 	 * @throws FileNotFoundException 
 	 */
 	public Network(String networkFileName, Random rand) throws FileNotFoundException {
+		BufferedReader reader = new BufferedReader( new FileReader (networkFileName));
+		buildNetworkFromString(reader, rand);
+	}
+	
+	/**
+	 * Initializes the network using the initialization string.
+	 * The string has to be identical with the sring created by the toString() method
+	 * @param initializationString
+	 */
+	public void initialize(String initializationString, Random rand){
+		BufferedReader reader = new BufferedReader( new StringReader(initializationString));
+		buildNetworkFromString(reader, rand);
+	}
+	
+	/**
+	 * Creates the network using the given reader.
+	 * Information in the reader should come from the toString() method
+	 * @param reader
+	 */
+	//TODO: Change description
+	private void buildNetworkFromString(BufferedReader reader, Random rand){
 		sensorLayer = new ArrayList<Sensor>();
 		unitLayers = new ArrayList<ArrayList<UnitNode>>();
 		unitNodes = new ArrayList<UnitNode>();
 		nodes = new ArrayList<Node>();
 		
-		BufferedReader reader = new BufferedReader( new FileReader (networkFileName));
 		String line = null;
 		
 		try {

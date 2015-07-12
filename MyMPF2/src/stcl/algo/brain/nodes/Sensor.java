@@ -55,7 +55,7 @@ public class Sensor extends Node {
 
 	@Override
 	public void reinitialize() {
-		input.set(0);
+		if (input != null) input.set(0);
 		
 	}
 

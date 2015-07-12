@@ -49,7 +49,7 @@ public class NeoCorticalUnit implements Serializable{
 	private boolean noTemporal;
 	private boolean noSpatial;
 	
-	private int chosenAction;
+	private int chosenAction; 
 	private int markovOrder;
 	
 	private int numPossibleActions;
@@ -134,6 +134,7 @@ public class NeoCorticalUnit implements Serializable{
 		this.numPossibleActions = numPossibleActions; 
 		this.reactionary = reactionary;
 		this.offlineLearning = offlineLearning;
+		this.temporalMapSize = temporalMapSize;
 		
 		//Initialize matrices
 		if (noSpatial){

@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.util.Normalizer;
 import dk.stcl.core.basic.SomBasics;
 import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.utils.SomConstants;
 
 public class SpatialPooler implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -40,7 +41,22 @@ public class SpatialPooler implements Serializable {
 		this.inputLength = inputLength;
 		this.mapSize = mapSize;		
 	}
-
+	
+	public SpatialPooler(String initializationString, Random rand){
+		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
+		String[] poolerInfo = lines[0].split(" ");
+		inputLength = Integer.parseInt(poolerInfo[0]);
+		mapSize = Integer.parseInt(poolerInfo[1]);
+		activationMatrix = new SimpleMatrix(mapSize, mapSize);
+		som = new SOM(initializationString);
+		this.rand = rand;
+	}
+	
+	public String toInitializationString(){
+		String s = inputLength + " " + mapSize + SomConstants.LINE_SEPARATOR;
+		s += som.toFileString();
+		return s;
+	}
 	
 	/**
 	 * 

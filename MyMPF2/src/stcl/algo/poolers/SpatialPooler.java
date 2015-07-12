@@ -48,7 +48,7 @@ public class SpatialPooler implements Serializable {
 		inputLength = Integer.parseInt(poolerInfo[0]);
 		mapSize = Integer.parseInt(poolerInfo[1]);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
-		som = new SOM(initializationString);
+		som = new SOM(initializationString, startLine + 1);
 		this.rand = rand;
 	}
 	

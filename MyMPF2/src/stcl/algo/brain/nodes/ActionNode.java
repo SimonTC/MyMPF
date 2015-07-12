@@ -228,13 +228,13 @@ public class ActionNode extends Node {
 
 	@Override
 	public void reinitialize() {
+		givenVotes = new TreeMap<Integer, Integer>();
 		for (Integer i : influenceMap.keySet()){
 			influenceMap.put(i, 1.0);
 			givenVotes.put(i, -1);
 		}
 		learningActions = true;
 		updateVoterInfluence = true;
-		givenVotes = new TreeMap<Integer, Integer>();
 		votesForActions.set(0);
 		String[] arr = initializationDescription.split(" ");
 		int length = arr.length;

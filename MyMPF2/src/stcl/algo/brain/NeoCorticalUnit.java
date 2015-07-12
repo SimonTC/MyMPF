@@ -12,6 +12,7 @@ import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.utils.SomConstants;
 
 public class NeoCorticalUnit implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -50,6 +51,10 @@ public class NeoCorticalUnit implements Serializable{
 	
 	private int chosenAction;
 	private int markovOrder;
+	
+	private int numPossibleActions;
+	private boolean reactionary;
+	private boolean offlineLearning;
 
 	/**
 	 * If true the FF output from the spatial pooler will be biased by the prediction done at t-1
@@ -73,7 +78,21 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param offlineLearning
 	 */
 	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning) {
+		initialize(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
+	}
+	
+	public NeoCorticalUnit(String initializationString, Random rand){
+		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
+		String[] unitInfo = lines[0].split(" ");
 		
+	}
+	public String toInitializationString(){
+		String s = ffInputVectorSize + " " + spatialMapSize + " " + temporalMapSize + " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning + SomConstants.LINE_SEPARATOR;
+		if (!noSpatial) s+= spatialPooler.toInitializationString();
+		return s;
+	}
+	
+	private void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		//Test arguments
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
@@ -111,6 +130,9 @@ public class NeoCorticalUnit implements Serializable{
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
 		chosenAction = -1;
+		this.numPossibleActions = numPossibleActions; 
+		this.reactionary = reactionary;
+		this.offlineLearning = offlineLearning;
 		
 		//Initialize matrices
 		if (noSpatial){

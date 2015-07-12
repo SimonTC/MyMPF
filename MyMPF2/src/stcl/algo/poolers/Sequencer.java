@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.utils.SomConstants;
 import stcl.algo.predictors.trie.Trie;
 import stcl.algo.predictors.trie.TrieNode;
 import stcl.algo.util.Normalizer;
@@ -27,11 +28,26 @@ public class Sequencer implements Serializable {
 	private int maxNumberOfSequencesInMemory;
 	private int inputLength;
 	private int elementsInMemory;
+	private int temporalGroupMapSize;
 	
 	private boolean learning;
 	
 	
 	public Sequencer(int markovOrder, int temporalGroupMapSize, int inputLength) {
+		initialize(markovOrder, temporalGroupMapSize, inputLength);
+	}
+	
+	public Sequencer(String initializationString){
+		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
+		String[] sequencerInfo = lines[0].split(" ");
+		markovOrder = Integer.parseInt(sequencerInfo[0]);
+		temporalGroupMapSize = Integer.parseInt(sequencerInfo[1]);
+		inputLength = Integer.parseInt(sequencerInfo[2]);
+		initialize(markovOrder, temporalGroupMapSize, inputLength);
+		
+	}
+	
+	private void initialize(int markovOrder, int temporalGroupMapSize, int inputLength){
 		this.markovOrder = markovOrder;
 		this.trie = new Trie<Integer>();
 		currentMinFrequency = Integer.MAX_VALUE;
@@ -45,6 +61,14 @@ public class Sequencer implements Serializable {
 		sequenceMemory = new ArrayList<LinkedList<TrieNode<Integer>>>();
 		for (int i = 0; i < maxNumberOfSequencesInMemory; i++) sequenceMemory.add(null);
 		elementsInMemory = 0;
+		this.temporalGroupMapSize = temporalGroupMapSize;
+	}
+	
+
+	
+	public String toInitializationString(){
+		String s = markovOrder + " " + temporalGroupMapSize + " " + inputLength + SomConstants.LINE_SEPARATOR;
+		return s;
 	}
 	
 	/**

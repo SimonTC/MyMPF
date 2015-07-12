@@ -12,8 +12,8 @@ public class ActionDecider_Q_Reactionary extends ActionDecider_Q {
 	private static final long serialVersionUID = 1L;
 	private int actionToDoNext;
 	
-	public ActionDecider_Q_Reactionary(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning) {
-		super(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);
+	public ActionDecider_Q_Reactionary(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
+		super(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);
 	}
 	
 	@Override

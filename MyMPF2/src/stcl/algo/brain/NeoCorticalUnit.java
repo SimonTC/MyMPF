@@ -88,7 +88,7 @@ public class NeoCorticalUnit implements Serializable{
 			spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
 		}
 		
-		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, offlineLearning, reactionary); //TODO: Move all parameters out
+		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, offlineLearning, reactionary); //TODO: Move all parameters out
 		
 		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
 		
@@ -256,12 +256,12 @@ public class NeoCorticalUnit implements Serializable{
 		return s;
 	}
 	
-	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning, boolean useReactionaryDecider){
+	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning, boolean useReactionaryDecider){
 		ActionDecider_Q a;
 		if (useReactionaryDecider){
-			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);//TODO: Change parameters. Especially decay
 		} else {
-			a = new ActionDecider_Q(numPossibleActions, numPossibleStates, decayFactor, rand, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);//TODO: Change parameters. Especially decay
 		}
 
 		return a;

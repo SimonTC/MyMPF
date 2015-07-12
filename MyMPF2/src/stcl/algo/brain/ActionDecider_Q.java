@@ -13,7 +13,7 @@ public class ActionDecider_Q implements Serializable {
 	protected int stateBefore, actionBefore;
 	protected boolean learning;
 
-	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand, boolean offlineLearning) {
+	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
 		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
 		stateBefore = -1;
 		actionBefore = -1;

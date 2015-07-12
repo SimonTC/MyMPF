@@ -46,6 +46,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	private Sequencer sequencer;
 	private boolean noTemporal;
+	private boolean noSpatial;
 	
 	private int chosenAction;
 	private int markovOrder;
@@ -75,14 +76,17 @@ public class NeoCorticalUnit implements Serializable{
 		
 		//Test arguments
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
-		if (spatialMapSize < 1) throw new IllegalArgumentException("The spatial map size has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
 		if (markovOrder < 1 && temporalMapSize > 0) throw new IllegalArgumentException("Markov order has to be greater than 0 when using the temporal pooler");
 		
 		
 		//Instantiate sub-components
-		spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
-		int spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
+		int spatialOutputLength = ffInputLength;
+		noSpatial = spatialMapSize < 1;
+		if (!noSpatial) {
+			spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
+			spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
+		}
 		
 		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, rand, offlineLearning, reactionary); //TODO: Move all parameters out
 		
@@ -136,7 +140,8 @@ public class NeoCorticalUnit implements Serializable{
 		ffInput = inputVector;
 		
 		//Spatial classification
-		SimpleMatrix spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
+		SimpleMatrix spatialFFOutputMatrix = ffInput;
+		if (!noSpatial) spatialFFOutputMatrix = spatialPooler.feedForward(inputVector);
 		SimpleMatrix biasedSpatialFFOutputMatrix = biasMatrix(spatialFFOutputMatrix, biasMatrix);
 		
 		needHelp = true;
@@ -221,7 +226,8 @@ public class NeoCorticalUnit implements Serializable{
 		if (decider != null) chosenAction = chooseAction(biasedTemporalFBOutput);
 		
 		//Selection of best spatial model
-		SimpleMatrix spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
+		SimpleMatrix spatialPoolerFBOutputVector = biasedTemporalFBOutput;
+		if (!noSpatial) spatialPoolerFBOutputVector = spatialPooler.feedBackward(biasedTemporalFBOutput);
 		
 		fbOutput = spatialPoolerFBOutputVector;
 		

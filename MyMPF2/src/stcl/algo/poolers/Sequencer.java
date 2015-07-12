@@ -54,10 +54,12 @@ public class Sequencer implements Serializable {
 	 * @param startNewSequence
 	 * @return Probability matrix containing the probabilities of having just exited each of the known sequences
 	 */
-	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, int spatialBMUID, boolean startNewSequence){
+	public SimpleMatrix feedForward(SimpleMatrix probabilityVector, boolean startNewSequence){
 		//Add input if we are still within the maximum length of a sequence
 		if (currentSequence.size() < markovOrder) {
-			currentSequence.addLast(spatialBMUID);
+			//Find the id of that symbol which we are most probably observing now
+			int mostProbableInputID = findMostProbableInput(probabilityVector);
+			currentSequence.addLast(mostProbableInputID);
 			currentInputProbabilitites.addLast(probabilityVector);
 		}
 		
@@ -106,6 +108,25 @@ public class Sequencer implements Serializable {
 		symbolProbabilities = Normalizer.normalize(symbolProbabilities);
 		
 		return symbolProbabilities;
+	}
+	
+	/**
+	 * Finds the id of the element with the highest value
+	 * @param probabilityMatrix
+	 * @return
+	 */
+	private int findMostProbableInput(SimpleMatrix probabilityMatrix){
+		double max = Double.NEGATIVE_INFINITY;
+		int maxID = -1;
+		for (int i = 0; i < probabilityMatrix.getNumElements(); i++){
+			double value = probabilityMatrix.get(i);
+			if (value > max){
+				maxID = i;
+				max = value;
+			}
+		}		
+		return maxID;
+		
 	}
 	
 	public void reset(){

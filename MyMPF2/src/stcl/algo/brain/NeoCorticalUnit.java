@@ -84,7 +84,8 @@ public class NeoCorticalUnit implements Serializable{
 	public NeoCorticalUnit(String initializationString, Random rand){
 		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
 		String[] unitInfo = lines[0].split(" ");
-		
+		initialize(rand, Integer.parseInt(unitInfo[0]), Integer.parseInt(unitInfo[1]), Integer.parseInt(unitInfo[2]), Integer.parseInt(unitInfo[3]), Integer.parseInt(unitInfo[4]), Boolean.parseBoolean(unitInfo[5]), Boolean.parseBoolean(unitInfo[6]), Boolean.parseBoolean(unitInfo[7]));
+		if (!noSpatial) spatialPooler = new SpatialPooler(initializationString, 1, rand);
 	}
 	public String toInitializationString(){
 		String s = ffInputVectorSize + " " + spatialMapSize + " " + temporalMapSize + " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning + SomConstants.LINE_SEPARATOR;

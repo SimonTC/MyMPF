@@ -78,7 +78,7 @@ public class NeoCorticalUnit implements Serializable{
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
 		if (markovOrder < 1 && temporalMapSize > 0) throw new IllegalArgumentException("Markov order has to be greater than 0 when using the temporal pooler");
-		
+		if (spatialMapSize < 1 && temporalMapSize < 1) throw new IllegalArgumentException("The spatial pooler and temporal pooler can't both have a map size of 0");
 		
 		//Instantiate sub-components
 		int spatialOutputLength = ffInputLength;
@@ -113,17 +113,20 @@ public class NeoCorticalUnit implements Serializable{
 		chosenAction = -1;
 		
 		//Initialize matrices
-		biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+		if (noSpatial){
+			biasMatrix = new SimpleMatrix(1, ffInputLength);
+			predictionMatrix = new SimpleMatrix(1, ffInputLength);
+		} else {
+			biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+			predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
+		}
 		biasMatrix.set(1);
+		predictionMatrix.set(1);
+		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
 		this.spatialMapSize = spatialMapSize;
-		
-		predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
-		predictionMatrix.set(1);
-		predictionMatrix = Normalizer.normalize(predictionMatrix);
-
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -169,7 +172,7 @@ public class NeoCorticalUnit implements Serializable{
 			spatialFFOutputDataVector = inputToSequencer.getMatrix().data;	
 			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-			ffOutput = sequencer.feedForward(temporalFFInputVector, spatialPooler.getSOM().getBMU().getId(), needHelp);
+			ffOutput = sequencer.feedForward(temporalFFInputVector, needHelp);
 		} else {
 			ffOutput = biasSpatialFFOutput ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 		}
@@ -201,7 +204,7 @@ public class NeoCorticalUnit implements Serializable{
 				SimpleMatrix normalizedSequencerFBOutput = normalize(sequencerFBOutput);
 				
 				//Transformation into matrix
-				normalizedSequencerFBOutput.reshape(spatialMapSize, spatialMapSize); //TODO: Is this necessary?
+				if (!noSpatial) normalizedSequencerFBOutput.reshape(spatialMapSize, spatialMapSize); 
 				
 				//Combine FB output from temporal pooler with bias and prediction (if enabled)
 				biasMatrix = normalizedSequencerFBOutput;
@@ -369,7 +372,7 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	public void setLearning(boolean learning){
-		spatialPooler.setLearning(learning);
+		if (spatialPooler != null) spatialPooler.setLearning(learning);
 		if (decider != null) decider.setLearning(learning);
 		if (predictor != null) predictor.setLearning(learning);
 		if (sequencer != null) sequencer.setLearning(learning);
@@ -388,7 +391,7 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	public void sensitize(int iteration){
-		spatialPooler.sensitize(iteration);
+		if (!noSpatial) spatialPooler.sensitize(iteration);
 	}
 	
 	public int findTemporalBMUID(){
@@ -412,7 +415,8 @@ public class NeoCorticalUnit implements Serializable{
 	}
 */
 	public SOM getSOM() {
-		return spatialPooler.getSOM();
+		if (!noSpatial) return spatialPooler.getSOM();
+		return null;
 	}
 
 	public void printPredictionModel() {

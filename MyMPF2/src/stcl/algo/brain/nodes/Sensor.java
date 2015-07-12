@@ -53,4 +53,10 @@ public class Sensor extends Node {
 		this.input = input;
 	}
 
+	@Override
+	public void reinitialize() {
+		input.set(0);
+		
+	}
+
 }

@@ -30,7 +30,7 @@ public abstract class Node implements Serializable {
 	}
 	
 	/**
-	 * Create new node from string created by the toString() method
+	 * Create new node from string created by the toString() or the toInitializationString() method
 	 * @param s
 	 */
 	public Node(String s){
@@ -128,6 +128,10 @@ public abstract class Node implements Serializable {
 		return s;
 	}
 	
+	public String toInitializationString(){
+		return this.toString();
+	}
+	
 	public abstract void feedforward(double reward, int actionPerformed);
 	
 	public abstract void feedback();
@@ -163,5 +167,11 @@ public abstract class Node implements Serializable {
 	public NodeType getType(){
 		return type;
 	}
+	
+	/**
+	 * Resets the node back to its original state before any learning has been performed.
+	 * Use if you need to run multiple trainings from an initial state
+	 */
+	public abstract void reinitialize();
 
 }

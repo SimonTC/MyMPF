@@ -258,6 +258,14 @@ public class Network implements Serializable{
 		for (UnitNode n : unitNodes) n.newEpisode();
 	}
 	
+	/**
+	 * Resets the network back to its original state before any learning has been performed.
+	 * Use if you need to run multiple trainings from an initial state
+	 */
+	public void reinitialize(){
+		for (Node n : nodes) n.reinitialize();
+	}
+	
 
 
 }

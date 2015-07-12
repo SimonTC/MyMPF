@@ -15,6 +15,7 @@ public class UnitNode extends Node {
 	protected Random rand;
 	private int chosenAction;
 	private String initializationDescription;
+	private String unitInitializationString;
 	
 	public UnitNode(int id, int x, int y, int z) {
 		super(id, x, y, z);
@@ -52,6 +53,7 @@ public class UnitNode extends Node {
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
+		unitInitializationString = unit.toInitializationString();
 	}
 	
 	public void setID(int id){
@@ -166,6 +168,12 @@ public class UnitNode extends Node {
 	
 	public void newEpisode(){
 		unit.newEpisode();
+	}
+
+	@Override
+	public void reinitialize() {
+		unit = new NeoCorticalUnit(unitInitializationString, rand);
+		
 	}
 
 }

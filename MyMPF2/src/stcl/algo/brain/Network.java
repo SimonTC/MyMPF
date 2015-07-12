@@ -47,7 +47,7 @@ public class Network implements Serializable{
 	
 	/**
 	 * Initializes the network using the initialization string.
-	 * The string has to be identical with the sring created by the toString() method
+	 * The string has to be identical with the string created by the toString() method
 	 * @param initializationString
 	 */
 	public void initialize(String initializationString, Random rand){

@@ -17,6 +17,11 @@ public class ActionDecider_Q implements Serializable {
 	private double noveltyInfluence;
 	private double decayConstant;
 	protected int counter;
+	/**
+	 * If true the reward given buy the game will also be the reward used in the Q-function.
+	 * If false The reward used will be a reward that leads to exploration.
+	 */
+	private boolean useExternalReward;
 
 	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
 		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
@@ -24,7 +29,7 @@ public class ActionDecider_Q implements Serializable {
 		actionBefore = -1;
 		learning = true;
 		maxError = 0;
-		noveltyInfluence = 0.3; //TODO: Make parameter
+		noveltyInfluence = 1; //TODO: Make parameter
 		decayConstant = 1/(double)1000; //TODO: Make parameter
 		counter = 0;
 	}
@@ -73,7 +78,7 @@ public class ActionDecider_Q implements Serializable {
 	 */
 	protected double calculateInternaleward(double externalReward, SimpleMatrix currentStateProbabilities){
 		double internalReward = externalReward;
-		if (prediction != null){
+		if (prediction != null && !useExternalReward){
 			SimpleMatrix diff = currentStateProbabilities.minus(prediction);
 			double error = diff.normF();
 			double normalizedError = error / maxError;
@@ -120,6 +125,10 @@ public class ActionDecider_Q implements Serializable {
 			map.set(state,action);
 		}
 		return map;
+	}
+	
+	public void setUseExternalReward(boolean flag){
+		useExternalReward = flag;
 	}
 
 }

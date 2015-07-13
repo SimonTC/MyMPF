@@ -266,6 +266,10 @@ public class Network implements Serializable{
 		for (Node n : nodes) n.reinitialize();
 	}
 	
+	public void setUseExternalReward(boolean flag){
+		for (UnitNode n : unitNodes) n.getUnit().getDecider().setUseExternalReward(flag);
+	}
+	
 
 
 }

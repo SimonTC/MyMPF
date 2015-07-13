@@ -2,6 +2,7 @@ package stcl.algo.brain;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -58,6 +59,10 @@ public class Network_DataCollector extends Network {
 
 	private FileWriter[] unitWriters;
 	private FileWriter brainWriter;
+	
+	public Network_DataCollector(String networkFileName, Random rand) throws FileNotFoundException {
+		super(networkFileName, rand);
+	}
 	
 	public void initializeWriters(String parentFolder, boolean append){
 		collectData = true;

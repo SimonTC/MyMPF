@@ -234,7 +234,9 @@ public class ActionNode extends Node {
 		votesForActions.set(0);
 		String[] arr = initializationDescription.split(" ");
 		int length = arr.length;
+		String orgPoolerInitializationString = poolerInitializationString; //Save string here as it is changed in initialization
 		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
+		poolerInitializationString = orgPoolerInitializationString;
 		pooler = new SpatialPooler(poolerInitializationString, 0, rand);
 	}
 

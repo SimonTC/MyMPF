@@ -21,6 +21,8 @@ public class FileWriter {
 	 * @param fileName
 	 */
 	public FileWriter(String fileName) {
+		File f = new File(fileName);
+		f.getParentFile().mkdirs(); 
 		file = new File(fileName);
 	}
 	

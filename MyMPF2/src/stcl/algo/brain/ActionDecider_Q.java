@@ -32,6 +32,7 @@ public class ActionDecider_Q implements Serializable {
 		noveltyInfluence = 1; //TODO: Make parameter
 		decayConstant = 1/(double)1000; //TODO: Make parameter
 		counter = 0;
+		useExternalReward = false;
 	}
 	
 	/**

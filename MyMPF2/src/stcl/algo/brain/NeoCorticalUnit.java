@@ -271,7 +271,7 @@ public class NeoCorticalUnit implements Serializable{
 				maxProbableState = i;
 			}
 		}
-		int action = decider.feedBack(maxProbableState);
+		int action = decider.feedBack(maxProbableState, state);
 		return action;
 	}
 	
@@ -311,7 +311,7 @@ public class NeoCorticalUnit implements Serializable{
 				maxProbableState = i;
 			}
 		}
-		decider.feedForward(maxProbableState, actionPerformed, reward);
+		decider.feedForward(maxProbableState, actionPerformed, reward, inputToDecider);
 	}
 	
 	

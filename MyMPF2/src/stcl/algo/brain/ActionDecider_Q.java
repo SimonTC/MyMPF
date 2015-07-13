@@ -12,12 +12,21 @@ public class ActionDecider_Q implements Serializable {
 	protected QLearner learner;
 	protected int stateBefore, actionBefore;
 	protected boolean learning;
+	protected SimpleMatrix prediction;
+	private double maxError;
+	private double noveltyInfluence;
+	private double decayConstant;
+	protected int counter;
 
 	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
 		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
 		stateBefore = -1;
 		actionBefore = -1;
 		learning = true;
+		maxError = 0;
+		noveltyInfluence = 0.3; //TODO: Make parameter
+		decayConstant = 1/(double)1000; //TODO: Make parameter
+		counter = 0;
 	}
 	
 	/**
@@ -26,8 +35,9 @@ public class ActionDecider_Q implements Serializable {
 	 * @param actionToBePerformedNow
 	 * @param rewardForCurrentState
 	 */
-	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState){
-		double internalReward = calculateInternaleward(rewardForCurrentState);
+	public void feedForward(int currentState, int actionToBePerformedNow, double rewardForCurrentState, SimpleMatrix currentStateProbabilities){
+		counter++;
+		double internalReward = calculateInternaleward(rewardForCurrentState, currentStateProbabilities);
 		if(stateBefore != -1 && learning){
 			learner.updateQMatrix(stateBefore, actionBefore, currentState, internalReward);
 			//learner.updateQMatrix(stateBefore, actionBefore, currentState, actionToBePerformedNow, internalReward);
@@ -48,26 +58,31 @@ public class ActionDecider_Q implements Serializable {
 	 * @param expectedNextStateProbabilities
 	 * @return
 	 */
-	public int feedBack(int originState){
+	public int feedBack(int originState, SimpleMatrix stateProbabilities){
 		int action = learner.selectBestAction(originState);
-		
+		prediction = stateProbabilities;
 		return action;
 	}
-	
-	protected double calculateInternaleward(double externalReward){
-		
-		//externalRewardNow = externalReward;
-		/*
-		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
-		
-		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
-		
-		internalRewardBefore = internalReward;
-		externalRewardBefore = externalRewardNow;
-		
+	//TODO: Better citation
+	/**
+	 * Calculate internal reward by using method described in Incentivizing Exploration In Reinforcement Learning
+	 * With Deep Predictive Models (Stadie, Levine and Abbeel)
+	 * @param externalReward
+	 * @param currentState
+	 * @return
+	 */
+	protected double calculateInternaleward(double externalReward, SimpleMatrix currentStateProbabilities){
+		double internalReward = externalReward;
+		if (prediction != null){
+			SimpleMatrix diff = currentStateProbabilities.minus(prediction);
+			double error = diff.normF();
+			double normalizedError = error / maxError;
+			double novelty = Math.pow(Math.abs(normalizedError / (counter * decayConstant)), 2);
+			internalReward += noveltyInfluence * novelty;
+			if (error > maxError) maxError = error;
+		}
+
 		return internalReward;
-		*/
-		return externalReward;
 
 	}
 	
@@ -89,6 +104,7 @@ public class ActionDecider_Q implements Serializable {
 		stateBefore = -1;
 		actionBefore = -1;
 		learner.newEpisode();
+		prediction = null;
 	}
 	
 	public void setLearning(boolean learning){

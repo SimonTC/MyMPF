@@ -23,8 +23,9 @@ public class ActionDecider_Q_Reactionary extends ActionDecider_Q {
 	 * @param actionToGetToCurrentState
 	 * @param rewardForCurrentState
 	 */
-	public void feedForward(int currentState, int actionToGetToCurrentState, double rewardForCurrentState){
-		double internalReward = calculateInternaleward(rewardForCurrentState);
+	public void feedForward(int currentState, int actionToGetToCurrentState, double rewardForCurrentState, SimpleMatrix currentStateProbabilities){
+		counter++;
+		double internalReward = calculateInternaleward(rewardForCurrentState, currentStateProbabilities);
 		if(stateBefore != -1 && learning){
 			learner.updateQMatrix(stateBefore, actionToGetToCurrentState, currentState, internalReward);
 		}
@@ -40,7 +41,8 @@ public class ActionDecider_Q_Reactionary extends ActionDecider_Q {
 	 * @param originState - Not used
 	 * @return
 	 */
-	public int feedBack(int originState){
+	public int feedBack(int originState, SimpleMatrix stateProbabilities){
+		prediction = stateProbabilities;
 		return actionToDoNext;
 	}
 

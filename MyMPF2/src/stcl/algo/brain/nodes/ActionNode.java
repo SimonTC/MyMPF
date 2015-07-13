@@ -86,38 +86,34 @@ public class ActionNode extends Node {
 	@Override
 	public void feedback() {
 		
-		if (rand.nextDouble() < explorationChance){
-			nextActionID = doExploration();
+		//Collect action votes
+		int mostPopularAction = -1;
+		double highestVote = Double.NEGATIVE_INFINITY;
+		votesForActions.set(0);
+		for (int i = 0; i < voters.size(); i++){
+			UnitNode n = voters.get(i);
+			int voterID = n.getID();
+			NeoCorticalUnit unit = n.getUnit();
+			givenVotes.put(voterID, -1);
+			boolean mayVote = unit.active();// && !unit.needHelp();
+			if (mayVote){
+				int vote = unit.getNextAction();
+				givenVotes.put(n.getID(), vote);
+				double voteInfluence = influenceMap.get(voterID);
+				double currentVoteValue = votesForActions.get(vote);
+				double newValue = currentVoteValue + voteInfluence;
+				votesForActions.set(vote, newValue);
+				if (newValue > highestVote){
+					highestVote = newValue;
+					mostPopularAction = vote;
+				}
+			}				
+		}
+		if (mostPopularAction < 0){
+			nextActionID = doExploration(); //Might happen if all nodes needs help
 		} else {
-			//Collect action votes
-			int mostPopularAction = -1;
-			double highestVote = Double.NEGATIVE_INFINITY;
-			votesForActions.set(0);
-			for (int i = 0; i < voters.size(); i++){
-				UnitNode n = voters.get(i);
-				int voterID = n.getID();
-				NeoCorticalUnit unit = n.getUnit();
-				givenVotes.put(voterID, -1);
-				boolean mayVote = unit.active();// && !unit.needHelp();
-				if (mayVote){
-					int vote = unit.getNextAction();
-					givenVotes.put(n.getID(), vote);
-					double voteInfluence = influenceMap.get(voterID);
-					double currentVoteValue = votesForActions.get(vote);
-					double newValue = currentVoteValue + voteInfluence;
-					votesForActions.set(vote, newValue);
-					if (newValue > highestVote){
-						highestVote = newValue;
-						mostPopularAction = vote;
-					}
-				}				
-			}
-			if (mostPopularAction < 0){
-				nextActionID = doExploration(); //Might happen if all nodes needs help
-			} else {
-				nextActionID = mostPopularAction;
-			}
-		}		
+			nextActionID = mostPopularAction;
+		}
 		
 		nextAction = pooler.getSOM().getNode(nextActionID).getVector();
 		feedbackOutput = nextAction;		

@@ -239,5 +239,8 @@ public class ActionNode extends Node {
 		poolerInitializationString = orgPoolerInitializationString;
 		pooler = new SpatialPooler(poolerInitializationString, 0, rand);
 	}
-
+	
+	public SpatialPooler getPooler(){
+		return pooler;
+	}
 }

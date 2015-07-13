@@ -11,8 +11,11 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomMap;
+import dk.stcl.core.basic.containers.SomNode;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
+import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.Sequencer;
 import stcl.algo.util.FileWriter;
 
@@ -25,6 +28,7 @@ public class Network_DataCollector extends Network {
 	//Inputs and outputs to the brain
 	private SimpleMatrix receivedInput[];
 	private SimpleMatrix returnedOutput[];
+	private SimpleMatrix[] actionModels;
 	
 	//Inputs to and outputs from the units
 	private SimpleMatrix[] FFOutputs;
@@ -127,6 +131,7 @@ public class Network_DataCollector extends Network {
 			//Collect Feedforward info
 			receivedInput = collectNetworkInput();
 			FFInputs = collectUnitInputs(true);
+			actionModels = collectActionModels();
 			activeStatuses = (collectActiveStatus());
 			helpStatuses = (collectHelpStatus());
 			predictionEntropies = (collectPredictionEntropies());
@@ -168,6 +173,7 @@ public class Network_DataCollector extends Network {
 		String header = "";
 		header += "Received input;";
 		header += "Returned output;";
+		header += "Action map;";
 		header = header.substring(0, header.length() - 1); //Remove last semi-colon
 		brainWriter.writeLine(header);
 		
@@ -204,6 +210,8 @@ public class Network_DataCollector extends Network {
 		for (SimpleMatrix m : receivedInput) brainWriter.write(writeMatrixArray(m));
 		brainWriter.write(";");
 		for (SimpleMatrix m : returnedOutput) brainWriter.write(writeMatrixArray(m));
+		brainWriter.write(";");
+		for (SimpleMatrix m : actionModels) brainWriter.write(writeMatrixArray(m) + ",");
 		brainWriter.writeLine("");
 		
 		
@@ -261,6 +269,20 @@ public class Network_DataCollector extends Network {
 		}
 		
 		return stream.toString();
+	}
+	
+	private SimpleMatrix[] collectActionModels(){
+		return collectSomModels(super.getActionNode().getPooler().getSOM());
+	}
+	
+	private SimpleMatrix[] collectSomModels(SOM som){
+		SomNode[] nodes = som.getNodes();
+		SimpleMatrix[] vectors = new SimpleMatrix[nodes.length];
+		for (int i = 0; i < nodes.length; i++ ){
+			SomNode n = nodes[i];
+			vectors[i] = new SimpleMatrix(n.getVector());
+		}
+		return vectors;
 	}
 	
 	private SimpleMatrix[] collectNetworkInput(){

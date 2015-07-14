@@ -9,14 +9,18 @@ public class QLearner implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private SimpleMatrix qMatrix;
+	private int[][] visitCount;
 	private int stateBefore;
 	private int actionBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
+	private int beta = 1000;
+	boolean addExplorationBonus = true;
 
 	
 	public QLearner(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		qMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
+		visitCount = new int[numPossibleActions][numPossibleStates];
 		//for (int i = 0; i < qMatrix.getNumElements(); i++) qMatrix.set(i, rand.nextDouble());
 		
 		this.numPossibleActions = numPossibleActions;
@@ -43,6 +47,7 @@ public class QLearner implements Serializable {
 	}
 	
 	public void updateQMatrix(int stateNow, int actionNow, double decayFactor, double learningRate, double reward){
+		visitCount[actionNow][stateNow]++;
 		if (stateBefore != -1){
 			double maxQ = maxQ(stateNow);
 			double delta = learningRate * (reward + decayFactor * maxQ - getQValue(stateBefore, actionBefore));

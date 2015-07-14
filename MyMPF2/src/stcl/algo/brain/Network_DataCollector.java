@@ -68,6 +68,8 @@ public class Network_DataCollector extends Network {
 		super(networkFileName, rand);
 	}
 	
+	public Network_DataCollector(){}
+	
 	public void initializeWriters(String parentFolder, boolean append){
 		collectData = true;
 		try {

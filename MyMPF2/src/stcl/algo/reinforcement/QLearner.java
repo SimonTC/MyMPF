@@ -13,10 +13,7 @@ public class QLearner implements Serializable {
 	private int actionBefore;
 	private int numPossibleStates;
 	private int numPossibleActions;
-	private double decayFactor;
-	private double lambda;
 
-	private double learningRate;
 	
 	public QLearner(int numPossibleActions, int numPossibleStates, double decayFactor, Random rand) {
 		qMatrix = new SimpleMatrix(numPossibleActions, numPossibleStates);
@@ -24,11 +21,8 @@ public class QLearner implements Serializable {
 		
 		this.numPossibleActions = numPossibleActions;
 		this.numPossibleStates = numPossibleStates;
-		this.decayFactor = decayFactor;
 		this.stateBefore = -1;
-		lambda = 0;// 0.9;//decayFactor; //TODO:Should be parameter
-		
-		this.learningRate = 0.1;
+
 	}
 	
 	public int chooseBestAction(SimpleMatrix stateProbabilities){
@@ -85,9 +79,6 @@ public class QLearner implements Serializable {
 	public SimpleMatrix getQMatrix(){
 		return qMatrix;
 	}
-		
-	public void setLearningRate(double learningRate){
-		this.learningRate = learningRate;
-	}
+
 
 }

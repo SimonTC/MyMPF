@@ -248,4 +248,8 @@ public class ActionNode extends Node {
 	public SpatialPooler getPooler(){
 		return pooler;
 	}
+	
+	public void createPoolerInitializationString(){
+		poolerInitializationString= pooler.toInitializationString();
+	}
 }

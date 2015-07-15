@@ -53,6 +53,10 @@ public class UnitNode extends Node {
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
+		createInitializationString();
+	}
+	
+	public void createInitializationString(){
 		unitInitializationString = unit.toInitializationString();
 	}
 	

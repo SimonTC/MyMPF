@@ -99,7 +99,7 @@ public class ActionNode extends Node {
 				int voterID = n.getID();
 				NeoCorticalUnit unit = n.getUnit();
 				givenVotes.put(voterID, -1);
-				boolean mayVote = unit.active();// && !unit.needHelp();
+				boolean mayVote = unit.active() && !unit.needHelp();// && !unit.needHelp();
 				if (mayVote){
 					int vote = unit.getNextAction();
 					givenVotes.put(n.getID(), vote);

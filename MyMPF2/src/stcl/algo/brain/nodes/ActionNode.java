@@ -129,7 +129,7 @@ public class ActionNode extends Node {
 	private int doExploration(){
 		//TODO: Implement better exploration policy
 		//int nextAction = rand.nextInt(votesForActions.getNumElements());
-		int nextAction = lastExplorativeAction++;
+		int nextAction = ++lastExplorativeAction;
 		if (nextAction == votesForActions.getNumElements()) nextAction = 0;
 		lastExplorativeAction = nextAction;
 		return nextAction;

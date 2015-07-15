@@ -32,6 +32,7 @@ public class ActionNode extends Node {
 	private String initializationDescription;
 	private boolean updateVoterInfluence;
 	private String poolerInitializationString;
+	private int lastExplorativeAction;
 
 	public ActionNode(int id) {
 		super(id, -1, -1, -1);
@@ -71,6 +72,7 @@ public class ActionNode extends Node {
 		initializationDescription = initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate;
 		explorationChance = initialExplorationChance;
 		poolerInitializationString = pooler.toInitializationString();
+		lastExplorativeAction = -1;
 	}
 	
 	public void setExplorationChance(double explorationChance){
@@ -126,7 +128,10 @@ public class ActionNode extends Node {
 	
 	private int doExploration(){
 		//TODO: Implement better exploration policy
-		int nextAction = rand.nextInt(votesForActions.getNumElements());
+		//int nextAction = rand.nextInt(votesForActions.getNumElements());
+		int nextAction = lastExplorativeAction++;
+		if (nextAction == votesForActions.getNumElements()) nextAction = 0;
+		lastExplorativeAction = nextAction;
 		return nextAction;
 	}
 

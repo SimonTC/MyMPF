@@ -17,6 +17,7 @@ import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.Sequencer;
+import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.util.FileWriter;
 
 /**
@@ -372,9 +373,9 @@ public class Network_DataCollector extends Network {
 			if (spatial){
 				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getSpatialPooler().getActivationMatrix());
 			} else {
-				Sequencer sequencer = super.getUnitNodes().get(i).getUnit().getSequencer();
-				if (sequencer != null){
-					m = new SimpleMatrix(sequencer.getSequenceProbabilities());
+				TemporalPooler pooler = super.getUnitNodes().get(i).getUnit().getTemporalPooler();
+				if (pooler != null){
+					m = new SimpleMatrix(pooler.getActivationMatrix());
 				} else {
 					m = new SimpleMatrix(1, 1);
 					m.set(-1);

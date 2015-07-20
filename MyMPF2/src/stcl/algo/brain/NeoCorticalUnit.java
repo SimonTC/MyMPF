@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 import stcl.algo.poolers.Sequencer;
 import stcl.algo.poolers.SOM;
 import stcl.algo.poolers.SpatialPooler;
+import stcl.algo.poolers.TemporalPooler;
 import stcl.algo.predictors.Predictor_VOMM;
 import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
@@ -45,7 +46,8 @@ public class NeoCorticalUnit implements Serializable{
 
 	private boolean entropyThresholdFrozen;
 	
-	private Sequencer sequencer;
+	private TemporalPooler temporalPooler;
+	//private Sequencer sequencer;
 	private boolean noTemporal;
 	private boolean noSpatial;
 	
@@ -112,7 +114,9 @@ public class NeoCorticalUnit implements Serializable{
 		
 		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
 		
-		if (temporalMapSize > 0) sequencer = instantiateSequencer(markovOrder, temporalMapSize, spatialOutputLength);
+		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
+		
+		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(rand, spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
 		
 		//Set flags
 		this.usePrediction = usePrediction;
@@ -124,7 +128,7 @@ public class NeoCorticalUnit implements Serializable{
 		useBiasedInputInSequencer = false;
 		
 		//Set fields
-		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
+		
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		this.rand = rand;
 		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
@@ -190,13 +194,14 @@ public class NeoCorticalUnit implements Serializable{
 			}
 		}
 		
-		if (sequencer != null){
+		if (temporalPooler != null){
 			SimpleMatrix inputToSequencer = useBiasedInputInSequencer ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 			double[] spatialFFOutputDataVector;
 			spatialFFOutputDataVector = inputToSequencer.getMatrix().data;	
 			SimpleMatrix temporalFFInputVector = new SimpleMatrix(1, spatialFFOutputDataVector.length);
 			temporalFFInputVector.getMatrix().data = spatialFFOutputDataVector;
-			ffOutput = sequencer.feedForward(temporalFFInputVector, needHelp);
+			ffOutput = temporalPooler.feedForward(temporalFFInputVector);
+			//ffOutput = sequencer.feedForward(temporalFFInputVector, needHelp);
 		} else {
 			ffOutput = biasSpatialFFOutput ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 		}
@@ -220,9 +225,9 @@ public class NeoCorticalUnit implements Serializable{
 			//Normalize
 			SimpleMatrix normalizedInput = normalize(inputMatrix);
 			
-			if (sequencer != null){
+			if (temporalPooler != null){
 				//Selection of best temporal model
-				SimpleMatrix sequencerFBOutput = sequencer.feedBackward(normalizedInput);
+				SimpleMatrix sequencerFBOutput = temporalPooler.feedBackward(normalizedInput);
 				
 				//Normalize
 				SimpleMatrix normalizedSequencerFBOutput = normalize(sequencerFBOutput);
@@ -293,6 +298,11 @@ public class NeoCorticalUnit implements Serializable{
 	
 	private Predictor_VOMM instantiatePredictor(int markovOrder, double learningRate, Random rand){
 		Predictor_VOMM p = new Predictor_VOMM(markovOrder, learningRate, rand);
+		return p;
+	}
+	
+	private TemporalPooler instantiateTemporalPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, double decay){
+		TemporalPooler p = new TemporalPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay);
 		return p;
 	}
 	
@@ -392,14 +402,14 @@ public class NeoCorticalUnit implements Serializable{
 	public void flush(){
 		biasMatrix.set(1);
 		if (predictor != null) predictor.flush();
-		if (sequencer != null) sequencer.reset();
+		if (temporalPooler != null) temporalPooler.flushTemporalMemory();
 	}
 	
 	public void setLearning(boolean learning){
 		if (spatialPooler != null) spatialPooler.setLearning(learning);
 		if (decider != null) decider.setLearning(learning);
 		if (predictor != null) predictor.setLearning(learning);
-		if (sequencer != null) sequencer.setLearning(learning);
+		if (temporalPooler != null) temporalPooler.setLearning(learning);
 	}
 
 	public SpatialPooler getSpatialPooler() {
@@ -469,9 +479,7 @@ public class NeoCorticalUnit implements Serializable{
 		return active;
 	}
 	
-	public Sequencer getSequencer(){
-		return sequencer;
-	}
+	public TemporalPooler getTemporalPooler(){ return temporalPooler;}
 
 	/**
 	 * @param entropyThresholdFrozen the entropyThresholdFrozen to set

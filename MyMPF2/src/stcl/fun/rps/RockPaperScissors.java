@@ -13,6 +13,7 @@ import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 import stcl.algo.poolers.Sequencer;
+import stcl.algo.poolers.TemporalPooler;
 
 public class RockPaperScissors {
 
@@ -387,8 +388,8 @@ public class RockPaperScissors {
 			unit.getSpatialPooler().printModelWeigths();
 			System.out.println();
 			System.out.println("Temporal groups in unit " + id);
-			Sequencer sequencer = unit.getSequencer();
-			if (sequencer != null) sequencer.printSequenceMemory();
+			TemporalPooler pooler = unit.getTemporalPooler();
+			if (pooler != null) pooler.printModelWeigths();
 			System.out.println();
 			System.out.println("Prediction model, unit " + id);
 			unit.printPredictionModel();

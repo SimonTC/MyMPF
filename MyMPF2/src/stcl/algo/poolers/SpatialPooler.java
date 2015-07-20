@@ -16,11 +16,11 @@ public class SpatialPooler implements Serializable {
 	private SOM som;
 	
 	//Matrice used 
-	private SimpleMatrix activationMatrix;
+	protected SimpleMatrix activationMatrix;
 	
 	//Variables used for testing inputs
-	private int inputLength;
-	private int mapSize;
+	protected int inputLength;
+	protected int mapSize;
 	
 	//Misc
 	private Random rand;
@@ -134,7 +134,7 @@ public class SpatialPooler implements Serializable {
 	 * @param map
 	 * @return
 	 */
-	private SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
+	protected SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
 		//Transform bias matrix into vector
 		double[] vector = input.getMatrix().data;
 		

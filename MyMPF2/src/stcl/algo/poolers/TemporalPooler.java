@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.utils.SomConstants;
 import stcl.algo.util.Normalizer;
 
 public class TemporalPooler extends SpatialPooler  {
@@ -16,6 +17,10 @@ public class TemporalPooler extends SpatialPooler  {
 		super(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
 
 		rsom = new RSOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev, decay);
+	}
+	
+	public TemporalPooler (String initializationString, int startLine, Random rand){
+		super(initializationString, startLine, rand);
 	}
 
 	

@@ -91,10 +91,22 @@ public class NeoCorticalUnit implements Serializable{
 		String[] unitInfo = lines[0].split(" ");
 		initialize(rand, Integer.parseInt(unitInfo[0]), Integer.parseInt(unitInfo[1]), Integer.parseInt(unitInfo[2]), Integer.parseInt(unitInfo[3]), Integer.parseInt(unitInfo[4]), Boolean.parseBoolean(unitInfo[5]), Boolean.parseBoolean(unitInfo[6]), Boolean.parseBoolean(unitInfo[7]));
 		if (!noSpatial) spatialPooler = new SpatialPooler(initializationString, 1, rand);
+		if (!noTemporal){
+			int temporalStart = 0;
+			String[] tmp = initializationString.split(SomConstants.LINE_SEPARATOR);
+			for (int i = 0; i < tmp.length; i++){
+				if (tmp[i].equalsIgnoreCase("TEMPORAL")){
+					temporalStart = i + 1;
+					break;
+				}
+			}
+			temporalPooler = new TemporalPooler(initializationString, temporalStart, rand);
+		}
 	}
 	public String toInitializationString(){
 		String s = ffInputVectorSize + " " + spatialMapSize + " " + temporalMapSize + " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning + SomConstants.LINE_SEPARATOR;
 		if (!noSpatial) s+= spatialPooler.toInitializationString();
+		if (!noTemporal) s+= "TEMPORAL" + SomConstants.LINE_SEPARATOR +  temporalPooler.toInitializationString();
 		return s;
 	}
 	
@@ -118,7 +130,7 @@ public class NeoCorticalUnit implements Serializable{
 		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
 		
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
-		
+
 		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(rand, spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
 		
 		//Set flags

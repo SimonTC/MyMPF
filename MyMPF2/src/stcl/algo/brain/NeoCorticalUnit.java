@@ -57,6 +57,9 @@ public class NeoCorticalUnit implements Serializable{
 	private int numPossibleActions;
 	private boolean reactionary;
 	private boolean offlineLearning;
+	
+	private int stepsSinceSequenceStart;
+	private SimpleMatrix temporalProbabilityMatrixToSend;
 
 	/**
 	 * If true the FF output from the spatial pooler will be biased by the prediction done at t-1
@@ -139,6 +142,8 @@ public class NeoCorticalUnit implements Serializable{
 		this.reactionary = reactionary;
 		this.offlineLearning = offlineLearning;
 		this.temporalMapSize = temporalMapSize;
+		stepsSinceSequenceStart = 0;
+		temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutputMapSize, ffOutputMapSize);
 		
 		//Initialize matrices
 		if (noSpatial){
@@ -206,6 +211,9 @@ public class NeoCorticalUnit implements Serializable{
 			ffOutput = biasSpatialFFOutput ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 		}
 		
+		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutput);		
+		stepsSinceSequenceStart++;
+		
 		return ffOutput;
 	}
 	
@@ -246,7 +254,7 @@ public class NeoCorticalUnit implements Serializable{
 				
 				biasMatrix = normalize(biasMatrix);			
 			}
-			
+			stepsSinceSequenceStart = 0;
 		} else {
 			biasMatrix = predictionMatrix;
 		}

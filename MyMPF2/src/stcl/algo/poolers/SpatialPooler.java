@@ -10,20 +10,10 @@ import dk.stcl.core.basic.SomBasics;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.utils.SomConstants;
 
-public class SpatialPooler implements Serializable {
+public class SpatialPooler extends Pooler implements Serializable {
 	private static final long serialVersionUID = 1L;
 	//Weight matrix
-	private SOM som;
-	
-	//Matrice used 
-	protected SimpleMatrix activationMatrix;
-	
-	//Variables used for testing inputs
-	protected int inputLength;
-	protected int mapSize;
-	
-	//Misc
-	private Random rand;
+	protected SOM som;
 
 	/**
 	 * Constructor used when all parameters are given
@@ -35,25 +25,18 @@ public class SpatialPooler implements Serializable {
 	 * @param activationCodingFactor
 	 */
 	public SpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
-		this.rand = rand;
+		super(rand, inputLength, mapSize);
 		som = new SOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev);
-		activationMatrix = new SimpleMatrix(mapSize, mapSize);
-		this.inputLength = inputLength;
-		this.mapSize = mapSize;		
 	}
 	
 	public SpatialPooler(String initializationString, int startLine, Random rand){
-		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
-		String[] poolerInfo = lines[startLine].split(" ");
-		inputLength = Integer.parseInt(poolerInfo[0]);
-		mapSize = Integer.parseInt(poolerInfo[1]);
-		activationMatrix = new SimpleMatrix(mapSize, mapSize);
+		super(initializationString, startLine, rand);
 		som = new SOM(initializationString, startLine + 1);
-		this.rand = rand;
 	}
 	
+	@Override
 	public String toInitializationString(){
-		String s = inputLength + " " + mapSize + SomConstants.LINE_SEPARATOR;
+		String s = super.toInitializationString();
 		s += som.toFileString();
 		return s;
 	}
@@ -98,83 +81,14 @@ public class SpatialPooler implements Serializable {
 		return model;		
 	}
 	
-	/**
-	 * Use roulette method to choose a random model from the given SomBasics object
-	 * @param input
-	 * @return
-	 */
-	private SimpleMatrix chooseRandom(SimpleMatrix input, SomBasics map){
-		//Transform matrix into vector
-		double[] vector = input.getMatrix().data;
-		
-		//Choose random number between 0 and 1
-		double d = rand.nextDouble();
-		
-		//Go through bias vector until value is >= random number
-		double tmp = 0;
-		int id = 0;
-		while (tmp < d && id < vector.length){
-			tmp += vector[id++];
-		}
-		
-		id--; //We have to subtract to be sure we get the correct model
-		
-		//Choose model from som
-		SimpleMatrix model = map.getNode(id).getVector();
-		
-		//System.out.println("Chose model: " + id);
-		
-		return model;
-		
-	}
-	
-	/**
-	 * Choose the most probable model from the given SomBasics object
-	 * @param input
-	 * @param map
-	 * @return
-	 */
-	protected SimpleMatrix chooseMax(SimpleMatrix input, SomBasics map){
-		//Transform bias matrix into vector
-		double[] vector = input.getMatrix().data;
-		
-		//Go through bias vector until value is >= random number
-		double max = Double.NEGATIVE_INFINITY;
-		int maxID = -1;
-		int id = 0;
-		
-		for (double d : vector){
-			if (d > max){
-				max = d;
-				maxID = id;
-			}
-			id++;
-		}
-		
-		//System.out.println("Chose model: " + maxID);
-		
-		//Choose model from som
-		SimpleMatrix model = map.getNode(maxID).getVector();
-		
-		return model;
-		
-	}
-	
 	public SOM getSOM(){
 		return som;
 	}
-	
-	public SimpleMatrix getActivationMatrix(){
-		return this.activationMatrix;
-	}
-	
+
 	public void setLearning(boolean learning){
 		som.setLearning(learning);
 	}
 	
-	public int getMapSize(){
-		return this.mapSize;
-	}
 	
 	public void sensitize(int iteration){
 		som.sensitize(iteration);

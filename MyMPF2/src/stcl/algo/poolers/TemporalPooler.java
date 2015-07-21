@@ -4,17 +4,18 @@ import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.utils.SomConstants;
 import stcl.algo.util.Normalizer;
 
-public class TemporalPooler extends SpatialPooler  {
+public class TemporalPooler extends Pooler  {
 
 	private RSOM rsom; 	
 	
 	public TemporalPooler(Random rand, int inputLength, int mapSize,
 			double initialLearningRate, double stddev,
 			double activationCodingFactor, double decay) {
-		super(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
+		super(rand, inputLength, mapSize);
 
 		rsom = new RSOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev, decay);
 	}
@@ -73,7 +74,6 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	@Override
 	public void setLearning(boolean learning){
-		super.setLearning(learning);
 		rsom.setLearning(learning);
 	}
 	
@@ -83,6 +83,16 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	public RSOM getRSOM(){
 		return this.rsom;
+	}
+
+	@Override
+	public void printModelWeigths(){
+		for (SomNode n :rsom.getNodes()){
+			for (double d : n.getVector().getMatrix().data){
+				System.out.printf("%.3f  ", d);
+			}
+			System.out.println();
+		}
 	}
 }
 	

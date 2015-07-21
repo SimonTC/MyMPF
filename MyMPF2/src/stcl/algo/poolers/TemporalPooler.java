@@ -25,7 +25,12 @@ public class TemporalPooler extends Pooler  {
 		rsom = new RSOM(initializationString, startLine + 1);
 	}
 
-	
+	@Override
+	public String toInitializationString(){
+		String s = super.toInitializationString();
+		s += rsom.toFileString();
+		return s;
+	}
 	
 	@Override
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){

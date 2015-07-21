@@ -21,6 +21,7 @@ public class TemporalPooler extends SpatialPooler  {
 	
 	public TemporalPooler (String initializationString, int startLine, Random rand){
 		super(initializationString, startLine, rand);
+		rsom = new RSOM(initializationString, startLine);
 	}
 
 	

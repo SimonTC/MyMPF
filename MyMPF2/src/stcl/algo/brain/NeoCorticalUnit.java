@@ -115,7 +115,7 @@ public class NeoCorticalUnit implements Serializable{
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
 		if (markovOrder < 1 && temporalMapSize > 0) throw new IllegalArgumentException("Markov order has to be greater than 0 when using the temporal pooler");
-		//if (spatialMapSize < 1 && temporalMapSize < 1) throw new IllegalArgumentException("The spatial pooler and temporal pooler can't both have a map size of 0");
+		if (spatialMapSize < 1 && temporalMapSize < 1) throw new IllegalArgumentException("The spatial pooler and temporal pooler can't both have a map size of 0");
 		
 		//Instantiate sub-components
 		int spatialOutputLength = ffInputLength;
@@ -131,11 +131,23 @@ public class NeoCorticalUnit implements Serializable{
 		
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 
+		noTemporal = (temporalMapSize < 1);
 		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(rand, spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
+		
+		//Set map and output sizes
+		this.spatialMapSize = spatialMapSize;
+		this.temporalMapSize = temporalMapSize;
+		
+		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
+		
+		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
+		fbOutput = new SimpleMatrix(1, ffInputLength);
+		ffInputVectorSize = ffInputLength;
+		
+		
 		
 		//Set flags
 		this.usePrediction = usePrediction;
-		noTemporal = (temporalMapSize < 1);
 		needHelp = false;
 		entropyThresholdFrozen = false;
 		biasSpatialFFOutput = false; //TODO: Make sure this can be changed
@@ -146,7 +158,6 @@ public class NeoCorticalUnit implements Serializable{
 		
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		this.rand = rand;
-		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
 		chosenAction = -1;
@@ -168,10 +179,7 @@ public class NeoCorticalUnit implements Serializable{
 		biasMatrix.set(1);
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
-		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
-		fbOutput = new SimpleMatrix(1, ffInputLength);
-		ffInputVectorSize = ffInputLength;
-		this.spatialMapSize = spatialMapSize;
+		
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){

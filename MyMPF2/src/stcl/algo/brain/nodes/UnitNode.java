@@ -53,6 +53,8 @@ public class UnitNode extends Node {
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
 		this.rand = rand;
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
+		this.feedforwardOutput = new SimpleMatrix(1, feedforwardOutputVectorLength);
+		feedforwardOutput.set(1);
 		createInitializationString();
 	}
 	

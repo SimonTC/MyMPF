@@ -234,7 +234,7 @@ public class NeoCorticalUnit implements Serializable{
 		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutput);		
 		stepsSinceSequenceStart++;
 		
-		return ffOutput;
+		return temporalProbabilityMatrixToSend;
 	}
 	
 	/**
@@ -550,6 +550,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public void newEpisode(){
 		decider.newEpisode();
+		stepsSinceSequenceStart = 0;
 	}
 	
 	public ActionDecider_Q getDecider(){

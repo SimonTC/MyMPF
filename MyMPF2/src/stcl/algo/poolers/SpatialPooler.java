@@ -48,7 +48,6 @@ public class SpatialPooler extends Pooler implements Serializable {
 	 */
 	public SimpleMatrix feedForward(SimpleMatrix feedForwardInputVector){
 		//Test input
-		if (!feedForwardInputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a vector");
 		if (feedForwardInputVector.numCols() != inputLength) throw new IllegalArgumentException("The feed forward input to the spatial pooler has to be a 1 x " + inputLength + " vector");
 		
 		//Adjust weights of SOM
@@ -71,7 +70,6 @@ public class SpatialPooler extends Pooler implements Serializable {
 	 */
 	public SimpleMatrix feedBackward(SimpleMatrix feedBackwardInputMatrix){
 		//Test input
-		if (feedBackwardInputMatrix.isVector()) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a matrix");
 		if (feedBackwardInputMatrix.numCols() != mapSize || feedBackwardInputMatrix.numRows() != mapSize) throw new IllegalArgumentException("The feed back input to the spatial pooler has to be a " + mapSize + " x " + mapSize + " matrix");
 		
 		//Choose random model from som by roulette selection based on the input

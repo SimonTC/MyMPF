@@ -115,7 +115,7 @@ public class NeoCorticalUnit implements Serializable{
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
 		if (markovOrder < 1 && temporalMapSize > 0) throw new IllegalArgumentException("Markov order has to be greater than 0 when using the temporal pooler");
-		if (spatialMapSize < 1 && temporalMapSize < 1) throw new IllegalArgumentException("The spatial pooler and temporal pooler can't both have a map size of 0");
+		//if (spatialMapSize < 1 && temporalMapSize < 1) throw new IllegalArgumentException("The spatial pooler and temporal pooler can't both have a map size of 0");
 		
 		//Instantiate sub-components
 		int spatialOutputLength = ffInputLength;

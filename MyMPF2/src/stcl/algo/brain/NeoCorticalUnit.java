@@ -255,7 +255,7 @@ public class NeoCorticalUnit implements Serializable{
 			
 			if (temporalPooler != null){
 				//Selection of best temporal model
-				SimpleMatrix sequencerFBOutput = temporalPooler.feedBackward(normalizedInput);
+				SimpleMatrix sequencerFBOutput = new SimpleMatrix(temporalPooler.feedBackward(normalizedInput));
 				
 				//Normalize
 				SimpleMatrix normalizedSequencerFBOutput = normalize(sequencerFBOutput);

@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.TreeMap;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import org.ejml.simple.SimpleMatrix;
+import org.w3c.dom.NodeList;
 
 import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Node;
@@ -296,16 +299,23 @@ public class Network implements Serializable{
 			int id = n.getID();
 			buffer.append("//NODECLASS " + id + " " + n.getType().name() + " Nodes\n");
 			buffer.append("//NODESIZE " + id + " " + nodeSize + "\n");
-			int[] coordinates = n.getCoordinates();
-			for (int i = 0; i < maxCoordinates.length; i++){
-				if(coordinates[i] > maxCoordinates[i]) maxCoordinates[i] = coordinates[i];
-			}
 		}
 		
+		//Unit nodes should be visualized within the same area as the sensor nodes. Otherwise the visualization is too big without extra info
+		
+		//Find max x and y in the sensor layer
+		int maxX = 0, maxY = 0;
+		for (Node n : sensorLayer){
+			int[] coordinates = n.getCoordinates();
+			int x = coordinates[0];
+			int y = coordinates[1];
+			if (x > maxX) maxX = x;
+			if (y > maxY) maxY = y;
+		}
+		
+		int maxZ = unitLayers.size();
+		
 		//Add node coordinates
-		int maxX = maxCoordinates[0];
-		int maxY = maxCoordinates[1];
-		int maxZ = maxCoordinates[2];
 		int stepX = maxWidth / maxX; 
 		int stepY = maxWidth / maxY;
 		int stepZ = maxWidth / maxZ;

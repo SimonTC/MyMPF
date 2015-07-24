@@ -277,7 +277,7 @@ public class Network implements Serializable{
 	 * @param nodeSize
 	 * @return
 	 */
-	public String toVisualString(int nodeSize, int maxWidth){
+	public String toVisualString(int nodeSize, int maxWidth, boolean threeD){
 		StringBuffer buffer = new StringBuffer();
 		//Create list of connections
 		for (Node n : nodes){
@@ -311,9 +311,16 @@ public class Network implements Serializable{
 		int stepZ = maxWidth / maxZ;
 		for (Node n : nodes){
 			int[] coordinates = n.getCoordinates();
-			int x = coordinates[0] * stepX;
-			int y = coordinates[1] * stepY;
-			int z = coordinates[2] * stepZ;
+			int x, y, z;
+			if (threeD){
+				x = coordinates[0] * stepX;
+				y = coordinates[1] * stepY;
+				z = coordinates[2] * stepZ;
+			} else {
+				x = (coordinates[0] * coordinates[1] + coordinates[0]) * stepX;
+				y = coordinates[2] * stepZ;
+				z = maxWidth / 2;
+			}
 			buffer.append("//NODECOORD " + n.getID() + " " + x + " " + y + " " + z +"\n" );			
 		}
 		

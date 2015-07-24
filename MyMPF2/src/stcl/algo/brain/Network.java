@@ -277,14 +277,16 @@ public class Network implements Serializable{
 	 * @param nodeSize
 	 * @return
 	 */
-	public String toVisualString(int nodeSize){
+	public String toVisualString(int nodeSize, int maxWidth){
 		StringBuffer buffer = new StringBuffer();
 		//Create list of connections
 		for (Node n : nodes){
 			Node parent = n.getParent();
 			if (parent != null){
-				buffer.append(n.getID() + " " + parent.getID());
-				buffer.append("\n");
+				if (parent.getType() != NodeType.ACTION){
+					buffer.append(n.getID() + " " + parent.getID());
+					buffer.append("\n");
+				}
 			}
 		}
 		
@@ -304,9 +306,9 @@ public class Network implements Serializable{
 		int maxX = maxCoordinates[0];
 		int maxY = maxCoordinates[1];
 		int maxZ = maxCoordinates[2];
-		int stepX = 1000 / maxX; //Use 1000 because it this the max size of the BioLayout field
-		int stepY = 1000 / maxY;
-		int stepZ = 1000 / maxZ;
+		int stepX = maxWidth / maxX; 
+		int stepY = maxWidth / maxY;
+		int stepZ = maxWidth / maxZ;
 		for (Node n : nodes){
 			int[] coordinates = n.getCoordinates();
 			int x = coordinates[0] * stepX;
@@ -314,6 +316,10 @@ public class Network implements Serializable{
 			int z = coordinates[2] * stepZ;
 			buffer.append("//NODECOORD " + n.getID() + " " + x + " " + y + " " + z +"\n" );			
 		}
+		
+		buffer.append("//NODECLASSCOLOR SENSOR Nodes #ff0000\n");
+		buffer.append("//NODECLASSCOLOR UNIT Nodes #0000ff\n");
+		buffer.append("//NODECLASSCOLOR ACTION Nodes #33FFFF\n");
 		return buffer.toString();
 	}
 

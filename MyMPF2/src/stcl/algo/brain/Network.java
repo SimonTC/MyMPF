@@ -319,7 +319,8 @@ public class Network implements Serializable{
 		
 		buffer.append("//NODECLASSCOLOR SENSOR Nodes #ff0000\n");
 		buffer.append("//NODECLASSCOLOR UNIT Nodes #0000ff\n");
-		buffer.append("//NODECLASSCOLOR ACTION Nodes #33FFFF\n");
+		buffer.append("//NODECLASSCOLOR ACTION Nodes #33FFFF\n"); //Only added to make sure they are not here
+		buffer.append("//CURRENTCLASSSET Nodes");
 		return buffer.toString();
 	}
 

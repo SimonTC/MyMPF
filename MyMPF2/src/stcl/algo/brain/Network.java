@@ -14,6 +14,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Node;
+import stcl.algo.brain.nodes.Node.NodeType;
 import stcl.algo.brain.nodes.NodeFactory;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
@@ -270,6 +271,50 @@ public class Network implements Serializable{
 		for (UnitNode n : unitNodes) n.getUnit().getDecider().setUseExternalReward(flag);
 	}
 	
-
+	/**
+	 * Return a string that can be used to visualize the network in BioLayout Express 3D version 3.3
+	 * Link: http://www.biolayout.org/
+	 * @param nodeSize
+	 * @return
+	 */
+	public String toVisualString(int nodeSize){
+		StringBuffer buffer = new StringBuffer();
+		//Create list of connections
+		for (Node n : nodes){
+			Node parent = n.getParent();
+			if (parent != null){
+				buffer.append(n.getID() + " " + parent.getID());
+				buffer.append("\n");
+			}
+		}
+		
+		//Create the nodes
+		int[] maxCoordinates = new int[3];
+		for (Node n : nodes){
+			int id = n.getID();
+			buffer.append("//NODECLASS " + id + " " + n.getType().name() + " Nodes\n");
+			buffer.append("//NODESIZE " + id + " " + nodeSize + "\n");
+			int[] coordinates = n.getCoordinates();
+			for (int i = 0; i < maxCoordinates.length; i++){
+				if(coordinates[i] > maxCoordinates[i]) maxCoordinates[i] = coordinates[i];
+			}
+		}
+		
+		//Add node coordinates
+		int maxX = maxCoordinates[0];
+		int maxY = maxCoordinates[1];
+		int maxZ = maxCoordinates[2];
+		int stepX = 1000 / maxX; //Use 1000 because it this the max size of the BioLayout field
+		int stepY = 1000 / maxY;
+		int stepZ = 1000 / maxZ;
+		for (Node n : nodes){
+			int[] coordinates = n.getCoordinates();
+			int x = coordinates[0] * stepX;
+			int y = coordinates[1] * stepY;
+			int z = coordinates[2] * stepZ;
+			buffer.append("//NODECOORD " + n.getID() + " " + x + " " + y + " " + z +"\n" );			
+		}
+		return buffer.toString();
+	}
 
 }

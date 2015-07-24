@@ -317,7 +317,7 @@ public class Network implements Serializable{
 				y = coordinates[1] * stepY;
 				z = coordinates[2] * stepZ;
 			} else {
-				x = (coordinates[0] * coordinates[1] + coordinates[0]) * stepX;
+				x = (coordinates[1] * maxX + coordinates[0]) * stepX; 
 				y = coordinates[2] * stepZ;
 				z = maxWidth / 2;
 			}

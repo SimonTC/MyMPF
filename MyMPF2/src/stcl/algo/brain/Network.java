@@ -247,13 +247,6 @@ public class Network implements Serializable{
 			buffer.append(conn[0] + " --> " + conn[1] + "\n");
 		}
 
-		buffer.append("Voter influence\n");
-		TreeMap<Integer, Double> influenceMap = actionNode.getInfluenceMap();
-		for (Integer key : influenceMap.keySet()){
-			double influence = influenceMap.get(key);
-			buffer.append(key + " : " + influence + "\n");
-		}
-		
 		return buffer.toString();
 		
 	}

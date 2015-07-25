@@ -24,25 +24,21 @@ public class ActionNode extends Node {
 	private int nextActionID;
 	private Random rand;
 	private TreeMap<Integer, Integer> givenVotes;
-	private TreeMap<Integer, Double> influenceMap;
 	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
 	private double rewardInfluence;
 	private boolean learningActions;
 	private String initializationDescription;
-	private boolean updateVoterInfluence;
 	private String poolerInitializationString;
 	private int lastExplorativeAction;
 
 	public ActionNode(int id) {
 		super(id, -1, -1, -1);
 		voters = new ArrayList<UnitNode>();
-		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
 		learningActions = true;
-		updateVoterInfluence = true;
 	}
 	
 	/**
@@ -55,11 +51,9 @@ public class ActionNode extends Node {
 	public ActionNode(String s, Random rand){
 		super(s);
 		voters = new ArrayList<UnitNode>();
-		influenceMap = new TreeMap<Integer, Double>();
 		givenVotes = new TreeMap<Integer, Integer>();
 		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		learningActions = true;
-		updateVoterInfluence = true;
 		String[] arr = s.split(" ");
 		int length = arr.length;
 		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
@@ -104,7 +98,7 @@ public class ActionNode extends Node {
 				if (mayVote){
 					int vote = unit.getNextAction();
 					givenVotes.put(n.getID(), vote);
-					double voteInfluence = influenceMap.get(voterID);
+					double voteInfluence = 1;
 					double currentVoteValue = votesForActions.get(vote);
 					double newValue = currentVoteValue + voteInfluence;
 					votesForActions.set(vote, newValue);
@@ -139,32 +133,11 @@ public class ActionNode extends Node {
 		pooler.feedForward(actionSensor.getFeedforwardOutput());
 		currentAction = pooler.getSOM().getBMU().getId();
 		
-		
-		//TODO: Implement weighting of votes
-		//Update weights of voters
-		//If you voted for the action that was performed your influenced is changed based on how good the outcome was
-		if (updateVoterInfluence){
-			for (UnitNode voter : voters){
-				int voterID = voter.getID();
-				int vote = givenVotes.get(voterID);
-				if (vote != -1){
-					//Voter did vote in last election
-					if (vote == currentAction){
-						double oldInfluence = influenceMap.get(voterID);
-						double newInfluence = oldInfluence + reward * rewardInfluence;
-						if (newInfluence < 0) newInfluence = 0;
-						if (newInfluence > 1) newInfluence = 1;
-						influenceMap.put(voterID, newInfluence);
-					}
-				}
-			}
-		}
 	}
 	
 	public void addVoter(UnitNode voter){
 		voters.add(voter);
 		int voterID = voter.getID();
-		influenceMap.put(voterID, 1.0);
 		givenVotes.put(voterID, -1);
 	}
 	
@@ -184,20 +157,8 @@ public class ActionNode extends Node {
 		pooler.printModelWeigths();
 	}
 	
-	public void printVoterInfluence(){
-		System.out.println(influenceMap.toString());
-	}
-	
 	public void printActionModels(){
 		pooler.printModelWeigths();
-	}
-	
-	public TreeMap<Integer, Double> getInfluenceMap(){
-		return influenceMap;
-	}
-	
-	public void setInfluenceMap(TreeMap<Integer, Double> influenceMap){
-		this.influenceMap = influenceMap;
 	}
 	
 	/**
@@ -220,10 +181,6 @@ public class ActionNode extends Node {
 		
 	}
 	
-	public void setUpdateVoterInfluence(boolean flag){
-		this.updateVoterInfluence = flag;
-	}
-	
 	@Override
 	public String toString(){
 		String s = super.toString();
@@ -234,12 +191,7 @@ public class ActionNode extends Node {
 	@Override
 	public void reinitialize() {
 		givenVotes = new TreeMap<Integer, Integer>();
-		for (Integer i : influenceMap.keySet()){
-			influenceMap.put(i, 1.0);
-			givenVotes.put(i, -1);
-		}
 		learningActions = true;
-		updateVoterInfluence = true;
 		votesForActions.set(0);
 		String[] arr = initializationDescription.split(" ");
 		int length = arr.length;

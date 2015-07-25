@@ -26,17 +26,16 @@ public class ActionNode extends Node {
 	private TreeMap<Integer, Integer> givenVotes;
 	private SimpleMatrix votesForActions;
 	private SimpleMatrix nextAction;
-	private double rewardInfluence;
 	private boolean learningActions;
 	private String initializationDescription;
 	private String poolerInitializationString;
 	private int lastExplorativeAction;
+	private boolean useRandomExploration;
 
 	public ActionNode(int id) {
 		super(id, -1, -1, -1);
 		voters = new ArrayList<UnitNode>();
 		givenVotes = new TreeMap<Integer, Integer>();
-		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		this.type = NodeType.ACTION;
 		learningActions = true;
 	}
@@ -52,21 +51,21 @@ public class ActionNode extends Node {
 		super(s);
 		voters = new ArrayList<UnitNode>();
 		givenVotes = new TreeMap<Integer, Integer>();
-		this.rewardInfluence = 0.01; //TODO: Make a parameter
 		learningActions = true;
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
+		this.initialize(rand, Integer.parseInt(arr[length-4]), Integer.parseInt(arr[length-3]), Double.parseDouble(arr[length - 2]), Double.parseDouble(arr[length-5]), Boolean.parseBoolean(arr[length-1]));
 	}
 	
-	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate, double initialExplorationChance){
+	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate, double initialExplorationChance, boolean useRandomExploration){
 		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
 		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
-		initializationDescription = initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate;
+		initializationDescription = initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate + " " + useRandomExploration;
 		explorationChance = initialExplorationChance;
 		poolerInitializationString = pooler.toInitializationString();
 		lastExplorativeAction = -1;
+		this.useRandomExploration = useRandomExploration;
 	}
 	
 	public void setExplorationChance(double explorationChance){
@@ -120,11 +119,14 @@ public class ActionNode extends Node {
 	}
 	
 	private int doExploration(){
-		//TODO: Implement better exploration policy
-		//int nextAction = rand.nextInt(votesForActions.getNumElements());
-		int nextAction = ++lastExplorativeAction;
-		if (nextAction == votesForActions.getNumElements()) nextAction = 0;
-		lastExplorativeAction = nextAction;
+		int nextAction = -1;
+		if (useRandomExploration){
+			rand.nextInt(votesForActions.getNumElements());
+		} else {
+			nextAction = ++lastExplorativeAction;
+			if (nextAction == votesForActions.getNumElements()) nextAction = 0;
+			lastExplorativeAction = nextAction;
+		}
 		return nextAction;
 	}
 
@@ -196,7 +198,7 @@ public class ActionNode extends Node {
 		String[] arr = initializationDescription.split(" ");
 		int length = arr.length;
 		String orgPoolerInitializationString = poolerInitializationString; //Save string here as it is changed in initialization
-		this.initialize(rand, Integer.parseInt(arr[length-3]), Integer.parseInt(arr[length-2]), Double.parseDouble(arr[length - 1]), Double.parseDouble(arr[length-4]));
+		this.initialize(rand, Integer.parseInt(arr[length-4]), Integer.parseInt(arr[length-3]), Double.parseDouble(arr[length - 2]), Double.parseDouble(arr[length-5]), Boolean.parseBoolean(arr[length-1]));
 		poolerInitializationString = orgPoolerInitializationString;
 		pooler = new SpatialPooler(poolerInitializationString, 0, rand);
 	}

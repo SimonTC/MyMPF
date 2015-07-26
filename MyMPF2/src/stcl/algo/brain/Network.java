@@ -87,7 +87,7 @@ public class Network implements Serializable{
 			}
 			//Connect nodes
 			while( ( line = reader.readLine() ) != null ) {
-				if(line.equalsIgnoreCase("Voter influence")) break;
+				if(line.equalsIgnoreCase("Voter influence") || line.equalsIgnoreCase("")) break;
 				String[] arr = line.split(" --> ");
 				int childID = Integer.parseInt(arr[0]);
 				int parentID = Integer.parseInt(arr[1]);

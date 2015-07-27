@@ -231,7 +231,7 @@ public class NeoCorticalUnit implements Serializable{
 			ffOutput = biasSpatialFFOutput ? biasedSpatialFFOutputMatrix : spatialFFOutputMatrix;
 		}
 		
-		if (stepsSinceSequenceStart < markovOrder) temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutput);		
+		if (stepsSinceSequenceStart <= markovOrder) temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutput);		
 		stepsSinceSequenceStart++;
 		
 		return temporalProbabilityMatrixToSend;

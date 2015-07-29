@@ -173,5 +173,7 @@ public abstract class Node implements Serializable {
 	 * Use if you need to run multiple trainings from an initial state
 	 */
 	public abstract void reinitialize();
+	
+	public abstract void reinitialize(String initializationString);
 
 }

@@ -28,7 +28,7 @@ public class TemporalPooler extends Pooler  {
 	@Override
 	public String toInitializationString(){
 		String s = super.toInitializationString();
-		s += rsom.toFileString();
+		s += rsom.toInitializationString();
 		return s;
 	}
 	

@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
+import dk.stcl.core.utils.SomConstants;
 import stcl.algo.brain.NeoCorticalUnit;
 import stcl.algo.poolers.SpatialPooler;
 import stcl.algo.util.Normalizer;
@@ -203,6 +204,16 @@ public class ActionNode extends Node {
 		pooler = new SpatialPooler(poolerInitializationString, 0, rand);
 	}
 	
+	@Override
+	public void reinitialize(String initializationString) {
+		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
+		this.initializationDescription = lines[0];
+		String s = initializationString.replace(lines[0], "");
+		poolerInitializationString = s;
+		reinitialize();
+		
+	}
+	
 	public SpatialPooler getPooler(){
 		return pooler;
 	}
@@ -214,6 +225,8 @@ public class ActionNode extends Node {
 	@Override
 	public String toInitializationString(){
 		String s = initializationDescription;
-		return s + "\n" + pooler.toInitializationString();
+		return s + SomConstants.LINE_SEPARATOR + pooler.toInitializationString();
 	}
+
+	
 }

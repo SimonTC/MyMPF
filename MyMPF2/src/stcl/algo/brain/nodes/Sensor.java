@@ -59,4 +59,10 @@ public class Sensor extends Node {
 		
 	}
 
+	@Override
+	public void reinitialize(String initializationString) {
+		this.reinitialize();
+		
+	}
+
 }

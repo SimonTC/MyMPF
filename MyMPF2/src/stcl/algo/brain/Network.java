@@ -15,6 +15,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 import org.ejml.simple.SimpleMatrix;
 import org.w3c.dom.NodeList;
 
+import dk.stcl.core.utils.SomConstants;
 import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Node;
 import stcl.algo.brain.nodes.Node.NodeType;
@@ -66,6 +67,14 @@ public class Network implements Serializable{
 	 */
 	//TODO: Change description
 	private void buildNetworkFromString(BufferedReader reader, Random rand){
+		//Build the architecture of the network
+		buildArchitecture(reader, rand);
+		
+		//Set all internal parameters as they where when network was exported
+		setInternalParameters(reader);
+	}
+	
+	private void buildArchitecture(BufferedReader reader, Random rand){
 		sensorLayer = new ArrayList<Sensor>();
 		unitLayers = new ArrayList<ArrayList<UnitNode>>();
 		unitNodes = new ArrayList<UnitNode>();
@@ -109,6 +118,65 @@ public class Network implements Serializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void setInternalParameters(BufferedReader reader){
+		String line = null;
+		
+		try {
+			//Go to start of detailed description
+			while( ( line = reader.readLine() ) != null) {
+				if (line.equalsIgnoreCase("----Detailed description----")) break;
+			}
+			
+			while( ( line = reader.readLine() ) != null) {
+				if (line.equalsIgnoreCase("----End network description----")) break;
+				if (line.contains("Node")){
+					String nodeID = line.replace("Node ", "");
+					reinitializeNode(nodeID, reader);
+				}
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void reinitializeNode(String NodeID, BufferedReader reader) throws IOException{
+		//Find node
+		int id = Integer.parseInt(NodeID);
+		Node node = null;
+		for (Node n : nodes){
+			if (n.getID() == id){
+				node = n;
+				break;
+			}
+		}
+		
+		String line = reader.readLine();
+		
+		switch(node.getType()){
+		case SENSOR: node.reinitialize(line); break;
+		case UNIT:		
+		case ACTION: 
+			String initializationString = "";
+			while( ( line = reader.readLine() ) != null) {
+				if (line.equals("")) break;
+				initializationString += line + SomConstants.LINE_SEPARATOR;
+			}
+			node.reinitialize(initializationString);
+		}
+		
+	}
+	
+	/**
+	 * Resets the network back to its original state before any learning has been performed.
+	 * Use if you need to run multiple trainings from an initial state
+	 */
+	public void reinitialize(){
+		for (Node n : nodes) n.reinitialize();
 	}
 	
 	/**
@@ -229,13 +297,14 @@ public class Network implements Serializable{
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
 		ArrayList<int[]> connections = new ArrayList<int[]>();
+		String ls = SomConstants.LINE_SEPARATOR;
 		
-		buffer.append("----Simple description----\n");
+		buffer.append("----Simple description----" + ls);
 		
-		buffer.append("Nodes\n");
+		buffer.append("Nodes" + ls);
 		for (Node n :  nodes){
 			buffer.append(n.toString());
-			buffer.append("\n");
+			buffer.append(ls);
 			int[] connection = new int[2];
 			if (n.getParent() != null){
 				connection[0] = n.getID();
@@ -244,15 +313,16 @@ public class Network implements Serializable{
 			}
 		}
 		
-		buffer.append("Connections\n");
+		buffer.append("Connections" + ls);
 		for (int[] conn : connections){
-			buffer.append(conn[0] + " --> " + conn[1] + "\n");
+			buffer.append(conn[0] + " --> " + conn[1] + ls);
 		}
 		
-		buffer.append("----Detailed description----\n");
+		buffer.append(ls);
+		buffer.append("----Detailed description----" + ls);
 		this.reinitialize(); //Need to reinitialize to make sure we get the start values and not the learned values
 		for (Node n : nodes){
-			buffer.append("Node " + n.getID() + "\n");
+			buffer.append("Node " + n.getID() + ls);
 			String initializationString = "";
 			switch (n.getType()){
 			case ACTION: 
@@ -270,9 +340,10 @@ public class Network implements Serializable{
 			}
 			
 			buffer.append(initializationString );
-			buffer.append("\n");
+			buffer.append(ls);
 		}
 		
+		buffer.append("----End network description----" + ls);
 
 		return buffer.toString();
 		
@@ -280,14 +351,6 @@ public class Network implements Serializable{
 	
 	public void newEpisode(){
 		for (UnitNode n : unitNodes) n.newEpisode();
-	}
-	
-	/**
-	 * Resets the network back to its original state before any learning has been performed.
-	 * Use if you need to run multiple trainings from an initial state
-	 */
-	public void reinitialize(){
-		for (Node n : nodes) n.reinitialize();
 	}
 	
 	public void setUseExternalReward(boolean flag){

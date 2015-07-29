@@ -175,10 +175,15 @@ public class UnitNode extends Node {
 	public void newEpisode(){
 		unit.newEpisode();
 	}
-
+	
 	@Override
 	public void reinitialize() {
-		unit = new NeoCorticalUnit(unitInitializationString, rand);
+		unit = new NeoCorticalUnit(unitInitializationString, rand);		
+	}
+	
+	@Override
+	public void reinitialize(String initializationString) {
+		unit = new NeoCorticalUnit(initializationString, rand);	
 		
 	}
 	
@@ -186,5 +191,7 @@ public class UnitNode extends Node {
 	public String toInitializationString(){
 		return unit.toInitializationString();
 	}
+
+	
 
 }

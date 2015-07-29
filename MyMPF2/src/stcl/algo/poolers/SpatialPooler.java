@@ -37,7 +37,7 @@ public class SpatialPooler extends Pooler implements Serializable {
 	@Override
 	public String toInitializationString(){
 		String s = super.toInitializationString();
-		s += som.toFileString();
+		s += som.toInitializationString();
 		return s;
 	}
 	

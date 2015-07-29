@@ -178,8 +178,12 @@ public class UnitNode extends Node {
 	}
 	
 	@Override
+	/**
+	 * Using this method overwrites the local initialization string and saves the given initialization string
+	 */
 	public void reinitialize(String initializationString) {
 		unit = new NeoCorticalUnit(initializationString);	
+		unitInitializationString = initializationString;
 		
 	}
 	

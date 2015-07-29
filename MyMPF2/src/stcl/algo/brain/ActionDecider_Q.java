@@ -77,6 +77,7 @@ public class ActionDecider_Q implements Serializable {
 	 * @param currentState
 	 * @return
 	 */
+	//TODO: Is this used? Does it work? Wasn't there a problem with this?
 	protected double calculateInternaleward(double externalReward, SimpleMatrix currentStateProbabilities){
 		double internalReward = externalReward;
 		if (prediction != null && !useExternalReward){

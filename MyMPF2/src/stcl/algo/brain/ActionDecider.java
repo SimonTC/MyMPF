@@ -53,7 +53,7 @@ public class ActionDecider implements Serializable {
 		
 		return action;
 	}
-	
+	//TODO: remove this function
 	private double calculateInternaleward(double externalReward){
 		
 		//externalRewardNow = externalReward;

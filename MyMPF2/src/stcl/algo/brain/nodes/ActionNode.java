@@ -208,7 +208,7 @@ public class ActionNode extends Node {
 	public void reinitialize(String initializationString) {
 		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
 		this.initializationDescription = lines[0];
-		String s = initializationString.replace(lines[0], "");
+		String s = initializationString.replace(lines[0] + SomConstants.LINE_SEPARATOR, "");
 		poolerInitializationString = s;
 		reinitialize();
 		

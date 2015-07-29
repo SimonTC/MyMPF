@@ -161,7 +161,7 @@ public class Network implements Serializable{
 		case SENSOR: node.reinitialize(line); break;
 		case UNIT:		
 		case ACTION: 
-			String initializationString = "";
+			String initializationString = line + SomConstants.LINE_SEPARATOR;
 			while( ( line = reader.readLine() ) != null) {
 				if (line.equals("")) break;
 				initializationString += line + SomConstants.LINE_SEPARATOR;

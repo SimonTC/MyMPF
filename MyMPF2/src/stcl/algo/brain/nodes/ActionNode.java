@@ -210,4 +210,10 @@ public class ActionNode extends Node {
 	public void createPoolerInitializationString(){
 		poolerInitializationString= pooler.toInitializationString();
 	}
+	
+	@Override
+	public String toInitializationString(){
+		String s = initializationDescription;
+		return s + "\n" + pooler.toInitializationString();
+	}
 }

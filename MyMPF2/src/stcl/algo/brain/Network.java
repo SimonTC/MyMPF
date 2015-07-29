@@ -230,6 +230,8 @@ public class Network implements Serializable{
 		StringBuffer buffer = new StringBuffer();
 		ArrayList<int[]> connections = new ArrayList<int[]>();
 		
+		buffer.append("----Simple description----\n");
+		
 		buffer.append("Nodes\n");
 		for (Node n :  nodes){
 			buffer.append(n.toString());
@@ -246,6 +248,14 @@ public class Network implements Serializable{
 		for (int[] conn : connections){
 			buffer.append(conn[0] + " --> " + conn[1] + "\n");
 		}
+		
+		buffer.append("----Detailed description----\n");
+		for (Node n : nodes){
+			buffer.append("Node " + n.getID() + "\n");
+			buffer.append(n.toInitializationString());
+			buffer.append("\n");
+		}
+		
 
 		return buffer.toString();
 		

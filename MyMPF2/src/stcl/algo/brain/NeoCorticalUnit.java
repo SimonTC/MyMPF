@@ -1,7 +1,6 @@
 package stcl.algo.brain;
 
 import java.io.Serializable;
-import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -41,8 +40,6 @@ public class NeoCorticalUnit implements Serializable{
 	
 	private boolean usePrediction;
 	private boolean active;
-	
-	private Random rand;
 
 	private boolean entropyThresholdFrozen;
 	
@@ -82,15 +79,15 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param reactionary
 	 * @param offlineLearning
 	 */
-	public NeoCorticalUnit(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning) {
-		initialize(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
+	public NeoCorticalUnit(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning) {
+		initialize(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 	}
 	
-	public NeoCorticalUnit(String initializationString, Random rand){
+	public NeoCorticalUnit(String initializationString){
 		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
 		String[] unitInfo = lines[0].split(" ");
-		initialize(rand, Integer.parseInt(unitInfo[0]), Integer.parseInt(unitInfo[1]), Integer.parseInt(unitInfo[2]), Integer.parseInt(unitInfo[3]), Integer.parseInt(unitInfo[4]), Boolean.parseBoolean(unitInfo[5]), Boolean.parseBoolean(unitInfo[6]), Boolean.parseBoolean(unitInfo[7]));
-		if (!noSpatial) spatialPooler = new SpatialPooler(initializationString, 1, rand);
+		initialize(Integer.parseInt(unitInfo[0]), Integer.parseInt(unitInfo[1]), Integer.parseInt(unitInfo[2]), Integer.parseInt(unitInfo[3]), Integer.parseInt(unitInfo[4]), Boolean.parseBoolean(unitInfo[5]), Boolean.parseBoolean(unitInfo[6]), Boolean.parseBoolean(unitInfo[7]));
+		if (!noSpatial) spatialPooler = new SpatialPooler(initializationString, 1);
 		if (!noTemporal){
 			int temporalStart = 0;
 			String[] tmp = initializationString.split(SomConstants.LINE_SEPARATOR);
@@ -100,7 +97,7 @@ public class NeoCorticalUnit implements Serializable{
 					break;
 				}
 			}
-			temporalPooler = new TemporalPooler(initializationString, temporalStart, rand);
+			temporalPooler = new TemporalPooler(initializationString, temporalStart);
 		}
 	}
 	public String toInitializationString(){
@@ -110,7 +107,7 @@ public class NeoCorticalUnit implements Serializable{
 		return s;
 	}
 	
-	private void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
+	private void initialize(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		//Test arguments
 		if (ffInputLength < 1) throw new IllegalArgumentException("Input length has to be greater than 0");
 		if (usePrediction && markovOrder < 1) throw new IllegalArgumentException("Markov order has to be greater than 0 when using prediction");
@@ -121,18 +118,18 @@ public class NeoCorticalUnit implements Serializable{
 		int spatialOutputLength = ffInputLength;
 		noSpatial = spatialMapSize < 1;
 		if (!noSpatial) {
-			spatialPooler = instantiateSpatialPooler(rand, ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
+			spatialPooler = instantiateSpatialPooler(ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
 			spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
 		}
 		
 		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, offlineLearning, reactionary); //TODO: Move all parameters out
 		
-		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1, rand); //TODO: Move all parameters out
+		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1); //TODO: Move all parameters out
 		
 		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
 
 		noTemporal = (temporalMapSize < 1);
-		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(rand, spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
+		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
 		
 		//Set map and output sizes
 		this.spatialMapSize = spatialMapSize;
@@ -157,7 +154,6 @@ public class NeoCorticalUnit implements Serializable{
 		//Set fields
 		
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
-		this.rand = rand;
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
 		chosenAction = -1;
@@ -308,8 +304,8 @@ public class NeoCorticalUnit implements Serializable{
 		return action;
 	}
 	
-	private SpatialPooler instantiateSpatialPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor){
-		SpatialPooler s = new SpatialPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
+	private SpatialPooler instantiateSpatialPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor){
+		SpatialPooler s = new SpatialPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
 		return s;
 	}
 	
@@ -324,13 +320,13 @@ public class NeoCorticalUnit implements Serializable{
 		return a;
 	}
 	
-	private Predictor_VOMM instantiatePredictor(int markovOrder, double learningRate, Random rand){
-		Predictor_VOMM p = new Predictor_VOMM(markovOrder, learningRate, rand);
+	private Predictor_VOMM instantiatePredictor(int markovOrder, double learningRate){
+		Predictor_VOMM p = new Predictor_VOMM(markovOrder, learningRate);
 		return p;
 	}
 	
-	private TemporalPooler instantiateTemporalPooler(Random rand, int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, double decay){
-		TemporalPooler p = new TemporalPooler(rand, inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay);
+	private TemporalPooler instantiateTemporalPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, double decay){
+		TemporalPooler p = new TemporalPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay);
 		return p;
 	}
 	
@@ -360,6 +356,7 @@ public class NeoCorticalUnit implements Serializable{
 	 * @param noiseMagnitude
 	 * @return
 	 */
+	/*
 	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
 		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
 		m = m.plus(noise);
@@ -371,6 +368,7 @@ public class NeoCorticalUnit implements Serializable{
 		}
 		return m;
 	}
+	*/
 	
 	public void resetActivity(){
 		needHelp = false;

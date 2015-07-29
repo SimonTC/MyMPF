@@ -59,7 +59,7 @@ public class ActionNode extends Node {
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate, double initialExplorationChance, boolean useRandomExploration){
-		pooler = new SpatialPooler(rand, actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
+		pooler = new SpatialPooler(actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
 		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
 		initializationDescription = initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate + " " + useRandomExploration;
@@ -201,7 +201,7 @@ public class ActionNode extends Node {
 		String orgPoolerInitializationString = poolerInitializationString; //Save string here as it is changed in initialization
 		this.initialize(rand, Integer.parseInt(arr[length-4]), Integer.parseInt(arr[length-3]), Double.parseDouble(arr[length - 2]), Double.parseDouble(arr[length-5]), Boolean.parseBoolean(arr[length-1]));
 		poolerInitializationString = orgPoolerInitializationString;
-		pooler = new SpatialPooler(poolerInitializationString, 0, rand);
+		pooler = new SpatialPooler(poolerInitializationString, 0);
 	}
 	
 	@Override

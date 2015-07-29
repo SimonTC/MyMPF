@@ -3,7 +3,6 @@ package stcl.algo.predictors;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -22,14 +21,12 @@ public class Predictor_VOMM implements Serializable{
 	private LinkedList<Double> inputProbabilities;
 	private int predictedNextSymbol;
 	private SimpleMatrix probabilityMatrix;
-	private Random rand;
 
-	public Predictor_VOMM(int markovOrder, double learningRate, Random rand) {
+	public Predictor_VOMM(int markovOrder, double learningRate) {
 		vomm = new VOMM<Integer>(markovOrder, learningRate);
 		inputProbabilities = new LinkedList<Double>();
 		this.markovOrder = markovOrder;
 		predictedNextSymbol = -1;
-		this.rand = rand;
 		
 	}
 
@@ -85,7 +82,7 @@ public class Predictor_VOMM implements Serializable{
 		}
 		return d;
 	}
-	
+	/*
 	private int findInputByRoulette(SimpleMatrix probabilityMatrix){
 		double v = rand.nextDouble();
 		double sum = 0;
@@ -103,7 +100,7 @@ public class Predictor_VOMM implements Serializable{
 		} while (!found && i < probabilityMatrix.getNumElements());
 		return id;
 	}
-	
+	*/
 	/**
 	 * Finds the id of the element with the highest value
 	 * @param probabilityMatrix

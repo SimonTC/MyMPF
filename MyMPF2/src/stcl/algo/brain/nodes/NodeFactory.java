@@ -20,7 +20,7 @@ public class NodeFactory {
 		switch(type){
 		case ACTION: n = new ActionNode(s, rand);break;
 		case SENSOR: n = new Sensor(s); break;
-		case UNIT: n = new UnitNode(s, rand);break;
+		case UNIT: n = new UnitNode(s);break;
 		default: n = null; break;		
 		}
 		return n;

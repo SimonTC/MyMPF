@@ -1,7 +1,5 @@
 package stcl.algo.brain.nodes;
 
-import java.util.ArrayList;
-import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -12,7 +10,6 @@ public class UnitNode extends Node {
 
 	private NeoCorticalUnit unit;
 	private int ffOutputMapSize;
-	protected Random rand;
 	private int chosenAction;
 	private String initializationDescription;
 	private String unitInitializationString;
@@ -29,11 +26,11 @@ public class UnitNode extends Node {
 	 * @param s
 	 * @param rand
 	 */
-	public UnitNode(String s, Random rand){
+	public UnitNode(String s){
 		super(s);
 		String[] arr = s.split(" ");
 		int length = arr.length;
-		this.initialize(rand, Integer.parseInt(arr[length-8]), Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Boolean.parseBoolean(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
+		this.initialize(Integer.parseInt(arr[length-8]), Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Boolean.parseBoolean(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
 	}
 	
 	
@@ -47,11 +44,10 @@ public class UnitNode extends Node {
 	 * @param numPossibleActions
 	 * @param usePrediction
 	 */
-	public void initialize(Random rand, int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
-		unit = new NeoCorticalUnit(rand, ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
+	public void initialize(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
+		unit = new NeoCorticalUnit(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
-		this.rand = rand;
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
 		this.feedforwardOutput = new SimpleMatrix(1, feedforwardOutputVectorLength);
 		feedforwardOutput.set(1);
@@ -76,9 +72,9 @@ public class UnitNode extends Node {
 	 * @param markovOrder int >= 0 if zero then no prediction is performed
 	 * @param numPossibleActions  int >= 0 If 0 then no actions will be decided on.
 	 */
-	public void initialize(Random rand, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
+	public void initialize(int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		int inputLength = feedforwardInputLength;
-		this.initialize(rand, inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
+		this.initialize(inputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 	}
 
 	@Override
@@ -178,12 +174,12 @@ public class UnitNode extends Node {
 	
 	@Override
 	public void reinitialize() {
-		unit = new NeoCorticalUnit(unitInitializationString, rand);		
+		unit = new NeoCorticalUnit(unitInitializationString);		
 	}
 	
 	@Override
 	public void reinitialize(String initializationString) {
-		unit = new NeoCorticalUnit(initializationString, rand);	
+		unit = new NeoCorticalUnit(initializationString);	
 		
 	}
 	

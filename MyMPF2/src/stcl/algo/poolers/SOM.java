@@ -1,6 +1,5 @@
 package stcl.algo.poolers;
 
-import java.util.Random;
 
 import dk.stcl.core.som.SOM_SemiOnline;
 
@@ -9,10 +8,10 @@ public class SOM extends SOM_SemiOnline {
 	public SOM(String s, int startLine){
 		super(s, startLine);
 	}
-	public SOM(int mapSize, int inputLength, Random rand,
+	public SOM(int mapSize, int inputLength, 
 			double learningRate, double activationCodingFactor, double stdDev) {
 		
-		super(mapSize, inputLength, rand, learningRate, activationCodingFactor, stdDev);
+		super(mapSize, inputLength, learningRate, activationCodingFactor, stdDev);
 		
 	}
 

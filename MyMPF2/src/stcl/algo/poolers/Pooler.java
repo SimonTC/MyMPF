@@ -1,7 +1,5 @@
 package stcl.algo.poolers;
 
-import java.util.Random;
-
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.SomBasics;
@@ -16,31 +14,27 @@ public abstract class Pooler {
 	//Variables used for testing inputs
 	protected int inputLength;
 	protected int mapSize;
+
 	
-	//Misc
-	private Random rand;
-	
-	public Pooler(Random rand, int inputLength, int mapSize){
-		this.rand = rand;
+	public Pooler( int inputLength, int mapSize){
 		this.inputLength = inputLength;
 		this.mapSize = mapSize;
 		this.activationMatrix = new SimpleMatrix(mapSize, mapSize);
 	}
 	
-	public Pooler(String initializationString, int startLine, Random rand){
+	public Pooler(String initializationString, int startLine){
 		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
 		String[] poolerInfo = lines[startLine].split(" ");
 		inputLength = Integer.parseInt(poolerInfo[0]);
 		mapSize = Integer.parseInt(poolerInfo[1]);
 		activationMatrix = new SimpleMatrix(mapSize, mapSize);
-		this.rand = rand;
 	}
 	
 	public String toInitializationString(){
 		String s = inputLength + " " + mapSize + SomConstants.LINE_SEPARATOR;
 		return s;
 	}
-	
+	/*
 	protected SimpleMatrix chooseRandom(SimpleMatrix input, SomBasics map){
 		//Transform matrix into vector
 		double[] vector = input.getMatrix().data;
@@ -65,7 +59,7 @@ public abstract class Pooler {
 		return model;
 		
 	}
-	
+	*/
 	/**
 	 * Choose the most probable model from the given SomBasics object
 	 * @param input

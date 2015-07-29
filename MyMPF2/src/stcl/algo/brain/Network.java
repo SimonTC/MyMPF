@@ -253,7 +253,23 @@ public class Network implements Serializable{
 		this.reinitialize(); //Need to reinitialize to make sure we get the start values and not the learned values
 		for (Node n : nodes){
 			buffer.append("Node " + n.getID() + "\n");
-			buffer.append(n.toInitializationString());
+			String initializationString = "";
+			switch (n.getType()){
+			case ACTION: 
+				ActionNode an = (ActionNode) n;
+				initializationString = an.toInitializationString();
+				break;
+			case SENSOR: 
+				Sensor s = (Sensor) n;
+				initializationString = s.toInitializationString();
+				break;
+			case UNIT:
+				UnitNode un = (UnitNode) n;
+				initializationString = un.toInitializationString();
+				break;			
+			}
+			
+			buffer.append(initializationString );
 			buffer.append("\n");
 		}
 		

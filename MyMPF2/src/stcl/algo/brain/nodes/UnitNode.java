@@ -59,7 +59,7 @@ public class UnitNode extends Node {
 	}
 	
 	public void createInitializationString(){
-		unitInitializationString = unit.toInitializationString();
+		unitInitializationString = this.toInitializationString();
 	}
 	
 	public void setID(int id){
@@ -180,6 +180,11 @@ public class UnitNode extends Node {
 	public void reinitialize() {
 		unit = new NeoCorticalUnit(unitInitializationString, rand);
 		
+	}
+	
+	@Override
+	public String toInitializationString(){
+		return unit.toInitializationString();
 	}
 
 }

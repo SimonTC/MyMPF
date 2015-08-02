@@ -291,16 +291,7 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	private int chooseAction(SimpleMatrix state){
-		int maxProbableState = -1;
-		double maxProb = Double.NEGATIVE_INFINITY;
-		for (int i = 0; i < state.getNumElements(); i++){
-			double d = state.get(i);
-			if (d > maxProb){
-				maxProb = d;
-				maxProbableState = i;
-			}
-		}
-		int action = decider.feedBack(maxProbableState, state);
+		int action = decider.feedBack(state);
 		return action;
 	}
 	

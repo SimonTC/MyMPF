@@ -41,7 +41,7 @@ public class ActionDecider_Q_Reactionary extends ActionDecider_Q {
 	 * @param originState - Not used
 	 * @return
 	 */
-	public int feedBack(int originState, SimpleMatrix stateProbabilities){
+	public int feedBack(SimpleMatrix stateProbabilities){
 		prediction = stateProbabilities;
 		return actionToDoNext;
 	}

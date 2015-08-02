@@ -33,15 +33,20 @@ public class NeoCorticalUnit implements Serializable{
 	private int ffOutputMapSize;
 	
 	private boolean needHelp;
-	private boolean neededHelpThisTurn; //Used in reporting
+	
+	//Entropy related
 	private double predictionEntropy;
-	private double entropyThreshold; //The exponential moving average of the prediction entropy
-	private double entropyDiscountingFactor;
+	private double entropyThreshold;
+	private double entropyDiscountFactor;
+	private double episodeEntropy;
+	private boolean entropyThresholdFrozen;
 	
 	private boolean usePrediction;
 	private boolean active;
+	
+	private int episodeLength;
 
-	private boolean entropyThresholdFrozen;
+	
 	
 	private TemporalPooler temporalPooler;
 	//private Sequencer sequencer;
@@ -150,7 +155,7 @@ public class NeoCorticalUnit implements Serializable{
 		
 		//Set fields
 		
-		entropyDiscountingFactor = decay; //TODO: Does this make sense?
+		entropyDiscountFactor = 0.1; //TODO: move to parameters
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
 		
@@ -188,9 +193,18 @@ public class NeoCorticalUnit implements Serializable{
 		biasMatrix.set(1);
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
-		
+		this.updateEntropyThreshold();
+		episodeEntropy = 0;
+		episodeLength = 0;
 		stepsSinceSequenceStart = 0;
 		this.resetActivity();
+	}
+	
+	private void updateEntropyThreshold(){
+		if (!entropyThresholdFrozen){
+			double avgEpisodeEntropy = episodeEntropy / (double) episodeLength;
+			entropyThreshold = entropyDiscountFactor * avgEpisodeEntropy + (1-entropyDiscountFactor) * entropyThreshold;
+		}
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -203,6 +217,8 @@ public class NeoCorticalUnit implements Serializable{
 		if (inputVector.numCols() != ffInputVectorSize) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a 1 x " + ffInputVectorSize + " vector");
 		
 		active = true;
+		
+		episodeLength++;
 		
 		ffInput = inputVector;
 		
@@ -224,9 +240,7 @@ public class NeoCorticalUnit implements Serializable{
 				predictionMatrix = predictor.predict(inputToPredictor);			
 				predictionEntropy = calculateEntropy(predictionMatrix);			
 				needHelp =  (predictionEntropy > entropyThreshold);
-				if (!entropyThresholdFrozen){
-					entropyThreshold = entropyDiscountingFactor * predictionEntropy + (1-entropyDiscountingFactor) * entropyThreshold;
-				}
+				episodeEntropy += predictionEntropy;
 			}
 		}
 		

@@ -59,7 +59,7 @@ public class ActionNode extends Node {
 	}
 	
 	public void initialize(Random rand, int actionVectorLength, int actionGroupMapSize, double initialLearningRate, double initialExplorationChance, boolean useRandomExploration){
-		pooler = new SpatialPooler(actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); //TODO: Move all parameters out
+		pooler = new SpatialPooler(actionVectorLength, actionGroupMapSize, initialLearningRate, Math.sqrt(actionGroupMapSize), 0.125); 
 		votesForActions = new SimpleMatrix(actionGroupMapSize, actionGroupMapSize);
 		this.rand = rand;
 		initializationDescription = initialExplorationChance +  " " + actionVectorLength + " " + actionGroupMapSize + " " + initialLearningRate + " " + useRandomExploration;

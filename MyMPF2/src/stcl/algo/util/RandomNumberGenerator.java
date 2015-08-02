@@ -75,7 +75,6 @@ public class RandomNumberGenerator implements Serializable {
 	 * @return
 	 */
 	public int nextInt(int floor, int ceiling){
-		//TODO: Need check for floor <= ceiling
 		int diff = ceiling - floor;
 		int result = rand.nextInt(diff);
 		result = floor + result;

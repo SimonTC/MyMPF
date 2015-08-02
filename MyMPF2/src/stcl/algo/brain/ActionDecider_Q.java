@@ -13,9 +13,6 @@ public class ActionDecider_Q implements Serializable {
 	protected int stateBefore, actionBefore;
 	protected boolean learning;
 	protected SimpleMatrix prediction;
-	private double maxError;
-	private double noveltyInfluence;
-	private double decayConstant;
 	protected int counter;
 
 	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
@@ -23,9 +20,6 @@ public class ActionDecider_Q implements Serializable {
 		stateBefore = -1;
 		actionBefore = -1;
 		learning = true;
-		maxError = 0;
-		noveltyInfluence = 1; //TODO: Make parameter
-		decayConstant = 1/(double)1000; //TODO: Make parameter
 		counter = 0;
 	}
 	

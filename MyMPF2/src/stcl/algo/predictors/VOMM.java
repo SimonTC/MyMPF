@@ -11,13 +11,11 @@ import stcl.algo.predictors.trie.Trie;
 import stcl.algo.predictors.trie.TrieNode;
 
 /**
- * VOMM is an implementation of the Adaptive Model Averaged PPM algorithm
- * presented by Saishankar K.P. and Sheetal Kalyani in 
- * "A Modified PPM Algorithm for Online Sequence Prediction using Short Data Records"
+ * VOMM is an implementation of the Adaptive Model Averaged PPM algorithm from 
+ * S. Pulliyakode and S. Kalyani, “A Modified PPM Algorithm for Online Sequence Prediction using Short Data Records,” IEEE Commun. Lett., vol. 7798, no. c, pp. 1–1, 2014.
  * @author Simon
  *
  */
-//TODO: Better citation
 public class VOMM<T> implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private Trie<T> trie;
@@ -198,7 +196,7 @@ public class VOMM<T> implements Serializable{
 			for (int j = 1; j <= memory.size(); j++){
 				T c = memory.get(memory.size() - j);
 				context.addFirst(c);
-				currentNodeSequence = trie.add(context, reward); //TODO: Should the reward be added all the time?
+				currentNodeSequence = trie.add(context, reward);
 			}
 		} else {
 			currentNodeSequence = trie.findNodeSequence(memory);

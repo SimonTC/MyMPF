@@ -123,15 +123,15 @@ public class NeoCorticalUnit implements Serializable{
 		int spatialOutputLength = ffInputLength;
 		noSpatial = spatialMapSize < 1;
 		if (!noSpatial) {
-			spatialPooler = instantiateSpatialPooler(ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125); //TODO: Move all parameters out
+			spatialPooler = instantiateSpatialPooler(ffInputLength, spatialMapSize, 0.1, Math.sqrt(spatialMapSize), 0.125);
 			spatialOutputLength = (int) Math.pow(spatialMapSize, 2);
 		}
 		
-		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, offlineLearning, reactionary); //TODO: Move all parameters out
+		if (numPossibleActions > 0) decider = instantiateActionDecider(numPossibleActions, spatialOutputLength, 0.9, offlineLearning, reactionary);
 		
-		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1); //TODO: Move all parameters out
+		if (markovOrder > 0) predictor = instantiatePredictor(markovOrder, 0.1); 
 		
-		double decay = calculateDecay(markovOrder,0.01);// 1.0 / markovOrder);
+		double decay = calculateDecay(markovOrder,0.01);
 
 		noTemporal = (temporalMapSize < 1);
 		if (temporalMapSize > 0) temporalPooler = instantiateTemporalPooler(spatialOutputLength, temporalMapSize, 0.1, Math.sqrt(temporalMapSize), 0.125, decay);
@@ -149,13 +149,13 @@ public class NeoCorticalUnit implements Serializable{
 		this.usePrediction = usePrediction;
 		needHelp = false;
 		entropyThresholdFrozen = false;
-		biasSpatialFFOutput = false; //TODO: Make sure this can be changed
+		biasSpatialFFOutput = false; 
 		useBiasedInputInPredictor = false;
 		useBiasedInputInSequencer = false;
 		
 		//Set fields
 		
-		entropyDiscountFactor = 0.1; //TODO: move to parameters
+		entropyDiscountFactor = 0.1;
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
 		
@@ -332,9 +332,9 @@ public class NeoCorticalUnit implements Serializable{
 	private ActionDecider_Q instantiateActionDecider(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning, boolean useReactionaryDecider){
 		ActionDecider_Q a;
 		if (useReactionaryDecider){
-			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q_Reactionary(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);
 		} else {
-			a = new ActionDecider_Q(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);//TODO: Change parameters. Especially decay
+			a = new ActionDecider_Q(numPossibleActions, numPossibleStates, decayFactor, offlineLearning);
 		}
 
 		return a;
@@ -565,7 +565,10 @@ public class NeoCorticalUnit implements Serializable{
 	public ActionDecider_Q getDecider(){
 		return this.decider;
 	}
-
+	
+	public void setBiasSpatialFFOutput(boolean flag){
+		this.biasSpatialFFOutput = flag;
+	}
 	
 
 }

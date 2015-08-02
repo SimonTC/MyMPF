@@ -53,20 +53,8 @@ public class ActionDecider implements Serializable {
 		
 		return action;
 	}
-	//TODO: remove this function
 	private double calculateInternaleward(double externalReward){
 		
-		//externalRewardNow = externalReward;
-		/*
-		double exponentialWeightedMovingAverage = (externalRewardNow - externalRewardBefore) / maxReward;
-		
-		double internalReward = alpha * exponentialWeightedMovingAverage + (1-alpha) * internalRewardBefore;
-		
-		internalRewardBefore = internalReward;
-		externalRewardBefore = externalRewardNow;
-		
-		return internalReward;
-		*/
 		return externalReward;
 
 	}

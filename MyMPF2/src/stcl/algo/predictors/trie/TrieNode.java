@@ -24,7 +24,7 @@ public class TrieNode<T> implements Serializable{
 		sequenceID = -2;
 		this.parent = parent;
 		reward = 0;
-		rewardDecay = 0.2; //TODO: Should be a parameter
+		rewardDecay = 0.1; 
 	}
 	
 	/**

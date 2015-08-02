@@ -60,12 +60,6 @@ public class Network implements Serializable{
 		buildNetworkFromString(reader, rand);
 	}
 	
-	/**
-	 * Creates the network using the given reader.
-	 * Information in the reader should come from the toString() method
-	 * @param reader
-	 */
-	//TODO: Change description
 	private void buildNetworkFromString(BufferedReader reader, Random rand){
 		//Build the architecture of the network
 		buildArchitecture(reader, rand);

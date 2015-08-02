@@ -271,7 +271,7 @@ public class Network implements Serializable{
 	
 	
 	public void setLearning(boolean learning){
-		for (UnitNode n : unitNodes) n.getUnit().setLearning(learning);
+		for (Node n : nodes) n.setLearning(learning);
 	}
 	
 	public void flush(){

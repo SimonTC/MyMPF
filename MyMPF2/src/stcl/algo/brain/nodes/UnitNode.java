@@ -192,6 +192,12 @@ public class UnitNode extends Node {
 		return unit.toInitializationString();
 	}
 
+	@Override
+	public void setLearning(boolean learning) {
+		unit.setLearning(learning);
+		
+	}
+
 	
 
 }

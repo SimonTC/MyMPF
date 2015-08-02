@@ -65,4 +65,9 @@ public class Sensor extends Node {
 		
 	}
 
+	@Override
+	public void setLearning(boolean learning) {
+		//No learning is performed in sensor, so change doesn't matter		
+	}
+
 }

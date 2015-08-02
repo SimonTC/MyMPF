@@ -227,6 +227,12 @@ public class ActionNode extends Node {
 		String s = initializationDescription;
 		return s + SomConstants.LINE_SEPARATOR + pooler.toInitializationString();
 	}
+	
+	@Override
+	public void setLearning(boolean learning){
+		this.learningActions = learning;
+		pooler.setLearning(learning);
+	}
 
 	
 }

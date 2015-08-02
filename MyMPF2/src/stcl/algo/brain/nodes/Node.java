@@ -168,6 +168,8 @@ public abstract class Node implements Serializable {
 		return type;
 	}
 	
+	public abstract void setLearning(boolean learning);
+	
 	/**
 	 * Resets the node back to its original state before any learning has been performed.
 	 * Use if you need to run multiple trainings from an initial state

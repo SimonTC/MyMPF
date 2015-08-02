@@ -274,10 +274,6 @@ public class Network implements Serializable{
 		for (Node n : nodes) n.setLearning(learning);
 	}
 	
-	public void flush(){
-		for (UnitNode n : unitNodes) n.getUnit().flush();
-	}
-	
 	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
 		for (UnitNode n : unitNodes) n.getUnit().setEntropyThresholdFrozen(entropyThresholdFrozen);
 	}

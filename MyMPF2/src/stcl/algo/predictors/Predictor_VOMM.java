@@ -24,10 +24,8 @@ public class Predictor_VOMM implements Serializable{
 
 	public Predictor_VOMM(int markovOrder, double learningRate) {
 		vomm = new VOMM<Integer>(markovOrder, learningRate);
-		inputProbabilities = new LinkedList<Double>();
 		this.markovOrder = markovOrder;
-		predictedNextSymbol = -1;
-		
+		this.newEpisode();
 	}
 
 	/**
@@ -82,25 +80,7 @@ public class Predictor_VOMM implements Serializable{
 		}
 		return d;
 	}
-	/*
-	private int findInputByRoulette(SimpleMatrix probabilityMatrix){
-		double v = rand.nextDouble();
-		double sum = 0;
-		boolean found = false;
-		int id = -1;
-		int i = 0;
-		do{
-			double d = probabilityMatrix.get(i);
-			sum += d;
-			if (sum >= v){
-				found = true;
-				id = 1;
-			}
-			i++;
-		} while (!found && i < probabilityMatrix.getNumElements());
-		return id;
-	}
-	*/
+
 	/**
 	 * Finds the id of the element with the highest value
 	 * @param probabilityMatrix
@@ -119,9 +99,11 @@ public class Predictor_VOMM implements Serializable{
 		return maxID;
 		
 	}
-
-	public void flush() {
-		vomm.flushMemory();		
+	
+	public void newEpisode(){
+		vomm.flushMemory();
+		inputProbabilities = new LinkedList<Double>();
+		predictedNextSymbol = -1;
 	}
 
 	public SimpleMatrix getConditionalPredictionMatrix() {

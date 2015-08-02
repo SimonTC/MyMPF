@@ -69,8 +69,8 @@ public class TemporalPooler extends Pooler  {
 		return model;		
 	}
 	
-	public void flushTemporalMemory(){
-		rsom.flush();	
+	public void newEpisode(){
+		rsom.flush();
 	}
 	
 	@Override

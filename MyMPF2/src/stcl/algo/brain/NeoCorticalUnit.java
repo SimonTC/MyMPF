@@ -136,9 +136,6 @@ public class NeoCorticalUnit implements Serializable{
 		this.temporalMapSize = temporalMapSize;
 		
 		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
-		
-		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
-		fbOutput = new SimpleMatrix(1, ffInputLength);
 		ffInputVectorSize = ffInputLength;
 		
 		
@@ -156,14 +153,12 @@ public class NeoCorticalUnit implements Serializable{
 		entropyDiscountingFactor = decay; //TODO: Does this make sense?
 		entropyThreshold = 0;
 		this.markovOrder = markovOrder;
-		chosenAction = -1;
+		
 		this.numPossibleActions = numPossibleActions; 
 		this.reactionary = reactionary;
 		this.offlineLearning = offlineLearning;
 		this.temporalMapSize = temporalMapSize;
-		stepsSinceSequenceStart = 0;
-		temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutputMapSize, ffOutputMapSize);
-		
+				
 		//Initialize matrices
 		if (noSpatial){
 			biasMatrix = new SimpleMatrix(1, ffInputLength);
@@ -172,10 +167,30 @@ public class NeoCorticalUnit implements Serializable{
 			biasMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 			predictionMatrix = new SimpleMatrix(spatialMapSize, spatialMapSize);
 		}
+		
+		this.newEpisode();
+	}
+	
+	/**
+	 * Resets all temporal knowledge of the elements in the unit.
+	 * the entropy threshold is not reset as it makes sense for the unit to retain nowledge about the prediction difficulty of the world.
+	 */
+	public void newEpisode(){
+		decider.newEpisode();
+		predictor.newEpisode();
+		temporalPooler.newEpisode();
+		stepsSinceSequenceStart = 0;
+		
+		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
+		fbOutput = new SimpleMatrix(1, ffInputVectorSize);
+		temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutputMapSize, ffOutputMapSize);
+		
 		biasMatrix.set(1);
 		predictionMatrix.set(1);
 		predictionMatrix = Normalizer.normalize(predictionMatrix);
 		
+		stepsSinceSequenceStart = 0;
+		this.resetActivity();
 	}
 	
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
@@ -416,12 +431,6 @@ public class NeoCorticalUnit implements Serializable{
 		return Normalizer.normalize(m);
 	}
 	
-	public void flush(){
-		biasMatrix.set(1);
-		if (predictor != null) predictor.flush();
-		if (temporalPooler != null) temporalPooler.flushTemporalMemory();
-	}
-	
 	public void setLearning(boolean learning){
 		if (spatialPooler != null) spatialPooler.setLearning(learning);
 		if (decider != null) decider.setLearning(learning);
@@ -537,10 +546,7 @@ public class NeoCorticalUnit implements Serializable{
 		return markovOrder;
 	}
 	
-	public void newEpisode(){
-		decider.newEpisode();
-		stepsSinceSequenceStart = 0;
-	}
+
 	
 	public ActionDecider_Q getDecider(){
 		return this.decider;

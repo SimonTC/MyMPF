@@ -181,18 +181,21 @@ public class NeoCorticalUnit implements Serializable{
 	 * the entropy threshold is not reset as it makes sense for the unit to retain nowledge about the prediction difficulty of the world.
 	 */
 	public void newEpisode(){
-		decider.newEpisode();
-		predictor.newEpisode();
-		temporalPooler.newEpisode();
+		if (decider!= null) decider.newEpisode();
+		if (predictor != null) predictor.newEpisode();
+		if (temporalPooler != null) temporalPooler.newEpisode();
 		stepsSinceSequenceStart = 0;
 		
 		ffOutput = new SimpleMatrix(this.ffOutputMapSize, this.ffOutputMapSize);
 		fbOutput = new SimpleMatrix(1, ffInputVectorSize);
 		temporalProbabilityMatrixToSend = new SimpleMatrix(ffOutputMapSize, ffOutputMapSize);
 		
-		biasMatrix.set(1);
-		predictionMatrix.set(1);
-		predictionMatrix = Normalizer.normalize(predictionMatrix);
+		if (biasMatrix != null) biasMatrix.set(1);
+		if (predictionMatrix != null) {
+			predictionMatrix.set(1);
+			predictionMatrix = Normalizer.normalize(predictionMatrix);
+		}
+		
 		this.updateEntropyThreshold();
 		episodeEntropy = 0;
 		episodeLength = 0;

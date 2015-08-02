@@ -17,11 +17,6 @@ public class ActionDecider_Q implements Serializable {
 	private double noveltyInfluence;
 	private double decayConstant;
 	protected int counter;
-	/**
-	 * If true the reward given buy the game will also be the reward used in the Q-function.
-	 * If false The reward used will be a reward that leads to exploration.
-	 */
-	private boolean useExternalReward;
 
 	public ActionDecider_Q(int numPossibleActions, int numPossibleStates, double decayFactor, boolean offlineLearning) {
 		learner = new QLearner(numPossibleStates, numPossibleActions, 0.1, decayFactor, offlineLearning);
@@ -32,7 +27,6 @@ public class ActionDecider_Q implements Serializable {
 		noveltyInfluence = 1; //TODO: Make parameter
 		decayConstant = 1/(double)1000; //TODO: Make parameter
 		counter = 0;
-		useExternalReward = false;
 	}
 	
 	/**
@@ -69,26 +63,9 @@ public class ActionDecider_Q implements Serializable {
 		prediction = stateProbabilities;
 		return action;
 	}
-	//TODO: Better citation
-	/**
-	 * Calculate internal reward by using method described in Incentivizing Exploration In Reinforcement Learning
-	 * With Deep Predictive Models (Stadie, Levine and Abbeel)
-	 * @param externalReward
-	 * @param currentState
-	 * @return
-	 */
-	//TODO: Is this used? Does it work? Wasn't there a problem with this?
+
 	protected double calculateInternaleward(double externalReward, SimpleMatrix currentStateProbabilities){
 		double internalReward = externalReward;
-		if (prediction != null && !useExternalReward){
-			SimpleMatrix diff = currentStateProbabilities.minus(prediction);
-			double error = diff.normF();
-			double normalizedError = error / maxError;
-			double novelty = Math.pow(Math.abs(normalizedError / (counter * decayConstant)), 2);
-			internalReward += noveltyInfluence * novelty;
-			if (error > maxError) maxError = error;
-		}
-
 		return internalReward;
 
 	}
@@ -127,10 +104,6 @@ public class ActionDecider_Q implements Serializable {
 			map.set(state,action);
 		}
 		return map;
-	}
-	
-	public void setUseExternalReward(boolean flag){
-		useExternalReward = flag;
 	}
 
 }

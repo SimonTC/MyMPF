@@ -349,10 +349,6 @@ public class Network implements Serializable{
 		for (UnitNode n : unitNodes) n.newEpisode();
 	}
 	
-	public void setUseExternalReward(boolean flag){
-		for (UnitNode n : unitNodes) n.getUnit().getDecider().setUseExternalReward(flag);
-	}
-	
 	/**
 	 * Return a string that can be used to visualize the network in BioLayout Express 3D version 3.3
 	 * Link: http://www.biolayout.org/

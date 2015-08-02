@@ -65,7 +65,7 @@ public class ActionDecider_Q implements Serializable {
 	 * @return
 	 */
 	public int feedBack(int originState, SimpleMatrix stateProbabilities){
-		int action = learner.selectBestAction(originState);
+		int action = learner.selectBestAction(stateProbabilities);
 		prediction = stateProbabilities;
 		return action;
 	}

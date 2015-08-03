@@ -266,9 +266,10 @@ public class Network_DataCollector extends Network {
 		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(stream);
-		
-		for (double d : m.getMatrix().data){
-			ps.printf(Locale.US, format, d);
+		if (m != null){
+			for (double d : m.getMatrix().data){
+				ps.printf(Locale.US, format, d);
+			}
 		}
 		
 		return stream.toString();
@@ -390,10 +391,14 @@ public class Network_DataCollector extends Network {
 		SimpleMatrix[] outputs = new SimpleMatrix[numUnits];
 		for (int i = 0; i < numUnits; i++){
 			SimpleMatrix m;
+			UnitNode n = super.getUnitNodes().get(i);
 			if (feedForward){
-				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFFOutput());
+				m = n.getUnit().getFFOutput();
 			} else {
-				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFBOutput());
+				m = n.getUnit().getFBOutput();
+			}
+			if (m != null){
+				m = new SimpleMatrix(m);
 			}
 			outputs[i] = m;
 		}
@@ -404,11 +409,17 @@ public class Network_DataCollector extends Network {
 		SimpleMatrix[] outputs = new SimpleMatrix[numUnits];
 		for (int i = 0; i < numUnits; i++){
 			SimpleMatrix m;
+			UnitNode n = super.getUnitNodes().get(i);
 			if (feedforward){
-				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFFInput());
+				m = n.getUnit().getFFInput();
 			} else {
-				m = new SimpleMatrix(super.getUnitNodes().get(i).getUnit().getFBInput());
+				m = n.getUnit().getFBInput();
 			}
+			
+			if (m != null){
+				m = new SimpleMatrix(m);
+			}
+			
 			outputs[i] = m;
 		}
 		return outputs;

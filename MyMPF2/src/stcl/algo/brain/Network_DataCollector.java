@@ -329,7 +329,13 @@ public class Network_DataCollector extends Network {
 		int[] bmus = new int[numUnits];
 		for (int i = 0; i < numUnits; i++){
 			if (spatial) {
-				bmus[i] = super.getUnitNodes().get(i).getUnit().getSOM().getBMU().getId();
+				SomNode n = super.getUnitNodes().get(i).getUnit().getSOM().getBMU();
+				if (n != null){
+					bmus[i] = n.getId();
+				} else {
+					bmus[i] = -1;
+				}
+				
 			} else {
 				bmus[i] = super.getUnitNodes().get(i).getUnit().findTemporalBMUID();
 			}

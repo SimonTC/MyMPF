@@ -122,7 +122,7 @@ public class ActionNode extends Node {
 	private int doExploration(){
 		int nextAction = -1;
 		if (useRandomExploration){
-			rand.nextInt(votesForActions.getNumElements());
+			nextAction = rand.nextInt(votesForActions.getNumElements());
 		} else {
 			nextAction = ++lastExplorativeAction;
 			if (nextAction == votesForActions.getNumElements()) nextAction = 0;

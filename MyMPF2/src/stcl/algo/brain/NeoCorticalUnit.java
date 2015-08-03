@@ -205,9 +205,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	private void updateEntropyThreshold(){
 		if (!entropyThresholdFrozen){
-			if (episodeLength == 0){
-				entropyThreshold = 0;
-			} else {
+			if (episodeLength > 0){
 				double avgEpisodeEntropy = episodeEntropy / (double) episodeLength;
 				entropyThreshold = entropyDiscountFactor * avgEpisodeEntropy + (1-entropyDiscountFactor) * entropyThreshold;
 			}

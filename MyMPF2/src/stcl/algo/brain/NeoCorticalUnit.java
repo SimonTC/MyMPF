@@ -30,6 +30,7 @@ public class NeoCorticalUnit implements Serializable{
 	private int ffInputVectorSize;
 	private int spatialMapSize;
 	private int temporalMapSize;
+	private int ffOutputVectorLength;
 	private int ffOutputMapSize;
 	
 	private boolean needHelp;
@@ -137,7 +138,10 @@ public class NeoCorticalUnit implements Serializable{
 		this.spatialMapSize = spatialMapSize;
 		this.temporalMapSize = temporalMapSize;
 		
+		ffOutputVectorLength = (int) (noTemporal ? Math.pow(spatialMapSize,2) : Math.pow(temporalMapSize,2));
+		
 		ffOutputMapSize = noTemporal ? spatialMapSize : temporalMapSize;
+
 		ffInputVectorSize = ffInputLength;
 		
 		
@@ -532,6 +536,10 @@ public class NeoCorticalUnit implements Serializable{
 	
 	public int getFeedForwardMapSize(){
 		return ffOutputMapSize;
+	}
+	
+	public int getFeedForwardVectorLength(){
+		return ffOutputVectorLength;
 	}
 	
 	public void setUsePrediction(boolean usePrediction){

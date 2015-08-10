@@ -47,7 +47,7 @@ public class UnitNode extends Node {
 	public void initialize(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		unit = new NeoCorticalUnit(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
-		feedforwardOutputVectorLength = unit.getFeedForwardMapSize() * unit.getFeedForwardMapSize();
+		feedforwardOutputVectorLength = unit.getFeedForwardVectorLength();
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
 		this.feedforwardOutput = new SimpleMatrix(1, feedforwardOutputVectorLength);
 		feedforwardOutput.set(1);

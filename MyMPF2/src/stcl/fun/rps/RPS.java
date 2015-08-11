@@ -6,6 +6,7 @@ import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Network_DataCollector;
 import stcl.fun.rps.rewardfunctions.RewardFunction;
+import stcl.graphics.MPFGUI;
 
 
 
@@ -18,6 +19,8 @@ public class RPS {
 	protected int evaluationIterations;
 	protected double[][] sequenceScores;
 	
+	private MPFGUI gui;
+	
 	protected SequenceRunner runner;
 	
 	
@@ -28,7 +31,8 @@ public class RPS {
 			int trainingIterations,
 			int evaluationIterations,
 			long randSeed,
-			double noiseMagnitude){
+			double noiseMagnitude,
+			MPFGUI gui){
 		rand = new Random(randSeed);
 		runner = new SequenceRunner(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
 		this.numExperimentsPerSequence = numExperimentsPerSequence;
@@ -36,6 +40,7 @@ public class RPS {
 		this.evaluationIterations = evaluationIterations;
 		sequenceScores = new double[sequences.length][2];
 		this.sequences = sequences;
+		this.gui = gui;
 
 	}
 	
@@ -50,7 +55,11 @@ public class RPS {
 			int[] curSequence = sequences[sequenceID];
 			runner.setSequence(curSequence);
 			
+			
 			for (int sequenceIteration = 0; sequenceIteration < numExperimentsPerSequence; sequenceIteration++){
+				String name = sequenceID + " test " + sequenceIteration;
+				
+				
 				//System.out.println("Starting on iteration " + sequenceIteration);
 				runner.reset(false);
 				brain.reinitialize();
@@ -58,14 +67,14 @@ public class RPS {
 				//Let it train
 				brain.setUsePrediction(true);
 				brain.getActionNode().setExplorationChance(explorationChance);
-				runExperiment(trainingIterations, brain, runner);
+				runExperiment(trainingIterations, brain, runner, null, name);
 				
 				//Evaluate
 				brain.getActionNode().setExplorationChance(0.0);
 				brain.setLearning(false);
 				brain.newEpisode();
 				runner.reset(false);
-				double[] scores = runExperiment(evaluationIterations, brain, runner);
+				double[] scores = runExperiment(evaluationIterations, brain, runner, gui, name);
 				double fitness = scores[1];
 				double prediction = scores[0];
 				sequenceFitness += fitness;
@@ -99,12 +108,13 @@ public class RPS {
 	 * @param activator
 	 * @return the score given as [avgPredictionSuccess, avgFitness]
 	 */
-	protected double[] runExperiment(int numSequences, Network_DataCollector activator, SequenceRunner runner){
+	protected double[] runExperiment(int numSequences, Network_DataCollector activator, SequenceRunner runner, MPFGUI gui, String name){
 		double totalPrediction = 0;
 		double totalFitness = 0;
 		for(int i = 0; i < numSequences; i++){
 			activator.newEpisode();
-			double[] result = runner.runSequence(activator);
+			if (gui != null) gui.setSequenceName(name + " iteration " + i);
+			double[] result = runner.runSequence(activator, gui);
 			totalPrediction += result[0];
 			totalFitness += result[1];
 		}

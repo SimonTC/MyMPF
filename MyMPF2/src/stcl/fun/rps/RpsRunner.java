@@ -7,16 +7,20 @@ import org.ejml.simple.SimpleMatrix;
 
 
 
+
 import stcl.algo.brain.Network_DataCollector;
 import stcl.fun.rps.rewardfunctions.RewardFunction;
 import stcl.fun.rps.rewardfunctions.RewardFunction_Inverse;
 import stcl.fun.rps.rewardfunctions.RewardFunction_Standard;
 import stcl.fun.rps.sequencecreation.SequenceBuilder;
+import stcl.graphics.MPFGUI;
 
 
 public class RpsRunner {
 	
-	private boolean setSequenceManually = true;
+	private boolean setSequenceManually = false;
+	private boolean visualize = true;
+	private int framesPerSecond = 10;
 	
 	protected SimpleMatrix[] possibleInputs;
 	protected int[][] sequences;
@@ -69,7 +73,7 @@ public class RpsRunner {
 		numDifferentSequences = 1;
 		numExperimentsPerSequence = 1;
 		exploreChance = 0.1;
-		noiseMagnitude = 0;
+		noiseMagnitude = 0.1;
 		
 		sequences = createSequences(rand);
 		
@@ -84,8 +88,13 @@ public class RpsRunner {
 	
 	private double[][] evaluate(Network_DataCollector network) throws FileNotFoundException {
 		RPS eval;
+		MPFGUI gui = null;
+		if (visualize){
+			gui = new MPFGUI();
+			gui.initialize(5, 2, framesPerSecond);
+		}
 		RewardFunction[] functions = {new RewardFunction_Standard(), new RewardFunction_Inverse()};
-		eval = new RPS(possibleInputs, sequences, functions, numExperimentsPerSequence, trainingIterations, evaluationIterations, rand.nextLong(), noiseMagnitude);
+		eval = new RPS(possibleInputs, sequences, functions, numExperimentsPerSequence, trainingIterations, evaluationIterations, rand.nextLong(), noiseMagnitude, gui);
 	
 		eval.run(network, exploreChance);	
 		double[][] result = eval.getSequenceScores();
@@ -93,13 +102,6 @@ public class RpsRunner {
 
 		return result;
 	}
-	
-	private RPS setupEvaluator(){
-		RewardFunction[] functions = {new RewardFunction_Standard()};
-		RPS eval = new RPS(possibleInputs, sequences, functions,  numExperimentsPerSequence, trainingIterations, evaluationIterations, rand.nextLong(), noiseMagnitude);
-		return eval;
-	}
-	
 	private int[][] createSequences(Random rand){
 
 		int sequenceLevels = 3;

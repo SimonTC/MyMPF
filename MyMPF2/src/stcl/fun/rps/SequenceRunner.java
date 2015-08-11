@@ -3,15 +3,16 @@ package stcl.fun.rps;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.JFrame;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.Network_DataCollector;
 import stcl.algo.brain.nodes.Sensor;
 import stcl.fun.rps.rewardfunctions.RewardFunction;
+import stcl.graphics.MPFGUI;
 
 public class SequenceRunner {
-	
-	private boolean visual;
 	
 	private SimpleMatrix[] possibleInputs;
 	private int[] sequence;
@@ -76,7 +77,7 @@ public class SequenceRunner {
 	 * @param activator
 	 * @return Array containing prediction success and fitness in the form [prediction,fitness]
 	 */
-	public double[] runSequence(Network_DataCollector activator){
+	public double[] runSequence(Network_DataCollector activator, MPFGUI gui){
 		double totalPredictionError = 0;
 		double totalGameScore = 0;
 		
@@ -123,6 +124,10 @@ public class SequenceRunner {
 			SimpleMatrix[] output = collectOutput(activator);
 			prediction = output[0];
 			actionNextTimeStep = output[1];
+			
+			if (gui != null){
+				gui.update(activator, noisyInput, actionThisTimestep, prediction, actionNextTimeStep, i);
+			}
 		}
 		
 		double avgPredictionError = totalPredictionError / (double) sequence.length;

@@ -11,6 +11,8 @@ import stcl.fun.rps.rewardfunctions.RewardFunction;
 
 public class SequenceRunner {
 	
+	private boolean visual;
+	
 	private SimpleMatrix[] possibleInputs;
 	private int[] sequence;
 	private RewardFunction[] rewardFunctions;

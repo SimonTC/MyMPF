@@ -11,17 +11,26 @@ import stcl.algo.brain.nodes.Node.NodeType;
  */
 public class NodeFactory {
 
-	public Node buildNode(String s, Random rand){
+	public Node buildNode(String s, Random rand, boolean randomInitialization){
 		String[] data = s.split(" ");
 		int typeID = Integer.parseInt(data[1]);
 		NodeType type = NodeType.values()[typeID];
 		
 		Node n = null;
-		switch(type){
-		case ACTION: n = new ActionNode(s, rand);break;
-		case SENSOR: n = new Sensor(s); break;
-		case UNIT: n = new UnitNode(s);break;
-		default: n = null; break;		
+		if (!randomInitialization){
+			switch(type){
+			case ACTION: n = new ActionNode(s, rand);break;
+			case SENSOR: n = new Sensor(s); break;
+			case UNIT: n = new UnitNode(s);break;
+			default: n = null; break;		
+			}
+		} else {
+			switch(type){
+			case ACTION: n = new ActionNode(s, rand);break;
+			case SENSOR: n = new Sensor(s); break;
+			case UNIT: n = new UnitNode(s, rand);break;
+			default: n = null; break;		
+			}
 		}
 		return n;
 	}

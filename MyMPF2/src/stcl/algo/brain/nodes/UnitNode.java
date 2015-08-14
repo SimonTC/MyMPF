@@ -1,6 +1,8 @@
 package stcl.algo.brain.nodes;
 
 
+import java.util.Random;
+
 import org.ejml.simple.SimpleMatrix;
 
 import stcl.algo.brain.NeoCorticalUnit;
@@ -33,6 +35,13 @@ public class UnitNode extends Node {
 		this.initialize(Integer.parseInt(arr[length-8]), Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Boolean.parseBoolean(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]));
 	}
 	
+	public UnitNode(String s, Random rand){
+		super(s);
+		String[] arr = s.split(" ");
+		int length = arr.length;
+		this.initialize(Integer.parseInt(arr[length-8]), Integer.parseInt(arr[length-7]), Integer.parseInt(arr[length-6]), Integer.parseInt(arr[length-5]), Integer.parseInt(arr[length-4]), Boolean.parseBoolean(arr[length-3]), Boolean.parseBoolean(arr[length-2]), Boolean.parseBoolean(arr[length-1]), rand);
+	}
+	
 	
 	/**
 	 * 
@@ -46,6 +55,26 @@ public class UnitNode extends Node {
 	 */
 	public void initialize(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning){
 		unit = new NeoCorticalUnit(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning);
+		this.ffOutputMapSize = unit.getFeedForwardMapSize();
+		feedforwardOutputVectorLength = unit.getFeedForwardVectorLength();
+		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;
+		this.feedforwardOutput = new SimpleMatrix(1, feedforwardOutputVectorLength);
+		feedforwardOutput.set(1);
+		createInitializationString();
+	}
+	
+	/**
+	 * 
+	 * @param rand
+	 * @param ffInputLength
+	 * @param spatialMapSize
+	 * @param temporalMapSize
+	 * @param markovOrder
+	 * @param numPossibleActions
+	 * @param usePrediction
+	 */
+	public void initialize(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning, Random rand){
+		unit = new NeoCorticalUnit(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning, rand);
 		this.ffOutputMapSize = unit.getFeedForwardMapSize();
 		feedforwardOutputVectorLength = unit.getFeedForwardVectorLength();
 		initializationDescription = ffInputLength + " " + spatialMapSize + " " + temporalMapSize +  " " + markovOrder + " " + numPossibleActions + " " + usePrediction + " " + reactionary + " " + offlineLearning;

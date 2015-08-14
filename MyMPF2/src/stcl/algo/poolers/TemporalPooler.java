@@ -1,5 +1,7 @@
 package stcl.algo.poolers;
 
+import java.util.Random;
+
 import org.ejml.simple.SimpleMatrix;
 
 import dk.stcl.core.basic.containers.SomNode;
@@ -16,6 +18,14 @@ public class TemporalPooler extends Pooler  {
 		super(inputLength, mapSize);
 
 		rsom = new RSOM(mapSize, inputLength,initialLearningRate, activationCodingFactor, stddev, decay);
+	}
+	
+	public TemporalPooler(int inputLength, int mapSize,
+			double initialLearningRate, double stddev,
+			double activationCodingFactor, double decay, Random rand) {
+		super(inputLength, mapSize);
+
+		rsom = new RSOM(mapSize, inputLength,rand,initialLearningRate, activationCodingFactor, stddev, decay);
 	}
 	
 	public TemporalPooler (String initializationString, int startLine){

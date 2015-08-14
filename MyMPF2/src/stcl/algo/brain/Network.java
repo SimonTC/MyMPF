@@ -40,14 +40,15 @@ public class Network implements Serializable{
 	}
 	
 	/**
-	 * Use this constructor to create a NEtwork based on the string created by the toString() method
+	 * Use this constructor to create a NEtwork based on the string created by the toString() method.
+	 * The spatial and temporal pooler is initialized randomly
 	 * @param networkFileName
 	 * @param rand
 	 * @throws FileNotFoundException 
 	 */
 	public Network(String networkFileName, Random rand) throws FileNotFoundException {
 		BufferedReader reader = new BufferedReader( new FileReader (networkFileName));
-		buildNetworkFromString(reader, rand);
+		buildNetworkFromString(reader, rand, true);
 	}
 	
 	/**
@@ -57,18 +58,22 @@ public class Network implements Serializable{
 	 */
 	public void initialize(String initializationString, Random rand){
 		BufferedReader reader = new BufferedReader( new StringReader(initializationString));
-		buildNetworkFromString(reader, rand);
+		buildNetworkFromString(reader, rand, false);
 	}
 	
-	private void buildNetworkFromString(BufferedReader reader, Random rand){
+	private void buildNetworkFromString(BufferedReader reader, Random rand, boolean initializeRandomly){
 		//Build the architecture of the network
-		buildArchitecture(reader, rand);
+		buildArchitecture(reader, rand, initializeRandomly);
 		
-		//Set all internal parameters as they where when network was exported
-		setInternalParameters(reader);
+		if (!initializeRandomly){
+			//Set all internal parameters as they where when network was exported
+			setInternalParameters(reader);
+		} else {
+			
+		}
 	}
 	
-	private void buildArchitecture(BufferedReader reader, Random rand){
+	private void buildArchitecture(BufferedReader reader, Random rand, boolean randomInitialization){
 		sensorLayer = new ArrayList<Sensor>();
 		unitLayers = new ArrayList<ArrayList<UnitNode>>();
 		unitNodes = new ArrayList<UnitNode>();
@@ -85,7 +90,7 @@ public class Network implements Serializable{
 			NodeFactory factory = new NodeFactory();
 			while( ( line = reader.readLine() ) != null) {
 				if (line.equalsIgnoreCase("Connections")) break;
-				Node n = factory.buildNode(line, rand);
+				Node n = factory.buildNode(line, rand, randomInitialization);
 				this.addNode(n);
 			}
 			//Connect nodes

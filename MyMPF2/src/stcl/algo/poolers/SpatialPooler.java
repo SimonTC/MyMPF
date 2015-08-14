@@ -1,6 +1,7 @@
 package stcl.algo.poolers;
 
 import java.io.Serializable;
+import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
 
@@ -26,6 +27,11 @@ public class SpatialPooler extends Pooler implements Serializable {
 	public SpatialPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor ) {
 		super(inputLength, mapSize);
 		som = new SOM(mapSize, inputLength, initialLearningRate, activationCodingFactor, stddev);
+	}
+	
+	public SpatialPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, Random rand ) {
+		super(inputLength, mapSize);
+		som = new SOM(mapSize, inputLength, rand, initialLearningRate, activationCodingFactor, stddev);
 	}
 	
 	public SpatialPooler(String initializationString, int startLine){

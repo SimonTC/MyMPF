@@ -57,8 +57,22 @@ public class Network implements Serializable{
 	 * @param initializationString
 	 */
 	public void initialize(String initializationString, Random rand){
-		BufferedReader reader = new BufferedReader( new StringReader(initializationString));
-		buildNetworkFromString(reader, rand, false);
+		this.initialize(initializationString, rand, false);
+	}
+	
+	public void initialize(String initializationString, Random rand, boolean fromFile){
+		BufferedReader reader = null;
+		try {
+			if (!fromFile) {
+				reader = new BufferedReader( new StringReader(initializationString));
+			} else {
+				reader = new BufferedReader(( new FileReader(initializationString)));				
+			}
+			buildNetworkFromString(reader, rand, false);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void buildNetworkFromString(BufferedReader reader, Random rand, boolean initializeRandomly){
@@ -68,9 +82,7 @@ public class Network implements Serializable{
 		if (!initializeRandomly){
 			//Set all internal parameters as they where when network was exported
 			setInternalParameters(reader);
-		} else {
-			
-		}
+		} 
 	}
 	
 	private void buildArchitecture(BufferedReader reader, Random rand, boolean randomInitialization){

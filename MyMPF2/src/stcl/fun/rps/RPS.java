@@ -66,7 +66,7 @@ public class RPS {
 				
 				//Let it train
 				brain.setUsePrediction(true);
-				brain.getActionNode().setExplorationChance(explorationChance);
+				brain.getActionNode().setExplorationChance(0);
 				runExperiment(trainingIterations, brain, runner, null, name);
 				
 				//Evaluate
@@ -79,6 +79,8 @@ public class RPS {
 				double prediction = scores[0];
 				sequenceFitness += fitness;
 				sequencePrediction += prediction;
+				
+				//brain.getUnitNodes().get(1).getUnit().getDecider().printQMatrix();
 
 				
 			}
@@ -113,8 +115,13 @@ public class RPS {
 		double totalFitness = 0;
 		for(int i = 0; i < numSequences; i++){
 			activator.newEpisode();
-			if (gui != null) gui.setSequenceName(name + " iteration " + i);
-			double[] result = runner.runSequence(activator, gui);
+			if (gui != null){
+				gui.setSequenceName(name + " iteration " + i);
+			} else {
+				//We are training and should adjust the exploration rate
+				//activator.getActionNode().setExplorationChance(1 - ((double) i / numSequences));
+			}
+			double[] result = runner.runSequence(activator, gui,(1 - ((double) i / numSequences)));
 			totalPrediction += result[0];
 			totalFitness += result[1];
 		}

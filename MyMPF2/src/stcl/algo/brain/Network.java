@@ -246,7 +246,7 @@ public class Network implements Serializable{
 		resetUnitActivity();
 	}
 	
-	protected void feedForward(double reward){
+	public void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
 		int actionPerformed = 0;
 		if (actionNode != null) {
@@ -261,7 +261,7 @@ public class Network implements Serializable{
 		}
 	}
 	
-	protected void feedback(){
+	public void feedback(){
 		
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
 			ArrayList<UnitNode> layer = unitLayers.get(layerID);
@@ -276,7 +276,7 @@ public class Network implements Serializable{
 		
 	}
 	
-	protected void resetUnitActivity(){
+	public void resetUnitActivity(){
 		for (UnitNode n : unitNodes) n.resetActivityOfUnit();
 	}
 	

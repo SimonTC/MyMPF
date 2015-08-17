@@ -47,6 +47,7 @@ public class Network_DataCollector extends Network {
 	//Spatial and temporal BMUs in the units
 	private int[] spatialBMUs;
 	private int[] temporalBMUs;
+	private SimpleMatrix[][] spatialModels;
 	
 	//Activations
 	private SimpleMatrix[] temporalActivations;
@@ -131,19 +132,7 @@ public class Network_DataCollector extends Network {
 		this.feedForward(reward);
 		
 		if (collectData){
-			//Collect Feedforward info
-			receivedInput = collectNetworkInput();
-			FFInputs = collectUnitInputs(true);
-			actionModels = collectActionModels();
-			activeStatuses = (collectActiveStatus());
-			helpStatuses = (collectHelpStatus());
-			predictionEntropies = (collectPredictionEntropies());
-			entropiesThresholds = (collectEntropyThresholds());
-			spatialBMUs = (collectBMUs(true));
-			temporalBMUs = (collectBMUs(false));
-			FFOutputs = (collectUnitOutputs(true));
-			temporalActivations = (collectActivations(false));
-			spatialActivations = (collectActivations(true));
+			collectFeedForwardData();
 		}
 		
 		//Feed back
@@ -151,22 +140,47 @@ public class Network_DataCollector extends Network {
 		
 		//Collect feed back info
 		if (collectData){
-			returnedOutput = collectNetworkOutput();
-			FBInputs = collectUnitInputs(false);
-			FBOutputs = (collectUnitOutputs(false));
-			actionVotes = collectActionVotes();
+			collectFeedBackData();
 		}
 		
 		super.resetUnitActivity();
 		
 		//Print data to files
 		if (collectData){
-			try {
-				writeData();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			printDataToFiles();
+		}
+	}
+	
+	public void collectFeedForwardData(){
+		//Collect Feedforward info
+		receivedInput = collectNetworkInput();
+		FFInputs = collectUnitInputs(true);
+		actionModels = collectActionModels();
+		activeStatuses = (collectActiveStatus());
+		helpStatuses = (collectHelpStatus());
+		predictionEntropies = (collectPredictionEntropies());
+		entropiesThresholds = (collectEntropyThresholds());
+		spatialBMUs = (collectBMUs(true));
+		temporalBMUs = (collectBMUs(false));
+		FFOutputs = (collectUnitOutputs(true));
+		temporalActivations = (collectActivations(false));
+		spatialActivations = (collectActivations(true));	
+		spatialModels = collectSpatialModels();
+	}
+	
+	public void collectFeedBackData(){
+		returnedOutput = collectNetworkOutput();
+		FBInputs = collectUnitInputs(false);
+		FBOutputs = (collectUnitOutputs(false));
+		actionVotes = collectActionVotes();
+	}
+	
+	public void printDataToFiles(){
+		try {
+			writeData();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -190,6 +204,8 @@ public class Network_DataCollector extends Network {
 		
 		header += writeRepeatedString("Spatial BMU", 1, ";");
 		header += writeRepeatedString("Temporal BMU", 1, ";");
+		
+		header += writeRepeatedString("Spatial models", 1, ";");
 		
 		header += writeRepeatedString("Need help", 1, ";");
 		header += writeRepeatedString("Was active", 1, ";");
@@ -228,6 +244,9 @@ public class Network_DataCollector extends Network {
 			
 			writer.write(spatialBMUs[i] + ";");
 			writer.write(temporalBMUs[i] + ";");
+			
+			for (SimpleMatrix m : spatialModels[i]) writer.write(writeMatrixArray(m) + ",");
+			writer.write(";");
 			
 			writer.write(helpStatuses[i] + ";");
 			writer.write(activeStatuses[i] + ";");
@@ -277,6 +296,14 @@ public class Network_DataCollector extends Network {
 	
 	private SimpleMatrix[] collectActionModels(){
 		return collectSomModels(super.getActionNode().getPooler().getSOM());
+	}
+	
+	private SimpleMatrix[][] collectSpatialModels(){
+		SimpleMatrix[][] spatialModels = new SimpleMatrix[numUnits][];
+		for (int i = 0; i < numUnits; i++){
+			spatialModels[i] = collectSomModels(super.getUnitNodes().get(i).getUnit().getSpatialPooler().getSOM());
+		}
+		return spatialModels;
 	}
 	
 	private SimpleMatrix[] collectSomModels(SOM som){

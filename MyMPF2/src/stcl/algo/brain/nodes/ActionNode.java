@@ -114,7 +114,7 @@ public class ActionNode extends Node {
 				nextActionID = mostPopularAction;
 			}
 		}
-		
+
 		nextAction = pooler.getSOM().getNode(nextActionID).getVector();
 		feedbackOutput = nextAction;		
 	}

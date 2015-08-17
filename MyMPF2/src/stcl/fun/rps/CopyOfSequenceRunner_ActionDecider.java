@@ -7,84 +7,58 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
+import dk.itu.stcl.agents.QLearner;
+import stcl.algo.brain.ActionDecider_Q;
 import stcl.algo.brain.Network_DataCollector;
 import stcl.algo.brain.nodes.Sensor;
-import stcl.algo.util.Normalizer;
 import stcl.fun.rps.rewardfunctions.RewardFunction;
+import stcl.fun.rps.rewardfunctions.RewardFunction_Inverse;
+import stcl.fun.rps.rewardfunctions.RewardFunction_Standard;
+import stcl.fun.rps.sequencecreation.SequenceBuilder;
 import stcl.graphics.MPFGUI;
 
-public class SequenceRunner {
+public class CopyOfSequenceRunner_ActionDecider {
 	
-	private SimpleMatrix[] possibleInputs;
-	private SimpleMatrix[] patternsToTestAgainst;
 	private int[] sequence;
 	private RewardFunction[] rewardFunctions;
 	private RewardFunction curRewardFunction;
 	private int curRewardFunctionID;
 	private Random rand;
-	private ArrayList<SimpleMatrix> possibleActions;
-	private double noiseMagnitude;
 	
-	public SequenceRunner(int[] sequence, SimpleMatrix[] possibleInputs, RewardFunction[] rewardFunctions, Random rand, double noiseMagnitude) {
-		this.possibleInputs = possibleInputs;
+	private ActionDecider_Q activator;
+	
+	//Variables have to be saved here to remember values between sequence runs
+	private SimpleMatrix action;
+	private SimpleMatrix prediction;
+	
+	
+	public static void main(String[] args){
+		RewardFunction[] functions = {new RewardFunction_Standard(), new RewardFunction_Inverse()};
+		Random rand = new Random();
+		int[] sequence = createSequences(rand);
+		CopyOfSequenceRunner_ActionDecider sr = new CopyOfSequenceRunner_ActionDecider(sequence, functions, rand);
+		
+		int numSeq = 10000;
+		for (int i = 0; i < numSeq; i++){
+			double[] scores = sr.runSequence(1.0 - ((double)i / numSeq));
+			double fitness = scores[1];
+			System.out.println(i + ": " + fitness);
+		}
+	}
+	
+	private static int[] createSequences(Random rand){
+		int[] mySequence ={0};
+		return mySequence;		
+	}
+
+	public CopyOfSequenceRunner_ActionDecider(int[] sequence, RewardFunction[] rewardFunctions, Random rand) {
 		this.rand = rand;
 		setSequence(sequence);
 		setRewardFunctions(rewardFunctions);
-		reset(false);
-		this.possibleActions = createPossibleActions();
-		this.noiseMagnitude = noiseMagnitude;
-		this.patternsToTestAgainst = createPatternsToTestAgainst(possibleInputs);
+		activator = new ActionDecider_Q(3, 3, 0.2, false);
 	}
 	
-	/**
-	 * Reset all variables to their initial values.
-	 */
-	public void reset(boolean gotoNextRewardFunction){
-		double[][] tmp = {{1,0,0}};
-		if (gotoNextRewardFunction){
-			curRewardFunctionID++;
-			if (curRewardFunctionID == rewardFunctions.length) curRewardFunctionID = 0;
-			curRewardFunction = rewardFunctions[curRewardFunctionID];
-		}
-	}
-	
-	private SimpleMatrix[] createPatternsToTestAgainst(SimpleMatrix[] possibleInputs){
-		int cols = possibleInputs[0].numCols();
-		int rows = possibleInputs[0].numRows();
-		SimpleMatrix[] testPatterns = new SimpleMatrix[possibleInputs.length * 2];
-		int counter = 0;
-		for (int i = 0; i < possibleInputs.length; i++){
-			testPatterns[i] = new SimpleMatrix(rows, cols);
-			for (int j = 0; j < testPatterns[i].getNumElements(); j++){
-				testPatterns[i].set(j, rand.nextDouble());
-			}
-			counter = i;
-		}
-		counter += 1;
-		for (int i = 0; i < possibleInputs.length; i++){
-			testPatterns[i + counter] = new SimpleMatrix(possibleInputs[i]);
-			
-		}
-		return testPatterns;
-	}
-	
-	private ArrayList<SimpleMatrix> createPossibleActions(){
-		double[][] rock = {{1,0,0}};
-		double[][] paper = {{0,1,0}};
-		double[][] scissors = {{0,0,1}};
-		double[][] empty = {{0,0,0}};
-		
-		SimpleMatrix r = new SimpleMatrix(rock);
-		SimpleMatrix p = new SimpleMatrix(paper);
-		SimpleMatrix s = new SimpleMatrix(scissors);
-		SimpleMatrix e = new SimpleMatrix(empty);
-		ArrayList<SimpleMatrix> arr = new ArrayList<SimpleMatrix>();
-		arr.add(r);
-		arr.add(p);
-		arr.add(s);
-		arr.add(e);
-		return arr;
-	}
+
 	
 	/**
 	 * Goes through the sequence once.
@@ -92,116 +66,48 @@ public class SequenceRunner {
 	 * @param activator
 	 * @return Array containing prediction success and fitness in the form [prediction,fitness]
 	 */
-	public double[] runSequence(Network_DataCollector activator, MPFGUI gui){
+	public double[] runSequence(double explorationChance){
 		double totalPredictionError = 0;
 		double totalGameScore = 0;
 		double reward_before = 0;
 		
 		int state = 1;
-		activator.getActionNode().setPossibleActions(possibleActions);
 		
-		initializeSequence(activator);
-		
-		for (int i = 0; i < sequence.length; i++){
-			
-			//Get input			
-			state = sequence[i];
-			SimpleMatrix input = possibleInputs[state];
-			SimpleMatrix noisyInput = addNoise(input, noiseMagnitude);
-						
-			//Collect output
-			activator.feedback();
-			
-			//activator.collectFeedBackData();
-			SimpleMatrix[] output = collectOutput(activator);
-			SimpleMatrix prediction = output[0];
-			SimpleMatrix myAction = output[1];
-			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
-			myAction.set(0);
-			myAction.set(realVote, 1);
-			
-			activator.resetUnitActivity();
-			
-			double reward_now = calculateReward(myAction, state);
-			totalGameScore += reward_now;	
-			
-			double predictionError = calculatePredictionError(prediction, input);
-			totalPredictionError += predictionError;
-			
-			giveInputsToActivator(activator, noisyInput, myAction);
-			activator.feedForward(reward_before);
-			//activator.collectFeedForwardData();
-			reward_before = reward_now;
-			//activator.printDataToFiles();
-			
-		}
-		
-		endSequence(activator, reward_before);
-		
-		activator.newEpisode();
-		
-		double avgPredictionError = totalPredictionError / (double) sequence.length;
-		double avgScore = totalGameScore / (double) sequence.length;
-		double predictionSuccess = 1 - avgPredictionError;
-		
-		double[] result = {predictionSuccess, avgScore};
-		return result;
-	}
-	
-	public double[] runSequence(Network_DataCollector activator, MPFGUI gui, double explorationChance){
-		double totalPredictionError = 0;
-		double totalGameScore = 0;
-		double reward_before = 0;
-		
-		int state;
-		activator.getActionNode().setPossibleActions(possibleActions);
-		
-		initializeSequence(activator);
+		activator.feedForward(0, 0, 0, null);
 		
 		for (int i = 0; i < sequence.length; i++){
-			
-			//Get input			
 			state = sequence[i];
-			SimpleMatrix input = possibleInputs[state];
-			SimpleMatrix noisyInput = addNoise(input, noiseMagnitude);
-						
-			//Collect output
-			activator.feedback();
 			
-			//activator.collectFeedBackData();
-			SimpleMatrix[] output = collectOutput(activator);
-			SimpleMatrix prediction = output[0];
-			SimpleMatrix myAction = output[1];
-			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
+			SimpleMatrix prediction = new SimpleMatrix(1, 3);
+			prediction.set(state, 1);
+			int myAction = activator.feedBack(prediction);	
 			if (rand.nextDouble() < explorationChance){
-				realVote = rand.nextInt(3);
-			}	
-			myAction.set(0);
-			if (realVote < 3) myAction.set(realVote, 1);
+				myAction = rand.nextInt(3);
+			}			
 			
-			activator.resetUnitActivity();
-			
-			double reward_now = calculateReward(myAction, state);
+			double reward_now = curRewardFunction.reward(state, myAction);
 			totalGameScore += reward_now;	
+
 			
-			double predictionError = calculatePredictionError(prediction, input);
-			totalPredictionError += predictionError;
+			activator.feedForward(state, myAction, reward_before, null);
 			
-			giveInputsToActivator(activator, noisyInput, myAction);
-			activator.feedForward(reward_before);
-			//activator.collectFeedForwardData();
+			//activator.updateQMatrix(state, myAction, nextState, -1, reward_now);
+			
 			reward_before = reward_now;
-			//activator.printDataToFiles();
 			
 		}
-		
-		endSequence(activator, reward_before);
+		activator.feedForward(0, 0, reward_before, null);
 		
 		activator.newEpisode();
+
+		
+		//endSequence(activator, reward_before);
 		
 		double avgPredictionError = totalPredictionError / (double) sequence.length;
 		double avgScore = totalGameScore / (double) sequence.length;
 		double predictionSuccess = 1 - avgPredictionError;
+		
+		//Scores can't be less than zero as the evolutionary algorithm can't work with that
 		
 		double[] result = {predictionSuccess, avgScore};
 		return result;
@@ -213,39 +119,21 @@ public class SequenceRunner {
 		SimpleMatrix initialAction = new SimpleMatrix(1, 3);
 		giveInputsToActivator(activator, initialInput, initialAction);
 		
-		activator.feedForward(0);
+		activator.step(0);
 
 	}
 	
 	private void endSequence(Network_DataCollector activator, double reward){
 		//Give blank input and action to network
 		SimpleMatrix input = new SimpleMatrix(5, 5);
-		SimpleMatrix action = new SimpleMatrix(1, 3);
+		SimpleMatrix[] output = collectOutput(activator);
+		action = output[1];
 		giveInputsToActivator(activator, input, action);
 		
-		activator.feedForward(reward);
+		activator.step(reward);
 	}
 	
-	private double calculatePredictionError(SimpleMatrix prediction, SimpleMatrix actual){
-		double minError = Double.POSITIVE_INFINITY;
-		SimpleMatrix bestMatch = null;
-		
-		for (SimpleMatrix m : patternsToTestAgainst){
-			SimpleMatrix diff = m.minus(prediction);
-			double d = diff.normF();	
-			if (d < minError){
-				minError = d;
-				bestMatch = m;
-			}
-		}		
-		
-		double predictionError = 1;
-		if (bestMatch.isIdentical(actual, 0.001)) {
-			predictionError = 0;
-		}
-		
-		return predictionError;
-	}
+
 	
 	private void giveInputsToActivator(Network_DataCollector activator, SimpleMatrix input, SimpleMatrix action){
 		SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
@@ -299,7 +187,7 @@ public class SequenceRunner {
 	 * @return
 	 */
 	private double calculateReward(SimpleMatrix action, int inputID){
-		if (action.elementSum() < 0.001) return 0; //Make sure that null actions are punished
+		if (action.elementSum() < 0.001) return -1; //Make sure that null actions are punished
 		
 		int actionID = -1;
 		double maxValue = Double.NEGATIVE_INFINITY;
@@ -380,10 +268,6 @@ public class SequenceRunner {
 	
 	public void setSequence(int[] sequence){
 		this.sequence = sequence;
-	}
-	
-	public void setNoiseMagnitude(double d){
-		this.noiseMagnitude = d;
 	}
 	
 	public void setRewardFunctions(RewardFunction[] rewardFunctions){

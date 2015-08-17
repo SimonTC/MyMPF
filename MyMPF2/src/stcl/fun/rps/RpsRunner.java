@@ -8,6 +8,7 @@ import org.ejml.simple.SimpleMatrix;
 
 
 
+
 import stcl.algo.brain.Network_DataCollector;
 import stcl.fun.rps.rewardfunctions.RewardFunction;
 import stcl.fun.rps.rewardfunctions.RewardFunction_Inverse;
@@ -18,9 +19,12 @@ import stcl.graphics.MPFGUI;
 
 public class RpsRunner {
 	
-	private boolean setSequenceManually = false;
-	private boolean visualize = true;
+	private boolean setSequenceManually = true;
+	private boolean visualize = false;
 	private int framesPerSecond = 10;
+	////////////////////////////////////////
+	boolean initializeRandomly = true; //Set to false when testing genomes created by evolution
+	////////////////////////////////////////
 	
 	protected SimpleMatrix[] possibleInputs;
 	protected int[][] sequences;
@@ -36,8 +40,13 @@ public class RpsRunner {
 	protected double exploreChance;
 
 	public static void main(String[] args) throws FileNotFoundException {
-		String experimentRun = "C:/Users/Simon/Google Drev/Experiments/HTM/rps_pc/1439281660206";
-		String genomeFile = experimentRun + "/best_performing-final-1196.txt";;
+		//String experimentRun = "C:/Users/Simon/Google Drev/Experiments/HTM/rps_pc/1439281660206";
+		//String genomeFile = experimentRun + "/best_performing-final-1196.txt";;
+		
+		String sequencePath = "";//"C:/Users/Simon/Google Drev/Experiments/HTM/rps/Master data/evaluation/results 2-2-2/sequences.txt";
+		String experimentRun = "C:/Users/Simon/Google Drev/Experiments/HTM/rps/Master data/evaluation/genomes/8 Simple Network";
+		String propsFileName = experimentRun + "/props.properties";
+		String genomeFile = experimentRun + "/SimpleNetwork_1_2.txt";
 
 		RpsRunner runner = new RpsRunner();
 		runner.run(genomeFile);
@@ -49,7 +58,11 @@ public class RpsRunner {
 	public void run(String networkfilename) throws FileNotFoundException{
 		this.init();
 		Network_DataCollector brain = setupBrain(networkfilename, rand);
+		brain.initializeWriters("C:/Users/Simon/Desktop/Eval", false);
+		brain.openFiles(true);
+		brain.setCollectData(true);
 		double[][] result = this.evaluate(brain);
+		brain.closeFiles();
 		
 		double predictionSum = 0;
 		double fitnessSum = 0;
@@ -62,6 +75,9 @@ public class RpsRunner {
 		double avgFitness = fitnessSum / (double) result.length;
 		double avgPrediction = predictionSum / (double) result.length;
 		System.out.println("Avg prediction: " + avgPrediction + " Avg fitness: " + avgFitness);
+		
+		
+		
 	}
 	
 	
@@ -71,9 +87,9 @@ public class RpsRunner {
 		trainingIterations = 1000;
 		evaluationIterations = 100;
 		numDifferentSequences = 1;
-		numExperimentsPerSequence = 1;
+		numExperimentsPerSequence = 10;
 		exploreChance = 0.1;
-		noiseMagnitude = 0.1;
+		noiseMagnitude = 0.0;
 		
 		sequences = createSequences(rand);
 		
@@ -83,6 +99,9 @@ public class RpsRunner {
 	
 	private Network_DataCollector setupBrain(String fileName, Random rand) throws FileNotFoundException{
 		Network_DataCollector brain = new Network_DataCollector(fileName, rand);
+		if (!initializeRandomly){
+			brain.initialize(fileName, rand, true);
+		}
 		return brain;
 	}
 	
@@ -109,7 +128,7 @@ public class RpsRunner {
 		int blockLengthMax = 2;
 		int alphabetSize = 3;
 		if (setSequenceManually){ //Only used for debugging
-			int[][] mySequence ={{0,1,2}};
+			int[][] mySequence ={{0}};
 			return mySequence;
 		} else {		
 			Random sequenceRand = new Random();

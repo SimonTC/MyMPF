@@ -98,7 +98,6 @@ public class SequenceRunner {
 		double reward_before = 0;
 		
 		int state = 1;
-		activator.getActionNode().setPossibleActions(possibleActions);
 		
 		initializeSequence(activator);
 		
@@ -113,9 +112,8 @@ public class SequenceRunner {
 			activator.feedback();
 			
 			//activator.collectFeedBackData();
-			SimpleMatrix[] output = collectOutput(activator);
-			SimpleMatrix prediction = output[0];
-			SimpleMatrix myAction = output[1];
+			SimpleMatrix prediction = collectOutput(activator);
+			SimpleMatrix myAction = new SimpleMatrix(1, 3);
 			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
 			myAction.set(0);
 			myAction.set(realVote, 1);
@@ -128,8 +126,8 @@ public class SequenceRunner {
 			double predictionError = calculatePredictionError(prediction, input);
 			totalPredictionError += predictionError;
 			
-			giveInputsToActivator(activator, noisyInput, myAction);
-			activator.feedForward(reward_before);
+			giveInputsToActivator(activator, noisyInput);
+			activator.feedForward(reward_before, realVote);
 			//activator.collectFeedForwardData();
 			reward_before = reward_now;
 			//activator.printDataToFiles();
@@ -154,7 +152,6 @@ public class SequenceRunner {
 		double reward_before = 0;
 		
 		int state;
-		activator.getActionNode().setPossibleActions(possibleActions);
 		
 		initializeSequence(activator);
 		
@@ -169,9 +166,8 @@ public class SequenceRunner {
 			activator.feedback();
 			
 			//activator.collectFeedBackData();
-			SimpleMatrix[] output = collectOutput(activator);
-			SimpleMatrix prediction = output[0];
-			SimpleMatrix myAction = output[1];
+			SimpleMatrix prediction = collectOutput(activator);
+			SimpleMatrix myAction = new SimpleMatrix(1, 3);
 			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
 			if (rand.nextDouble() < explorationChance){
 				realVote = rand.nextInt(3);
@@ -187,8 +183,8 @@ public class SequenceRunner {
 			double predictionError = calculatePredictionError(prediction, input);
 			totalPredictionError += predictionError;
 			
-			giveInputsToActivator(activator, noisyInput, myAction);
-			activator.feedForward(reward_before);
+			giveInputsToActivator(activator, noisyInput);
+			activator.feedForward(reward_before, realVote);
 			//activator.collectFeedForwardData();
 			reward_before = reward_now;
 			//activator.printDataToFiles();
@@ -211,9 +207,9 @@ public class SequenceRunner {
 		//Give blank input and action to network
 		SimpleMatrix initialInput = new SimpleMatrix(5, 5);
 		SimpleMatrix initialAction = new SimpleMatrix(1, 3);
-		giveInputsToActivator(activator, initialInput, initialAction);
+		giveInputsToActivator(activator, initialInput);
 		
-		activator.feedForward(0);
+		activator.feedForward(0,3);
 
 	}
 	
@@ -221,9 +217,9 @@ public class SequenceRunner {
 		//Give blank input and action to network
 		SimpleMatrix input = new SimpleMatrix(5, 5);
 		SimpleMatrix action = new SimpleMatrix(1, 3);
-		giveInputsToActivator(activator, input, action);
+		giveInputsToActivator(activator, input);
 		
-		activator.feedForward(reward);
+		activator.feedForward(reward,3);
 	}
 	
 	private double calculatePredictionError(SimpleMatrix prediction, SimpleMatrix actual){
@@ -247,11 +243,9 @@ public class SequenceRunner {
 		return predictionError;
 	}
 	
-	private void giveInputsToActivator(Network_DataCollector activator, SimpleMatrix input, SimpleMatrix action){
+	private void giveInputsToActivator(Network_DataCollector activator, SimpleMatrix input){
 		SimpleMatrix inputVector = new SimpleMatrix(1, input.getNumElements(), true, input.getMatrix().data);
-		SimpleMatrix actionVector = new SimpleMatrix(1, action.getNumElements(), true, action.getMatrix().data);
 		setInput(inputVector.getMatrix().data, activator);		
-		setAction(actionVector.getMatrix().data, activator);
 	}
 	
 	public void setInput(double[] stimuli, Network_DataCollector network){
@@ -262,13 +256,6 @@ public class SequenceRunner {
 			s.setInput(stimuli[i]);
 		}
 
-	}
-	
-	public void setAction(double[] action, Network_DataCollector network){
-		ArrayList<Sensor> sensors = network.getSensors();
-		Sensor actionSensor = sensors.get(sensors.size()-1);
-		SimpleMatrix input = new SimpleMatrix(1, action.length, true, action);
-		actionSensor.setInput(input);
 	}
 	
 	/**
@@ -320,22 +307,13 @@ public class SequenceRunner {
 	 * @param activator
 	 * @return prediction and action for the next time step
 	 */
-	private SimpleMatrix[] collectOutput(Network_DataCollector activator){
+	private SimpleMatrix collectOutput(Network_DataCollector activator){
 		double[] predictionData = getOutput(activator);
 		SimpleMatrix prediction = new SimpleMatrix(1, predictionData.length, true, predictionData);
 		prediction.reshape(5, 5);
 		
-		double[] actionData = getAction(activator);
-		SimpleMatrix actionNextTimeStep = new SimpleMatrix(1, actionData.length, true, actionData);
-
-		//Set max value of action to 1. The rest to zero
-		int max = maxID(actionNextTimeStep);
-		if (max != -1){
-			actionNextTimeStep.set(0);
-			actionNextTimeStep.set(max, 1);
-		}				
-		SimpleMatrix[] result = {prediction, actionNextTimeStep};
-		return result;
+		
+		return prediction;
 	}
 	
 	public double[] getOutput(Network_DataCollector network){
@@ -345,13 +323,6 @@ public class SequenceRunner {
 			Sensor s = sensors.get(i);
 			output[i] = s.getFeedbackOutput().get(0);
 		}
-		return output;
-	}
-	
-	public double[] getAction(Network_DataCollector network){
-		ArrayList<Sensor> sensors = network.getSensors();
-		Sensor actionSensor = sensors.get(sensors.size()-1);
-		double[] output = actionSensor.getFeedbackOutput().getMatrix().data;
 		return output;
 	}
 	

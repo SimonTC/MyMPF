@@ -16,7 +16,6 @@ import org.ejml.simple.SimpleMatrix;
 import org.w3c.dom.NodeList;
 
 import dk.stcl.core.utils.SomConstants;
-import stcl.algo.brain.nodes.ActionNode;
 import stcl.algo.brain.nodes.Node;
 import stcl.algo.brain.nodes.Node.NodeType;
 import stcl.algo.brain.nodes.NodeFactory;
@@ -29,7 +28,6 @@ public class Network implements Serializable{
 	private ArrayList<Sensor> sensorLayer;
 	private ArrayList<ArrayList<UnitNode>> unitLayers;
 	private ArrayList<UnitNode> unitNodes;
-	private ActionNode actionNode;
 	private ArrayList<Node> nodes;
 	
 	public Network() {
@@ -199,8 +197,9 @@ public class Network implements Serializable{
 		nodes.add(node);
 		switch(node.getType()){
 		case SENSOR: this.addSensor((Sensor) node); break;
-		case UNIT: this.addUnitNode((UnitNode) node); break;			
-		case ACTION: this.setActionNode((ActionNode) node); break;
+		case UNIT: this.addUnitNode((UnitNode) node); break;
+		default:
+			break;			
 		}
 	}
 	
@@ -213,21 +212,8 @@ public class Network implements Serializable{
 		while (unitLayers.size() <= layer) unitLayers.add(new ArrayList<UnitNode>());
 		unitLayers.get(layer).add(node);
 		unitNodes.add(node);
-		if (actionNode != null){
-			actionNode.addVoter(node);
-		}
 	}
 	
-	private void setActionNode(ActionNode node){
-		this.actionNode = node;
-		for (UnitNode n : unitNodes){
-			actionNode.addVoter(n);
-		}
-	}
-	
-	public ActionNode getActionNode(){
-		return actionNode;
-	}
 	
 	public ArrayList<Sensor> getSensors(){
 		return sensorLayer;
@@ -238,21 +224,16 @@ public class Network implements Serializable{
 	 * Set sensors before stepping
 	 * @param reward
 	 */
-	public void step(double reward){
-		feedForward(reward);
+	public void step(double reward, int actionPerformed){
+		feedForward(reward, actionPerformed);
 		
 		feedback();
 		
 		resetUnitActivity();
 	}
 	
-	public void feedForward(double reward){
+	public void feedForward(double reward, int actionPerformed){
 		for (Sensor s : sensorLayer) s.feedforward();
-		int actionPerformed = 0;
-		if (actionNode != null) {
-			actionNode.feedforward(reward, -1);		
-		 	actionPerformed = actionNode.getCurrentAction();
-		}
 		
 		for (ArrayList<UnitNode> layer : unitLayers){
 			for (UnitNode n : layer){
@@ -271,7 +252,6 @@ public class Network implements Serializable{
 		}	
 		
 		//Decide on what action to do
-		if (actionNode != null) actionNode.feedback();
 		for (Sensor s : sensorLayer) s.feedback();		
 		
 	}
@@ -332,10 +312,6 @@ public class Network implements Serializable{
 			buffer.append("Node " + n.getID() + ls);
 			String initializationString = "";
 			switch (n.getType()){
-			case ACTION: 
-				ActionNode an = (ActionNode) n;
-				initializationString = an.toInitializationString();
-				break;
 			case SENSOR: 
 				Sensor s = (Sensor) n;
 				initializationString = s.toInitializationString();

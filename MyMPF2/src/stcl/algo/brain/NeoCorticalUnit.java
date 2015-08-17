@@ -338,9 +338,9 @@ public class NeoCorticalUnit implements Serializable{
 	private SpatialPooler instantiateSpatialPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, Random rand){
 		SpatialPooler s;
 		if (rand!= null){
-			s = new SpatialPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
+			s = new SpatialPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, rand);			
 		} else {
-			s = new SpatialPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, rand);
+			s = new SpatialPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor);
 		}
 		return s;
 	}
@@ -364,9 +364,9 @@ public class NeoCorticalUnit implements Serializable{
 	private TemporalPooler instantiateTemporalPooler(int inputLength, int mapSize, double initialLearningRate, double stddev, double activationCodingFactor, double decay, Random rand){
 		TemporalPooler p;
 		if (rand != null){
-			p = new TemporalPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay);
+			p = new TemporalPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay, rand);			
 		} else {
-			p = new TemporalPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay, rand);
+			p = new TemporalPooler(inputLength, mapSize, initialLearningRate, stddev, activationCodingFactor, decay);
 		}
 		return p;
 	}

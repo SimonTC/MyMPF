@@ -42,8 +42,8 @@ public class RPS {
 		this.sequences = sequences;
 		this.gui = gui;
 		
-		//runner = new SequenceRunner(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
-		runner = new SequenceRunner_NU(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
+		runner = new SequenceRunner(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
+		//runner = new SequenceRunner_NU(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
 
 	}
 	

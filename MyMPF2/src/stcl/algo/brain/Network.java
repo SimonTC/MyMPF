@@ -24,7 +24,7 @@ import stcl.algo.brain.nodes.Sensor;
 import stcl.algo.brain.nodes.UnitNode;
 
 
-public class Network implements Serializable{
+public class Network implements Serializable, INetwork{
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Sensor> sensorLayer;
 	private ArrayList<ArrayList<UnitNode>> unitLayers;
@@ -51,15 +51,18 @@ public class Network implements Serializable{
 		buildNetworkFromString(reader, rand, true);
 	}
 	
-	/**
-	 * Initializes the network using the initialization string.
-	 * The string has to be identical with the string created by the toString() method
-	 * @param initializationString
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#initialize(java.lang.String, java.util.Random)
 	 */
+	@Override
 	public void initialize(String initializationString, Random rand){
 		this.initialize(initializationString, rand, false);
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#initialize(java.lang.String, java.util.Random, boolean)
+	 */
+	@Override
 	public void initialize(String initializationString, Random rand, boolean fromFile){
 		BufferedReader reader = null;
 		try {
@@ -182,19 +185,18 @@ public class Network implements Serializable{
 		
 	}
 	
-	/**
-	 * Resets the network back to its original state before any learning has been performed.
-	 * Use if you need to run multiple trainings from an initial state
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#reinitialize()
 	 */
+	@Override
 	public void reinitialize(){
 		for (Node n : nodes) n.reinitialize();
 	}
 	
-	/**
-	 * Add the given node to the network.
-	 * Node will be placed according to its type
-	 * @param node
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#addNode(stcl.algo.brain.nodes.Node)
 	 */
+	@Override
 	public void addNode(Node node){
 		nodes.add(node);
 		switch(node.getType()){
@@ -225,19 +227,26 @@ public class Network implements Serializable{
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#getActionNode()
+	 */
+	@Override
 	public ActionNode getActionNode(){
 		return actionNode;
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#getSensors()
+	 */
+	@Override
 	public ArrayList<Sensor> getSensors(){
 		return sensorLayer;
 	}
 	
-	/**
-	 * Takes one step through the network.
-	 * Set sensors before stepping
-	 * @param reward
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#step(double)
 	 */
+	@Override
 	public void step(double reward){
 		feedForward(reward);
 		
@@ -246,6 +255,10 @@ public class Network implements Serializable{
 		resetUnitActivity();
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#feedForward(double)
+	 */
+	@Override
 	public void feedForward(double reward){
 		for (Sensor s : sensorLayer) s.feedforward();
 		int actionPerformed = 0;
@@ -261,6 +274,10 @@ public class Network implements Serializable{
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#feedback()
+	 */
+	@Override
 	public void feedback(){
 		
 		for (int layerID = unitLayers.size()-1; layerID >= 0; layerID--){
@@ -276,31 +293,59 @@ public class Network implements Serializable{
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#resetUnitActivity()
+	 */
+	@Override
 	public void resetUnitActivity(){
 		for (UnitNode n : unitNodes) n.resetActivityOfUnit();
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#setLearning(boolean)
+	 */
+	@Override
 	public void setLearning(boolean learning){
 		for (Node n : nodes) n.setLearning(learning);
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#setEntropyThresholdFrozen(boolean)
+	 */
+	@Override
 	public void setEntropyThresholdFrozen(boolean entropyThresholdFrozen) {
 		for (UnitNode n : unitNodes) n.getUnit().setEntropyThresholdFrozen(entropyThresholdFrozen);
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#setUsePrediction(boolean)
+	 */
+	@Override
 	public void setUsePrediction(boolean flag) {
 		for (UnitNode n : unitNodes) n.getUnit().setUsePrediction(flag);
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#getNumUnitNodes()
+	 */
+	@Override
 	public int getNumUnitNodes(){
 		return unitNodes.size();
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#getUnitNodes()
+	 */
+	@Override
 	public ArrayList<UnitNode> getUnitNodes(){
 		return unitNodes;
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#toString()
+	 */
+	@Override
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
 		ArrayList<int[]> connections = new ArrayList<int[]>();
@@ -356,16 +401,18 @@ public class Network implements Serializable{
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#newEpisode()
+	 */
+	@Override
 	public void newEpisode(){
 		for (UnitNode n : unitNodes) n.newEpisode();
 	}
 	
-	/**
-	 * Return a string that can be used to visualize the network in BioLayout Express 3D version 3.3
-	 * Link: http://www.biolayout.org/
-	 * @param nodeSize
-	 * @return
+	/* (non-Javadoc)
+	 * @see stcl.algo.brain.INetwork#toVisualString(int, int, boolean)
 	 */
+	@Override
 	public String toVisualString(int nodeSize, int maxWidth, boolean threeD){
 		StringBuffer buffer = new StringBuffer();
 		//Create list of connections

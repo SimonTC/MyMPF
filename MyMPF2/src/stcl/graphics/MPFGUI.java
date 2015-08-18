@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import org.ejml.simple.SimpleMatrix;
 
-import stcl.algo.brain.Network;
+import stcl.algo.brain.INetwork;
 
 public class MPFGUI {
 	
@@ -29,7 +29,7 @@ public class MPFGUI {
 	}
 
 	
-	public void update(Network brain, SimpleMatrix inputNow, SimpleMatrix actionNow, SimpleMatrix prediction, SimpleMatrix actionNext, int step){
+	public void update(INetwork brain, SimpleMatrix inputNow, SimpleMatrix actionNow, SimpleMatrix prediction, SimpleMatrix actionNext, int step){
 		overview.updateData(inputNow, actionNow, prediction, actionNext);
 		frame.setTitle("Sequence " + curSequenceName + " Step " + step);
 		frame.revalidate();

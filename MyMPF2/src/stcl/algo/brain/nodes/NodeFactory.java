@@ -19,12 +19,14 @@ public class NodeFactory {
 		Node n = null;
 		if (!randomInitialization){
 			switch(type){
+			case ACTION: n = new ActionNode(s, rand);break;
 			case SENSOR: n = new Sensor(s); break;
 			case UNIT: n = new UnitNode(s);break;
 			default: n = null; break;		
 			}
 		} else {
 			switch(type){
+			case ACTION: n = new ActionNode(s, rand);break;
 			case SENSOR: n = new Sensor(s); break;
 			case UNIT: n = new UnitNode(s, rand);break;
 			default: n = null; break;		

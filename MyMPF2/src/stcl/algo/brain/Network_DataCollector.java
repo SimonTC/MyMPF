@@ -126,10 +126,10 @@ public class Network_DataCollector extends Network {
 	
 
 	@Override
-	public void step(double reward, int actionPerformed) {
+	public void step(double reward) {
 		
 		//Feed forward
-		this.feedForward(reward, actionPerformed);
+		this.feedForward(reward);
 		
 		if (collectData){
 			collectFeedForwardData();
@@ -155,6 +155,7 @@ public class Network_DataCollector extends Network {
 		//Collect Feedforward info
 		receivedInput = collectNetworkInput();
 		FFInputs = collectUnitInputs(true);
+		actionModels = collectActionModels();
 		activeStatuses = (collectActiveStatus());
 		helpStatuses = (collectHelpStatus());
 		predictionEntropies = (collectPredictionEntropies());
@@ -293,6 +294,9 @@ public class Network_DataCollector extends Network {
 		return stream.toString();
 	}
 	
+	private SimpleMatrix[] collectActionModels(){
+		return collectSomModels(super.getActionNode().getPooler().getSOM());
+	}
 	
 	private SimpleMatrix[][] collectSpatialModels(){
 		SimpleMatrix[][] spatialModels = new SimpleMatrix[numUnits][];

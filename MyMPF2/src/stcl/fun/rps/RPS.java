@@ -66,9 +66,11 @@ public class RPS {
 				
 				//Let it train
 				brain.setUsePrediction(true);
+				brain.getActionNode().setExplorationChance(0);
 				runExperiment(trainingIterations, brain, runner, null, name);
 				
 				//Evaluate
+				brain.getActionNode().setExplorationChance(0.0);
 				brain.setLearning(false);
 				brain.newEpisode();
 				runner.reset(false);

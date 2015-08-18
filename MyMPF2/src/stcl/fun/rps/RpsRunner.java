@@ -47,7 +47,7 @@ public class RpsRunner {
 		String experimentRun = "C:/Users/Simon/Google Drev/Experiments/HTM/rps/Master data/evaluation/genomes/8 Simple Network";
 		String propsFileName = experimentRun + "/props.properties";
 		String genomeFile = experimentRun + "/SimpleNetwork_1_2.txt";
-
+		
 		RpsRunner runner = new RpsRunner();
 		runner.run(genomeFile);
 		System.out.println();
@@ -84,7 +84,7 @@ public class RpsRunner {
 	public void init() {
 		rand = new Random();
 		learningIterations = 100;
-		trainingIterations = 1000;
+		trainingIterations = 1500;
 		evaluationIterations = 100;
 		numDifferentSequences = 1;
 		numExperimentsPerSequence = 10;
@@ -128,7 +128,8 @@ public class RpsRunner {
 		int blockLengthMax = 2;
 		int alphabetSize = 3;
 		if (setSequenceManually){ //Only used for debugging
-			int[][] mySequence ={{0}};
+			int[][] mySequence ={{0,1,2}, {0,2,1}, {1,0,2}, {1,2,0}, {2,0,1}, {2,1,0}};
+			//int[][] mySequence = {{2, 0, 2, 0, 1, 0, 1, 0, 2, 0, 2, 0, 1, 0, 1, 0}};
 			return mySequence;
 		} else {		
 			Random sequenceRand = new Random();

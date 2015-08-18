@@ -22,7 +22,6 @@ import stcl.graphics.MPFGUI;
 
 public class CopyOfSequenceRunner_NU_Stolen {
 	
-	private int[] sequence;
 	private RewardFunction[] rewardFunctions;
 	private RewardFunction curRewardFunction;
 	private int curRewardFunctionID;
@@ -45,39 +44,43 @@ public class CopyOfSequenceRunner_NU_Stolen {
 		
 		RewardFunction[] functions = {new RewardFunction_Standard(), new RewardFunction_Inverse()};
 		Random rand = new Random();
-		int[] sequence = createSequences(rand);
-		CopyOfSequenceRunner_NU_Stolen sr = new CopyOfSequenceRunner_NU_Stolen(sequence, functions, rand, genomeFile);
-		double total = 0;
-		for (int j = 0; j < 10; j++){
+		int[][] sequences = createSequences(rand);
 		
-			int numSeq = 1000;
-			for (int i = 0; i < numSeq; i++){
-				double[] scores = sr.runSequence(1.0 - ((double)i / numSeq));
-				double fitness = scores[1];
+		
+		
+		for (int[] seq : sequences){
+			CopyOfSequenceRunner_NU_Stolen sr = new CopyOfSequenceRunner_NU_Stolen(sequences, functions, rand, genomeFile);
+			double total = 0;
+			for (int j = 0; j < 10; j++){
+			
+				int numSeq = 500;
+				for (int i = 0; i < numSeq; i++){
+					double[] scores = sr.runSequence(0.1, seq);
+					double fitness = scores[1];
+				}
+				
+				double itr_fitness = 0;
+				for (int i = 0; i < 100; i++){
+					double[] scores = sr.runSequence(0, seq);
+					double fitness = scores[1];
+					itr_fitness += fitness;
+				}
+				
+				total += itr_fitness / (double) 100;
 			}
 			
-			double itr_fitness = 0;
-			for (int i = 0; i < 100; i++){
-				double[] scores = sr.runSequence(0);
-				double fitness = scores[1];
-				itr_fitness += fitness;
-			}
-			
-			total += itr_fitness / (double) 100;
+			double avg = total / (double) 10;
+			System.out.println("Average: " + avg);
 		}
-		
-		double avg = total / (double) 10;
-		System.out.println("Average: " + avg);
 	}
 	
-	private static int[] createSequences(Random rand){
-		int[] mySequence ={0};
-		return mySequence;		
+	private static int[][] createSequences(Random rand){
+		int[][] mySequences ={{0,1,2}, {0,2,1}, {1,0,2}, {1,2,0}, {2,0,1}, {2,1,0}};
+		return mySequences;		
 	}
-
-	public CopyOfSequenceRunner_NU_Stolen(int[] sequence, RewardFunction[] rewardFunctions, Random rand, String networkfilename) throws FileNotFoundException {
+	
+	public CopyOfSequenceRunner_NU_Stolen(int[][] sequences, RewardFunction[] rewardFunctions, Random rand, String networkfilename) throws FileNotFoundException {
 		this.rand = rand;
-		setSequence(sequence);
 		setRewardFunctions(rewardFunctions);
 		Network_DataCollector brain = setupBrain(networkfilename, rand);
 		activator = brain.getUnitNodes().get(0).getUnit();
@@ -140,7 +143,7 @@ public class CopyOfSequenceRunner_NU_Stolen {
 	 * @param activator
 	 * @return Array containing prediction success and fitness in the form [prediction,fitness]
 	 */
-	public double[] runSequence(double explorationChance){
+	public double[] runSequence(double explorationChance, int[] sequence){
 		double totalPredictionError = 0;
 		double totalGameScore = 0;
 		double reward_before = 0;
@@ -338,10 +341,7 @@ public class CopyOfSequenceRunner_NU_Stolen {
 		}
 		return maxID;
 	}
-	
-	public void setSequence(int[] sequence){
-		this.sequence = sequence;
-	}
+
 	
 	public void setRewardFunctions(RewardFunction[] rewardFunctions){
 		this.rewardFunctions = rewardFunctions;

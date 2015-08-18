@@ -34,13 +34,16 @@ public class RPS {
 			double noiseMagnitude,
 			MPFGUI gui){
 		rand = new Random(randSeed);
-		runner = new SequenceRunner(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
+		
 		this.numExperimentsPerSequence = numExperimentsPerSequence;
 		this.trainingIterations = trainingIterations;
 		this.evaluationIterations = evaluationIterations;
 		sequenceScores = new double[sequences.length][2];
 		this.sequences = sequences;
 		this.gui = gui;
+		
+		//runner = new SequenceRunner(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
+		runner = new SequenceRunner_NU(null, possibleInputs, rewardFunctions, rand, noiseMagnitude);
 
 	}
 	
@@ -66,15 +69,14 @@ public class RPS {
 				
 				//Let it train
 				brain.setUsePrediction(true);
-				brain.getActionNode().setExplorationChance(0);
-				runExperiment(trainingIterations, brain, runner, null, name);
+				brain.setLearning(true);
+				runExperiment(trainingIterations, brain, runner, null, name, false);
 				
 				//Evaluate
-				brain.getActionNode().setExplorationChance(0.0);
 				brain.setLearning(false);
 				brain.newEpisode();
 				runner.reset(false);
-				double[] scores = runExperiment(evaluationIterations, brain, runner, gui, name);
+				double[] scores = runExperiment(evaluationIterations, brain, runner, gui, name, true);
 				double fitness = scores[1];
 				double prediction = scores[0];
 				sequenceFitness += fitness;
@@ -110,18 +112,26 @@ public class RPS {
 	 * @param activator
 	 * @return the score given as [avgPredictionSuccess, avgFitness]
 	 */
-	protected double[] runExperiment(int numSequences, Network_DataCollector activator, SequenceRunner runner, MPFGUI gui, String name){
+	protected double[] runExperiment(int numSequences, Network_DataCollector activator, SequenceRunner runner, MPFGUI gui, String name, boolean evaluation){
 		double totalPrediction = 0;
 		double totalFitness = 0;
 		for(int i = 0; i < numSequences; i++){
 			activator.newEpisode();
+			double[] result;
 			if (gui != null){
 				gui.setSequenceName(name + " iteration " + i);
-			} else {
-				//We are training and should adjust the exploration rate
-				//activator.getActionNode().setExplorationChance(1 - ((double) i / numSequences));
 			}
-			double[] result = runner.runSequence(activator, gui,(1 - ((double) i / numSequences)));
+			
+			if (evaluation){
+				activator.getActionNode().setExplorationChance(0);
+				//result = runner.runSequence(activator, gui,0);
+			} else {
+				activator.getActionNode().setExplorationChance(1 - ((double) i / numSequences));
+				//result = runner.runSequence(activator, gui,(1 - ((double) i / numSequences)));
+			}
+			
+			//double[] result = runner.runSequence(activator, gui,(1 - ((double) i / numSequences)));
+			result = runner.runSequence(activator, gui);
 			totalPrediction += result[0];
 			totalFitness += result[1];
 		}

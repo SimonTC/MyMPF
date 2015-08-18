@@ -15,13 +15,13 @@ import stcl.graphics.MPFGUI;
 
 public class SequenceRunner {
 	
-	private SimpleMatrix[] possibleInputs;
+	protected SimpleMatrix[] possibleInputs;
 	private SimpleMatrix[] patternsToTestAgainst;
-	private int[] sequence;
+	protected int[] sequence;
 	private RewardFunction[] rewardFunctions;
-	private RewardFunction curRewardFunction;
+	protected RewardFunction curRewardFunction;
 	private int curRewardFunctionID;
-	private Random rand;
+	protected Random rand;
 	private ArrayList<SimpleMatrix> possibleActions;
 	private double noiseMagnitude;
 	
@@ -116,10 +116,7 @@ public class SequenceRunner {
 			SimpleMatrix[] output = collectOutput(activator);
 			SimpleMatrix prediction = output[0];
 			SimpleMatrix myAction = output[1];
-			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
-			myAction.set(0);
-			myAction.set(realVote, 1);
-			
+						
 			activator.resetUnitActivity();
 			
 			double reward_now = calculateReward(myAction, state);
@@ -175,9 +172,10 @@ public class SequenceRunner {
 			int realVote = activator.getUnitNodes().get(0).getUnit().getNextAction();
 			if (rand.nextDouble() < explorationChance){
 				realVote = rand.nextInt(3);
+				myAction.set(0);
+				if (realVote < 3) myAction.set(realVote, 1);
 			}	
-			myAction.set(0);
-			if (realVote < 3) myAction.set(realVote, 1);
+			
 			
 			activator.resetUnitActivity();
 			

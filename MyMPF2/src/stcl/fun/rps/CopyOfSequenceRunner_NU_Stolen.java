@@ -53,9 +53,9 @@ public class CopyOfSequenceRunner_NU_Stolen {
 			double total = 0;
 			for (int j = 0; j < 10; j++){
 			
-				int numSeq = 500;
+				int numSeq = 1000;
 				for (int i = 0; i < numSeq; i++){
-					double[] scores = sr.runSequence(0.1, seq);
+					double[] scores = sr.runSequence(1.0 - ((double)i / numSeq), seq);
 					double fitness = scores[1];
 				}
 				

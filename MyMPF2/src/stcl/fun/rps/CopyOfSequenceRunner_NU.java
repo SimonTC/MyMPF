@@ -55,7 +55,7 @@ public class CopyOfSequenceRunner_NU {
 	}
 	
 	private static int[] createSequences(Random rand){
-		int[] mySequence ={0};
+		int[] mySequence ={0,1,2};
 		return mySequence;		
 	}
 

@@ -462,4 +462,8 @@ public class Network_DataCollector extends Network {
 		this.collectData = collectData;
 	}
 	
+	public boolean getCollectData(){
+		return this.collectData;
+	}
+	
 }

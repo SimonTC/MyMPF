@@ -7,6 +7,8 @@ It is inspired by the implementation by David Rawlinson and Gideon Kowadlo used 
 
 It makes use of an action node to give the network the ability to react to inputs. Mapping states to actions happens in the individual neocortical units in the network.
 
+It is used as part of the MPF-HyperNEAT program found in my repository
+
 #Main elements
 The neocortical units used in this implementation consists of a spatial pooler, a temporal pooler, a predictor and an action decider.
 

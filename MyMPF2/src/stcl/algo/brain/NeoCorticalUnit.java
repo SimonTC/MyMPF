@@ -14,7 +14,12 @@ import stcl.algo.util.Normalizer;
 import stcl.algo.util.Orthogonalizer;
 import dk.stcl.core.basic.containers.SomNode;
 import dk.stcl.core.utils.SomConstants;
-
+/**
+ * The neocortical unit is the main computational unit in the network.
+ * It consists of four sub elements: a spatial pooler, a temporal pooler, a predictor and a action decider.
+ * @author Simon
+ *
+ */
 public class NeoCorticalUnit implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private SpatialPooler spatialPooler;
@@ -76,7 +81,6 @@ public class NeoCorticalUnit implements Serializable{
 
 	/**
 	 * 
-	 * @param rand
 	 * @param ffInputLength
 	 * @param spatialMapSize
 	 * @param temporalMapSize
@@ -90,10 +94,27 @@ public class NeoCorticalUnit implements Serializable{
 		initialize(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning, null);
 	}
 	
+	/**
+	 * 
+	 * @param ffInputLength
+	 * @param spatialMapSize
+	 * @param temporalMapSize
+	 * @param markovOrder
+	 * @param numPossibleActions
+	 * @param usePrediction
+	 * @param reactionary
+	 * @param offlineLearning
+	 * @param rand
+	 */
 	public NeoCorticalUnit(int ffInputLength, int spatialMapSize, int temporalMapSize, int markovOrder, int numPossibleActions, boolean usePrediction, boolean reactionary, boolean offlineLearning, Random rand) {
 		initialize(ffInputLength, spatialMapSize, temporalMapSize, markovOrder, numPossibleActions, usePrediction, reactionary, offlineLearning, rand);
 	}
 	
+	/**
+	 * Create the Neocortical unit from the initialization string created by the toInitializationString() method.
+	 * All elements of the Unit are initialized with the values in the initialization string
+	 * @param initializationString
+	 */
 	public NeoCorticalUnit(String initializationString){
 		String[] lines = initializationString.split(SomConstants.LINE_SEPARATOR);
 		String[] unitInfo = lines[0].split(" ");
@@ -184,7 +205,7 @@ public class NeoCorticalUnit implements Serializable{
 	
 	/**
 	 * Resets all temporal knowledge of the elements in the unit.
-	 * the entropy threshold is not reset as it makes sense for the unit to retain nowledge about the prediction difficulty of the world.
+	 * the entropy threshold is not reset as it makes sense for the unit to retain knowledge about the prediction difficulty of the world.
 	 */
 	public void newEpisode(){
 		if (decider!= null) decider.newEpisode();
@@ -221,7 +242,7 @@ public class NeoCorticalUnit implements Serializable{
 	public SimpleMatrix feedForward(SimpleMatrix inputVector){
 		return this.feedForward(inputVector, 0,0);
 	}
-	
+
 	public SimpleMatrix feedForward(SimpleMatrix inputVector, double reward, int actionPerformed){
 		//Test input
 		if (!inputVector.isVector()) throw new IllegalArgumentException("The feed forward input to the neocortical unit has to be a vector");
@@ -273,12 +294,6 @@ public class NeoCorticalUnit implements Serializable{
 		return temporalProbabilityMatrixToSend;
 	}
 	
-	/**
-	 * 
-	 * @param inputMatrix
-	 * @param correlationMatrix
-	 * @return
-	 */
 	public SimpleMatrix feedBackward(SimpleMatrix inputMatrix){
 		//Test input
 		if (inputMatrix.numCols() != ffOutputMapSize || inputMatrix.numRows() != ffOutputMapSize) throw new IllegalArgumentException("The feed back input to the neocortical unit has to be a " + ffOutputMapSize + " x " + ffOutputMapSize + " matrix");
@@ -390,27 +405,6 @@ public class NeoCorticalUnit implements Serializable{
 	}
 	
 	
-	/**
-	 * Adds noise to the given matrix and returns the matrix.
-	 * The matrix is altered in this method.
-	 * @param m
-	 * @param noiseMagnitude
-	 * @return
-	 */
-	/*
-	private SimpleMatrix addNoise(SimpleMatrix m, double noiseMagnitude){
-		double noise = (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-		m = m.plus(noise);
-		for (int i = 0; i < m.getNumElements(); i++){
-			double d = m.get(i);
-			d = d + (rand.nextDouble() - 0.5) * 2 * noiseMagnitude;
-			if (d < 0) d = 0;
-			m.set(i, d);
-		}
-		return m;
-	}
-	*/
-	
 	public void resetActivity(){
 		needHelp = false;
 		active = false;
@@ -504,11 +498,6 @@ public class NeoCorticalUnit implements Serializable{
 		return maxID;
 	}
 	
-	/*
-	public Predictor getPredictor(){
-		return predictor;
-	}
-*/
 	public SOM getSOM() {
 		if (!noSpatial) return spatialPooler.getSOM();
 		return null;

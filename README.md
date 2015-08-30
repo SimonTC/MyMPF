@@ -25,4 +25,4 @@ Efficient Java Matrix Library version 0.26 (http://ejml.org/wiki/index.php?title
 
 Q_Learning (https://github.com/SimonTC/Q_learning)
 
-MySOM
+MySOM (https://github.com/SimonTC/MySOM)
